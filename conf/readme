@@ -1,0 +1,2 @@
+1. copy the sample file to your home directory and rename it same with your site name
+2. modify tool/config.py to change the config file name according to the name you set in step 1

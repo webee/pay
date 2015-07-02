@@ -1,0 +1,3 @@
+source bin/activate
+export PYTHONPATH=$PYTHONPATH:`pwd`/src
+python src/build.py $@

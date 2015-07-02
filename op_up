@@ -1,0 +1,4 @@
+source bin/activate
+export PYTHONPATH=$PYTHONPATH:`pwd`/src
+#uwsgi -s /tmp/uwsgi-op.sock -b 81920 --module op_site.op --chdir src --daemonize log/op-uwsgi.log --callable app -H `pwd` --chmod-socket=666
+nohup python src/op_site/op.py > log/op.log 2>&1 &

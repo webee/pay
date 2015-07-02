@@ -1,0 +1,2 @@
+source bin/activate
+nohup python src/worker.py $@ > log/worker.log 2>&1 & << EOF

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
-from op_site.domain import *
+from pay_op_site.domain import *
 import logging
 import datetime
 

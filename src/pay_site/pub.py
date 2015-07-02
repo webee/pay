@@ -7,6 +7,8 @@ import re
 from tool.filters import *
 from werkzeug.exceptions import NotFound
 
+from domain.entry import register_entry_module
+from domain.trade import register_trade_module
 
 log = logging.getLogger(__name__)
 
@@ -17,6 +19,8 @@ PROPAGATE_EXCEPTIONS = True
 app = Flask(__name__, template_folder='')
 app.config.from_object(__name__)
 
+register_entry_module(app)
+register_trade_module(app)
 
 register_filters(app)
 register_global_functions(app)

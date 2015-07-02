@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from entry import mod
+from trade import mod
 
-def register_entry_module(app):
+def register_trade_module(app):
     app.register_blueprint(mod)

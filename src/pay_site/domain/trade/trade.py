@@ -18,18 +18,24 @@ def pay_action():
     amount = float(data.get('amount', -1))
     if source_channel is None or source_order_id is None or source_order_name is None or amount <= 0:
         abort(httplib.BAD_REQUEST)
-    create_trade_record(source_channel, source_order_id, source_order_name, amount, payer, trade_type=1)
+    trades = from_db().list('select * from pay_trades')
+    trade_id = create_trade_record(source_channel, source_order_id, source_order_name, amount, payer, trade_type=1)
+    print(trade_id)
+
+    print(trades)
     return redirect(get_payment_agent_url())
 
+
+@transactional
 def create_trade_record(source_channel, source_order_id, source_order_name, amount, payer, trade_type):
-    from_db().insert('pay_trades',
-                     source_channel=source_channel,
-                     source_order_id=source_order_id,
-                     source_order_name=source_order_name,
-                     amount=amount,
-                     payer=payer,
-                     trade_type=trade_type
-    )
+    return from_db().insert('pay_trades', returns_id=True,
+                            source_channel=source_channel,
+                            source_order_id=source_order_id,
+                            source_order_name=source_order_name,
+                            amount=amount,
+                            payer=payer,
+                            trade_type=trade_type
+                            )
 
 
 

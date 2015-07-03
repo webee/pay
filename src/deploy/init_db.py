@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from fabric.api import local
-from tool.log import *
+from tools.log import *
 import config
 
 cfg = config.config()

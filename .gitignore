@@ -1,9 +1,6 @@
-bin/
-lib/
-include/
+*.py[co]
+
+venv/
 .idea/
-var/
 log/
 nohup.out
-*.pyc
-

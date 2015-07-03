@@ -1,3 +1,3 @@
-source bin/activate
+source venv/bin/activate
 export PYTHONPATH=$PYTHONPATH:`pwd`/src
-uwsgi -s /tmp/uwsgi-pub.sock -b 81920 --module pub_site.pub --chdir src --daemonize log/pub-uwsgi.log --callable app -H `pwd` --chmod-socket=666
+uwsgi -s /tmp/uwsgi-pub.sock -b 81920 --module pay_wsgi --chdir src --daemonize log/pub-uwsgi.log --callable app -H `pwd` --chmod-socket=666

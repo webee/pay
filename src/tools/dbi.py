@@ -5,8 +5,8 @@ from functools import wraps, partial
 from contextlib import contextmanager, closing
 
 import MySQLdb as mysql
-import config
-from tool.collection import *
+import file_config
+from tools.collection import *
 
 
 LOGGER = logging.getLogger(__name__)
@@ -282,7 +282,7 @@ instance = []
 
 def from_db():
     if len(instance) == 0:
-        cfg = config.config()
+        cfg = file_config.config()
         db = DatabaseInterface(objectify({
             'unix_socket': cfg.get('database', 'unix_socket'),
             'username': cfg.get('database', 'username'),

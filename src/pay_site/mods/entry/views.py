@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
-from pay_op_site.domain import *
+from flask import render_template
 import logging
-import datetime
+from . import entry_mod as mod
 
 log = logging.getLogger(__name__)
 
-mod = Blueprint('entry', __name__, template_folder='', static_folder='static')
 
-@mod.route('/entry')
-def show_entry_page(name=None):
+@mod.route('/')
+def show_entry_page():
     return render_template('entry.html')

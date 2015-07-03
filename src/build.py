@@ -16,7 +16,7 @@ def init_user():
 
 
 def migrate():
-    from tool.migrate import migrate
+    from tools.migrate import migrate
 
     migrate()
 

@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
-from pay_op_site.domain import *
-import logging, httplib
+
+import logging
+import httplib
+from os import abort
+from flask import request, redirect
+from tools.dbi import from_db
+from tools.dbi import transactional
+from . import trade_mod as mod
+
 
 log = logging.getLogger(__name__)
 
-mod = Blueprint('trade', __name__, template_folder='', static_folder='static')
 
-
-@mod.route('/trade/pay', methods=['POST'])
+@mod.route('/pay', methods=['POST'])
 def pay_action():
     data = request.form
     source_channel = data.get('source_channel', None)

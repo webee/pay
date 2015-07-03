@@ -1,6 +1,6 @@
 import config
 import fabric.api as fab
-from tool.log import warn
+from tools.log import warn
 
 cfg = config.config()
 fab.use_ssh_config = True

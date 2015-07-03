@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function, division
 import os
 import sys
-from tool.dbi import from_db
+from tools.dbi import from_db
 from log import *
 from fabric.api import local
 from config import config

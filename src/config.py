@@ -1,14 +1,65 @@
-import ConfigParser
-from os.path import expanduser, join
-import logging
+# coding=utf-8
+from __future__ import unicode_literals, print_function
+import os
 
-log = logging.getLogger(__name__)
+basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 
-def config():
-    home = expanduser("~")
-    config_file = join(home, '.pay-site')
+class Config:
+    """Base Common Configuration"""
+    # system
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'base key.'
+    PROPAGATE_EXCEPTIONS = True
 
-    cf = ConfigParser.ConfigParser()
-    cf.read(config_file)
-    return cf
+    @staticmethod
+    def init_app(app):
+        pass
+
+
+class DevelopmentConfig(Config):
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
+                              'sqlite:///' + os.path.join(basedir, 'data/data-dev.sqlite')
+    SQLALCHEMY_BINDS = {
+    }
+
+
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
+                              'sqlite:///' + os.path.join(basedir, 'data/data-dev.sqlite')
+    SQLALCHEMY_BINDS = {
+    }
+
+
+class BetaConfig(Config):
+    SQLALCHEMY_DATABASE_URI = os.environ.get('BETA_DATABASE_URL') or \
+                              'sqlite:///' + os.path.join(basedir, 'data/data-dev.sqlite')
+    SQLALCHEMY_BINDS = {
+    }
+
+
+class ProductionConfig(Config):
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+                              'sqlite:///' + os.path.join(basedir, 'data/data.sqlite')
+    SQLALCHEMY_BINDS = {
+    }
+
+
+PAY_CONFIG = {
+    'development': DevelopmentConfig,
+    'testing': TestingConfig,
+    'beta': BetaConfig,
+    'production': ProductionConfig,
+
+    'default': BetaConfig
+}
+
+OP_CONFIG = {
+    'development': DevelopmentConfig,
+    'testing': TestingConfig,
+    'beta': BetaConfig,
+    'production': ProductionConfig,
+
+    'default': BetaConfig
+}

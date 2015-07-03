@@ -22,13 +22,9 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 # 数据库相关
 #####################################
 @manager.command
-def prepare_db():
-    print("prepare db.")
-
-
-@manager.command
-def drop_db():
-    print("drop db.")
+def init_db():
+    from deploy import init_db
+    init_db()
 
 
 @manager.option('-u', '--user_id', dest="user_id", required=True)

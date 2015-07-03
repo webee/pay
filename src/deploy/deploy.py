@@ -1,8 +1,8 @@
-import config
+import file_config
 import fabric.api as fab
 from tools.log import warn
 
-cfg = config.config()
+cfg = file_config.config()
 fab.use_ssh_config = True
 fab.env.host_string = cfg.get('deploy', 'prod.host')
 

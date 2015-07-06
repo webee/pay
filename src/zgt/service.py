@@ -20,27 +20,12 @@ def format_string(text):
     return "" if not text else text.strip()
 
 
-def parse_http_response_body(status_code, response_body, hmac_encryption_order):
+def parse_data_from_yeepay(data, hmac_encryption_order):
     key_for_hmac = merchantInfo.keyValue
     key_for_aes = merchantInfo.keyValue[:16]
 
-    result = {}
-    if status_code != 200:
-        result['customError'] = "Request failed, response code = " + status_code
-        return result
-
-    json_map = json.loads(response_body)
-
-    if 'msg' in json_map:
-        result = json_map
-        return result
-
-    data_from_yeepay = format_string(json_map.get('data'))
+    data_from_yeepay = format_string(data)
     decrypt_data = aes_util.decrypt(data_from_yeepay, key_for_aes)
-
-    logger.info('decrypt_data: %s', decrypt_data)
-    with open('/tmp/decrypt_data.json', 'w') as fout:
-        fout.write(decrypt_data)
 
     result = json.loads(decrypt_data)
 
@@ -52,10 +37,24 @@ def parse_http_response_body(status_code, response_body, hmac_encryption_order):
     hmac_local = get_hmac(string_array, key_for_hmac)
 
     if hmac_local != hmac_yeepay:
-        customError = "hmac mismatch error."
-        result["customError"] = customError
+        result['customError'] = "hmac_mismatch error."
 
     return result
+
+
+def parse_http_response_body(status_code, response_body, hmac_encryption_order):
+    result = {}
+    if status_code != 200:
+        result['customError'] = "Request failed, response code = " + status_code
+        return result
+
+    json_map = json.loads(response_body)
+
+    if 'msg' in json_map:
+        result = json_map
+        return result
+
+    return parse_data_from_yeepay(json_map.get('data'), hmac_encryption_order)
 
 
 def payment_request(request_params):

@@ -3,7 +3,6 @@ from __future__ import unicode_literals, print_function, division
 
 from flask import Flask, render_template
 from config import PAY_CONFIG
-import mods
 from tools.filters import register_filters, register_global_functions
 
 
@@ -32,12 +31,22 @@ def init_errors(app):
         return render_template('500.html', error=e), 500
 
 
+def register_mods(app):
+    from pay_site.entry import entry_mod
+    from pay_site.trade import trade_mod
+    from pay_site.lvye import lvye_mod
+
+    app.register_blueprint(entry_mod)
+    app.register_blueprint(trade_mod, url_prefix='/trade')
+    app.register_blueprint(lvye_mod, url_prefix='/lvye')
+
+
 def create_app(config_name):
-    app = Flask(__name__, template_folder='')
+    app = Flask(__name__, template_folder='./templates')
     app.config.from_object(PAY_CONFIG[config_name])
     PAY_CONFIG[config_name].init_app(app)
 
-    mods.register_mods(app)
+    register_mods(app)
     init_template(app)
     init_errors(app)
 

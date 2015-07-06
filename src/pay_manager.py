@@ -24,14 +24,14 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 #####################################
 @manager.command
 def init_db():
-    from deploy import init_db
+    from ops.deploy import init_db
     init_db()
 
 
 @manager.command
 def update_env():
-    from deploy import update_env
-    update_env
+    from ops.deploy import update_env
+    update_env()
 
 
 @manager.option('-u', '--user_id', dest="user_id", required=True)

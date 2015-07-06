@@ -4,7 +4,7 @@ CREATE TABLE db_migration (
 
 insert into db_migration values(0);
 
-create table trade_types(
+create table zyt_trade_types(
   id int PRIMARY KEY ,
   name VARCHAR(30)
 ) ;
@@ -12,7 +12,8 @@ insert into trade_types values(1, '支付');
 insert into trade_types values(2, '提现');
 insert into trade_types values(3, '退款');
 
-CREATE TABLE pay_trade_records(
+
+CREATE TABLE trade_records(
   id int AUTO_INCREMENT PRIMARY KEY ,
   trade_type int NOT NULL ,
   trade_serial_no VARCHAR(50) NOT NULL ,
@@ -28,4 +29,11 @@ CREATE TABLE pay_trade_records(
   status VARCHAR(32) NOT NULL ,
   created_at TIMESTAMP DEFAULT current_timestamp,
   FOREIGN KEY pay_trades_type (trade_type) REFERENCES trade_types (id)
+);
+
+CREATE TABLE zyt_accounts(
+  id int AUTO_INCREMENT PRIMARY KEY ,
+  account VARCHAR(32) NOT NULL UNIQUE ,
+  password VARCHAR(64) NOT NULL ,
+  pay_password VARCHAR(64)
 );

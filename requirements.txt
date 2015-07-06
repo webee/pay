@@ -3,6 +3,7 @@ Fabric==1.10.2
 Flask==0.10.1
 Flask-Script==2.0.5
 gnureadline==6.3.3
+gunicorn==19.3.0
 ipython==3.2.0
 itsdangerous==0.24
 Jinja2==2.7.3

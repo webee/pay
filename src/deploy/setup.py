@@ -5,12 +5,7 @@ def update_env():
     install_dependencies()
 
 def install_dependencies():
-    pip_install('flask')
-    pip_install('requests')
-    pip_install('mysql-python')
-    pip_install('markupsafe')
-    pip_install('uwsgi')
-
+    pip_install('-r requirements.txt')
 
 
 def yum_install(package):

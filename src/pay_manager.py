@@ -28,6 +28,12 @@ def init_db():
     init_db()
 
 
+@manager.command
+def update_env():
+    from deploy import update_env
+    update_env
+
+
 @manager.option('-u', '--user_id', dest="user_id", required=True)
 @manager.option('-p', '--password', dest="password", required=True)
 def add_user(user_id, password):

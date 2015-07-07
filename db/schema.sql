@@ -4,10 +4,19 @@ CREATE TABLE db_migration (
 
 insert into db_migration values(0);
 
+-- 自游通客户端信息
+CREATE TABLE client_infos(
+  id int AUTO_INCREMENT PRIMARY KEY ,
+  name VARCHAR(32) ,
+  client_id VARCHAR(16) NOT NULL UNIQUE ,
+  key_value VARCHAR(64) NOT NULL ,
+  created_at TIMESTAMP DEFAULT current_timestamp
+);
 
+-- 支付记录
 CREATE TABLE payments(
   id int AUTO_INCREMENT PRIMARY KEY ,
-  order_source VARCHAR(32) NOT NULL ,
+  client_id VARCHAR(16) NOT NULL ,
   order_id VARCHAR(64) NOT NULL ,
 
   product_name VARCHAR(50) NOT NULL ,
@@ -29,6 +38,7 @@ CREATE TABLE payments(
 );
 
 
+-- 自游通账号
 CREATE TABLE accounts(
   id int AUTO_INCREMENT PRIMARY KEY ,
   account_id VARCHAR(64) NOT NULL UNIQUE ,

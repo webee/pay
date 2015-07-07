@@ -25,7 +25,13 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 @manager.command
 def init_db():
     from ops.deploy import init_db
+    from tools.dbi import from_db, require_transaction_context
+    from pay_site.entry import client_info
     init_db()
+
+    with require_transaction_context():
+        db = from_db()
+        db.insert('client_infos', name='TEST', client_id=client_info.client_id, key_value=client_info.key_value)
 
 
 @manager.command

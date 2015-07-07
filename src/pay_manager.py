@@ -29,9 +29,11 @@ def init_db():
     from pay_site.entry import client_info
     init_db()
 
+    # 准备测试数据
     with require_transaction_context():
         db = from_db()
         db.insert('client_info', name='TEST', client_id=client_info.client_id, key_value=client_info.key_value)
+        db.insert('account', id=client_info.to_account_id, user_source='lvye', user_id='webee')
 
 
 @manager.command

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-import logging
 from datetime import datetime
 from flask import request, redirect, url_for, jsonify
-from tools.dbi import from_db
+from tools.dbi import from_db, require_transaction_context
 from tools.dbi import transactional
 from tools.mylog import get_logger
 from . import trade_mod as mod
 import zgt.service as zgt
-
+from .utils import format_string
+from service import get_or_create_account, gen_transaction_id
 
 logger = get_logger(__name__)
 
@@ -24,29 +24,33 @@ def pay():
     if request.method == 'POST':
         data = request.form
 
-    source_channel = zgt.format_string('source_channel')
-    source_order_id = zgt.format_string('source_order_id')
-    source_user_id = zgt.format_string(data.get('source_user_id'))
-    source_account = zgt.format_string(data.get('source_account'))
-    amount = float(zgt.format_string(data.get('amount', '0')))
-    to_account = zgt.format_string(data.get('to_account'))
-    product_name = zgt.format_string(data.get('product_name'))
-    product_cat = zgt.format_string(data.get('product_cat'))
-    product_desc = zgt.format_string(data.get('product_desc'))
-    trade_type = 1
-    trade_serial_no = "ZGTPAY" + datetime.now().strftime("%y%m%d_%H%M%S%f")
-    status = "INIT"
+    client_id = format_string(data.get('client_id'))
+    order_id = format_string(data.get('order_id'))
+
+    product_name = format_string(data.get('product_name'))
+    product_category = format_string(data.get('product_category'))
+    product_desc = format_string(data.get('product_desc'))
+
+    user_source = format_string(data.get('user_source'))
+    user_id = format_string(data.get('user_id'))
+
+    to_account_id = format_string(data.get('to_account_id'))
+    amount = float(format_string(data.get('amount', '0')))
 
     # TODO: check parameters.
     # requires, account exists.
+    #
 
-    record = {'source_channel': source_channel, 'source_order_id': source_order_id,
-              'source_user_id': source_user_id, 'source_account': source_account,
-              'amount': amount, 'to_account': to_account,
-              'trade_type': trade_type, 'trade_serial_no': trade_serial_no, 'status': status,
-              'product_name': product_name, 'product_cat': product_cat, 'product_desc': product_desc}
-    trade_id = create_trade_record(record)
-    trade_record = from_db().get('select * from trade_records where id=%(id)s', id=trade_id)
+    # 新建普通用户
+    account = get_or_create_account(user_source, user_id)
+    payment_id = gen_transaction_id(account['id'])
+
+    payment_fields = {'client_id': client_id, 'order_id': order_id,
+                      'product_name': product_name, 'product_category': product_category, 'product_desc': product_desc,
+                      'id': payment_id,
+                      'account_id': account['id'], 'to_account_id': to_account_id, 'amount': amount}
+    create_payment(payment_fields)
+    payment = from_db().get('select * from payment where id=%(id)s', id=payment_id)
 
     # TODO: 配置此地址
     host_url = request.host_url.strip('/')
@@ -54,12 +58,12 @@ def pay():
     pay_web_callback_url = host_url + url_for('trade.pay_web_callback')
 
     request_params = {
-        'requestid': trade_record['trade_serial_no'],
-        'amount': str(trade_record['amount']),
+        'requestid': payment['id'],
+        'amount': str(payment['amount']),
         'assure': '0',
-        'productname': trade_record['product_name'],
-        'productcat': trade_record['product_cat'],
-        'productdesc': trade_record['product_desc'],
+        'productname': payment['product_name'],
+        'productcat': payment['product_category'],
+        'productdesc': payment['product_desc'],
         'divideinfo': '',
         'callbackurl': pay_callback_url,
         'webcallbackurl': pay_web_callback_url,
@@ -67,7 +71,7 @@ def pay():
         'period': '',
         'memo': '',
         'payproducttype': 'ONEKEY',
-        'userno': gen_userno(trade_record['source_account'], trade_record['source_user_id']),
+        'userno': payment['account_id'],
         'ip': '',
         'cardname': '',
         'idcard': '',
@@ -97,15 +101,9 @@ def pay():
     return redirect(url_for("main.pay_web_callback", param=1))
 
 
-def gen_userno(source_account, from_user):
-    import hashlib
-    md = hashlib.md5(source_account+from_user)
-    return md.hexdigest()[:30]
-
-
 @transactional
-def create_trade_record(record):
-    return from_db().insert('pay_trade_records', returns_id=True, **record)
+def create_payment(fields):
+    return from_db().insert('payment', **fields)
 
 
 @mod.route('/pay_callback/', methods=['GET', 'POST'])
@@ -122,20 +120,20 @@ def pay_callback():
                              'cardno', 'bankcode']
     result = zgt.parse_data_from_yeepay(data, hmac_encryption_order)
 
+    # TODO: check result, notifytype==SERVER, amount.
+    #
+
     code = result['code']
     logger.info(str(result))
     if code == "1":
         # success
-        trade_serial_no = result['requestid']
-        trade_record = from_db().get("select * from trade_records where trade_serial_no=%(trade_serial_no)s",
-                                     trade_serial_no=trade_serial_no)
-        if trade_record:
-            trade_record = {k: v for k, v in trade_record.items() if k != 'id'}
-            trade_record['status'] = "SUCCESS"
-
-            trade_id = create_trade_record(trade_record)
-        return "SUCCESS"
-    return ""
+        payment_id = result['requestid']
+        payment = from_db().get("select * from payment where id=%(id)s", id=payment_id)
+        if payment is not None:
+            with require_transaction_context():
+                from_db().execute('update payment set sucess=1, yeepay_transaction_id=%(externalid)s, transaction_ended_on=current_timestamp() where id=%(id)s',
+                                  externalid=result['externalid'], id=payment['id'])
+    return "SUCCESS"
 
 
 @mod.route('/pay_web_callback/', methods=['GET', 'POST'])

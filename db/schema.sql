@@ -14,13 +14,12 @@ CREATE TABLE client_info(
 
 
 CREATE TABLE payment(
-  id int AUTO_INCREMENT PRIMARY KEY ,
+  id CHAR(27) PRIMARY KEY ,
   client_id VARCHAR(16) NOT NULL ,
   order_id VARCHAR(64) NOT NULL ,
   product_name VARCHAR(50) NOT NULL ,
   product_category VARCHAR(50) NOT NULL ,
   product_desc VARCHAR(50) NOT NULL ,
-  transaction_id VARCHAR(64) NOT NULL ,
   account_id VARCHAR(64) NOT NULL ,
   to_account_id VARCHAR(64) NOT NULL ,
   amount DECIMAL(12, 2) NOT NULL ,
@@ -33,10 +32,8 @@ CREATE TABLE payment(
 
 CREATE TABLE account(
   id int AUTO_INCREMENT PRIMARY KEY ,
-  account_id VARCHAR(64) NOT NULL UNIQUE ,
   user_source VARCHAR(16),
-  user_id VARCHAR(32),
-  activated BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否激活'
+  user_id VARCHAR(32)
 );
 
 

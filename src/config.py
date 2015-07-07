@@ -11,6 +11,8 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'base key.'
     PROPAGATE_EXCEPTIONS = True
 
+    SERVER_NAME = '127.0.0.1:2222'
+
     @staticmethod
     def init_app(app):
         pass
@@ -37,6 +39,8 @@ class BetaConfig(Config):
                               'sqlite:///' + os.path.join(basedir, 'data/data-dev.sqlite')
     SQLALCHEMY_BINDS = {
     }
+
+    SERVER_NAME = 'newpay.lvye.info'
 
 
 class ProductionConfig(Config):

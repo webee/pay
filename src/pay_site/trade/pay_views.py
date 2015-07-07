@@ -56,6 +56,7 @@ def pay():
     host_url = request.host_url.strip('/')
     pay_callback_url = host_url + url_for('trade.pay_callback')
     pay_web_callback_url = host_url + url_for('trade.pay_web_callback')
+    logger.info("host_url: %s", host_url)
 
     request_params = {
         'requestid': payment['id'],

@@ -130,7 +130,7 @@ def pay_callback():
         payment = from_db().get("select * from payment where id=%(id)s", id=payment_id)
         if payment is not None:
             with require_transaction_context():
-                from_db().execute('update payment set sucess=1, yeepay_transaction_id=%(externalid)s, transaction_ended_on=current_timestamp() where id=%(id)s',
+                from_db().execute('update payment set success=1, yeepay_transaction_id=%(externalid)s, transaction_ended_on=current_timestamp() where id=%(id)s',
                                   externalid=result['externalid'], id=payment['id'])
     return "SUCCESS"
 
@@ -140,7 +140,7 @@ def pay_web_callback():
     """付款前台回调
     :return:
     """
-    data = request.args.get('data')
+    data = request.args
     if request.method == 'POST':
         data = request.args.form
     data = data.get('data')

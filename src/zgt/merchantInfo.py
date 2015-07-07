@@ -15,10 +15,10 @@ updateAccountURL="https://o2o.yeepay.com/zgt-api/api/modifyRequest"
 queryUpdateURL="https://o2o.yeepay.com/zgt-api/api/queryModifyRequest"
 #
 #交易请求地址
-requestURL="https://o2o.yeepay.com/zgt-api/api/pay"
+pay_url="https://o2o.yeepay.com/zgt-api/api/pay"
 #
 #订单查询请求地址
-queryURL="https://o2o.yeepay.com/zgt-api/api/queryOrder"
+query_order_url="https://o2o.yeepay.com/zgt-api/api/queryOrder"
 #
 #非交易转账请求地址
 transferURL="https://o2o.yeepay.com/zgt-api/api/transfer"

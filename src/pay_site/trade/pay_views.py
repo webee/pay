@@ -115,9 +115,9 @@ def pay_callback():
         data = request.args.form
     data = data.get('data')
 
-    hmac_encryption_order = ['customernumber', 'requestid', 'code', 'notifytype', 'externalid', 'amount',
-                             'cardno', 'bankcode']
-    result = zgt.parse_data_from_yeepay(data, hmac_encryption_order)
+    hmac_sign_order = ['customernumber', 'requestid', 'code', 'notifytype', 'externalid', 'amount',
+                       'cardno', 'bankcode']
+    result = zgt.parse_data_from_yeepay(data, hmac_sign_order)
 
     # TODO: check result, notifytype==SERVER, amount.
     #
@@ -152,3 +152,24 @@ def pay_web_callback():
         result = zgt.parse_data_from_yeepay(data, hmac_encryption_order)
 
     return jsonify(result)
+
+
+@mod.route('/query_pay/', methods=['GET', 'POST'])
+def user_pay():
+    """支付查询接口
+    :return:
+    """
+    # TODO: 加密接口数据
+    data = request.args
+    if request.method == 'POST':
+        data = request.form
+
+    payment_id = format_string(data.get('payment_id'))
+
+    request_params = {
+        'requestid': payment_id
+    }
+
+    request_result = zgt.payment_query(request_params)
+
+    return jsonify(request_result)

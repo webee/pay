@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 @mod.route('/<int:account_id>/bankcards')
 def list_bankcards(account_id):
     bankcards = bankcard.list_all(account_id)
-    return render_template('bankcard_management.html')
+    return render_template('bankcard_management.html', bankcards=bankcards)
 
 @mod.route('/<int:account_id>/withdraw')
 def withdraw(account_id):

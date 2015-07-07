@@ -4,7 +4,7 @@ CREATE TABLE db_migration (
 
 insert into db_migration values(0);
 
-create table zyt_trade_types(
+create table trade_types(
   id int PRIMARY KEY ,
   name VARCHAR(30)
 ) ;

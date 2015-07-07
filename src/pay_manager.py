@@ -31,7 +31,7 @@ def init_db():
 
     with require_transaction_context():
         db = from_db()
-        db.insert('client_infos', name='TEST', client_id=client_info.client_id, key_value=client_info.key_value)
+        db.insert('client_info', name='TEST', client_id=client_info.client_id, key_value=client_info.key_value)
 
 
 @manager.command

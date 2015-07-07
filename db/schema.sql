@@ -27,7 +27,7 @@ CREATE TABLE payment(
   created_on TIMESTAMP DEFAULT current_timestamp,
   success SMALLINT , -- 0/1, FAIL/SUCCESS
   yeepay_transaction_id VARCHAR(64),
-  transaction_ended_on TIMESTAMP DEFAULT current_timestamp
+  transaction_ended_on TIMESTAMP
 );
 
 

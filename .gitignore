@@ -1,5 +1,6 @@
 *.py[co]
 
+env.local.sh
 venv/
 .idea/
 log/

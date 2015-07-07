@@ -37,7 +37,6 @@ CREATE TABLE payment(
   end_at TIMESTAMP DEFAULT current_timestamp
 );
 
-
 -- 自游通账号
 CREATE TABLE account(
   id int AUTO_INCREMENT PRIMARY KEY ,
@@ -45,4 +44,17 @@ CREATE TABLE account(
   user_source VARCHAR(16),
   user_id VARCHAR(32),
   activated BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否激活'
+);
+
+CREATE TABLE virtual_account_bank_card(
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  account_id INT NOT NULL,
+  card_no VARCHAR(21) NOT NULL,
+  bank_name VARCHAR(50) NOT NULL,
+  bank_account_name VARCHAR(20) NOT NULL,
+  bank_account_type VARCHAR(11) NOT NULL,
+  reserved_phone VARCHAR(11) NOT NULL,
+  province VARCHAR(10) NOT NULL,
+  city VARCHAR(20) NOT NULL,
+  FOREIGN KEY zyt_account_id (zyt_account_id) REFERENCES account(id)
 );

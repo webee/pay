@@ -35,10 +35,12 @@ def register_mods(app):
     from pay_site.entry import entry_mod
     from pay_site.trade import trade_mod
     from pay_site.lvye import lvye_mod
+    from pay_site.account import account_mod
 
     app.register_blueprint(entry_mod)
     app.register_blueprint(trade_mod, url_prefix='/trade')
     app.register_blueprint(lvye_mod, url_prefix='/lvye')
+    app.register_blueprint(account_mod, url_prefix='/account')
 
 
 def create_app(config_name):

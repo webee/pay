@@ -5,7 +5,7 @@ CREATE TABLE db_migration (
 insert into db_migration values(0);
 
 -- 自游通客户端信息
-CREATE TABLE client_infos(
+CREATE TABLE client_info(
   id int AUTO_INCREMENT PRIMARY KEY ,
   name VARCHAR(32) ,
   client_id VARCHAR(16) NOT NULL UNIQUE ,
@@ -14,7 +14,7 @@ CREATE TABLE client_infos(
 );
 
 -- 支付记录
-CREATE TABLE payments(
+CREATE TABLE payment(
   id int AUTO_INCREMENT PRIMARY KEY ,
   client_id VARCHAR(16) NOT NULL ,
   order_id VARCHAR(64) NOT NULL ,
@@ -39,12 +39,10 @@ CREATE TABLE payments(
 
 
 -- 自游通账号
-CREATE TABLE accounts(
+CREATE TABLE account(
   id int AUTO_INCREMENT PRIMARY KEY ,
   account_id VARCHAR(64) NOT NULL UNIQUE ,
-  password VARCHAR(64),
-  pay_password VARCHAR(64),
-  user_source VARCHAR(32),
-  user_id VARCHAR(64),
+  user_source VARCHAR(16),
+  user_id VARCHAR(32),
   activated BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否激活'
 );

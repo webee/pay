@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% block title %}提现{% endblock %}
+
+{% block css %}
+    <style type="text/css">
+    </style>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+<h1>提现到银行卡</h1>
+<form action="" method="post" class="form-horizontal">
+    <div class="form-group">
+        <label for="source-channel" class="col-sm-2 control-label">Source channel</label>
+        <div class="col-sm-10">
+            <input class="form-control" id="source-channel" name="source_channel" placeholder="Source Channel Name" value="huodong.lvye.com">
+        </div>
+    </div>
+ <button class="btn btn-success btn-lg " type="submit">提现</button>
+</form>
+{% endblock %}

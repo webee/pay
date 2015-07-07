@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-from datetime import datetime
-from flask import request, redirect, url_for, jsonify
+from flask import request, redirect, url_for, jsonify, current_app
 from tools.dbi import from_db, require_transaction_context
 from tools.dbi import transactional
 from tools.mylog import get_logger
@@ -52,8 +51,9 @@ def pay():
     create_payment(payment_fields)
     payment = from_db().get('select * from payment where id=%(id)s', id=payment_id)
 
-    pay_callback_url = url_for('trade.pay_callback', _external=True)
-    pay_web_callback_url = url_for('trade.pay_web_callback', _external=True)
+    host_url = current_app.config.get('HOST_URL', 'http://localhost')
+    pay_callback_url = host_url + url_for('trade.pay_callback')
+    pay_web_callback_url = host_url + url_for('trade.pay_web_callback')
     logger.info("pay_callback_url: %s", pay_callback_url)
 
     request_params = {

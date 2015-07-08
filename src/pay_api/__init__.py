@@ -6,9 +6,11 @@ from config import PAY_API_CONFIG
 
 
 def register_mods(app):
-    from pay_site.account import account_mod
+    from pay_api.account import account_mod
+    from pay_api.trade import trade_mod
 
     app.register_blueprint(account_mod, url_prefix='/account')
+    app.register_blueprint(account_mod, url_prefix='/trade')
 
 
 def create_app(config_name):

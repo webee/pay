@@ -19,7 +19,7 @@ def add_bankcard(account_id):
 
 @mod.route('/<int:account_id>/bankcards/new')
 def register_bankcard_info(account_id):
-    return render_template('new_bankcard.html')
+    return render_template('new_bankcard.html', account_id=account_id)
 
 @mod.route('/<int:account_id>/withdraw')
 def withdraw(account_id):

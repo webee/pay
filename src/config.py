@@ -18,34 +18,19 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'data/data-dev.sqlite')
-    SQLALCHEMY_BINDS = {
-    }
 
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'data/data-dev.sqlite')
-    SQLALCHEMY_BINDS = {
-    }
 
 
 class BetaConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get('BETA_DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'data/data-dev.sqlite')
-    SQLALCHEMY_BINDS = {
-    }
-
     HOST_URL = 'http://newpay.lvye.info'
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'data/data.sqlite')
-    SQLALCHEMY_BINDS = {
-    }
+    DEBUG = False
+    TESTING = False
 
 
 PAY_CONFIG = {
@@ -57,7 +42,7 @@ PAY_CONFIG = {
     'default': BetaConfig
 }
 
-OP_CONFIG = {
+PAY_API_CONFIG = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'beta': BetaConfig,

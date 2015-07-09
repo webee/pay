@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
-import logging
 from datetime import datetime
 
 from flask import request, render_template, redirect, url_for, jsonify, current_app
 from . import entry_mod as mod
 from pay_site import test_client_info
 from tools.utils import format_string
+from tools.mylog import get_logger
 import requests
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 @mod.route('/')

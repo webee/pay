@@ -166,9 +166,10 @@ def pay_callback():
     # TODO: 设计更可靠的方式
     req = requests.post(client_callback, ret)
     if req.status_code != 200 and not req.content.startswith('SUCCESS'):
-        logger.info("client callback success.")
         # try more.
         pass
+    else:
+        logger.info("client callback success.")
 
     return "SUCCESS"
 

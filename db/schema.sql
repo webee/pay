@@ -22,9 +22,10 @@ CREATE TABLE payment(
   account_id int ,
   to_account_id int NOT NULL ,
   amount DECIMAL(12, 2) NOT NULL ,
-  created_on TIMESTAMP DEFAULT current_timestamp,
+  created_on TIMESTAMP DEFAULT current_timestamp ,
   success SMALLINT , -- 0/1, FAIL/SUCCESS
-  yeepay_transaction_id VARCHAR(64),
+  actual_amount DECIMAL(12, 2) ,
+  yeepay_transaction_id VARCHAR(64) ,
   transaction_ended_on TIMESTAMP
 );
 

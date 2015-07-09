@@ -3,8 +3,7 @@ from __future__ import print_function, unicode_literals
 import json
 
 import requests
-
-import digest
+from encrypt_utils import digest
 import merchantInfo
 import aes_util
 from tools.mylog import get_logger

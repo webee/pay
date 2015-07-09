@@ -59,10 +59,9 @@ def decrypt(data, key):
 
     data = data.decode('hex')
     cipher = AES.new(key, AES.MODE_ECB)
-    result = cipher.decrypt(data)
-    data = result.decode('utf8')
+    result = __depkcs7_padding(cipher.decrypt(data), 16)
 
-    return __depkcs7_padding(data, 16)
+    return result.decode('utf8')
 
 
 if __name__ == '__main__':

@@ -7,9 +7,9 @@ from contextlib import contextmanager, closing
 import MySQLdb as mysql
 import file_config
 from tools.collection import *
+from mylog import get_logger
 
-
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(__name__)
 
 
 def transactional(func):
@@ -23,7 +23,7 @@ def transactional(func):
 
 @contextmanager
 def require_transaction_context():
-    db=from_db()
+    db = from_db()
     if db.autocommit is False:
         yield
     else:
@@ -136,7 +136,6 @@ class DatabaseInterface:
             })
         return [row[0] for row in rows]
 
-
     def get(self, sql, **kwargs):
         rows = self._query(sql, **kwargs)
         if not rows:
@@ -245,7 +244,7 @@ class DatabaseInterface:
                 })
                 raise
 
-            def get_column_name( i):
+            def get_column_name(i):
                 return cursor.description[i][0].lower()
 
             def to_dict_object(row):

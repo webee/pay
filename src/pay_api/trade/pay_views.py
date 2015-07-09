@@ -83,7 +83,7 @@ def pay():
         'period': '',
         'memo': '',
         'payproducttype': 'ONEKEY',
-        'userno': payment['account_id'],
+        'userno': user_source + str(payment['account_id']),
         'ip': '',
         'cardname': '',
         'idcard': '',

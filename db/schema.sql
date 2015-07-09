@@ -7,8 +7,7 @@ insert into db_migration values(0);
 CREATE TABLE client_info(
   id int AUTO_INCREMENT PRIMARY KEY ,
   name VARCHAR(32) ,
-  client_id VARCHAR(16) NOT NULL UNIQUE ,
-  key_value VARCHAR(64) NOT NULL ,
+  client_id CHAR(16) NOT NULL UNIQUE ,
   created_at TIMESTAMP DEFAULT current_timestamp
 );
 
@@ -20,8 +19,8 @@ CREATE TABLE payment(
   product_name VARCHAR(50) NOT NULL ,
   product_category VARCHAR(50) NOT NULL ,
   product_desc VARCHAR(50) NOT NULL ,
-  account_id VARCHAR(64) NOT NULL ,
-  to_account_id VARCHAR(64) NOT NULL ,
+  account_id int ,
+  to_account_id int NOT NULL ,
   amount DECIMAL(12, 2) NOT NULL ,
   created_on TIMESTAMP DEFAULT current_timestamp,
   success SMALLINT , -- 0/1, FAIL/SUCCESS

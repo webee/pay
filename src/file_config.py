@@ -1,13 +1,13 @@
+import os
 import ConfigParser
-from os.path import expanduser, join
 import logging
+from config import basedir
 
 log = logging.getLogger(__name__)
 
 
 def config():
-    home = expanduser("~")
-    config_file = join(home, '.pay-site')
+    config_file = os.path.join(basedir, 'conf/site.config')
 
     cf = ConfigParser.ConfigParser()
     cf.read(config_file)

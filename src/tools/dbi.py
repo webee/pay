@@ -44,6 +44,7 @@ def require_transaction_context():
 class DatabaseInterface:
     def __init__(self, options):
         self.options = options
+        self.conn = None
 
     @property
     def autocommit(self):
@@ -101,7 +102,8 @@ class DatabaseInterface:
 
     def connect(self):
         self.conn = mysql.connect(
-            unix_socket=self.options.unix_socket,
+            host=self.options.host,
+            port=self.options.port,
             user=self.options.username,
             passwd=self.options.password,
             db=self.options.database,
@@ -283,7 +285,8 @@ def from_db():
     if len(instance) == 0:
         cfg = file_config.config()
         db = DatabaseInterface(objectify({
-            'unix_socket': cfg.get('database', 'unix_socket'),
+            'host': cfg.get('database', 'host'),
+            'port': int(cfg.get('database', 'port')) if cfg.get('database', 'port') else None,
             'username': cfg.get('database', 'username'),
             'password': cfg.get('database', 'password'),
             'database': cfg.get('database', 'instance')

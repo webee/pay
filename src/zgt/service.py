@@ -2,9 +2,14 @@
 from __future__ import print_function, unicode_literals
 import json
 
+import os
 import requests
 from encrypt_utils import digest
-import merchantInfo
+if os.getenv('SYSTEM_CONFIG', 'development') == 'production':
+    import merchantInfo as merchantInfo
+else:
+    import merchantInfo_test as merchantInfo
+
 import aes_util
 from tools.mylog import get_logger
 

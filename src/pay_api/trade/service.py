@@ -16,17 +16,20 @@ def gen_transaction_id(user_db_id):
 
 
 def get_or_create_account(user_source, user_id):
-    from tools.dbi import from_db, require_transaction_context
+    if user_source and user_id:
+        from tools.dbi import from_db, require_transaction_context
 
-    db = from_db()
+        db = from_db()
 
-    account = db.get("select * from account where user_source=%(user_source)s and user_id=%(user_id)s",
-                     user_source=user_source, user_id=user_id)
+        account = db.get("select * from account where user_source=%(user_source)s and user_id=%(user_id)s",
+                         user_source=user_source, user_id=user_id)
 
-    if account is None:
-        with require_transaction_context():
-            db_id = db.insert('account', user_source=user_source, user_id=user_id)
+        if account is None:
+            with require_transaction_context():
+                db_id = db.insert('account', user_source=user_source, user_id=user_id)
 
-        account = db.get("select * from account where id=%(id)s", id=db_id)
+            account = db.get("select * from account where id=%(id)s", id=db_id)
 
-    return account
+        return account
+    # 匿名用户
+    return {"id": 0}

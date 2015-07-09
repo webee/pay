@@ -12,6 +12,7 @@ class Config:
     PROPAGATE_EXCEPTIONS = True
 
     CONF_DIR = os.path.join(basedir, 'conf')
+    HOST_URL = 'http://localhost'
 
     @staticmethod
     def init_app(app):

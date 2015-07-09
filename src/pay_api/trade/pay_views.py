@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
+import urllib
 from flask import request, redirect, url_for, jsonify, current_app
 from tools.dbi import from_db, require_transaction_context
 from tools.dbi import transactional
 from tools.mylog import get_logger
 from . import trade_mod as mod
 import zgt.service as zgt
-from .utils import format_string
+from .utils import format_string, to_int, to_float
 from service import get_or_create_account, gen_transaction_id
+from constants import data_encrypt_key
+from encrypt_utils import aes
+import requests
 
 logger = get_logger(__name__)
 
@@ -18,7 +22,6 @@ def pay():
     """支付接口
     :return:
     """
-    # TODO: 加密接口数据
     data = request.args
     if request.method == 'POST':
         data = request.form
@@ -34,11 +37,20 @@ def pay():
     user_id = format_string(data.get('user_id'))
 
     to_account_id = format_string(data.get('to_account_id'))
-    amount = float(format_string(data.get('amount', '0')))
+    amount = to_float(format_string(data.get('amount')))
 
-    # TODO: check parameters.
-    # requires, account exists.
-    #
+    callback = format_string(data.get('callback'))
+    web_callback = to_float(format_string(data.get('web_callback')))
+
+    # check parameters.
+    client_info = from_db().get("select * from client_info where client_id=%(client_id)s", client_id=client_id)
+    if client_info is None:
+        return jsonify(ret=False, code=600, msg="客户不存在: %s" % client_id)
+    account = from_db().get("select * from account where id=%(id)s", id=to_int(to_account_id))
+    if not account:
+        return jsonify(ret=False, code=601, msg="账号不存在: %s" % to_account_id)
+    if amount <= 0:
+        return jsonify(ret=False, code=602, msg="金额错误")
 
     # 新建普通用户
     account = get_or_create_account(user_source, user_id)
@@ -51,10 +63,17 @@ def pay():
     create_payment(payment_fields)
     payment = from_db().get('select * from payment where id=%(id)s', id=payment_id)
 
-    host_url = current_app.config.get('HOST_URL', 'http://localhost')
-    pay_callback_url = host_url + url_for('trade.pay_callback')
-    pay_web_callback_url = host_url + url_for('trade.pay_web_callback')
+    req_data = {
+        'client_id': client_id,
+        'client_callback': callback,
+        'payment_id': payment['id']
+    }
+    encrypt_req_data = aes.encrypt_data(req_data, data_encrypt_key)
+    host_url = current_app.config.get('HOST_URL')
+    pay_callback_url = host_url + url_for('trade.pay_callback') + '?' + urllib.urlencode({'req_data': encrypt_req_data})
+    pay_web_callback_url = web_callback
     logger.info("pay_callback_url: %s", pay_callback_url)
+    logger.info("pay_web_callback_url: %s", pay_web_callback_url)
 
     request_params = {
         'requestid': payment['id'],
@@ -76,6 +95,7 @@ def pay():
         'idcard': '',
         'bankcardnum': ''
     }
+    # FIXME: 目前只使用ONEKEY方式支付
 
     request_result = zgt.payment_request(request_params)
 
@@ -86,18 +106,15 @@ def pay():
 
     # TODO: 跳转到错误页面
     if custom_error != "":
-        return jsonify(customError=custom_error)
+        logger.error(custom_error)
+        return jsonify(ret=False, code=1000, msg="系统错误")
     elif code != "1":
-        return jsonify(code=code, msg=msg)
+        logger.error("yeepay error: %s, %s" % (code, msg))
+        return jsonify(ret=False, code=1000, msg="系统错误")
 
-    # 成功
     if payurl != "":
-        return redirect(payurl)
-
-    # 无卡直连成功
-    # 跳转到支付成功页面
-    # TODO: 添加相应参数
-    return redirect(url_for("main.pay_web_callback", param=1))
+        return jsonify(ret=True, payurl=payurl)
+    return jsonify(ret=False, code=1000, msg="系统错误")
 
 
 @transactional
@@ -110,6 +127,8 @@ def pay_callback():
     """付款后台回调
     :return:
     """
+    encrypt_req_data = format_string(request.args.get('req_data'))
+
     data = request.args
     if request.method == 'POST':
         data = request.args.form
@@ -119,43 +138,49 @@ def pay_callback():
                        'cardno', 'bankcode']
     result = zgt.parse_data_from_yeepay(data, hmac_sign_order)
 
-    # TODO: check result, notifytype==SERVER, amount.
-    #
+    logger.info("callback result: %s" % str(result))
+    try:
+        req_data = aes.decrypt_data(encrypt_req_data, data_encrypt_key)
+    except ValueError as e:
+        return "SUCCESS"
 
+    client_id = req_data['client_id']
+    client_callback = req_data['client_callback']
     code = result['code']
-    logger.info(str(result))
-    if code == "1":
+    ret = None
+    if code != "1":
+        # 失败
+        msg = result.get('msg', '')
+        logger.info("支付失败, %s" % msg)
+        payment_id = req_data['payment_id']
+        ret = {'ret': False, 'client_id': client_id, 'payment_id': payment_id, 'msg': msg}
+    else:
         # success
+        notifytype = result['notifytype']
+        if notifytype != "SERVER":
+            logger.warn("need notifytype SERVER, get %s" % notifytype)
+        actual_amount = float(result['amount'])
+
         payment_id = result['requestid']
         payment = from_db().get("select * from payment where id=%(id)s", id=payment_id)
         if payment is not None:
             with require_transaction_context():
                 from_db().execute('update payment set success=1, yeepay_transaction_id=%(externalid)s, transaction_ended_on=current_timestamp() where id=%(id)s',
-                                  externalid=result['externalid'], id=payment['id'])
+                                  externalid=result['externalid'], actual_amount=actual_amount, id=payment['id'])
+            ret = {'ret': True, 'client_id': client_id, 'order_id': payment['order_id'],
+                   'payment_id': payment_id, 'amount': actual_amount}
+    # call client.
+    # TODO: 设计更可靠的方式
+    req = requests.post(client_callback, ret)
+    if req.status_code != 200 and not req.content.startswith('SUCCESS'):
+        # try more.
+        pass
+
     return "SUCCESS"
 
 
-@mod.route('/pay_web_callback/', methods=['GET', 'POST'])
-def pay_web_callback():
-    """付款前台回调
-    :return:
-    """
-    data = request.args
-    if request.method == 'POST':
-        data = request.args.form
-    data = data.get('data')
-
-    result = {}
-    if data:
-        hmac_encryption_order = ['customernumber', 'requestid', 'code', 'notifytype', 'externalid', 'amount',
-                                 'cardno', 'bankcode']
-        result = zgt.parse_data_from_yeepay(data, hmac_encryption_order)
-
-    return jsonify(result)
-
-
 @mod.route('/query_pay/', methods=['GET', 'POST'])
-def user_pay():
+def query_pay():
     """支付查询接口
     :return:
     """

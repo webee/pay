@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals
 from Crypto.Cipher import AES
 
-def data_padding(data, size=16):
+def __pkcs7_padding(data, size=16):
     """补足被解密串到单位长度的位数
     :param data: 被加密串
     :param size: 单位长度
@@ -12,17 +12,23 @@ def data_padding(data, size=16):
     return data + chr(length) * length
 
 
-def data_stripping(data, size=16):
+def __depkcs7_padding(data, size=16):
     """移除解密出的字符串的padding
     :param data: 解密出的字符串
     :param size: 单位长度
     :return:
     """
-    length = ord(data[-1])
-    if data[-length:] == data[-1] * length:
-        # check是否为paddding
-        return data[:-length]
-    return data
+    newdata = data[:-size]
+    for c in data[-size:]:
+        if ord(c) > size:
+            newdata += c
+    return newdata
+
+    # length = ord(data[-1])
+    # if length < size and data[-length:] == data[-1] * length:
+    #     # check是否为paddding
+    #     return data[:-length]
+    # return data
 
 
 def encrypt(data, key):
@@ -38,7 +44,7 @@ def encrypt(data, key):
         key = key[:16]
 
     data = data.encode('utf8')
-    data = data_padding(data, 16)
+    data = __pkcs7_padding(data, 16)
 
     cipher = AES.new(key, AES.MODE_ECB)
     result = cipher.encrypt(data)
@@ -56,7 +62,7 @@ def decrypt(data, key):
     result = cipher.decrypt(data)
     data = result.decode('utf8')
 
-    return data_stripping(data, 16)
+    return __depkcs7_padding(data, 16)
 
 
 if __name__ == '__main__':

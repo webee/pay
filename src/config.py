@@ -11,6 +11,8 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'base key.'
     PROPAGATE_EXCEPTIONS = True
 
+    CONF_DIR = os.path.join(basedir, 'conf')
+
     @staticmethod
     def init_app(app):
         pass

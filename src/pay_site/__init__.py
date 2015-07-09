@@ -36,9 +36,10 @@ def register_mods(app):
     from pay_site.lvye import lvye_mod
     from pay_site.account import account_mod
 
-    app.register_blueprint(entry_mod)
-    app.register_blueprint(lvye_mod, url_prefix='/lvye')
-    app.register_blueprint(account_mod, url_prefix='/account')
+    # all site should prefix with /site.
+    app.register_blueprint(entry_mod, url_prefix='/site')
+    app.register_blueprint(lvye_mod, url_prefix='/site/lvye')
+    app.register_blueprint(account_mod, url_prefix='/site/account')
 
 
 def create_app(config_name):

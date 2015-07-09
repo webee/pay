@@ -42,6 +42,7 @@ def pay():
 
         host_url = current_app.config.get('HOST_URL')
         callback_url = host_url + url_for('entry.pay_callback')
+        web_callback_url = host_url + url_for('entry.pay')
         params = {
             'client_id': test_client_info.client_id,
             'order_id': order_id,
@@ -53,7 +54,7 @@ def pay():
             'to_account_id': to_account_id,
             'amount': amount,
             'callback': callback_url,
-            'web_callback': ""
+            'web_callback': web_callback_url
         }
 
         pay_api_url = current_app.config['PAY_API_URL']

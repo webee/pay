@@ -16,6 +16,12 @@ logger = get_logger(__name__)
 def index():
     return render_template('index.html')
 
+@mod.route('/error/')
+def error():
+    code = request.args.get('code')
+    msg = request.args.get('msg')
+    return render_template('error.html', code=code, msg=msg)
+
 
 @mod.route('/pay/', methods=['GET', 'POST'])
 def pay():
@@ -61,8 +67,11 @@ def pay():
         req = requests.post(pay_api_url, params)
         result = req.json()
 
-        payurl = result['payurl']
-        return redirect(payurl)
+        if result['ret']:
+            payurl = result['payurl']
+            return redirect(payurl)
+        else:
+            return redirect(url_for('entry.error', code=result.get('code'), msg=result.get('msg')))
 
 
 @mod.route('/pay_callback/', methods=['POST'])

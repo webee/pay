@@ -28,7 +28,8 @@ def get_or_create_account(user_source, user_id):
             with require_transaction_context():
                 db_id = db.insert('account', user_source=user_source, user_id=user_id)
 
-            account = db.get("select * from account where id=%(id)s", id=db_id)
+            account = db.get("select * from account where user_source=%(user_source)s and user_id=%(user_id)s",
+                             user_source=user_source, user_id=user_id)
 
         return account
     # 匿名用户

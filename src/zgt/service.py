@@ -84,7 +84,6 @@ def parse_http_response_body(status_code, body_content, hmac_encryption_order):
         result = json_map
         return result
 
-    logger.info('response body: %s', json_map)
     return parse_data_from_yeepay(json_map.get('data'), hmac_encryption_order)
 
 

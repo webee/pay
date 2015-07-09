@@ -38,7 +38,7 @@ def pay():
         user_id = format_string(data.get('user_id'))
 
         to_account_id = test_client_info.to_account_id
-        amount = float(format_string(data.get('amount', '0')))
+        amount = format_string(data.get('amount', '0'))
 
         host_url = current_app.config.get('HOST_URL')
         callback_url = host_url + url_for('entry.pay_callback')

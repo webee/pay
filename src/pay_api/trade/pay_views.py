@@ -45,6 +45,8 @@ def pay():
     client_info = from_db().get("select * from client_info where client_id=%(client_id)s", client_id=client_id)
     if client_info is None:
         return jsonify(ret=False, code=600, msg="客户不存在: %s" % client_id)
+    if not order_id:
+        return jsonify(ret=False, code=603, msg="订单不能为空")
     account = from_db().get("select * from account where id=%(id)s", id=to_int(to_account_id))
     if not account:
         return jsonify(ret=False, code=601, msg="账号不存在: %s" % to_account_id)

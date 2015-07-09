@@ -69,3 +69,5 @@ def pay_callback():
     data = request.form
 
     logger.info('pay_callback data: %s', str(data))
+
+    return 'SUCCESS'

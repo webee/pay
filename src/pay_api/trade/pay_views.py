@@ -157,7 +157,7 @@ def pay_callback():
         payment = from_db().get("select * from payment where id=%(id)s", id=payment_id)
         if payment is not None:
             with require_transaction_context():
-                from_db().execute('update payment set success=1, yeepay_transaction_id=%(externalid)s, transaction_ended_on=current_timestamp() where id=%(id)s',
+                from_db().execute('update payment set success=1, actual_amount=%(actual_amount)s, yeepay_transaction_id=%(externalid)s, transaction_ended_on=current_timestamp() where id=%(id)s',
                                   externalid=result['externalid'], actual_amount=actual_amount, id=payment['id'])
             ret = {'ret': True, 'order_id': payment['order_id'],
                    'payment_id': payment_id, 'amount': actual_amount}
@@ -166,6 +166,7 @@ def pay_callback():
     # TODO: 设计更可靠的方式
     req = requests.post(client_callback, ret)
     if req.status_code != 200 and not req.content.startswith('SUCCESS'):
+        logger.info("client callback success.")
         # try more.
         pass
 

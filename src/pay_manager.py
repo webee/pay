@@ -6,7 +6,7 @@ import os
 
 from flask.ext.script import Manager, Shell, Server
 
-from pay_site import create_app
+from pay_site import create_app, test_client_info
 
 app = create_app(os.getenv('SYSTEM_CONFIG') or 'default')
 manager = Manager(app)
@@ -26,28 +26,14 @@ manager.add_command("runserver", server)
 #####################################
 @manager.command
 def init_db():
-    from ops.deploy import init_db
     from tools.dbi import from_db, require_transaction_context
-    from pay_site.entry import client_info
-    init_db()
+    from pay_site import test_client_info
 
     # 准备测试数据
     with require_transaction_context():
         db = from_db()
-        db.insert('client_info', name='TEST', client_id=client_info.client_id, key_value=client_info.key_value)
-        db.insert('account', id=client_info.to_account_id, user_source='lvye', user_id='webee')
-
-
-@manager.command
-def update_env():
-    from ops.deploy import update_env
-    update_env()
-
-
-@manager.option('-u', '--user_id', dest="user_id", required=True)
-@manager.option('-p', '--password', dest="password", required=True)
-def add_user(user_id, password):
-    print("add user %s." % user_id)
+        db.insert('client_info', name='TEST', client_id=test_client_info.client_id)
+        db.insert('account', id=test_client_info.to_account_id, user_source='lvye', user_id='webee')
 
 
 if __name__ == '__main__':

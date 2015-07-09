@@ -29,7 +29,7 @@ def init_errors(app):
 def register_mods(app):
     from lianlian_pay.sample import sample_mod
 
-    app.register_blueprint(sample_mod)
+    app.register_blueprint(sample_mod, url_prefix='/sample')
 
 
 def create_app(config_name):

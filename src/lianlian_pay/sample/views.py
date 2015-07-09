@@ -4,10 +4,28 @@ import logging
 
 from flask import render_template
 from . import sample_mod as mod
+from .trade.payment import pay as do_pay
+from datetime import datetime
 
 log = logging.getLogger(__name__)
 
 
-@mod.route('/sample')
+@mod.route('')
 def show_sample():
     return render_template('omnipotent.html')
+
+@mod.route('/pay', methods=['POST'])
+def pay():
+    status_code, content = pay_one_cent()
+    return render_template('omnipotent.html', status_code=status_code, content=content)
+
+def pay_one_cent():
+    return do_pay(
+        user_id='user_0001',
+        order_no='order_000001',
+        ordered_on=datetime(2015, 3, 10, 10, 18, 0),
+        order_name='Diablo III 1 account',
+        order_desc='The account purchased to log on server in Taiwan',
+        amount=0.01,
+        order_detail_url='www.amazon.cn'
+    )

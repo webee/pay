@@ -23,6 +23,7 @@ CREATE TABLE payment(
   to_account_id int NOT NULL ,
   amount DECIMAL(12, 2) NOT NULL ,
   created_on TIMESTAMP DEFAULT current_timestamp ,
+  callback_url VARCHAR(128) ,
   success SMALLINT , -- 0/1, FAIL/SUCCESS
   actual_amount DECIMAL(12, 2) ,
   yeepay_transaction_id VARCHAR(64) ,

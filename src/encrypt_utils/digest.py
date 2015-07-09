@@ -32,7 +32,3 @@ def hmac_sign(avalue, akey, encode="UTF-8"):
     md.update(dg[:16])
 
     return md.hexdigest()
-
-
-if __name__ == '__main__':
-    pass

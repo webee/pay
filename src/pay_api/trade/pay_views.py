@@ -2,16 +2,15 @@
 from __future__ import unicode_literals, print_function, division
 
 import urllib
-from flask import request, redirect, url_for, jsonify, current_app
+
+from flask import request, url_for, jsonify, current_app
 from tools.dbi import from_db, require_transaction_context
 from tools.dbi import transactional
 from tools.mylog import get_logger
 from . import trade_mod as mod
 import zgt.service as zgt
-from .utils import format_string, to_int, to_float
+from tools.utils import format_string, to_int, to_float
 from service import get_or_create_account, gen_transaction_id
-from constants import data_encrypt_key
-from encrypt_utils import aes
 import requests
 
 logger = get_logger(__name__)
@@ -40,7 +39,7 @@ def pay():
     amount = to_float(format_string(data.get('amount')))
 
     callback = format_string(data.get('callback'))
-    web_callback = to_float(format_string(data.get('web_callback')))
+    web_callback = format_string(data.get('web_callback'))
 
     # check parameters.
     client_info = from_db().get("select * from client_info where client_id=%(client_id)s", client_id=client_id)
@@ -59,18 +58,13 @@ def pay():
     payment_fields = {'client_id': client_id, 'order_id': order_id,
                       'product_name': product_name, 'product_category': product_category, 'product_desc': product_desc,
                       'id': payment_id,
-                      'account_id': account['id'], 'to_account_id': to_account_id, 'amount': amount}
+                      'account_id': account['id'], 'to_account_id': to_account_id, 'amount': amount,
+                      'callback_url': callback}
     create_payment(payment_fields)
     payment = from_db().get('select * from payment where id=%(id)s', id=payment_id)
 
-    req_data = {
-        'client_id': client_id,
-        'client_callback': callback,
-        'payment_id': payment['id']
-    }
-    encrypt_req_data = aes.encrypt_data(req_data, data_encrypt_key)
     host_url = current_app.config.get('HOST_URL')
-    pay_callback_url = host_url + url_for('trade.pay_callback') + '?' + urllib.urlencode({'req_data': encrypt_req_data})
+    pay_callback_url = host_url + url_for('trade.pay_callback') + '?' + urllib.urlencode({'d': payment_id})
     pay_web_callback_url = web_callback
     logger.info("pay_callback_url: %s", pay_callback_url)
     logger.info("pay_web_callback_url: %s", pay_web_callback_url)
@@ -96,6 +90,7 @@ def pay():
         'bankcardnum': ''
     }
     # FIXME: 目前只使用ONEKEY方式支付
+    logger.info('request_params: %s' % repr(request_params))
 
     request_result = zgt.payment_request(request_params)
 
@@ -127,7 +122,7 @@ def pay_callback():
     """付款后台回调
     :return:
     """
-    encrypt_req_data = format_string(request.args.get('req_data'))
+    payment_id = format_string(request.args.get('d'))
 
     data = request.args
     if request.method == 'POST':
@@ -139,21 +134,18 @@ def pay_callback():
     result = zgt.parse_data_from_yeepay(data, hmac_sign_order)
 
     logger.info("callback result: %s" % str(result))
-    try:
-        req_data = aes.decrypt_data(encrypt_req_data, data_encrypt_key)
-    except ValueError as e:
-        return "SUCCESS"
 
-    client_id = req_data['client_id']
-    client_callback = req_data['client_callback']
+    client_callback = None
     code = result['code']
     ret = None
     if code != "1":
         # 失败
         msg = result.get('msg', '')
         logger.info("支付失败, %s" % msg)
-        payment_id = req_data['payment_id']
-        ret = {'ret': False, 'client_id': client_id, 'payment_id': payment_id, 'msg': msg}
+        ret = {'ret': False, 'payment_id': payment_id, 'msg': msg}
+        payment = from_db().get("select * from payment where id=%(id)s", id=payment_id)
+        if payment is not None:
+            client_callback = payment['callback_url']
     else:
         # success
         notifytype = result['notifytype']
@@ -167,8 +159,9 @@ def pay_callback():
             with require_transaction_context():
                 from_db().execute('update payment set success=1, yeepay_transaction_id=%(externalid)s, transaction_ended_on=current_timestamp() where id=%(id)s',
                                   externalid=result['externalid'], actual_amount=actual_amount, id=payment['id'])
-            ret = {'ret': True, 'client_id': client_id, 'order_id': payment['order_id'],
+            ret = {'ret': True, 'order_id': payment['order_id'],
                    'payment_id': payment_id, 'amount': actual_amount}
+            client_callback = payment['callback_url']
     # call client.
     # TODO: 设计更可靠的方式
     req = requests.post(client_callback, ret)

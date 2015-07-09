@@ -10,7 +10,7 @@ def register_mods(app):
     from pay_api.trade import trade_mod
 
     app.register_blueprint(account_mod, url_prefix='/account')
-    app.register_blueprint(account_mod, url_prefix='/trade')
+    app.register_blueprint(trade_mod)
 
 
 def create_app(config_name):

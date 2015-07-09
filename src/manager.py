@@ -3,13 +3,18 @@
 from __future__ import unicode_literals, print_function
 
 from flask import Flask
-from flask.ext.script import Manager
+from flask.ext.script import Manager, Shell
 
 import pay_api_manager as pay_api
 import pay_manager as pay
 
 
+def make_shell_context():
+    return dict(pay=pay, pay_api=pay_api)
+
+
 manager = Manager(Flask(__name__))
+manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("pay_api", pay_api.manager)
 manager.add_command("pay", pay.manager)
 

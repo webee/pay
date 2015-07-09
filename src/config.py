@@ -13,6 +13,7 @@ class Config:
 
     CONF_DIR = os.path.join(basedir, 'conf')
     HOST_URL = 'http://localhost'
+    PAY_API_URL = 'http://127.0.0.1:5000/pay/'
 
     @staticmethod
     def init_app(app):

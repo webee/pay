@@ -16,9 +16,9 @@ def show_sample():
 
 @mod.route('/pay', methods=['POST'])
 def pay():
-    return pay_one_cent()
+    return _pay_one_cent()
 
-def pay_one_cent():
+def _pay_one_cent():
     return do_pay(
         user_id='user_0001',
         order_no='order_000001',

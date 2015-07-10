@@ -7,8 +7,12 @@
 <body>
     <ul>
         <li>
-            <button>支付 0.01</button>
+            <form action="/sample/pay" method="POST">
+                <input type="submit" value="支付 0.01元" />
+            </form>
         </li>
     </ul>
+    <div>{{ status_code }}</div>
+    <div>{{ content }}</div>
 </body>
 </html>

@@ -16,8 +16,7 @@ def show_sample():
 
 @mod.route('/pay', methods=['POST'])
 def pay():
-    status_code, content = pay_one_cent()
-    return render_template('omnipotent.html', status_code=status_code, content=content)
+    return pay_one_cent()
 
 def pay_one_cent():
     return do_pay(
@@ -27,5 +26,5 @@ def pay_one_cent():
         order_name='Diablo III 1 account',
         order_desc='The account purchased to log on server in Taiwan',
         amount=0.01,
-        order_detail_url='www.amazon.cn'
+        order_detail_url=''
     )

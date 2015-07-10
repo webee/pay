@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
-import requests
 from datetime import datetime
+from flask import Response
+
 from .attr_dict import AttrDict
 from .sign import sign
 
@@ -28,6 +29,7 @@ lianlian_config = AttrDict(
     )
 )
 
+
 def pay(user_id, order_no, ordered_on, order_name, order_desc, amount, order_detail_url):
     req_params = {
         'version': lianlian_config.version,
@@ -42,22 +44,36 @@ def pay(user_id, order_no, ordered_on, order_name, order_desc, amount, order_det
         'money_order': str(amount),
         'notify_url': lianlian_config.payment.notify_url,
         'url_return': lianlian_config.payment.return_url,
-        'userreq_ip': '199.195.192.17',
+        'userreq_ip': _encode_ip('199.195.192.17'),
         'url_order': order_detail_url,
         'valid_order': lianlian_config.default_order_expiration,
         'timestamp': _get_current_timestamp(),
         'risk_item': _get_risk_item(),
     }
-    req = requests.post(lianlian_config.payment.url, _sign(req_params))
-    status_code = req.status_code
-    content = req.content
-    return status_code, content
+    req_params = _append_md5_sign(req_params)
+    return Response(_generate_submit_form(req_params), status=200, mimetype='text/html')
+
+
+def _encode_ip(ip):
+    return ip.replace('.', '_')
+
+
+def _generate_submit_form(req_params):
+    submit_page = '<form id="payBillForm" action="{0}" method="POST">'.format(lianlian_config.payment.url)
+    for key in req_params:
+        submit_page += '<input type="hidden" name="{0}" value="{1}" />'.format(key, req_params[key])
+    submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'
+    submit_page += '<script>document.forms["payBillForm"].submit();</script>'
+    return submit_page
+
 
 def _timestamp_to_string(timestamp):
     return timestamp.strftime('%Y%m%d%H%M%S')
 
+
 def _get_current_timestamp():
     return _timestamp_to_string(datetime.now())
+
 
 def _get_risk_item():
     risk_item = {
@@ -66,7 +82,8 @@ def _get_risk_item():
     }
     return json.dumps(risk_item)
 
-def _sign(req_params):
+
+def _append_md5_sign(req_params):
     digest = sign(req_params, lianlian_config.sign_type.MD5, lianlian_config.MD5_key)
     req_params['sign'] = digest
     return req_params

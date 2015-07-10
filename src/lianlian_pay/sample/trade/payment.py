@@ -8,12 +8,12 @@ from .sign import sign
 
 lianlian_config = AttrDict(
     version='1.0',
-    oid_partner='201306031000001013',
+    oid_partner='201408071000001546',
     sign_type=AttrDict(
         MD5='MD5'
     ),
 
-    MD5_key='201306031000001013',
+    MD5_key='201408071000001546_test_20140815',
 
     busi_partner=AttrDict(
         virtual_goods='101001',

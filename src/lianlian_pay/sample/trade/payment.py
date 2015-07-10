@@ -47,7 +47,7 @@ def pay(user_id, order_no, ordered_on, order_name, order_desc, amount):
         'userreq_ip': _encode_ip('199.195.192.17'),
         'valid_order': config.default_order_expiration,
         'timestamp': _get_current_timestamp(),
-        'risk_item': _get_risk_item(),
+        # 'risk_item': _get_risk_item(),
     }
     req_params = _append_md5_sign(req_params)
     return Response(_generate_submit_form(req_params), status=200, mimetype='text/html')
@@ -83,6 +83,6 @@ def _get_risk_item():
 
 
 def _append_md5_sign(req_params):
-    digest = sign(req_params, lianlian_config.sign_type.MD5, lianlian_config.MD5_key)
+    digest = sign(req_params, config.sign_type.MD5, config.MD5_key)
     req_params['sign'] = digest
     return req_params

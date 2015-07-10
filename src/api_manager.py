@@ -5,7 +5,7 @@ from __future__ import unicode_literals, print_function
 import os
 
 from flask.ext.script import Manager, Shell, Server
-from pay_api import create_app
+from api import create_app
 
 
 app = create_app(os.getenv('SYSTEM_CONFIG') or 'default')

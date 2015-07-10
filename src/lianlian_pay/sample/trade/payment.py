@@ -30,7 +30,7 @@ lianlian_config = AttrDict(
 )
 
 
-def pay(user_id, order_no, ordered_on, order_name, order_desc, amount, order_detail_url):
+def pay(user_id, order_no, ordered_on, order_name, order_desc, amount):
     req_params = {
         'version': lianlian_config.version,
         'oid_partner': lianlian_config.oid_partner,
@@ -45,7 +45,6 @@ def pay(user_id, order_no, ordered_on, order_name, order_desc, amount, order_det
         'notify_url': lianlian_config.payment.notify_url,
         'url_return': lianlian_config.payment.return_url,
         'userreq_ip': _encode_ip('199.195.192.17'),
-        'url_order': order_detail_url,
         'valid_order': lianlian_config.default_order_expiration,
         'timestamp': _get_current_timestamp(),
         'risk_item': _get_risk_item(),

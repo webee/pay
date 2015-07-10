@@ -11,3 +11,7 @@ logger = get_logger(__name__)
 @mod.route('/')
 def index():
     return render_template('omnipotent.html')
+
+@mod.route('/pay-one-cent', methods=['POST'])
+def pay_one_cent():
+    return render_template('omnipotent.html', pay_result='SUCCESS')

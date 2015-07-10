@@ -3,12 +3,11 @@ import json
 from datetime import datetime
 from flask import Response
 
+from . import lianlian_base_config
 from .attr_dict import AttrDict
 from .sign import sign
 
-lianlian_config = AttrDict(
-    version='1.0',
-    oid_partner='201408071000001546',
+lianlian_payment_config = AttrDict(
     sign_type=AttrDict(
         MD5='MD5'
     ),
@@ -28,24 +27,25 @@ lianlian_config = AttrDict(
         return_url='www.baidu.com/return'
     )
 )
+config = lianlian_payment_config.merge_to(lianlian_base_config)
 
 
 def pay(user_id, order_no, ordered_on, order_name, order_desc, amount):
     req_params = {
-        'version': lianlian_config.version,
-        'oid_partner': lianlian_config.oid_partner,
+        'version': config.version,
+        'oid_partner': config.oid_partner,
         'user_id': user_id,
-        'sign_type': lianlian_config.sign_type.MD5,
-        'busi_partner': lianlian_config.busi_partner.virtual_goods,
+        'sign_type': config.sign_type.MD5,
+        'busi_partner': config.busi_partner.virtual_goods,
         'no_order': order_no,
         'dt_order': _timestamp_to_string(ordered_on),
         'name_goods': order_name,
         'info_order': order_desc,
         'money_order': str(amount),
-        'notify_url': lianlian_config.payment.notify_url,
-        'url_return': lianlian_config.payment.return_url,
+        'notify_url': config.payment.notify_url,
+        'url_return': config.payment.return_url,
         'userreq_ip': _encode_ip('199.195.192.17'),
-        'valid_order': lianlian_config.default_order_expiration,
+        'valid_order': config.default_order_expiration,
         'timestamp': _get_current_timestamp(),
         'risk_item': _get_risk_item(),
     }
@@ -58,7 +58,7 @@ def _encode_ip(ip):
 
 
 def _generate_submit_form(req_params):
-    submit_page = '<form id="payBillForm" action="{0}" method="POST">'.format(lianlian_config.payment.url)
+    submit_page = '<form id="payBillForm" action="{0}" method="POST">'.format(config.payment.url)
     for key in req_params:
         submit_page += '<input type="hidden" name="{0}" value="{1}" />'.format(key, req_params[key])
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'

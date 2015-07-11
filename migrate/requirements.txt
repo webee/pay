@@ -1,0 +1,3 @@
+paver==1.2.4
+psycopg2==2.3.2
+SQLAlchemy==1.0.6

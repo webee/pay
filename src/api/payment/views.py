@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 import logging
+from urlparse import urljoin
 
 from . import pay_mod as mod, config
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid
+from .postpay import *
 from flask import jsonify, request, Response
-from urlparse import urljoin
+
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +23,8 @@ def prepay():
                   request_values['ordered_on'])
     amount = request_values['amount']
 
-    transaction_uuid = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount, _abs_url(config.payment.notify_url))
+    transaction_uuid = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount,
+                                                   _abs_url(config.payment.notify_url))
     pay_url = _build_pay_url(transaction_uuid)
 
     return jsonify({'pay_url': pay_url})
@@ -35,7 +38,38 @@ def pay(uuid):
 
 @mod.route('/pay-result', methods=['POST'])
 def notify_payment():
-    return jsonify({})
+    request_values = request.values
+    partner_oid = request_values['oid_partner']
+    order_no = request_values['no_order']
+    amount = request_values['money_order']
+    pay_result = request_values['result_pay']
+    paybill_oid = request_values['oid_paybill']
+
+    if (not is_my_response(partner_oid)) or (not is_valid_transaction(order_no, amount)):
+        return _mark_as_invalid_notification()
+
+    if not is_successful_payment(pay_result):
+        fail_transaction(order_no)
+        return _mark_as_failure()
+
+    succeed_transaction(order_no, paybill_oid)
+    return _mark_as_success()
+
+
+def _mark_as_notified():
+    return jsonify({'ret_code': '0000', 'ret_msg': '重复通知'})
+
+
+def _mark_as_success():
+    return jsonify({'ret_code': '0000', 'ret_msg': '交易成功'})
+
+
+def _mark_as_failure():
+    return jsonify({'ret_code': '0000', 'ret_msg': '交易失败'})
+
+
+def _mark_as_invalid_notification():
+    return jsonify({'ret_code': '9999'})
 
 
 def _build_pay_url(transaction_uuid):

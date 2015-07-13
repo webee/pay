@@ -21,7 +21,7 @@ def pay_one_cent():
         'client_id': 1,
         'payer': 2001,
         'payee': 1001,
-        'order_no': 111111,
+        'order_no': 111112,
         'order_name': 'Christmas gift',
         'order_desc': 'Gift to my friend',
         'ordered_on': datetime(2015, 6, 18, 18, 28, 35),

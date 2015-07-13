@@ -32,8 +32,7 @@ CREATE TABLE payment(
   created_on TIMESTAMP DEFAULT current_timestamp ,
   callback_url VARCHAR(128) ,
   success SMALLINT , -- 0/1, FAIL/SUCCESS
-  actual_amount DECIMAL(12, 2) ,
-  yeepay_transaction_id VARCHAR(64) ,
+  paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,
 
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)

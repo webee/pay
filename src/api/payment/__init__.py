@@ -16,7 +16,7 @@ lianlian_payment_config = AttrDict(
     payment=AttrDict(
         url='https://yintong.com.cn/payment/bankgateway.htm',
         notify_url='/pay-result',
-        return_url='www.baidu.com/return'
+        return_url='http://www.baidu.com'
     )
 )
 config = lianlian_payment_config.merge_to(lianlian_base_config)

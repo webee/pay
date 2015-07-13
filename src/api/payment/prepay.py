@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from tools.dbi import from_db
+from tools.dbi import from_db, transactional
 from . import config
 
 
@@ -12,23 +12,13 @@ class Order(object):
         self.category = '绿野户外活动'
 
 
-def find_or_create_account(client_id, user_id):
-    account_id = from_db().get_scalar('SELECT id FROM account WHERE client_id = %s AND user_id = %s',
-                                      client_id, user_id)
-    if not account_id:
-        fields = {
-            'client_id': client_id,
-            'user_id': user_id
-        }
-        account_id = from_db().insert('account', **fields)
-    return account_id
-
-
+@transactional
 def generate_prepay_order(client_id, payer_user_id, payee_user_id, order, amount):
-    payer_account_id = find_or_create_account(client_id, payer_user_id)
-    payee_account_id = find_or_create_account(client_id, payee_user_id)
+    payer_account_id = _find_or_create_account(client_id, payer_user_id)
+    payee_account_id = _find_or_create_account(client_id, payee_user_id)
 
     payment_fields = {
+        'id': _generate_transaction_id(payer_account_id),
         'client_id': client_id,
         'order_id': order.no,
         'product_name': order.name,
@@ -44,3 +34,20 @@ def generate_prepay_order(client_id, payer_user_id, payee_user_id, order, amount
 
 def build_pay_url(pay_id):
     pass
+
+
+def _generate_transaction_id(payer_account_id):
+    from datetime import datetime
+    return datetime.now().strftime("%Y%m%d%H%M%S%f") + '%0.7d' % payer_account_id
+
+
+def _find_or_create_account(client_id, user_id):
+    account_id = from_db().get_scalar('SELECT id FROM account WHERE client_id = %(client_id)s AND user_id = %(user_id)s',
+                                      client_id=client_id, user_id=user_id)
+    if not account_id:
+        fields = {
+            'client_id': client_id,
+            'user_id': user_id
+        }
+        account_id = from_db().insert('account', returns_id=True, **fields)
+    return account_id

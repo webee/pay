@@ -10,6 +10,13 @@ CREATE TABLE client_info(
   created_at TIMESTAMP DEFAULT current_timestamp
 );
 
+CREATE TABLE account(
+  id int AUTO_INCREMENT PRIMARY KEY ,
+  client_id int NOT NULL,
+  user_id VARCHAR(32) NOT NULL,
+
+  FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
+);
 
 CREATE TABLE payment(
   id CHAR(27) PRIMARY KEY ,
@@ -18,8 +25,8 @@ CREATE TABLE payment(
   product_name VARCHAR(50) NOT NULL ,
   product_category VARCHAR(50) NOT NULL ,
   product_desc VARCHAR(50) NOT NULL ,
-  account_id int ,
-  to_account_id int NOT NULL ,
+  payer_account_id int NOT NULL ,
+  payee_account_id int NOT NULL ,
   amount DECIMAL(12, 2) NOT NULL ,
   created_on TIMESTAMP DEFAULT current_timestamp ,
   callback_url VARCHAR(128) ,
@@ -30,14 +37,6 @@ CREATE TABLE payment(
 
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 );
-
-
-CREATE TABLE account(
-  id int AUTO_INCREMENT PRIMARY KEY ,
-  user_source VARCHAR(16),
-  user_id VARCHAR(32)
-);
-
 
 CREATE TABLE virtual_account_bank_card(
   id INT AUTO_INCREMENT PRIMARY KEY,

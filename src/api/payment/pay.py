@@ -3,25 +3,8 @@ import json
 from datetime import datetime
 from flask import Response
 
-from api.attr_dict import AttrDict
-from api.base_config import lianlian_base_config
+from . import config
 from .sign import sign
-
-lianlian_payment_config = AttrDict(
-    busi_partner=AttrDict(
-        virtual_goods='101001',
-        physical_goods='109001',
-    ),
-
-    default_order_expiration='10080',
-
-    payment=AttrDict(
-        url='https://yintong.com.cn/payment/bankgateway.htm',
-        notify_url='www.baidu.com/notify',
-        return_url='www.baidu.com/return'
-    )
-)
-config = lianlian_payment_config.merge_to(lianlian_base_config)
 
 
 def pay(user_id, order_no, ordered_on, order_name, order_desc, amount):

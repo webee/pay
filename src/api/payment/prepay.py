@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import base64
+from .uuid import encode_uuid
 from tools.dbi import from_db, transactional
 
 
@@ -32,11 +33,7 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
     }
     from_db().insert('payment', **payment_fields)
 
-    return _generate_transaction_uuid(transaction_id)
-
-
-def _generate_transaction_uuid(transaction_id):
-    return base64.b64encode(transaction_id)
+    return encode_uuid(transaction_id)
 
 
 def _generate_transaction_id(payer_account_id):

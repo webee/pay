@@ -5,7 +5,7 @@ from .attr_dict import AttrDict
 lianlian_base_config = AttrDict(
     platform='lvye.com',
     version='1.0',
-    oid_partner='201306031000001013',
+    oid_partner='201408071000001546',
 
     sign_type=AttrDict(
         MD5='MD5',

@@ -9,7 +9,7 @@ class Order(object):
         self.name = name
         self.desc = desc
         self.created_on = created_on
-        self.category = '绿野户外活动'
+        self.category = '虚拟商品'
 
 
 @transactional
@@ -27,7 +27,7 @@ def generate_prepay_order(client_id, payer_user_id, payee_user_id, order, amount
         'payer_account_id': payer_account_id,
         'payee_account_id': payee_account_id,
         'amount': amount,
-        'callback_url': config.payment.url
+        'callback_url': config.payment.notify_url
     }
     from_db().insert('payment', **payment_fields)
 

@@ -74,27 +74,17 @@ def pay():
     request_params = {
         'requestid': payment['id'],
         'amount': str(payment['amount']),
-        'assure': '0',
         'productname': payment['product_name'],
         'productcat': payment['product_category'],
         'productdesc': payment['product_desc'],
-        'divideinfo': '',
         'callbackurl': pay_callback_url,
         'webcallbackurl': pay_web_callback_url,
-        'bankid': '',
-        'period': '',
-        'memo': '',
-        'payproducttype': 'ONEKEY',
         'userno': user_source + str(payment['account_id']),
-        'ip': '',
-        'cardname': '',
-        'idcard': '',
-        'bankcardnum': ''
     }
     # FIXME: 目前只使用ONEKEY方式支付
     logger.info('request_params: %s' % repr(request_params))
 
-    request_result = zgt.payment_request(request_params)
+    request_result = do_pay_request(request_params)
 
     code = zgt.format_string(request_result.get('code'))
     msg = zgt.format_string(request_result.get('msg'))
@@ -112,6 +102,25 @@ def pay():
     if payurl != "":
         return jsonify(ret=True, payurl=payurl)
     return jsonify(ret=False, code=1000, msg="系统错误")
+
+
+def do_pay_request(params):
+    # FIXME: 目前只使用ONEKEY方式支付
+    request_params = {
+        'assure': '0',
+        'divideinfo': '',
+        'bankid': '',
+        'period': '',
+        'memo': '',
+        'payproducttype': 'ONEKEY',
+        'ip': '',
+        'cardname': '',
+        'idcard': '',
+        'bankcardnum': ''
+    }
+    request_params.update(params)
+
+    return zgt.payment_request(request_params)
 
 
 @transactional

@@ -22,8 +22,8 @@ def prepay():
     return redirect(pay_url) #?????
 
 
-@mod.route('/pay/<id>', methods=['GET'])
-def pay(id):
+@mod.route('/pay/<uuid>', methods=['GET'])
+def pay(uuid):
     return jsonify({})
 
 

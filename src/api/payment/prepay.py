@@ -29,6 +29,7 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
         'payer_account_id': payer_account_id,
         'payee_account_id': payee_account_id,
         'amount': amount,
+        'ordered_on': order.created_on,
         'callback_url': notification_url
     }
     from_db().insert('payment', **payment_fields)

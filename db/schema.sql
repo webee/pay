@@ -28,6 +28,7 @@ CREATE TABLE payment(
   payer_account_id int NOT NULL ,
   payee_account_id int NOT NULL ,
   amount DECIMAL(12, 2) NOT NULL ,
+  ordered_on TIMESTAMP NOT NULL ,
   created_on TIMESTAMP DEFAULT current_timestamp ,
   callback_url VARCHAR(128) ,
   success SMALLINT , -- 0/1, FAIL/SUCCESS

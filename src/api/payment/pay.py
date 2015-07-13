@@ -12,7 +12,7 @@ def pay_by_uuid(transaction_uuid):
     transaction_id = decode_uuid(transaction_uuid)
     transaction = from_db().get(
         """
-            SELECT payer_account_id, order_id, product_name, product_desc, amount, callback_url
+            SELECT payer_account_id, order_id, product_name, product_desc, amount, ordered_on, callback_url
               FROM payment
               WHERE id = %(id)s
         """,
@@ -21,7 +21,7 @@ def pay_by_uuid(transaction_uuid):
                 order_no=transaction_id,
                 order_name=transaction['product_name'],
                 order_desc=transaction['product_desc'],
-                ordered_on=datetime.now(),
+                ordered_on=transaction['ordered_on'],
                 amount=transaction['amount'],
                 notification_url=transaction['callback_url'])
 

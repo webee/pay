@@ -24,7 +24,7 @@ def pay_one_cent():
         'order_no': 111111,
         'order_name': 'Christmas gift',
         'order_desc': 'Gift to my friend',
-        'ordered_on': datetime.now(),
+        'ordered_on': datetime(2015, 6, 18, 18, 28, 35),
         'amount': 0.01
     }
     resp = requests.post('http://localhost:5000/pre-pay', data=params)

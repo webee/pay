@@ -13,7 +13,7 @@ class Order(object):
 
 
 @transactional
-def generate_prepay_order(client_id, payer_user_id, payee_user_id, order, amount):
+def generate_prepay_order(client_id, payer_user_id, payee_user_id, order, amount, notification_url):
     payer_account_id = _find_or_create_account(client_id, payer_user_id)
     payee_account_id = _find_or_create_account(client_id, payee_user_id)
 
@@ -27,7 +27,7 @@ def generate_prepay_order(client_id, payer_user_id, payee_user_id, order, amount
         'payer_account_id': payer_account_id,
         'payee_account_id': payee_account_id,
         'amount': amount,
-        'callback_url': config.payment.notify_url
+        'callback_url': notification_url
     }
     from_db().insert('payment', **payment_fields)
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-from flask import render_template
+from flask import render_template, redirect
 from . import sample_mod as mod
 from tools.mylog import get_logger
 
@@ -27,5 +27,8 @@ def pay_one_cent():
         'ordered_on': datetime.now(),
         'amount': 58.86
     }
-    requests.post('http://localhost:5000/pre-pay', data=params)
+    resp = requests.post('http://localhost:5000/pre-pay', data=params)
+    if resp.status_code == 200:
+        content = resp.json()
+        return redirect(content['pay_url'])
     return render_template('omnipotent.html', pay_result='SUCCESS')

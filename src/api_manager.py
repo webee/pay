@@ -18,6 +18,11 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 server = Server(host="0.0.0.0", port=5000)
 manager.add_command("runserver", server)
 
+@manager.command
+def init_db():
+    from ops.deploy.init_db import init_db
+    init_db()
+
 
 if __name__ == '__main__':
     manager.run()

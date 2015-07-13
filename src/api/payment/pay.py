@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Response
 
 from api.attr_dict import AttrDict
-from api.config import lianlian_base_config
+from api.base_config import lianlian_base_config
 from .sign import sign
 
 lianlian_payment_config = AttrDict(

@@ -4,7 +4,8 @@ import logging
 
 from . import pay_mod as mod, config
 from .prepay import Order, generate_prepay_transaction
-from flask import jsonify, request
+from .pay import pay_by_uuid
+from flask import jsonify, request, Response
 from urlparse import urljoin
 
 log = logging.getLogger(__name__)
@@ -28,7 +29,8 @@ def prepay():
 
 @mod.route('/pay/<uuid>', methods=['GET'])
 def pay(uuid):
-    return jsonify({})
+    form_submit = pay_by_uuid(uuid)
+    return Response(form_submit, status=200, mimetype='text/html')
 
 
 @mod.route('/pay-result', methods=['POST'])
@@ -37,7 +39,7 @@ def notify_payment():
 
 
 def _build_pay_url(transaction_uuid):
-    return urljoin(request.url_root, 'pay', transaction_uuid)
+    return urljoin(request.url_root, 'pay/{0}').format(transaction_uuid)
 
 
 def _abs_url(relative_url):

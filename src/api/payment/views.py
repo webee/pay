@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, division
 import logging
 
 from . import pay_mod as mod, config
-from .prepay import Order, generate_prepay_order, build_pay_url
+from .prepay import Order, generate_prepay_transaction
 from flask import jsonify, request
 from urlparse import urljoin
 
@@ -20,10 +20,10 @@ def prepay():
                   request_values['ordered_on'])
     amount = request_values['amount']
 
-    pay_uuid = generate_prepay_order(client_id, payer_id, payee_id, order, amount, _abs_url(config.payment.notify_url))
-    pay_url = build_pay_url(pay_uuid)
+    transaction_uuid = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount, _abs_url(config.payment.notify_url))
+    pay_url = _build_pay_url(transaction_uuid)
 
-    return jsonify({})
+    return jsonify({'pay_url': pay_url})
 
 
 @mod.route('/pay/<uuid>', methods=['GET'])
@@ -34,6 +34,10 @@ def pay(uuid):
 @mod.route('/pay-result', methods=['POST'])
 def notify_payment():
     return jsonify({})
+
+
+def _build_pay_url(transaction_uuid):
+    return urljoin(request.url_root, 'pay', transaction_uuid)
 
 
 def _abs_url(relative_url):

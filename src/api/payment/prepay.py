@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+import base64
 from tools.dbi import from_db, transactional
-from . import config
 
 
 class Order(object):
@@ -13,12 +13,13 @@ class Order(object):
 
 
 @transactional
-def generate_prepay_order(client_id, payer_user_id, payee_user_id, order, amount, notification_url):
+def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, amount, notification_url):
     payer_account_id = _find_or_create_account(client_id, payer_user_id)
     payee_account_id = _find_or_create_account(client_id, payee_user_id)
 
+    transaction_id = _generate_transaction_id(payer_account_id)
     payment_fields = {
-        'id': _generate_transaction_id(payer_account_id),
+        'id': transaction_id,
         'client_id': client_id,
         'order_id': order.no,
         'product_name': order.name,
@@ -31,9 +32,11 @@ def generate_prepay_order(client_id, payer_user_id, payee_user_id, order, amount
     }
     from_db().insert('payment', **payment_fields)
 
+    return _generate_transaction_uuid(transaction_id)
 
-def build_pay_url(pay_id):
-    pass
+
+def _generate_transaction_uuid(transaction_id):
+    return base64.b64encode(transaction_id)
 
 
 def _generate_transaction_id(payer_account_id):

@@ -5,6 +5,9 @@ from flask import render_template
 from . import sample_mod as mod
 from tools.mylog import get_logger
 
+from datetime import datetime
+import requests
+
 logger = get_logger(__name__)
 
 
@@ -14,4 +17,15 @@ def index():
 
 @mod.route('/pay-one-cent', methods=['POST'])
 def pay_one_cent():
+    params = {
+        'client_id': 1,
+        'payer': 2001,
+        'payee': 1001,
+        'order_no': 111111,
+        'order_name': 'Christmas gift',
+        'order_desc': 'Gift to my friend',
+        'ordered_on': datetime.now(),
+        'amount': 58.86
+    }
+    requests.post('http://localhost:5000/pre-pay', data=params)
     return render_template('omnipotent.html', pay_result='SUCCESS')

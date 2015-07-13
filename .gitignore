@@ -6,4 +6,6 @@ venv/
 log/
 nohup.out
 
+*.pem
+
 .DS_Store

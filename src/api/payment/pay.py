@@ -18,7 +18,7 @@ def pay_by_uuid(transaction_uuid):
         """,
         id=transaction_id)
     return _pay(payer_account_id=transaction['payer_account_id'],
-                order_no=transaction['order_id'],
+                order_no=transaction_id,
                 order_name=transaction['product_name'],
                 order_desc=transaction['product_desc'],
                 ordered_on=datetime.now(),

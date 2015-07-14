@@ -11,3 +11,8 @@ log = logging.getLogger(__name__)
 @mod.route('/refund', methods=['POST'])
 def refund():
     return jsonify({})
+
+
+@mod.route('/refund/<uuid>/result')
+def notify_refund_result(uuid):
+    return jsonify({})

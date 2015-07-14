@@ -7,35 +7,70 @@ from api import sign
 from api.base_config import get_config
 
 
-def request_api(api_url, params):
-    """ 请求连连api入口方法
-    :param api_url: api url.
-    :param params: api参数，必须包含sign_type属性
-    :return:
-    """
-    params['sign'] = sign.sign(params, params['sign_type'])
-    data = json.dumps(params)
+def _parse_data(raw_data):
+    data = None
+    try:
+        ret_data = json.loads(raw_data)
+        if isinstance(ret_data, dict):
+            data = ret_data
+        else:
+            msg = "数据错误"
+    except ValueError as e:
+        msg = "数据错误"
+    if data:
+        return {
+            'ret': True,
+            'data': data
+        }
+    else:
+        return {
+            'ret': False,
+            'msg': msg
+        }
 
-    req = requests.post(api_url, data)
 
+def parse_request_data(raw_data):
+    parsed_data = _parse_data(raw_data)
+    data = None
+    msg = None
+    if parsed_data['ret']:
+        ret_data = parsed_data['data']
+        if 'sign_type' in ret_data and sign.verify(ret_data, ret_data['sign_type']):
+            data = ret_data
+        else:
+            msg = "数据签名错误"
+    else:
+        msg = parsed_data['msg']
+
+    if data:
+        return {
+            'ret': True,
+            'data': data
+        }
+    else:
+        return {
+            'ret': False,
+            'msg': msg
+        }
+
+
+def parse_response_data(raw_data):
+    parsed_data = _parse_data(raw_data)
     data = None
     code = None
     msg = None
-    try:
-        ret_data = req.json()
-        if isinstance(ret_data, dict):
-            if ret_data['ret_code'] == '0000':
-                if sign.verify(ret_data, ret_data['sign_type']):
-                    data = ret_data
-                else:
-                    msg = "数据签名错误"
+    if parsed_data['ret']:
+        ret_data = parsed_data['data']
+        if 'ret_code' in ret_data and ret_data['ret_code'] == '0000':
+            if sign.verify(ret_data, ret_data['sign_type']):
+                data = ret_data
             else:
-                code = ret_data['ret_code']
-                msg = ret_data['ret_msg']
+                msg = "数据签名错误"
         else:
-            msg = "返回数据错误"
-    except ValueError as e:
-        msg = "返回数据错误"
+            code = ret_data.get('ret_code')
+            msg = ret_data.get('ret_msg')
+    else:
+        msg = parsed_data['msg']
 
     if data:
         return {
@@ -48,6 +83,21 @@ def request_api(api_url, params):
             'code': code,
             'msg': msg
         }
+
+
+def request_api(api_url, params):
+    """ 请求连连api入口方法
+    :param api_url: api url.
+    :param params: api参数，必须包含sign_type属性, 且所有参数为字符串
+    :return:
+    """
+    params = {unicode(k): unicode(v) for k, v in params.items()}
+    params['sign'] = sign.sign(params, params['sign_type'])
+    data = json.dumps(params)
+
+    req = requests.post(api_url, data)
+
+    return parse_response_data(req.content)
 
 
 def bankcard_query(card_no):
@@ -90,19 +140,33 @@ def withdraw(no_order, money_order, info_order, notify_url, bankcard):
         'dt_order': get_current_dt_str(),
         'money_order': money_order,
         'info_order': info_order,
-        'flag_card': bankcard.flag_card,
+        'flag_card': unicode(bankcard.flag),
         'card_no': bankcard.card_no,
-        'acct_name': bankcard.acct_name,
+        'acct_name': bankcard.account_name,
         'bank_code': bankcard.bank_code,
         'province_code': bankcard.province_code,
         'city_code': bankcard.city_code,
-        'brabank_name': bankcard.brabank_name,
+        'brabank_name': bankcard.branch_bank_name,
         'notify_url': notify_url,
-        'api_version': config.api_version,
+        'api_version': "1.2",
         'prcptcd': ''
     }
     # note: bankcode, 对公必须传
     # note: province_code, city_code, brabank_name, 工、农、中, 招,光大 浦发(对私打款),建行 (对公打款)可以不传, 其他银行必须传
 
     api_url = "https://yintong.com.cn/traderapi/cardandpay.htm"
+    return request_api(api_url, params)
+
+
+def query_order():
+    # TODO:
+    config = get_config()
+
+    params = {
+        'platform': config.platform,
+        'oid_partner': config.oid_partner,
+    }
+
+
+    api_url ="https://yintong.com.cn/traderapi/orderquery.htm",
     return request_api(api_url, params)

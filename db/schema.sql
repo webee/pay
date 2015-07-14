@@ -38,6 +38,7 @@ CREATE TABLE payment(
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 );
 
+
 CREATE TABLE bankcard(
   id INT AUTO_INCREMENT PRIMARY KEY COMMENT '自增主键',
   account_id INT NOT NULL COMMENT '银行卡对应的账号',
@@ -52,6 +53,23 @@ CREATE TABLE bankcard(
   updated_on TIMESTAMP NOT NULL,
   FOREIGN KEY bankcard_account_id (account_id) REFERENCES account(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '提款绑定银行卡';
+
+
+CREATE TABLE withdraw(
+  id CHAR(32) PRIMARY KEY COMMENT '订单id',
+  account_id INT NOT NULL COMMENT '提现账号',
+  bankcard_id INT NOT NULL COMMENT '提现到银行号id',
+  amount DECIMAL(12, 2) NOT NULL COMMENT '提现金额',
+  created_on TIMESTAMP NOT NULL COMMENT '创建时间',
+  paybill_id VARCHAR(18) COMMENT '第三方交易订单id',
+  result SMALLINT COMMENT '提现结果',
+  settle_date CHAR(8) COMMENT '成功支付，清算日期',
+  failure_info VARCHAR(255) COMMENT '提现失败原因',
+  ended_on TIMESTAMP NOT NULL COMMENT '结束时间',
+  FOREIGN KEY withdraw_account_id (account_id) REFERENCES account(id),
+  FOREIGN KEY withdraw_bankcard_id (bankcard_id) REFERENCES bankcard(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '提现订单';
+
 
 CREATE TABLE secured_account_transaction_log(
   transaction_id CHAR(27) PRIMARY KEY,

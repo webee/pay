@@ -32,6 +32,6 @@ def _pay_one_cent():
         order_no='order_000001',
         ordered_on=datetime(2015, 3, 10, 10, 18, 0),
         order_name='Diablo III 1 account',
-        order_desc='The account purchased to log on server in Taiwan',
+        order_desc='The account purchased to logger on server in Taiwan',
         amount=0.01
     )

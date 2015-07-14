@@ -89,7 +89,7 @@ def verify(data, sign_type):
 
 if __name__ == '__main__':
     from api.base_config import use_config
-    from api.account.withdraw import config as withdraw_config
+    from api.account.withdraw import withdraw_config as withdraw_config
     data = {"acct_name": "张三", "api_version": "1.2", "bank_code": "03050001", "brabank_name": "运城车站支行",
             "card_no": "6222081202007688888", "city_code": "110001", "dt_order": "20140520171420", "flag_card": "0",
             "info_order": "测试", "money_order": "0.01", "no_order": "20150713170704115", "notify_url": "www.sina.com",

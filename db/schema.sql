@@ -38,7 +38,7 @@ CREATE TABLE payment(
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 );
 
-CREATE TABLE virtual_account_bank_card(
+CREATE TABLE bank_card(
   id INT AUTO_INCREMENT PRIMARY KEY,
   account_id INT NOT NULL,
   card_no VARCHAR(21) NOT NULL,

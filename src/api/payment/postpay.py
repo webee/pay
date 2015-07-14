@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from uuid import decode_uuid
+from api.util.uuid import decode_uuid
 from tools.dbi import from_db, transactional
 
 

@@ -87,3 +87,14 @@ CREATE TABLE zyt_cash_transaction_log(
   amount DECIMAL(12, 2) NOT NULL, -- BORROW: amount is positive, otherwise it is negative
   created_on TIMESTAMP NOT NULL
 );
+
+CREATE TABLE refund(
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  transaction_id CHAR(27) NOT NULL,
+  payer_account_id INT NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY transaction_id(transaction_id) REFERENCES payment(id),
+  FOREIGN KEY payer_account_id(payer_account_id) REFERENCES account(id)
+);

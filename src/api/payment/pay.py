@@ -3,8 +3,9 @@ import json
 from datetime import datetime
 
 from . import config
-from .sign import sign
-from .uuid import decode_uuid
+from api.util import timestamp
+from api.util.sign import sign
+from api.util.uuid import decode_uuid
 from tools.dbi import from_db
 
 
@@ -34,7 +35,7 @@ def _pay(payer_account_id, order_no, ordered_on, order_name, order_desc, amount,
         'sign_type': config.sign_type.MD5,
         'busi_partner': config.busi_partner.virtual_goods,
         'no_order': order_no,
-        'dt_order': _timestamp_to_string(ordered_on),
+        'dt_order': timestamp.to_str(ordered_on),
         'name_goods': order_name,
         'info_order': order_desc,
         'money_order': str(amount),
@@ -62,12 +63,8 @@ def _generate_submit_form(req_params):
     return submit_page
 
 
-def _timestamp_to_string(timestamp):
-    return timestamp.strftime('%Y%m%d%H%M%S')
-
-
 def _stringify_current_timestamp():
-    return _timestamp_to_string(datetime.now())
+    return timestamp.to_str(datetime.now())
 
 
 def _get_risk_item():

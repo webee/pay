@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, division
 import logging
 
 from . import refund_mod as mod
-from flask import jsonify
+from flask import jsonify, request
 
 log = logging.getLogger(__name__)
 
@@ -13,6 +13,6 @@ def refund():
     return jsonify({})
 
 
-@mod.route('/refund/<uuid>/result')
+@mod.route('/refund/<uuid>/result', methods=['POST'])
 def notify_refund_result(uuid):
     return jsonify({})

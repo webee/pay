@@ -15,6 +15,7 @@ logger = get_logger(__name__)
 def index():
     return render_template('omnipotent.html')
 
+
 @mod.route('/pay-one-cent', methods=['POST'])
 def pay_one_cent():
     params = {
@@ -32,3 +33,18 @@ def pay_one_cent():
         content = resp.json()
         return redirect(content['pay_url'])
     return render_template('omnipotent.html', pay_result='SUCCESS')
+
+
+@mod.route('/refund-one-cent', methods=['POST'])
+def refund_one_cent():
+    params = {
+        'client_id': 1,
+        'payer': 2001,
+        'order_no': 111112,
+        'amount': 0.01
+    }
+    resp = requests.post('http://localhost:5000/refund', data=params)
+    refund_result = 'FAILURE'
+    if resp.status_code == 200:
+        refund_result = 'SUCCESS'
+    return render_template('omnipotent.html', refund_result=refund_result)

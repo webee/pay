@@ -9,7 +9,7 @@ def is_my_response(partner_oid):
 
 
 def is_valid_transaction(transaction_id, paid_amount):
-    amount = from_db().get_scalar('SELECT amount FROM payment WHERE id = %(id)s AND success IS NOT NULL',
+    amount = from_db().get_scalar('SELECT amount FROM payment WHERE id = %(id)s AND success IS NULL',
                                   id=transaction_id)
     return amount == paid_amount
 
@@ -20,7 +20,7 @@ def is_successful_payment(pay_result):
 
 @transactional
 def fail_transaction(transaction_id):
-    from_db().execute('UPDATE amount SET success = 0, transaction_ended_on = %(ended_on)s WHERE id = %(id)s',
+    from_db().execute('UPDATE payment SET success = 0, transaction_ended_on = %(ended_on)s WHERE id = %(id)s',
                       id=transaction_id, ended_on=datetime.now())
 
 
@@ -28,7 +28,7 @@ def fail_transaction(transaction_id):
 def succeed_transaction(transaction_id, paybill_id):
     from_db().execute(
         """
-            UPDATE amount SET success = 1, transaction_ended_on = %(ended_on)s, paybill_id=%(paybill_id)s
+            UPDATE payment SET success = 1, transaction_ended_on = %(ended_on)s, paybill_id=%(paybill_id)s
             WHERE id = %(id)s
         """,
         id=transaction_id, ended_on=datetime.now(), paybill_id=paybill_id)

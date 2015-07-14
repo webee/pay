@@ -38,18 +38,20 @@ CREATE TABLE payment(
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 );
 
-CREATE TABLE bank_card(
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  account_id INT NOT NULL,
-  card_no VARCHAR(21) NOT NULL,
-  bank_name VARCHAR(50) NOT NULL,
-  bank_account_name VARCHAR(20) NOT NULL,
-  bank_account_type VARCHAR(11) NOT NULL,
-  reserved_phone VARCHAR(11) NOT NULL,
-  province VARCHAR(10) NOT NULL,
-  city VARCHAR(20) NOT NULL,
-  FOREIGN KEY zyt_account_id (account_id) REFERENCES account(id)
-);
+CREATE TABLE bankcard(
+  id INT AUTO_INCREMENT PRIMARY KEY COMMENT '自增主键',
+  account_id INT NOT NULL COMMENT '银行卡对应的账号',
+  flag TINYINT NOT NULL COMMENT '0-对私，1-对公',
+  card_no VARCHAR(21) NOT NULL COMMENT '银行账号，对私必须是借记卡',
+  account_name VARCHAR(12) NOT NULL COMMENT '用户银行账号姓名',
+  bank_code VARCHAR(12) NOT NULL COMMENT '银行编码',
+  province_code VARCHAR(12) NOT NULL COMMENT '开户行所在省编码',
+  city_code VARCHAR(12) NOT NULL COMMENT '开户行所在市编码',
+  branch_bank_name VARCHAR(50) NOT NULL COMMENT '开户支行名称',
+  created_on TIMESTAMP NOT NULL,
+  updated_on TIMESTAMP NOT NULL,
+  FOREIGN KEY bankcard_account_id (account_id) REFERENCES account(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '提款绑定银行卡';
 
 CREATE TABLE secured_account_transaction_log(
   transaction_id CHAR(27) PRIMARY KEY,

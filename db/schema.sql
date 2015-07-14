@@ -7,7 +7,7 @@ insert into db_migration values(0);
 CREATE TABLE client_info(
   id int AUTO_INCREMENT PRIMARY KEY ,
   name VARCHAR(32) ,
-  created_at TIMESTAMP DEFAULT current_timestamp
+  created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE account(

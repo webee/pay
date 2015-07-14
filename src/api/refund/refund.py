@@ -34,17 +34,23 @@ def refund_transaction(client_id, payer_id, order_no, amount, url_root):
     payer_account_id = find_account_id(client_id, payer_id)
     refund_id, refunded_on = _apply_for_refund(transaction['id'], payer_account_id, amount)
 
+    _apply_to_refund(refund_id, refunded_on, amount, transaction['paybill_id'],
+                     _generate_notification_url(url_root, config.refund.notify_url, _encode_uuid(refund_id)))
+
+
+def _apply_to_refund(refund_id, refunded_on, amount, paybill_id, notification_url):
     req_params = {
         'oid_partner': config.oid_partner,
         'sign_type': config.sign_type.MD5,
         'no_refund': str(refund_id),
         'dt_refund': timestamp.to_str(refunded_on),
         'money_refund': str(amount),
-        'oid_paybill': transaction['paybill_id'],
-        'notify_url': _generate_notification_url(url_root, config.refund.notify_url, _encode_uuid(refund_id))
+        'oid_paybill': paybill_id,
+        'notify_url': notification_url
     }
     req_params = _append_md5_sign(req_params)
     resp = requests.post(config.refund.url, req_params)
+
     if resp.status_code != 200:
         raise RefundFailedException(refund_id)
     return_values = resp.json()

@@ -50,3 +50,13 @@ CREATE TABLE bank_card(
   city VARCHAR(20) NOT NULL,
   FOREIGN KEY zyt_account_id (account_id) REFERENCES account(id)
 );
+
+CREATE TABLE secured_account_transaction_log(
+  transaction_id CHAR(27) PRIMARY KEY,
+  type VARCHAR(16) NOT NULL, -- e.g. PAY
+  payee_account_id INT NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY transaction_id(transaction_id) REFERENCES payment(id)
+);

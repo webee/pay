@@ -26,9 +26,29 @@ def fail_transaction(transaction_id):
 
 @transactional
 def succeed_transaction(transaction_id, paybill_id):
+    # _update_payment(transaction_id, paybill_id)
+
+    payment = from_db().get('SELECT payee_account_id, amount FROM payment WHERE id=%(id)s', id=transaction_id)
+    _log_transaction_into_secured_account(transaction_id, payment['payee_account_id'], payment['amount'])
+
+
+def _update_payment(transaction_id, paybill_id):
     from_db().execute(
         """
             UPDATE payment SET success = 1, transaction_ended_on = %(ended_on)s, paybill_id=%(paybill_id)s
             WHERE id = %(id)s
         """,
         id=transaction_id, ended_on=datetime.now(), paybill_id=paybill_id)
+
+
+def _log_transaction_into_secured_account(transaction_id, payee_account_id, amount):
+    log = {
+        'transaction_id': transaction_id,
+        'type': 'PAY',
+        'payee_account_id': payee_account_id,
+        'amount': amount,
+        'created_on': datetime.now()
+    }
+    from_db().insert('secured_account_transaction_log', **log)
+
+

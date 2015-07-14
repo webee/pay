@@ -2,12 +2,13 @@
 from datetime import datetime
 from urlparse import urljoin
 
-from api.util import timestamp
 import requests
 from . import config
-from api.account.account import find_account_id
+from api.util.enum import enum
+from api.util import timestamp
 from api.util.sign import md5_sign
 from api.util.uuid import encode_uuid
+from api.account.account import find_account_id
 from tools.dbi import from_db, transactional
 
 
@@ -24,6 +25,9 @@ class RefundFailedException(Exception):
             .format(refund_id)
         super(RefundFailedException, self).__init__(message)
         self.refund_id = refund_id
+
+
+RefundState = enum(Applied=0, InProcessing=1, Success=2, Failure=3)
 
 
 def refund_transaction(client_id, payer_id, order_no, amount, url_root):

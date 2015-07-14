@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import base64
+from datetime import datetime
+
 from .uuid import encode_uuid
 from tools.dbi import from_db, transactional
 
@@ -30,7 +31,8 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
         'payee_account_id': payee_account_id,
         'amount': amount,
         'ordered_on': order.created_on,
-        'callback_url': notification_url
+        'callback_url': notification_url,
+        'created_on': datetime.now()
     }
     from_db().insert('payment', **payment_fields)
 
@@ -38,7 +40,6 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
 
 
 def _generate_transaction_id(payer_account_id):
-    from datetime import datetime
     return datetime.now().strftime("%Y%m%d%H%M%S%f") + '%0.7d' % payer_account_id
 
 

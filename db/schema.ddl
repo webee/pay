@@ -5,22 +5,22 @@ CREATE TABLE db_migration (
 insert into db_migration values(0);
 
 CREATE TABLE client_info(
-  id int AUTO_INCREMENT PRIMARY KEY ,
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY ,
   name VARCHAR(32) ,
   created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE account(
-  id int AUTO_INCREMENT PRIMARY KEY ,
-  client_id INT NOT NULL,
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  client_id INT UNSIGNED NOT NULL,
   user_id VARCHAR(32) NOT NULL,
 
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '用户';
 
 CREATE TABLE payment(
   id CHAR(27) PRIMARY KEY ,
-  client_id int NOT NULL ,
+  client_id INT UNSIGNED NOT NULL ,
   order_id VARCHAR(64) NOT NULL ,
   product_name VARCHAR(50) NOT NULL ,
   product_category VARCHAR(50) NOT NULL ,
@@ -40,8 +40,8 @@ CREATE TABLE payment(
 
 
 CREATE TABLE bankcard(
-  id INT AUTO_INCREMENT PRIMARY KEY COMMENT '自增主键',
-  account_id INT NOT NULL COMMENT '银行卡对应的账号',
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '自增主键',
+  account_id INT UNSIGNED NOT NULL COMMENT '银行卡对应的账号',
   flag TINYINT NOT NULL COMMENT '0-对私，1-对公',
   card_no VARCHAR(21) NOT NULL COMMENT '银行账号，对私必须是借记卡',
   account_name VARCHAR(12) NOT NULL COMMENT '用户银行账号姓名',
@@ -57,8 +57,8 @@ CREATE TABLE bankcard(
 
 CREATE TABLE withdraw(
   id CHAR(32) PRIMARY KEY COMMENT '订单id',
-  account_id INT NOT NULL COMMENT '提现账号',
-  bankcard_id INT NOT NULL COMMENT '提现到银行号id',
+  account_id INT UNSIGNED NOT NULL COMMENT '提现账号',
+  bankcard_id INT UNSIGNED NOT NULL COMMENT '提现到银行号id',
   amount DECIMAL(12, 2) NOT NULL COMMENT '提现金额',
   created_on TIMESTAMP NOT NULL COMMENT '创建时间',
   paybill_id VARCHAR(18) COMMENT '第三方交易订单id',
@@ -66,9 +66,48 @@ CREATE TABLE withdraw(
   settle_date CHAR(8) COMMENT '成功支付，清算日期',
   failure_info VARCHAR(255) COMMENT '提现失败原因',
   ended_on TIMESTAMP NOT NULL COMMENT '结束时间',
-  FOREIGN KEY withdraw_account_id (account_id) REFERENCES account(id),
-  FOREIGN KEY withdraw_bankcard_id (bankcard_id) REFERENCES bankcard(id)
+  FOREIGN KEY withdraw_account_id(account_id) REFERENCES account(id),
+  FOREIGN KEY withdraw_bankcard_id(bankcard_id) REFERENCES bankcard(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '提现订单';
+
+
+CREATE TABLE event_log(
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  account_id INT UNSIGNED NOT NULL COMMENT '事件对应账号id',
+  event_type ENUM('pay', 'withdraw', 'refund', 'prepaid') NOT NULL COMMENT '事件类型',
+  step TINYINT NOT NULL COMMENT '事件进度',
+  order_id CHAR(32) NOT NULL COMMENT '订单id',
+  amount DECIMAL(12, 2) NOT NULL COMMENT '事件发生金额, 正数',
+  summary VARCHAR(256) NOT NULL COMMENT '事件摘要',
+  created_on TIMESTAMP NOT NULL COMMENT '交易发生时间',
+  FOREIGN KEY event_log_account_id(account_id) REFERENCES account(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '流水事件日志';
+
+
+CREATE TABLE account_log(
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  account_id INT UNSIGNED NOT NULL COMMENT '账户对应账号id',
+  account ENUM('cash', 'frozen', 'business', 'secured', 'asset') NOT NULL COMMENT '账户',
+  side ENUM('debit', 'credit') NOT NULL COMMENT '记账方向',
+  amount DECIMAL(12, 2) NOT NULL COMMENT '记账金额, 正数',
+  event_id BIGINT UNSIGNED NOT NULL COMMENT '记账事件id',
+  created_on TIMESTAMP NOT NULL COMMENT '记账时间',
+  FOREIGN KEY accounts_log_account_id(account_id) REFERENCES account(id),
+  FOREIGN KEY accounts_log_event_id(event_id) REFERENCES event_log(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '用户账户日志';
+
+
+CREATE TABLE account_balance(
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  account_id INT UNSIGNED NOT NULL COMMENT '账户对应账号id',
+  account ENUM('cash', 'frozen', 'business', 'secured', 'asset') NOT NULL COMMENT '账户',
+  side ENUM('debit', 'credit', 'both') NOT NULL COMMENT '记账方向, both: 全额，其它：各方向发生额',
+  balance DECIMAL(12, 2) NOT NULL COMMENT '余额',
+  settle_time TIMESTAMP NOT NULL COMMENT '结算日期时间',
+  last_acount_log_id BIGINT NOT NULL COMMENT '结算最后账户日志id',
+  created_on TIMESTAMP NOT NULL COMMENT '创建时间',
+  FOREIGN KEY accounts_balance_account_id(account_id) REFERENCES account(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '账户全额记录';
 
 
 CREATE TABLE secured_account_transaction_log(
@@ -89,9 +128,9 @@ CREATE TABLE zyt_cash_transaction_log(
 );
 
 CREATE TABLE refund(
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   transaction_id CHAR(27) NOT NULL,
-  payer_account_id INT NOT NULL,
+  payer_account_id INT UNSIGNED NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
 

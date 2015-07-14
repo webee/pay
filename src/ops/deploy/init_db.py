@@ -18,7 +18,7 @@ def recreate_db():
 
 def create_schema():
     info('creating schema ...')
-    local('mysql -u root {} -p < db/schema.sql'.format(cfg.get('database', 'instance')))
+    local('mysql -u root {} -p < db/schema.ddl'.format(cfg.get('database', 'instance')))
 
 def init_test_data():
     info('initing test data ...')

@@ -26,10 +26,13 @@ def fail_transaction(transaction_id):
 
 @transactional
 def succeed_transaction(transaction_id, paybill_id):
-    # _update_payment(transaction_id, paybill_id)
+    _update_payment(transaction_id, paybill_id)
 
     payment = from_db().get('SELECT payee_account_id, amount FROM payment WHERE id=%(id)s', id=transaction_id)
-    _log_transaction_into_secured_account(transaction_id, payment['payee_account_id'], payment['amount'])
+    amount = payment['amount']
+    now = datetime.now()
+    _log_transaction_into_secured_account(transaction_id, payment['payee_account_id'], amount, now)
+    _charge_to_zyt_cash(amount, now)
 
 
 def _update_payment(transaction_id, paybill_id):
@@ -41,14 +44,26 @@ def _update_payment(transaction_id, paybill_id):
         id=transaction_id, ended_on=datetime.now(), paybill_id=paybill_id)
 
 
-def _log_transaction_into_secured_account(transaction_id, payee_account_id, amount):
+def _log_transaction_into_secured_account(transaction_id, payee_account_id, amount, created_on):
     log = {
         'transaction_id': transaction_id,
         'type': 'PAY',
         'payee_account_id': payee_account_id,
         'amount': amount,
-        'created_on': datetime.now()
+        'created_on': created_on
     }
     from_db().insert('secured_account_transaction_log', **log)
+
+
+def _charge_to_zyt_cash(amount, created_on):
+    entry = {
+        'type': 'BORROW',
+        'amount': amount,
+        'created_on': created_on
+    }
+    from_db().insert('zyt_cash_transaction_log', **entry)
+
+
+
 
 

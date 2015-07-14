@@ -60,3 +60,10 @@ CREATE TABLE secured_account_transaction_log(
 
   FOREIGN KEY transaction_id(transaction_id) REFERENCES payment(id)
 );
+
+CREATE TABLE zyt_cash_transaction_log(
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  type VARCHAR(6) NOT NULL, -- e.g. BORROW, LEND
+  amount DECIMAL(12, 2) NOT NULL, -- BORROW: amount is positive, otherwise it is negative
+  created_on TIMESTAMP NOT NULL
+);

@@ -12,7 +12,7 @@ CREATE TABLE client_info(
 
 CREATE TABLE account(
   id int AUTO_INCREMENT PRIMARY KEY ,
-  client_id int NOT NULL,
+  client_id INT NOT NULL,
   user_id VARCHAR(32) NOT NULL,
 
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
@@ -25,8 +25,8 @@ CREATE TABLE payment(
   product_name VARCHAR(50) NOT NULL ,
   product_category VARCHAR(50) NOT NULL ,
   product_desc VARCHAR(50) NOT NULL ,
-  payer_account_id int NOT NULL ,
-  payee_account_id int NOT NULL ,
+  payer_account_id INT NOT NULL ,
+  payee_account_id INT NOT NULL ,
   amount DECIMAL(12, 2) NOT NULL ,
   ordered_on TIMESTAMP NOT NULL ,
   created_on TIMESTAMP DEFAULT current_timestamp ,

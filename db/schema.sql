@@ -7,12 +7,12 @@ insert into db_migration values(0);
 CREATE TABLE client_info(
   id int AUTO_INCREMENT PRIMARY KEY ,
   name VARCHAR(32) ,
-  created_at TIMESTAMP DEFAULT current_timestamp
+  created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE account(
   id int AUTO_INCREMENT PRIMARY KEY ,
-  client_id int NOT NULL,
+  client_id INT NOT NULL,
   user_id VARCHAR(32) NOT NULL,
 
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
@@ -25,11 +25,11 @@ CREATE TABLE payment(
   product_name VARCHAR(50) NOT NULL ,
   product_category VARCHAR(50) NOT NULL ,
   product_desc VARCHAR(50) NOT NULL ,
-  payer_account_id int NOT NULL ,
-  payee_account_id int NOT NULL ,
+  payer_account_id INT NOT NULL ,
+  payee_account_id INT NOT NULL ,
   amount DECIMAL(12, 2) NOT NULL ,
   ordered_on TIMESTAMP NOT NULL ,
-  created_on TIMESTAMP DEFAULT current_timestamp ,
+  created_on TIMESTAMP NOT NULL ,
   callback_url VARCHAR(128) ,
   success SMALLINT , -- 0/1, FAIL/SUCCESS
   paybill_id VARCHAR(32) ,
@@ -38,15 +38,32 @@ CREATE TABLE payment(
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 );
 
-CREATE TABLE bank_card (
+CREATE TABLE bank_card(
   id INT AUTO_INCREMENT PRIMARY KEY,
-  account_id INT NOT NULL COMMENT '账号id',
-  flag TINYINT NOT NULL COMMENT '0-对私，1-对公',
-  card_no VARCHAR(21) NOT NULL COMMENT '用户银行卡, 对私必须是借记卡',
-  account_name VARCHAR(12) NOT NULL COMMENT '用户银行账号姓名',
-  bank_code VARCHAR(20) NOT NULL COMMENT '银行编码',
-  province_code VARCHAR(20) NOT NULL COMMENT '开户行所在省编码',
-  city_code VARCHAR(20) NOT NULL COMMENT '开户行所在市编码',
-  branch_bank_name VARCHAR(50) NOT NULL COMMENT '开户支行名称',
-  FOREIGN KEY bank_card_account_id (account_id) REFERENCES account(id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '账号绑定的提现银行卡';
+  account_id INT NOT NULL,
+  card_no VARCHAR(21) NOT NULL,
+  bank_name VARCHAR(50) NOT NULL,
+  bank_account_name VARCHAR(20) NOT NULL,
+  bank_account_type VARCHAR(11) NOT NULL,
+  reserved_phone VARCHAR(11) NOT NULL,
+  province VARCHAR(10) NOT NULL,
+  city VARCHAR(20) NOT NULL,
+  FOREIGN KEY zyt_account_id (account_id) REFERENCES account(id)
+);
+
+CREATE TABLE secured_account_transaction_log(
+  transaction_id CHAR(27) PRIMARY KEY,
+  type VARCHAR(16) NOT NULL, -- e.g. PAY
+  payee_account_id INT NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY transaction_id(transaction_id) REFERENCES payment(id)
+);
+
+CREATE TABLE zyt_cash_transaction_log(
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  type VARCHAR(6) NOT NULL, -- e.g. BORROW, LEND
+  amount DECIMAL(12, 2) NOT NULL, -- BORROW: amount is positive, otherwise it is negative
+  created_on TIMESTAMP NOT NULL
+);

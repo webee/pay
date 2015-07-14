@@ -2,6 +2,7 @@
 from __future__ import unicode_literals, print_function, division
 import logging
 from urlparse import urljoin
+from decimal import Decimal
 
 from . import pay_mod as mod, config
 from .prepay import Order, generate_prepay_transaction
@@ -41,7 +42,7 @@ def notify_payment():
     request_values = request.values
     partner_oid = request_values['oid_partner']
     order_no = request_values['no_order']
-    amount = request_values['money_order']
+    amount = Decimal(request_values['money_order'])
     pay_result = request_values['result_pay']
     paybill_oid = request_values['oid_paybill']
 

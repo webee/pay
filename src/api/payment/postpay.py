@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from uuid import decode_uuid
 from tools.dbi import from_db, transactional
 
 
@@ -8,7 +9,10 @@ def is_my_response(partner_oid):
     return partner_oid == config.oid_partner
 
 
-def is_valid_transaction(transaction_id, paid_amount):
+def is_valid_transaction(transaction_id, uuid, paid_amount):
+    if transaction_id != decode_uuid(uuid):
+        return False
+
     amount = from_db().get_scalar('SELECT amount FROM payment WHERE id = %(id)s AND success IS NULL',
                                   id=transaction_id)
     return amount == paid_amount

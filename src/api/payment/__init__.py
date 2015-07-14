@@ -15,7 +15,7 @@ lianlian_payment_config = AttrDict(
 
     payment=AttrDict(
         url='https://yintong.com.cn/payment/bankgateway.htm',
-        notify_url='/pay-result',
+        notify_url='/pay/{uuid}/result',
         return_url='http://www.baidu.com'
     )
 )

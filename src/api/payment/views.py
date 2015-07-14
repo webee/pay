@@ -25,7 +25,7 @@ def prepay():
     amount = request_values['amount']
 
     transaction_uuid = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount,
-                                                   _abs_url(config.payment.notify_url))
+                                                   request.url_root, config.payment.notify_url)
     pay_url = _build_pay_url(transaction_uuid)
 
     return jsonify({'pay_url': pay_url})
@@ -37,8 +37,8 @@ def pay(uuid):
     return Response(form_submit, status=200, mimetype='text/html')
 
 
-@mod.route('/pay-result', methods=['POST'])
-def notify_payment():
+@mod.route('/pay/<uuid>/result', methods=['POST'])
+def notify_payment(uuid):
     request_values = request.values
     partner_oid = request_values['oid_partner']
     order_no = request_values['no_order']
@@ -46,7 +46,7 @@ def notify_payment():
     pay_result = request_values['result_pay']
     paybill_oid = request_values['oid_paybill']
 
-    if (not is_my_response(partner_oid)) or (not is_valid_transaction(order_no, amount)):
+    if (not is_my_response(partner_oid)) or (not is_valid_transaction(order_no, uuid, amount)):
         return _mark_as_invalid_notification()
 
     if not is_successful_payment(pay_result):
@@ -75,7 +75,3 @@ def _mark_as_invalid_notification():
 
 def _build_pay_url(transaction_uuid):
     return urljoin(request.url_root, 'pay/{0}').format(transaction_uuid)
-
-
-def _abs_url(relative_url):
-    return urljoin(request.url_root, relative_url)

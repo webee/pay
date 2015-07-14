@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from urlparse import urljoin
 
 from .uuid import encode_uuid
 from tools.dbi import from_db, transactional
@@ -15,11 +16,12 @@ class Order(object):
 
 
 @transactional
-def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, amount, notification_url):
+def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, amount, request_root, notification_url):
     payer_account_id = _find_or_create_account(client_id, payer_user_id)
     payee_account_id = _find_or_create_account(client_id, payee_user_id)
 
     transaction_id = _generate_transaction_id(payer_account_id)
+    uuid = encode_uuid(transaction_id)
     payment_fields = {
         'id': transaction_id,
         'client_id': client_id,
@@ -31,12 +33,12 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
         'payee_account_id': payee_account_id,
         'amount': amount,
         'ordered_on': order.created_on,
-        'callback_url': notification_url,
+        'callback_url': _generate_notification_url(request_root, notification_url, uuid),
         'created_on': datetime.now()
     }
     from_db().insert('payment', **payment_fields)
 
-    return encode_uuid(transaction_id)
+    return uuid
 
 
 def _generate_transaction_id(payer_account_id):
@@ -53,3 +55,9 @@ def _find_or_create_account(client_id, user_id):
         }
         account_id = from_db().insert('account', returns_id=True, **fields)
     return account_id
+
+
+def _generate_notification_url(url_root, relative_url, uuid):
+    params = {'uuid': uuid}
+    relative_url = relative_url.format(**params)
+    return urljoin(url_root, relative_url)

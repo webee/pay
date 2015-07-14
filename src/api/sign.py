@@ -98,6 +98,7 @@ if __name__ == '__main__':
             "sign_type": "RSA", "user_id": "01020000"}
 
     with use_config(withdraw_config):
+        assert get_config() == withdraw_config
         assert get_config().oid_partner == withdraw_config.oid_partner
         assert get_config().TRADER_PRI_KEY == withdraw_config.TRADER_PRI_KEY
         assert sign(data, data['sign_type']) == data['sign']

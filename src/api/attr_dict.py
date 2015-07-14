@@ -11,6 +11,4 @@ class AttrDict(dict):
         return cloned
 
     def clone(self):
-        cloned = AttrDict()
-        cloned.__dict__ = self.__dict__.copy()
-        return cloned
+        return AttrDict(self.__dict__.copy())

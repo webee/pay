@@ -31,6 +31,11 @@ def notify_refund_result(uuid):
     return jsonify({})
 
 
+@mod.route('/client/<client_id>/order/<order_no>/refund', methods=['GET'])
+def query_refund_result(client_id, order_no):
+    return jsonify({})
+
+
 def _response_accepted(refund_id):
     return _response_with_code(refund_id, 202)
 

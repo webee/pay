@@ -56,7 +56,7 @@ CREATE TABLE bankcard(
 
 
 CREATE TABLE withdraw(
-  id CHAR(32) PRIMARY KEY COMMENT '订单id',
+  id CHAR(27) PRIMARY KEY COMMENT '订单id',
   account_id INT UNSIGNED NOT NULL COMMENT '提现账号',
   bankcard_id INT UNSIGNED NOT NULL COMMENT '提现到银行号id',
   amount DECIMAL(12, 2) NOT NULL COMMENT '提现金额',
@@ -80,7 +80,7 @@ CREATE TABLE refund(
 
   FOREIGN KEY transaction_id(transaction_id) REFERENCES payment(id),
   FOREIGN KEY payer_account_id(payer_account_id) REFERENCES account(id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE account_balance(
@@ -111,7 +111,7 @@ CREATE TABLE event(
 CREATE TABLE zyt_asset_transaction_log(
   id BIGINT UNSIGNED PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
-  account_id INT NOT NULL,
+  account_id INT UNSIGNED NOT NULL,
   side ENUM('DEBIT', 'CREDIT') NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE zyt_asset_transaction_log(
 CREATE TABLE secured_account_transaction_log(
   id BIGINT UNSIGNED PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
-  account_id INT NOT NULL,
+  account_id INT UNSIGNED NOT NULL,
   side ENUM('DEBIT', 'CREDIT') NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE secured_account_transaction_log(
 CREATE TABLE business_account_transaction_log(
   id BIGINT UNSIGNED PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
-  account_id INT NOT NULL,
+  account_id INT UNSIGNED NOT NULL,
   side ENUM('DEBIT', 'CREDIT') NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE business_account_transaction_log(
 CREATE TABLE cash_account_transaction_log(
   id BIGINT UNSIGNED PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
-  account_id INT NOT NULL,
+  account_id INT UNSIGNED NOT NULL,
   side ENUM('DEBIT', 'CREDIT') NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
@@ -161,7 +161,7 @@ CREATE TABLE cash_account_transaction_log(
 CREATE TABLE frozen_account_transaction_log(
   id BIGINT UNSIGNED PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
-  account_id INT NOT NULL,
+  account_id INT UNSIGNED NOT NULL,
   side ENUM('DEBIT', 'CREDIT') NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,

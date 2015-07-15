@@ -4,6 +4,7 @@ from datetime import datetime
 
 from api.base_config import get_config
 from .lianlian_api import request
+from .lianlian_config import config
 
 
 def query_bankcard_bin(card_no):
@@ -11,15 +12,13 @@ def query_bankcard_bin(card_no):
     :param card_no: 银行卡号
     :return:
     """
-    config = get_config()
+    # config = get_config()
     params = {
         'oid_partner': config.oid_partner,
         'sign_type': config.sign_type.MD5,
         'card_no': card_no
     }
-
-    api_url = "https://yintong.com.cn/traderapi/bankcardquery.htm"
-    return request(api_url, params)
+    return request(config.bankcard.bin_query_url, params)
 
 
 def withdraw(no_order, money_order, info_order, notify_url, bankcard):
@@ -31,8 +30,6 @@ def withdraw(no_order, money_order, info_order, notify_url, bankcard):
     :param bankcard: 代付到此银行卡
     :return:
     """
-    config = get_config()
-
     params = {
         'platform': config.platform,
         'oid_partner': config.oid_partner,
@@ -55,23 +52,18 @@ def withdraw(no_order, money_order, info_order, notify_url, bankcard):
     # TODO:
     # note: bankcode, 对公必须传
     # note: province_code, city_code, brabank_name, 工、农、中, 招,光大 浦发(对私打款),建行 (对公打款)可以不传, 其他银行必须传
-
-    api_url = "https://yintong.com.cn/traderapi/cardandpay.htm"
-    return request(api_url, params)
+    return request(config.pay_to_bankcard.url, params)
 
 
 def query_order():
     # TODO:
-    config = get_config()
 
     params = {
         'platform': config.platform,
         'oid_partner': config.oid_partner,
     }
 
-
-    api_url ="https://yintong.com.cn/traderapi/orderquery.htm",
-    return request(api_url, params)
+    return request(config.order.url, params)
 
 
 def _current_datetime_text():

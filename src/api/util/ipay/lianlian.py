@@ -1,8 +1,8 @@
 # coding=utf-8
 from __future__ import unicode_literals
+
 from datetime import datetime
 
-from api.base_config import get_config
 from .lianlian_api import request
 from .lianlian_config import config
 

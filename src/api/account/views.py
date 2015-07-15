@@ -2,12 +2,13 @@
 from __future__ import unicode_literals, print_function, division
 
 import json
+
 from flask import request, jsonify, current_app, url_for
 from . import account_mod as mod
 from .entities import get_user_bankcards, get_bankcard
 from tools.utils import to_int, to_float
-from api import lianlian_service as service
 from .withdraw import create_withdraw_order
+from api.util.ipay import transaction
 from tools.mylog import get_logger
 
 logger = get_logger(__name__)
@@ -36,7 +37,7 @@ def withdraw(account_id):
 
     order_id = create_withdraw_order(account_id, bankcard.id, amount)
 
-    data = service.withdraw(order_id, amount, order_info, notify_url, bankcard)
+    data = transaction.withdraw(order_id, amount, order_info, notify_url, bankcard)
 
     logger.info(json.dumps(data))
     if data['ret']:
@@ -48,7 +49,7 @@ def withdraw(account_id):
 def withdraw_notify():
     raw_data = request.data
 
-    data = service.parse_request_data(raw_data)
+    data = transaction.parse_request_data(raw_data)
     # oid_partner
     # no_order
     # dt_order

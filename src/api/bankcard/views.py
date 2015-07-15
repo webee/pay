@@ -4,14 +4,14 @@ import logging
 
 from . import card_mod as mod
 from flask import jsonify
-from api import lianlian_service as service
+from api.util.ipay import transaction
 
 log = logging.getLogger(__name__)
 
 
 @mod.route('/<card_no>/bin', methods=['GET'])
 def query_bin(card_no):
-    data = service.bankcard_query(card_no)
+    data = transaction.query_bankcard_bin(card_no)
 
     if data['ret']:
         return jsonify(ret=True,

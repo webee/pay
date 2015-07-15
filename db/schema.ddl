@@ -71,31 +71,16 @@ CREATE TABLE withdraw(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '提现订单';
 
 
-CREATE TABLE event_log(
+CREATE TABLE event(
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  account_id INT UNSIGNED NOT NULL COMMENT '事件对应账号id',
-  event_type ENUM('pay', 'withdraw', 'refund', 'prepaid') NOT NULL COMMENT '事件类型',
-  step TINYINT NOT NULL COMMENT '事件进度',
-  order_id CHAR(32) NOT NULL COMMENT '订单id',
-  amount DECIMAL(12, 2) NOT NULL COMMENT '事件发生金额, 正数',
-  summary VARCHAR(256) NOT NULL COMMENT '事件摘要',
-  created_on TIMESTAMP NOT NULL COMMENT '交易发生时间',
+  account_id INT UNSIGNED NOT NULL,
+  source_type ENUM('PAY', 'WITHDRAW', 'REFUND', 'PREPAID') NOT NULL,
+  source_id CHAR(27) NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL COMMENT,
+  created_on TIMESTAMP NOT NULL COMMENT,
+
   FOREIGN KEY event_log_account_id(account_id) REFERENCES account(id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '流水事件日志';
-
-
-CREATE TABLE account_log(
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  account_id INT UNSIGNED NOT NULL COMMENT '账户对应账号id',
-  account ENUM('cash', 'frozen', 'business', 'secured', 'asset') NOT NULL COMMENT '账户',
-  side ENUM('debit', 'credit') NOT NULL COMMENT '记账方向',
-  amount DECIMAL(12, 2) NOT NULL COMMENT '记账金额, 正数',
-  event_id BIGINT UNSIGNED NOT NULL COMMENT '记账事件id',
-  created_on TIMESTAMP NOT NULL COMMENT '记账时间',
-  FOREIGN KEY accounts_log_account_id(account_id) REFERENCES account(id),
-  FOREIGN KEY accounts_log_event_id(event_id) REFERENCES event_log(id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '用户账户日志';
-
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE account_balance(
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -107,25 +92,7 @@ CREATE TABLE account_balance(
   last_acount_log_id BIGINT NOT NULL COMMENT '结算最后账户日志id',
   created_on TIMESTAMP NOT NULL COMMENT '创建时间',
   FOREIGN KEY accounts_balance_account_id(account_id) REFERENCES account(id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '账户全额记录';
-
-
-CREATE TABLE secured_account_transaction_log(
-  transaction_id CHAR(27) PRIMARY KEY,
-  type VARCHAR(16) NOT NULL, -- e.g. PAY
-  payee_account_id INT NOT NULL,
-  amount DECIMAL(12, 2) NOT NULL,
-  created_on TIMESTAMP NOT NULL,
-
-  FOREIGN KEY transaction_id(transaction_id) REFERENCES payment(id)
-);
-
-CREATE TABLE zyt_cash_transaction_log(
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  type VARCHAR(6) NOT NULL, -- e.g. BORROW, LEND
-  amount DECIMAL(12, 2) NOT NULL, -- BORROW: amount is positive, otherwise it is negative
-  created_on TIMESTAMP NOT NULL
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE refund(
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -136,4 +103,62 @@ CREATE TABLE refund(
 
   FOREIGN KEY transaction_id(transaction_id) REFERENCES payment(id),
   FOREIGN KEY payer_account_id(payer_account_id) REFERENCES account(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+
+
+/*--- Kinds of Account ----------------------------------------------------------------------------------------*/
+
+CREATE TABLE secured_account_transaction_log(
+  event_id BIGINT UNSIGNED PRIMARY KEY,
+  account_id INT NOT NULL,
+  side ENUM('DEBIT', 'CREDIT') NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY event_id(event_id) REFERENCES event(id),
+  FOREIGN KEY account_id(account_id) REFERENCES account(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE zyt_asset_transaction_log(
+  event_id BIGINT UNSIGNED PRIMARY KEY,
+  account_id INT NOT NULL,
+  side ENUM('DEBIT', 'CREDIT') NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY event_id(event_id) REFERENCES event(id),
+  FOREIGN KEY account_id(account_id) REFERENCES account(id)
+);
+
+CREATE TABLE business_account_transaction_log(
+  event_id BIGINT UNSIGNED PRIMARY KEY,
+  account_id INT NOT NULL,
+  side ENUM('DEBIT', 'CREDIT') NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY event_id(event_id) REFERENCES event(id),
+  FOREIGN KEY account_id(account_id) REFERENCES account(id)
+);
+
+CREATE TABLE cash_account_transaction_log(
+  event_id BIGINT UNSIGNED PRIMARY KEY,
+  account_id INT NOT NULL,
+  side ENUM('DEBIT', 'CREDIT') NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY event_id(event_id) REFERENCES event(id),
+  FOREIGN KEY account_id(account_id) REFERENCES account(id)
+);
+
+CREATE TABLE frozen_account_transaction_log(
+  event_id BIGINT UNSIGNED PRIMARY KEY,
+  account_id INT NOT NULL,
+  side ENUM('DEBIT', 'CREDIT') NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY event_id(event_id) REFERENCES event(id),
+  FOREIGN KEY account_id(account_id) REFERENCES account(id)
 );

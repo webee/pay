@@ -7,20 +7,6 @@ from .lianlian_api import request
 from .lianlian_config import config
 
 
-def query_bankcard_bin(card_no):
-    """ 查询银行卡bin信息
-    :param card_no: 银行卡号
-    :return:
-    """
-    # config = get_config()
-    params = {
-        'oid_partner': config.oid_partner,
-        'sign_type': config.sign_type.MD5,
-        'card_no': card_no
-    }
-    return request(config.bankcard.bin_query_url, params)
-
-
 def withdraw(no_order, money_order, info_order, notify_url, bankcard):
     """ 代付
     :param no_order: 订单号

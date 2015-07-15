@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from urlparse import urljoin
 
-import requests
-from . import config
 from api.util.enum import enum
-from api.util import timestamp
-from api.util.sign import md5_sign
-from api.util.uuid import encode_uuid
+from api.util.ipay import transaction
 from api.account.account import find_account_id
 from tools.dbi import from_db, transactional
 
@@ -31,29 +26,18 @@ RefundState = enum(Applied=0, InProcessing=1, Success=2, Failure=3)
 
 
 def refund_transaction(client_id, payer_id, order_no, amount, url_root):
-    transaction = _find_payment(client_id, order_no)
-    if not transaction:
+    payment = _find_payment(client_id, order_no)
+    if not payment:
         raise NoTransactionFoundException(client_id, order_no)
 
     payer_account_id = find_account_id(client_id, payer_id)
-    refund_id, refunded_on = _apply_for_refund(transaction['id'], payer_account_id, amount)
+    refund_id, refunded_on = _apply_for_refund(payment['id'], payer_account_id, amount)
 
-    _apply_to_refund(refund_id, refunded_on, amount, transaction['paybill_id'],
-                     _generate_notification_url(url_root, config.refund.notify_url, _encode_uuid(refund_id)))
+    _apply_to_refund(refund_id, refunded_on, amount, payment['paybill_id'], url_root)
 
 
-def _apply_to_refund(refund_id, refunded_on, amount, paybill_id, notification_url):
-    req_params = {
-        'oid_partner': config.oid_partner,
-        'sign_type': config.sign_type.MD5,
-        'no_refund': str(refund_id),
-        'dt_refund': timestamp.to_str(refunded_on),
-        'money_refund': str(amount),
-        'oid_paybill': paybill_id,
-        'notify_url': notification_url
-    }
-    req_params = _append_md5_sign(req_params)
-    resp = requests.post(config.refund.url, req_params)
+def _apply_to_refund(refund_id, refunded_on, amount, paybill_id, url_root):
+    resp = transaction.refund(refund_id, refunded_on, amount, paybill_id, url_root)
 
     if resp.status_code != 200:
         raise RefundFailedException(refund_id)
@@ -84,22 +68,3 @@ def _apply_for_refund(transaction_id, payer_account_id, amount):
     refund_id = from_db().insert('refund', **fields)
     return refund_id, refunded_on
 
-
-def _encode_uuid(refund_id):
-    return encode_uuid('%0.8d' % refund_id)
-
-
-def _generate_transaction_id(payer_account_id):
-    return datetime.now().strftime("%Y%m%d%H%M%S%f") + '%0.7d' % payer_account_id
-
-
-def _generate_notification_url(url_root, relative_url, uuid):
-    params = {'uuid': uuid}
-    relative_url = relative_url.format(**params)
-    return urljoin(url_root, relative_url)
-
-
-def _append_md5_sign(req_params):
-    digest = md5_sign(req_params, config.MD5_key)
-    req_params['sign'] = digest
-    return req_params

@@ -42,4 +42,9 @@ config = AttrDict(
     order=AttrDict(
         url="https://yintong.com.cn/traderapi/orderquery.htm"
     ),
+
+    refund=AttrDict(
+        url='https://yintong.com.cn/traderapi/refund.htm',
+        notify_url='/refund/{uuid}/result',
+    ),
 )

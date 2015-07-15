@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import json
 
 import requests
-from api.util import sign
+from . import sign
 
 
 def request(api_url, params):

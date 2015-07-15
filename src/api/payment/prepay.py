@@ -2,6 +2,7 @@
 from datetime import datetime
 from urlparse import urljoin
 
+from api.util import id
 from api.util.uuid import encode_uuid
 from api.account.account import find_or_create_account
 from tools.dbi import from_db, transactional
@@ -21,7 +22,7 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
     payer_account_id = find_or_create_account(client_id, payer_user_id)
     payee_account_id = find_or_create_account(client_id, payee_user_id)
 
-    transaction_id = _generate_transaction_id(payer_account_id)
+    transaction_id = id.generate(payer_account_id)
     uuid = encode_uuid(transaction_id)
     payment_fields = {
         'id': transaction_id,
@@ -40,10 +41,6 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
     from_db().insert('payment', **payment_fields)
 
     return uuid
-
-
-def _generate_transaction_id(payer_account_id):
-    return datetime.now().strftime("%Y%m%d%H%M%S%f") + '%0.7d' % payer_account_id
 
 
 def _generate_notification_url(url_root, relative_url, uuid):

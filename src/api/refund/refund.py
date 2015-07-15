@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from api.util import timestamp
-import requests
 from datetime import datetime
 from urlparse import urljoin
 
+from api.util import timestamp
+import requests
 from . import config
 from api.account.account import find_account_id
-from api.util.sign import sign
+from api.util.sign import md5_sign
 from api.util.uuid import encode_uuid
 from tools.dbi import from_db, transactional
 
@@ -90,6 +90,6 @@ def _generate_notification_url(url_root, relative_url, uuid):
 
 
 def _append_md5_sign(req_params):
-    digest = sign(req_params, config.sign_type.MD5, config.MD5_key)
+    digest = md5_sign(req_params, config.MD5_key)
     req_params['sign'] = digest
     return req_params

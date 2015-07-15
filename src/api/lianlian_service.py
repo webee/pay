@@ -1,9 +1,10 @@
 # coding=utf-8
 from __future__ import unicode_literals
 import json
-import requests
 from datetime import datetime
-from api import sign
+
+import requests
+from api.util import sign
 from api.base_config import get_config
 
 

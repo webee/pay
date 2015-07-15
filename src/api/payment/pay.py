@@ -4,7 +4,7 @@ from datetime import datetime
 
 from . import config
 from api.util import timestamp
-from api.util.sign import sign
+from api.util.sign import md5_sign
 from api.util.uuid import decode_uuid
 from tools.dbi import from_db
 
@@ -76,6 +76,6 @@ def _get_risk_item():
 
 
 def _append_md5_sign(req_params):
-    digest = sign(req_params, config.sign_type.MD5, config.MD5_key)
+    digest = md5_sign(req_params, config.MD5_key)
     req_params['sign'] = digest
     return req_params

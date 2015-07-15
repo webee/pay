@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from lianlian_api import parse_request_data
 
 from .bankcard import query_bin as _query_bin
@@ -8,6 +7,7 @@ from .pay_to_bankcard import pay_to_bankcard as _pay_to_bankcard
 from .query_order import query_order as _query_order
 from .refund import refund as _refund
 from .lianlian_config import config
+from .util import generate_notification_url as _generate_notification_url
 
 
 def pay(payer_account_id, order_no, ordered_on, order_name, order_desc, amount, notification_url):
@@ -32,3 +32,7 @@ def query_order():
 
 def is_sending_to_me(partner_id):
     return partner_id == config.oid_partner
+
+
+def generate_pay_notification_url(id):
+    return _generate_notification_url(config.payment.notify_url, id)

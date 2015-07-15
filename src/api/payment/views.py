@@ -4,13 +4,12 @@ import logging
 from urlparse import urljoin
 from decimal import Decimal
 
-from . import pay_mod as mod, config
+from . import pay_mod as mod
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid
 from .postpay import *
 from api.util.ipay.transaction import is_sending_to_me
 from flask import jsonify, request, Response
-
 
 log = logging.getLogger(__name__)
 
@@ -25,8 +24,7 @@ def prepay():
                   request_values['ordered_on'])
     amount = request_values['amount']
 
-    transaction_uuid = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount,
-                                                   request.url_root, config.payment.notify_url)
+    transaction_uuid = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount)
     pay_url = _build_pay_url(transaction_uuid)
 
     return jsonify({'pay_url': pay_url})

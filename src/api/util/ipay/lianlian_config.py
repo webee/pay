@@ -2,6 +2,8 @@
 from api.util.attr_dict import AttrDict
 
 config = AttrDict(
+    root_url='http://localhost:5000',
+
     platform='lvye.com',
     version='1.0',
     oid_partner='201408071000001546',

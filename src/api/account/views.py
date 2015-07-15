@@ -37,7 +37,7 @@ def withdraw(account_id):
 
     order_id = create_withdraw_order(account_id, bankcard.id, amount)
 
-    data = transaction.withdraw(order_id, amount, order_info, notify_url, bankcard)
+    data = transaction.pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
 
     logger.info(json.dumps(data))
     if data['ret']:

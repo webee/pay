@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import json
-
 import requests
-from . import sign
+
+from .sign import sign, verify
 
 
 def request(api_url, params):
     params = {unicode(k): unicode(v) for k, v in params.items()}
-    params['sign'] = sign.sign(params, params['sign_type'])
+    params['sign'] = sign(params, params['sign_type'])
     data = json.dumps(params)
 
     req = requests.post(api_url, data)
@@ -22,7 +22,7 @@ def parse_request_data(raw_data):
     msg = None
     if parsed_data['ret']:
         ret_data = parsed_data['data']
-        if 'sign_type' in ret_data and sign.verify(ret_data, ret_data['sign_type']):
+        if 'sign_type' in ret_data and verify(ret_data, ret_data['sign_type']):
             data = ret_data
         else:
             msg = "数据签名错误"
@@ -71,7 +71,7 @@ def _parse_response_data(raw_data):
     if parsed_data['ret']:
         ret_data = parsed_data['data']
         if 'ret_code' in ret_data and ret_data['ret_code'] == '0000':
-            if sign.verify(ret_data, ret_data['sign_type']):
+            if verify(ret_data, ret_data['sign_type']):
                 data = ret_data
             else:
                 msg = "数据签名错误"

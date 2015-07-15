@@ -93,20 +93,3 @@ def verify(data, sign_type):
     elif sign_type == get_config().sign_type.RSA:
         return _verify_rsa_data(data, get_config().YT_PUB_KEY)
     raise Exception("unknown sign type: %s" % sign_type)
-
-
-if __name__ == '__main__':
-    from api.base_config import use_config
-    from api.account.withdraw import withdraw_config as withdraw_config
-    data = {"acct_name": "张三", "api_version": "1.2", "bank_code": "03050001", "brabank_name": "运城车站支行",
-            "card_no": "6222081202007688888", "city_code": "110001", "dt_order": "20140520171420", "flag_card": "0",
-            "info_order": "测试", "money_order": "0.01", "no_order": "20150713170704115", "notify_url": "www.sina.com",
-            "oid_partner": "201408071000001543",
-            "sign": "010PDVwXWGbh04krNssJmF8UMRkmuCmCpYy0tp7zccq3brSn+03yIep4/+JBjy7MexP0sYq/FYLHeEDcFrpk63SLIHyK4n7R+P/UVqQIAyNTCwBPKCqEf1/F5B4bUryw/B+Oq4Py0bu1r9TzSWZgAdk0LXfBBI8e9k56Hte6/bo=",
-            "sign_type": "RSA", "user_id": "01020000"}
-
-    with use_config(withdraw_config):
-        assert get_config() == withdraw_config
-        assert get_config().oid_partner == withdraw_config.oid_partner
-        assert get_config().TRADER_PRI_KEY == withdraw_config.TRADER_PRI_KEY
-        assert sign(data, data['sign_type']) == data['sign']

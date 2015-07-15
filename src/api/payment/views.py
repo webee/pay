@@ -8,6 +8,7 @@ from . import pay_mod as mod, config
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid
 from .postpay import *
+from api.util.ipay.transaction import is_sending_to_me
 from flask import jsonify, request, Response
 
 
@@ -46,7 +47,7 @@ def notify_payment(uuid):
     pay_result = request_values['result_pay']
     paybill_oid = request_values['oid_paybill']
 
-    if (not is_my_response(partner_oid)) or (not is_valid_transaction(order_no, uuid, amount)):
+    if (not is_sending_to_me(partner_oid)) or (not is_valid_transaction(order_no, uuid, amount)):
         return _mark_as_invalid_notification()
 
     if not is_successful_payment(pay_result):

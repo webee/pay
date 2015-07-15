@@ -4,11 +4,6 @@ from api.util.uuid import decode_uuid
 from tools.dbi import from_db, transactional
 
 
-def is_my_response(partner_oid):
-    from api.base_config import lianlian_base_config as config
-    return partner_oid == config.oid_partner
-
-
 def is_valid_transaction(transaction_id, uuid, paid_amount):
     if transaction_id != decode_uuid(uuid):
         return False

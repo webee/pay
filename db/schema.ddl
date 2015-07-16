@@ -19,7 +19,7 @@ CREATE TABLE account(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '用户';
 
 CREATE TABLE payment(
-  id CHAR(27) PRIMARY KEY ,
+  id CHAR(30) PRIMARY KEY ,
   client_id INT UNSIGNED NOT NULL ,
   order_id VARCHAR(64) NOT NULL ,
   product_name VARCHAR(50) NOT NULL ,
@@ -56,7 +56,7 @@ CREATE TABLE bankcard(
 
 
 CREATE TABLE withdraw(
-  id CHAR(27) PRIMARY KEY COMMENT '订单id',
+  id CHAR(30) PRIMARY KEY COMMENT '订单id',
   account_id INT UNSIGNED NOT NULL COMMENT '提现账号',
   bankcard_id INT UNSIGNED NOT NULL COMMENT '提现到银行号id',
   amount DECIMAL(12, 2) NOT NULL COMMENT '提现金额',
@@ -74,7 +74,7 @@ CREATE TABLE withdraw(
 
 CREATE TABLE refund(
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  transaction_id CHAR(27) NOT NULL,
+  transaction_id CHAR(30) NOT NULL,
   payer_account_id INT UNSIGNED NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE event(
   account_id INT UNSIGNED NOT NULL,
   source_type ENUM('PAY', 'WITHDRAW', 'REFUND', 'PREPAID', 'SETTLE') NOT NULL,
   step VARCHAR(16) NOT NULL,
-  source_id CHAR(27) NOT NULL,
+  source_id CHAR(30) NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
   FOREIGN KEY event_log_account_id(account_id) REFERENCES account(id)

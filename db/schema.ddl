@@ -63,7 +63,7 @@ CREATE TABLE withdraw(
   created_on TIMESTAMP NOT NULL COMMENT '创建时间',
   callback_url VARCHAR(128) COMMENT '请求方回调通知url',
   paybill_id VARCHAR(18) COMMENT '第三方交易订单id',
-  result ENUM('FROZEN', 'REQUEST_FAILURE', 'SUCCESS', 'FAILURE') COMMENT '提现结果',
+  result ENUM('FROZEN', 'REQUEST_FAILED', 'SUCCESS', 'FAILED') COMMENT '提现结果',
   settle_date CHAR(8) COMMENT '成功支付，清算日期',
   failure_info VARCHAR(255) COMMENT '提现失败原因',
   ended_on TIMESTAMP NOT NULL COMMENT '结束时间',
@@ -100,7 +100,7 @@ CREATE TABLE account_balance(
 CREATE TABLE event(
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   account_id INT UNSIGNED NOT NULL,
-  source_type ENUM('PAY', 'WITHDRAW', 'REFUND', 'PREPAID') NOT NULL,
+  source_type ENUM('PAY', 'WITHDRAW', 'REFUND', 'PREPAID', 'SETTLE') NOT NULL,
   step VARCHAR(16) NOT NULL,
   source_id CHAR(27) NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
@@ -110,6 +110,17 @@ CREATE TABLE event(
 
 
 /*--- Kinds of Account ----------------------------------------------------------------------------------------*/
+CREATE TABLE lianlian_transaction_log(
+  id BIGINT UNSIGNED PRIMARY KEY,
+  event_id BIGINT UNSIGNED NOT NULL,
+  account_id INT UNSIGNED NOT NULL,
+  side ENUM('DEBIT', 'CREDIT') NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+  FOREIGN KEY event_id(event_id) REFERENCES event(id),
+  FOREIGN KEY account_id(account_id) REFERENCES account(id)
+);
+
 CREATE TABLE zyt_asset_transaction_log(
   id BIGINT UNSIGNED PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,

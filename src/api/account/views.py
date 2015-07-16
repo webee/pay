@@ -5,17 +5,22 @@ import json
 
 from flask import request, jsonify, current_app, url_for
 from . import account_mod as mod
+from . import accounts
 from api.account.bankcard import get_user_bankcards, get_bankcard
 from tools.utils import to_int, to_float
-from .withdraw import create_withdraw_order, get_withdraw_order, withdraw_request_fail, withdraw_order_end
+from .withdraw import create_withdraw_order, get_withdraw_order, withdraw_request_failed, withdraw_order_end
 from .withdraw import freeze_withdraw_cash
 from api.util.ipay import transaction
+from api.util.api import return_json
+from api.constant import response as resp
+from api.util.ipay.constant import response as pay_resp
 from tools.mylog import get_logger
 
 logger = get_logger(__name__)
 
 
 @mod.route('/<int:account_id>/withdraw', methods=['POST'])
+@return_json
 def withdraw(account_id):
     """ 提现接口
     POST: bankcard_id, amount, callback_url
@@ -28,12 +33,15 @@ def withdraw(account_id):
 
     bankcard = get_bankcard(account_id, bankcard_id)
     if bankcard is None:
-        return jsonify(ret=False, msg="此银行卡不存在")
+        return resp.FALSE_BANKCARD_NOT_EXISTS
 
     amount = to_float(data.get('amount'))
     if amount <= 0:
-        return jsonify(ret=False, msg="[amount]错误")
-    # TODO: 获取余额, 检查余额是否足够
+        return resp.FALSE_AMOUNT_VALUE_ERROR
+    balance = accounts.cash_account_balance(account_id)
+    if amount > balance:
+        return resp.FALSE_INSUFFICIENT_BALANCE
+
     order_info = "提现"
     host_url = current_app.config.get('HOST_URL')
     notify_url = host_url + url_for('account.withdraw_notify')
@@ -48,33 +56,31 @@ def withdraw(account_id):
     logger.info(json.dumps(data))
 
     if data['ret']:
-        return jsonify(ret=True)
+        return resp.TRUE_JUST_OK
 
-    withdraw_request_fail(order_id)
-    return jsonify(ret=False, msg="请求失败")
+    withdraw_request_failed(order_id)
+    return resp.FALSE_REQUEST_FAILED
 
 
-@mod.route('/withdraw_notify', methods=['POST'])
-def withdraw_notify():
+@mod.route('/withdraw/<uuid>/result', methods=['POST'])
+@return_json
+def notify_withdraw(uuid):
     raw_data = request.data
 
     data = transaction.parse_request_data(raw_data)
     logger.info(json.dumps(data))
 
-    partner_id = data['oid_partner']
-    if transaction.is_sending_to_me(partner_id):
-        return jsonify(ret_code='9999', ret_msg='发送错误')
-
+    oid_partner = data['oid_partner']
     order_id = data['no_order']
+    if not transaction.is_valid_transaction(oid_partner, order_id, uuid):
+        return pay_resp.INVALID_NOTIFICATION
+
+    amount = to_float(data['money_order'])
     withdraw_order = get_withdraw_order(order_id)
-    if withdraw_order is None:
-        return jsonify(ret_code='9999', ret_msg='订单不存在')
+    if withdraw_order is None or amount != withdraw['amount']:
+        return pay_resp.INVALID_NOTIFICATION
 
     # dt_order = data['dt_order']
-
-    money_order = to_float(data['money_order'])
-    if money_order != withdraw_order['amount']:
-        return jsonify(ret_code='9999', ret_msg='订单金额不正确')
 
     paybill_id = data['oid_paybill']
     failure_info = data.get('info_order', '')
@@ -83,7 +89,7 @@ def withdraw_notify():
 
     withdraw_order_end(order_id, paybill_id, result, failure_info, settle_date)
 
-    return jsonify(ret_code='0000', ret_msg='交易成功')
+    return pay_resp.SUCCESS
 
 
 @mod.route('/<int:account_id>/bankcards', methods=['GET'])
@@ -100,3 +106,4 @@ def add_bankcard(account_id):
     data = request.values
 
     return jsonify(data=data)
+

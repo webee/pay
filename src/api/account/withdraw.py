@@ -4,7 +4,6 @@ from datetime import datetime
 
 from tools.dbi import from_db, transactional
 from api.util import id
-from . import constant as withdraw_constant
 from api import constant
 from api.util.bookkeeping import two_accounts_bookkeeping
 
@@ -39,10 +38,10 @@ def get_withdraw_order(order_id):
 
 
 @transactional
-def withdraw_request_fail(order_id):
+def withdraw_request_failed(order_id):
     db = from_db()
     db.execute("update withdraw set result=%(result)s, failure_info=%(failure_info)s, ended_on=%(ended_on)s"
-               "where id=%(id)s", result=withdraw_constant.withdraw.WITHDRAW_REQUEST_FAILURE,
+               "where id=%(id)s", result=constant.withdraw.WITHDRAW_REQUEST_FAILED,
                failure_info='withdraw request failed.', ended_on=datetime.now(), id=order_id)
 
 
@@ -59,6 +58,15 @@ def freeze_withdraw_cash(account_id, source_id, amount):
     source_type = constant.source_type.WITHDRAW,
     debit_account = 'cash'
     credit_account = 'frozen'
+    now = datetime.now()
+    event = {
+        'account_id': account_id,
+        'source_type': source_type,
+        'step': constant.STEP_FROZEN,
+        'source_id': source_id,
+        'amount': amount,
+        'created_on': now
+    }
 
-    return two_accounts_bookkeeping(account_id, source_type, source_id, amount, debit_account, credit_account)
+    return two_accounts_bookkeeping(event, debit_account, credit_account)
 

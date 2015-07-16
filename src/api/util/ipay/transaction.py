@@ -8,6 +8,7 @@ from .query_order import query_order as _query_order
 from .refund import refund as _refund
 from .lianlian_config import config
 from .util import generate_notification_url as _generate_notification_url
+from api.util.uuid import decode_uuid
 
 
 def pay(payer_account_id, order_no, ordered_on, order_name, order_desc, amount, notification_url):
@@ -32,6 +33,10 @@ def query_order():
 
 def is_sending_to_me(partner_id):
     return partner_id == config.oid_partner
+
+
+def is_valid_transaction(oid_partner, transaction_id, uuid):
+    return is_sending_to_me(oid_partner) and transaction_id == decode_uuid(uuid)
 
 
 def generate_pay_notification_url(id):

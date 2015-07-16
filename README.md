@@ -132,14 +132,15 @@ balance: 余额
 系统以 _连连支付_ 作为主要账户，作为资金中转账户。
 假如我们增加了微信支付, 我们需要其完成 **支付**, **充值**, **退款** 等功能,
 需要做如下事情:
+
 ```
-0. 添加微信账户作为外部资金对账账户
-1. 添加微信对应的business和secured账号
-2. 添加wexin-payment, weixin-prepaid, weixin-refund等表来记录相关功能,
-或者在扩展原来的表
-3. 添加微信支付，充值接口，支付微信退款
-4. 增加WEIXIN-PAY, WEIXIN-REFUND, WEIXIN-PREPAID等event来源类型
++ 微信账户作为外部资金对账账户
++ 微信对应的business和secured账号
++ weixin-payment, weixin-prepaid, weixin-refund等表来记录相关功能, 或者在扩展原来的表
++ 添加微信支付，充值接口，支付微信退款
++ 增加WEIXIN-PAY, WEIXIN-REFUND, WEIXIN-PREPAID等event来源类型
 ```
+
 下面讨论一下具体的操作流程
 
 ### 术语说明

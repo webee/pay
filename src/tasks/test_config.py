@@ -2,10 +2,8 @@
 from kombu import Exchange, Queue
 import os
 
-# BROKER_URL = 'redis://:webee@rank12345@10.88.132.144:6379/1'
-# CELERY_RESULT_BACKEND = 'redis://:webee@rank12345@10.88.132.144:6379/1'
-BROKER_URL = 'amqp://webee:webee@rank12345@l-qhrank1.h.cn5/qhimg'
-CELERY_RESULT_BACKEND = 'amqp://webee:webee@rank12345@l-qhrank1.h.cn5/qhimg'
+BROKER_URL = 'redis://127.0.0.1:6379/1'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
 
 BROKER_POOL_LIMIT = 48
 
@@ -24,21 +22,21 @@ CELERY_QUEUES = (
 )
 
 CELERY_ROUTES = {
-    'celery_proj.img_score_tasks.process_op_hist': {'queue': 'op_hist', 'routing_key': 'op_hist'},
+    'tasks.img_score_tasks.process_op_hist': {'queue': 'op_hist', 'routing_key': 'op_hist'},
 }
 
 from datetime import timedelta
 
 CELERYBEAT_SCHEDULE = {
     'consume_op_history-E60s': {
-        'task': 'celery_proj.img_score_tasks.consume_op_history',
+        'task': 'tasks.img_score_tasks.consume_op_history',
         'schedule': timedelta(seconds=1*60),
         'kwargs': {'def_ahead': 30, 'd': 10, 'use_id': True, 'use_id': True},
         'relative': True,
         'options': {'queue': 'celery_periodic'}
     },
     'consume_qhimgs-E0.5d': {
-        'task': 'celery_proj.img_score_tasks.consume_qhimgs',
+        'task': 'tasks.img_score_tasks.consume_qhimgs',
         'schedule': timedelta(days=0.5),
         'relative': True,
         'options': {'queue': 'celery_periodic'}

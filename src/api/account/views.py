@@ -107,3 +107,12 @@ def add_bankcard(account_id):
 
     return jsonify(data=data)
 
+
+@mod.route('/notify_test', methods=['POST'])
+@return_json
+def notify_test():
+    raw_data = request.data
+
+    data = transaction.parse_request_data(raw_data)
+    logger.info(json.dumps(data))
+    return pay_resp.SUCCESS

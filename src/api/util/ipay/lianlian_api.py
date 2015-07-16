@@ -12,8 +12,9 @@ def request(api_url, params):
     data = json.dumps(params)
 
     req = requests.post(api_url, data)
-
-    return _parse_response_data(req.content)
+    if req.status_code == 200:
+        return _parse_response_data(req.content)
+    return {'ret': False, 'msg': 'api http request failed.'}
 
 
 def parse_request_data(raw_data):
@@ -30,15 +31,8 @@ def parse_request_data(raw_data):
         msg = parsed_data['msg']
 
     if data:
-        return {
-            'ret': True,
-            'data': data
-        }
-    else:
-        return {
-            'ret': False,
-            'msg': msg
-        }
+        return {'ret': True, 'data': data}
+    return {'ret': False, 'msg': msg}
 
 
 def _parse_data(raw_data):
@@ -52,15 +46,8 @@ def _parse_data(raw_data):
     except ValueError as e:
         msg = "数据错误"
     if data:
-        return {
-            'ret': True,
-            'data': data
-        }
-    else:
-        return {
-            'ret': False,
-            'msg': msg
-        }
+        return {'ret': True, 'data': data}
+    return {'ret': False, 'msg': msg}
 
 
 def _parse_response_data(raw_data):
@@ -71,10 +58,13 @@ def _parse_response_data(raw_data):
     if parsed_data['ret']:
         ret_data = parsed_data['data']
         if 'ret_code' in ret_data and ret_data['ret_code'] == '0000':
-            if verify(ret_data, ret_data['sign_type']):
-                data = ret_data
+            if 'sign_type' in ret_data:
+                if verify(ret_data, ret_data['sign_type']):
+                    data = ret_data
+                else:
+                    msg = "数据签名错误"
             else:
-                msg = "数据签名错误"
+                data = {'ret_code': ret_data['ret_code'], 'ret_msg': ret_data.get('ret_msg')}
         else:
             code = ret_data.get('ret_code')
             msg = ret_data.get('ret_msg')
@@ -82,13 +72,5 @@ def _parse_response_data(raw_data):
         msg = parsed_data['msg']
 
     if data:
-        return {
-            'ret': True,
-            'data': data
-        }
-    else:
-        return {
-            'ret': False,
-            'code': code,
-            'msg': msg
-        }
+        return {'ret': True, 'data': data}
+    return {'ret': False, 'code': code, 'msg': msg}

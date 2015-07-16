@@ -38,7 +38,7 @@ config = AttrDict(
     ),
 
     pay_to_bankcard=AttrDict(
-        url="https://yintong.com.cn/traderapi/cardandpay.htm"
+        url="http://localhost:5000/ipay_mock/cardandpay"
     ),
 
     order=AttrDict(

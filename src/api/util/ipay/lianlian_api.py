@@ -2,14 +2,32 @@
 from __future__ import unicode_literals
 import json
 import requests
+from .lianlian_config import config
 
 from .sign import sign, verify
 
 
-def request(api_url, params):
+def sign_params(params):
     params = {unicode(k): unicode(v) for k, v in params.items()}
     params['sign'] = sign(params, params['sign_type'])
-    data = json.dumps(params)
+
+    return params
+
+
+def md5_sign_params(params):
+    params['sign_type'] = config.sign_type.MD5
+
+    return sign_params(params)
+
+
+def rsa_sign_params(params):
+    params['sign_type'] = config.sign_type.RSA
+
+    return sign_params(params)
+
+
+def request(api_url, params):
+    data = json.dumps(sign_params(params))
 
     req = requests.post(api_url, data)
     if req.status_code == 200:

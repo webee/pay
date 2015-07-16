@@ -44,7 +44,7 @@ def withdraw(account_id):
 
     order_info = "提现"
     host_url = current_app.config.get('HOST_URL')
-    notify_url = host_url + url_for('account.withdraw_notify')
+    notify_url = host_url + url_for('account.notify_withdraw', uuid=transaction.encode_uuid(order_id))
 
     # 1. 生成提现订单
     order_id = create_withdraw_order(account_id, bankcard.id, amount, callback_url)
@@ -106,13 +106,3 @@ def add_bankcard(account_id):
     data = request.values
 
     return jsonify(data=data)
-
-
-@mod.route('/notify_test', methods=['POST'])
-@return_json
-def notify_test():
-    raw_data = request.data
-
-    data = transaction.parse_request_data(raw_data)
-    logger.info(json.dumps(data))
-    return pay_resp.SUCCESS

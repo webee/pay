@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from api.util import id
 from api.util.enum import enum
 from api.util.ipay import transaction
 from api.account.account import find_account_id
@@ -60,6 +61,7 @@ def _find_payment(client_id, order_no):
 def _apply_for_refund(transaction_id, payer_account_id, amount):
     refunded_on = datetime.now()
     fields = {
+        'id': id.refund_id(payer_account_id),
         'transaction_id': transaction_id,
         'payer_account_id': payer_account_id,
         'amount': amount,

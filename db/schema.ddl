@@ -73,7 +73,7 @@ CREATE TABLE withdraw(
 
 
 CREATE TABLE refund(
-  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, -- prefix with 'RFD'
+  id CHAR(30) PRIMARY KEY,  -- prefix with 'RFD'
   transaction_id CHAR(30) NOT NULL,
   payer_account_id INT UNSIGNED NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,

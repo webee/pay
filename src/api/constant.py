@@ -20,6 +20,12 @@ class WithdrawResult(object):
     FAILED = 'FAILED'
 
 
+class PayStep(object):
+    SECURED = 'SECURED'
+    SUCCESS = 'SUCCESS'
+    FAILED = 'FAILED'
+
+
 class WithdrawStep(object):
     SECURED = "SECURED"
     EXPIRED = "EXPIRED"

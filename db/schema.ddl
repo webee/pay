@@ -111,7 +111,7 @@ CREATE TABLE event(
 
 /*--- Kinds of Account ----------------------------------------------------------------------------------------*/
 CREATE TABLE asset_account_transaction_log(
-  id BIGINT UNSIGNED PRIMARY KEY,
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
   account_id INT UNSIGNED NOT NULL,
   side ENUM('DEBIT', 'CREDIT') NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE asset_account_transaction_log(
 
 
 CREATE TABLE secured_account_transaction_log(
-  id BIGINT UNSIGNED PRIMARY KEY,
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
   account_id INT UNSIGNED NOT NULL,
   side ENUM('DEBIT', 'CREDIT') NOT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE secured_account_transaction_log(
 
 
 CREATE TABLE business_account_transaction_log(
-  id BIGINT UNSIGNED PRIMARY KEY,
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
   account_id INT UNSIGNED NOT NULL,
   side ENUM('DEBIT', 'CREDIT') NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE business_account_transaction_log(
 
 
 CREATE TABLE cash_account_transaction_log(
-  id BIGINT UNSIGNED PRIMARY KEY,
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
   account_id INT UNSIGNED NOT NULL,
   side ENUM('DEBIT', 'CREDIT') NOT NULL,
@@ -161,7 +161,7 @@ CREATE TABLE cash_account_transaction_log(
 
 
 CREATE TABLE frozen_account_transaction_log(
-  id BIGINT UNSIGNED PRIMARY KEY,
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
   account_id INT UNSIGNED NOT NULL,
   side ENUM('DEBIT', 'CREDIT') NOT NULL,

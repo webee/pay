@@ -23,6 +23,23 @@ class Event(object):
         self.created_on = datetime.now()
 
 
+def bookkeeping(event, account_a, account_b):
+    sa, account_a = account_a[0], account_a[1:]
+    sb, account_b = account_b[0], account_b[1:]
+    if sa == '+' and sb == '-':
+        debit_account, credit_account = _get_debit_and_credit(account_a, account_b)
+    elif sa == '-' and sb == '+':
+        debit_account, credit_account = _get_debit_and_credit(account_b, account_a)
+    elif sa == '+' and sb == '+':
+        debit_account, credit_account = _get_debit_and_credit_both_increased(account_b, account_a)
+    elif sa == '-' and sb == '-':
+        debit_account, credit_account = _get_debit_and_credit_both_decreased(account_b, account_a)
+    else:
+        raise ValueError('bad accounts format.')
+    amount = event['amount']
+    return _debit_credit_bookkeeping(event, ((debit_account, amount),), ((credit_account, amount),))
+
+
 def _get_debit_and_credit_both_increased(account_a, account_b):
     """ 都增加
     """
@@ -55,23 +72,6 @@ def _get_debit_and_credit_accounts(increased_accounts, decreased_accounts):
     credit_accounts = [account for account, s in accounts.items() if s == 'c']
 
     return debit_accounts, credit_accounts
-
-
-def bookkeeping(event, account_a, account_b):
-    sa, account_a = account_a[0], account_a[1:]
-    sb, account_b = account_b[0], account_b[1:]
-    if sa == '+' and sb == '-':
-        debit_account, credit_account = _get_debit_and_credit(account_a, account_b)
-    elif sa == '-' and sb == '+':
-        debit_account, credit_account = _get_debit_and_credit(account_b, account_a)
-    elif sa == '+' and sb == '+':
-        debit_account, credit_account = _get_debit_and_credit_both_increased(account_b, account_a)
-    elif sa == '-' and sb == '-':
-        debit_account, credit_account = _get_debit_and_credit_both_decreased(account_b, account_a)
-    else:
-        raise ValueError('bad accounts format.')
-    amount = event['amount']
-    return _debit_credit_bookkeeping(event, ((debit_account, amount),), ((credit_account, amount),))
 
 
 def _debit_credit_bookkeeping(event, debit_items, credit_items):

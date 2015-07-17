@@ -58,8 +58,8 @@ def _get_debit_and_credit_accounts(increased_accounts, decreased_accounts):
 
 
 def bookkeeping(event, account_a, account_b):
-    sa, account_a = account_a[1], account_a[1:]
-    sb, account_b = account_b[1], account_b[1:]
+    sa, account_a = account_a[0], account_a[1:]
+    sb, account_b = account_b[0], account_b[1:]
     if sa == '+' and sb == '-':
         debit_account, credit_account = _get_debit_and_credit(account_a, account_b)
     elif sa == '-' and sb == '+':

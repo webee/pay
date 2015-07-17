@@ -8,7 +8,6 @@ def two_accounts_bookkeeping(event, debit_account, credit_account):
     return debit_credit_bookkeeping(event, ((debit_account, amount),), ((credit_account, amount),))
 
 
-@transactional
 def debit_credit_bookkeeping(event, debit_items, credit_items):
     """ 复式记账法
     :param event: 事件

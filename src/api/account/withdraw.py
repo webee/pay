@@ -5,7 +5,7 @@ from datetime import datetime
 from tools.dbi import from_db, transactional
 from api.util import id
 from api import constant
-from api.util.bookkeeping import two_accounts_bookkeeping
+from api.util.bookkeeping import two_accounts_bookkeeping, Event
 
 
 @transactional
@@ -55,18 +55,8 @@ def withdraw_order_end(order_id, paybill_id, result, failure_info, settle_date):
 
 
 def freeze_withdraw_cash(account_id, source_id, amount):
-    source_type = constant.source_type.WITHDRAW,
-    debit_account = 'cash'
-    credit_account = 'frozen'
-    now = datetime.now()
-    event = {
-        'account_id': account_id,
-        'source_type': source_type,
-        'step': constant.STEP_FROZEN,
-        'source_id': source_id,
-        'amount': amount,
-        'created_on': now
-    }
-
-    return two_accounts_bookkeeping(event, debit_account, credit_account)
-
+    return two_accounts_bookkeeping(
+        Event(account_id, constant.source_type.WITHDRAW, constant.event.STEP_FROZEN, source_id, amount),
+        'cash',
+        'frozen'
+    )

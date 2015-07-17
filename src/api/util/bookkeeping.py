@@ -1,6 +1,18 @@
 # coding=utf-8
 from __future__ import unicode_literals
+from datetime import datetime
+
 from tools.dbi import from_db, transactional
+
+
+class Event(object):
+    def __init__(self, account_id, source_type, step, source_id, amount):
+        self.account_id = account_id,
+        self.source_type = source_type,
+        self.step = step,
+        self.source_id = source_id,
+        self.amount = amount,
+        self.created_on = datetime.now()
 
 
 def two_accounts_bookkeeping(event, debit_account, credit_account):

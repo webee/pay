@@ -2,17 +2,17 @@
 from __future__ import unicode_literals, print_function, division
 
 import json
+import random
+from datetime import datetime
 
 from flask import request
+
 from . import ipay_mock_mod as mod
 from api.util.api import return_json
 from api.util.ipay import transaction
 from tools.mylog import get_logger
 from api.util.ipay.constant import response as pay_resp
-from tasks import pay_tasks
-from api.util import id
-import random
-from datetime import datetime
+from lianlian_mock import pay_tasks
 
 logger = get_logger(__name__)
 

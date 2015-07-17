@@ -63,7 +63,7 @@ CREATE TABLE withdraw(
   created_on TIMESTAMP NOT NULL,
   callback_url VARCHAR(128) COMMENT '请求方回调通知url',
   paybill_id VARCHAR(18) COMMENT '第三方交易订单id',
-  result ENUM('FROZEN', 'REQUEST_FAILED', 'SUCCESS', 'FAILED') COMMENT '提现结果',
+  result ENUM('FROZEN', 'REQUEST_FAILED', 'SUCCESS', 'FAILED') NOT NULL COMMENT '提现结果',
   settle_date CHAR(8) COMMENT '成功支付，清算日期',
   failure_info VARCHAR(255) COMMENT '提现失败原因',
   ended_on TIMESTAMP NOT NULL COMMENT '结束时间',

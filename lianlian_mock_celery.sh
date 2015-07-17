@@ -18,5 +18,7 @@ if [ $# -lt 2 ]; then
     exit 123
 fi
 
-cd src
+
+cd lianlian_mock/
+
 exec celery "$@"

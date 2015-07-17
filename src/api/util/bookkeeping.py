@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from datetime import datetime
 
-from tools.dbi import from_db, transactional
+from tools.dbi import from_db
 
 ACCOUNTS_SIDES = {
     'asset': {'+': 'd', '-': 'c'},
@@ -23,31 +23,31 @@ class Event(object):
         self.created_on = datetime.now()
 
 
-def get_debit_and_credit_both_increased(account_a, account_b):
+def _get_debit_and_credit_both_increased(account_a, account_b):
     """ 都增加
     """
-    debit_accounts, credit_accounts = get_debit_and_credit_accounts((account_a, account_b), ())
+    debit_accounts, credit_accounts = _get_debit_and_credit_accounts((account_a, account_b), ())
 
     return debit_accounts[0], credit_accounts[0]
 
 
-def get_debit_and_credit_both_decreased(account_a, account_b):
+def _get_debit_and_credit_both_decreased(account_a, account_b):
     """ 都减少
     """
-    debit_accounts, credit_accounts = get_debit_and_credit_accounts((), (account_a, account_b))
+    debit_accounts, credit_accounts = _get_debit_and_credit_accounts((), (account_a, account_b))
 
     return debit_accounts[0], credit_accounts[0]
 
 
-def get_debit_and_credit(increased_account, decreased_account):
+def _get_debit_and_credit(increased_account, decreased_account):
     """ 一增一减
     """
-    debit_accounts, credit_accounts = get_debit_and_credit_accounts((increased_account, ), (decreased_account, ))
+    debit_accounts, credit_accounts = _get_debit_and_credit_accounts((increased_account, ), (decreased_account, ))
 
     return debit_accounts[0], credit_accounts[0]
 
 
-def get_debit_and_credit_accounts(increased_accounts, decreased_accounts):
+def _get_debit_and_credit_accounts(increased_accounts, decreased_accounts):
     accounts = {account: ACCOUNTS_SIDES[account]['+'] for account in increased_accounts}
     accounts.update({account: ACCOUNTS_SIDES[account]['-'] for account in decreased_accounts})
 
@@ -57,12 +57,22 @@ def get_debit_and_credit_accounts(increased_accounts, decreased_accounts):
     return debit_accounts, credit_accounts
 
 
-def two_accounts_bookkeeping(event, debit_account, credit_account):
+def bookkeeping(event, account_a, account_b):
+    sa, account_a = account_a[1], account_a[1:]
+    sb, account_b = account_b[1], account_b[1:]
+    if sa == '+' and sb == '-':
+        debit_account, credit_account = _get_debit_and_credit(account_a, account_b)
+    elif sa == '-' and sb == '+':
+        debit_account, credit_account = _get_debit_and_credit(account_b, account_a)
+    elif sa == '+' and sb == '+':
+        debit_account, credit_account = _get_debit_and_credit_both_increased(account_b, account_a)
+    elif sa == '-' and sb == '-':
+        debit_account, credit_account = _get_debit_and_credit_both_decreased(account_b, account_a)
     amount = event['amount']
-    return debit_credit_bookkeeping(event, ((debit_account, amount),), ((credit_account, amount),))
+    return _debit_credit_bookkeeping(event, ((debit_account, amount),), ((credit_account, amount),))
 
 
-def debit_credit_bookkeeping(event, debit_items, credit_items):
+def _debit_credit_bookkeeping(event, debit_items, credit_items):
     """ 复式记账法
     :param event: 事件
     :param debit_items: 借记事项[(account, amount), ...]

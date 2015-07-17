@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from lianlian_api import parse_request_data as _parse_request_data, request as _request
-from lianlian_api import sign_params, md5_sign_params, rsa_sign_params
 from .bankcard import query_bin as _query_bin
 from .pay import pay as _pay
 from .pay_to_bankcard import pay_to_bankcard as _pay_to_bankcard
@@ -8,7 +7,7 @@ from .query_order import query_order as _query_order
 from .refund import refund as _refund
 from .lianlian_config import config
 from .util import generate_notification_url as _generate_notification_url
-from api.util.uuid import encode_uuid, decode_uuid
+from api.util.uuid import decode_uuid
 
 
 def parse_request_data(raw_data):

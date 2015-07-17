@@ -5,7 +5,7 @@ from .lianlian_config import config
 from .util import datetime_to_str, generate_notification_url
 
 
-def refund(refund_id, refunded_on, amount, paybill_id, url_root):
+def refund(refund_id, refunded_on, amount, paybill_id):
     notification_url = _generate_refund_notification_url(refund_id)
 
     params = {

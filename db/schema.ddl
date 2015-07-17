@@ -110,17 +110,6 @@ CREATE TABLE event(
 
 
 /*--- Kinds of Account ----------------------------------------------------------------------------------------*/
-CREATE TABLE lianlian_transaction_log(
-  id BIGINT UNSIGNED PRIMARY KEY,
-  event_id BIGINT UNSIGNED NOT NULL,
-  account_id INT UNSIGNED NOT NULL,
-  side ENUM('DEBIT', 'CREDIT') NOT NULL,
-  amount DECIMAL(12, 2) NOT NULL,
-  created_on TIMESTAMP NOT NULL,
-  FOREIGN KEY event_id(event_id) REFERENCES event(id),
-  FOREIGN KEY account_id(account_id) REFERENCES account(id)
-);
-
 CREATE TABLE zyt_asset_transaction_log(
   id BIGINT UNSIGNED PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,

@@ -38,7 +38,8 @@ config = AttrDict(
     ),
 
     pay_to_bankcard=AttrDict(
-        url="https://yintong.com.cn/traderapi/cardandpay.htm"
+        url="https://yintong.com.cn/traderapi/cardandpay.htm",
+        notify_url='/withdraw/{uuid}/result',
     ),
 
     order=AttrDict(

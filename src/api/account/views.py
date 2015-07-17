@@ -26,15 +26,15 @@ def withdraw(account_id):
     :type account_id: unicode or int
     :return:
     """
-    data = request.values
-    bankcard_id = to_int(data.get('bankcard_id'))
-    callback_url = data.get('callback_url')
+    req_data = request.values
+    bankcard_id = to_int(req_data.get('bankcard_id'))
+    callback_url = req_data.get('callback_url')
 
     bankcard = get_bankcard(account_id, bankcard_id)
     if bankcard is None:
         return resp.FALSE_BANKCARD_NOT_EXISTS
 
-    amount = to_float(data.get('amount'))
+    amount = to_float(req_data.get('amount'))
     if amount <= 0:
         return resp.FALSE_AMOUNT_VALUE_ERROR
 
@@ -53,12 +53,12 @@ def withdraw(account_id):
     # TODO: 这里要释放锁
 
     # 3. 发送请求
-    notify_url = host_url + url_for('account.notify_withdraw', uuid=transaction.encode_uuid(order_id))
-    data = transaction.pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
+    notify_url = host_url + transaction.generate_pay_to_bankcard_notification_url(order_id)
+    res_data = transaction.pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
 
-    logger.info(json.dumps(data))
+    logger.info(json.dumps(res_data))
 
-    if data['ret']:
+    if res_data['ret']:
         return resp.TRUE_JUST_OK
 
     try:

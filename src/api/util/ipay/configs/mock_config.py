@@ -38,7 +38,8 @@ config = AttrDict(
     ),
 
     pay_to_bankcard=AttrDict(
-        url="http://localhost:5000/ipay_mock/cardandpay"
+        url="http://localhost:5000/ipay_mock/cardandpay",
+        notify_url='/withdraw/{uuid}/result',
     ),
 
     order=AttrDict(

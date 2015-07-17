@@ -16,7 +16,7 @@ CREATE TABLE account(
   user_id VARCHAR(32) NOT NULL,
 
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '用户';
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE payment(
   id CHAR(30) PRIMARY KEY , -- prefix with 'PAY'
@@ -40,7 +40,7 @@ CREATE TABLE payment(
 
 
 CREATE TABLE bankcard(
-  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '自增主键',
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   account_id INT UNSIGNED NOT NULL COMMENT '银行卡对应的账号',
   flag TINYINT NOT NULL COMMENT '0-对私，1-对公',
   card_no VARCHAR(21) NOT NULL COMMENT '银行账号，对私必须是借记卡',
@@ -52,15 +52,15 @@ CREATE TABLE bankcard(
   created_on TIMESTAMP NOT NULL,
   updated_on TIMESTAMP NOT NULL,
   FOREIGN KEY bankcard_account_id (account_id) REFERENCES account(id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '提款绑定银行卡';
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE withdraw(
-  id CHAR(30) PRIMARY KEY COMMENT '订单id', -- prefix with 'WDR'
+  id CHAR(30) PRIMARY KEY, -- prefix with 'WDR'
   account_id INT UNSIGNED NOT NULL COMMENT '提现账号',
   bankcard_id INT UNSIGNED NOT NULL COMMENT '提现到银行号id',
-  amount DECIMAL(12, 2) NOT NULL COMMENT '提现金额',
-  created_on TIMESTAMP NOT NULL COMMENT '创建时间',
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
   callback_url VARCHAR(128) COMMENT '请求方回调通知url',
   paybill_id VARCHAR(18) COMMENT '第三方交易订单id',
   result ENUM('FROZEN', 'REQUEST_FAILED', 'SUCCESS', 'FAILED') COMMENT '提现结果',
@@ -69,7 +69,7 @@ CREATE TABLE withdraw(
   ended_on TIMESTAMP NOT NULL COMMENT '结束时间',
   FOREIGN KEY withdraw_account_id(account_id) REFERENCES account(id),
   FOREIGN KEY withdraw_bankcard_id(bankcard_id) REFERENCES bankcard(id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '提现订单';
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE refund(
@@ -92,7 +92,7 @@ CREATE TABLE account_balance(
   balance DECIMAL(12, 2) NOT NULL COMMENT '余额',
   settle_time TIMESTAMP NOT NULL COMMENT '结算日期时间',
   last_transaction_log_id BIGINT NOT NULL COMMENT '结算最后账户日志id',
-  created_on TIMESTAMP NOT NULL COMMENT '创建时间',
+  created_on TIMESTAMP NOT NULL,
   FOREIGN KEY accounts_balance_account_id(account_id) REFERENCES account(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

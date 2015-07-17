@@ -110,7 +110,7 @@ CREATE TABLE event(
 
 
 /*--- Kinds of Account ----------------------------------------------------------------------------------------*/
-CREATE TABLE zyt_asset_transaction_log(
+CREATE TABLE asset_account_transaction_log(
   id BIGINT UNSIGNED PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
   account_id INT UNSIGNED NOT NULL,

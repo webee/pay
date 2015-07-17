@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 
-class source_type(object):
+class SourceType(object):
     PAY = "PAY"
     WITHDRAW = "WITHDRAW"
     REFUND = "REFUND"
@@ -11,24 +11,21 @@ class source_type(object):
     TRANSFER = "转账"
 
 
-class event(object):
-    STEP_SECURED = "SECURED"
-    STEP_EXPIRED = "EXPIRED"
-    STEP_FROZEN = "FROZEN"
-    STEP_SUCCESS = "SUCCESS"
-    STEP_FAILED = "FAILED"
-
-
-class withdraw(object):
-    # 提现订单结果
-    ## 提现请求失败
-    WITHDRAW_REQUEST_FAILED = 'REQUEST_FAILED'
+class WithdrawResult(object):
     ## 提现冻结
-    WITHDRAW_FROZEN = 'FROZEN'
+    FROZEN = 'FROZEN'
     ## 提现成功
-    WITHDRAW_SUCCESS = 'SUCCESS'
+    SUCCESS = 'SUCCESS'
     ## 提现失败
-    WITHDRAW_FAILED = 'FAILED'
+    FAILED = 'FAILED'
+
+
+class WithdrawStep(object):
+    SECURED = "SECURED"
+    EXPIRED = "EXPIRED"
+    FROZEN = "FROZEN"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
 
 
 class response(object):
@@ -37,3 +34,4 @@ class response(object):
     FALSE_BANKCARD_NOT_EXISTS = {"ret": False, "msg": "此银行卡不存在"}
     FALSE_AMOUNT_VALUE_ERROR = {"ret": False, "msg": "[amount]值错误"}
     FALSE_INSUFFICIENT_BALANCE = {"ret": False, "msg": "余额不足"}
+    FALSE_ERROR_CREATING_ORDER = {"ret": False, "msg": "创建订单失败"}

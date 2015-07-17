@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 import logging
-from urlparse import urljoin
 from decimal import Decimal
 
 from . import pay_mod as mod
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid
 from .postpay import *
-from api.util.ipay.transaction import is_sending_to_me
+from api.util.ipay import transaction
 from flask import jsonify, request, Response
 
 log = logging.getLogger(__name__)
@@ -24,8 +23,8 @@ def prepay():
                   request_values['ordered_on'])
     amount = request_values['amount']
 
-    transaction_uuid = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount)
-    pay_url = _build_pay_url(transaction_uuid)
+    payment_id = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount)
+    pay_url = transaction.generate_pay_url(payment_id)
 
     return jsonify({'pay_url': pay_url})
 
@@ -45,7 +44,7 @@ def notify_payment(uuid):
     pay_result = request_values['result_pay']
     paybill_oid = request_values['oid_paybill']
 
-    if (not is_sending_to_me(partner_oid)) or (not is_valid_transaction(order_no, uuid, amount)):
+    if (not transaction.is_sending_to_me(partner_oid)) or (not is_valid_transaction(order_no, uuid, amount)):
         return _mark_as_invalid_notification()
 
     if not is_successful_payment(pay_result):
@@ -71,6 +70,3 @@ def _mark_as_failure():
 def _mark_as_invalid_notification():
     return jsonify({'ret_code': '9999'})
 
-
-def _build_pay_url(transaction_uuid):
-    return urljoin(request.url_root, 'pay/{0}').format(transaction_uuid)

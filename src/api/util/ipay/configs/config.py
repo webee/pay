@@ -29,6 +29,7 @@ config = AttrDict(
         default_order_expiration='10080',
 
         url='https://yintong.com.cn/payment/bankgateway.htm',
+        redirect_url='/pay/{uuid}',
         notify_url='/pay/{uuid}/result',
         return_url='http://www.baidu.com'
     ),

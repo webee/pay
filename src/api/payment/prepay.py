@@ -39,4 +39,4 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
     }
     from_db().insert('payment', **payment_fields)
 
-    return encode_uuid(payment_id)
+    return payment_id

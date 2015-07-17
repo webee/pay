@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from .lianlian_api import request
 from .lianlian_config import config
-from .util import datetime_to_str, generate_notification_url
+from .util import datetime_to_str, generate_url
 
 
 def refund(refund_id, refunded_on, amount, paybill_id):
@@ -20,5 +20,5 @@ def refund(refund_id, refunded_on, amount, paybill_id):
 
 
 def _generate_refund_notification_url(id):
-    return generate_notification_url(config.payment.notify_url, id)
+    return generate_url(config.payment.notify_url, id)
 

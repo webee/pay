@@ -19,7 +19,7 @@ CREATE TABLE account(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '用户';
 
 CREATE TABLE payment(
-  id CHAR(30) PRIMARY KEY ,
+  id CHAR(30) PRIMARY KEY , -- prefix with 'PAY'
   client_id INT UNSIGNED NOT NULL ,
   order_id VARCHAR(64) NOT NULL ,
   product_name VARCHAR(50) NOT NULL ,
@@ -56,7 +56,7 @@ CREATE TABLE bankcard(
 
 
 CREATE TABLE withdraw(
-  id CHAR(30) PRIMARY KEY COMMENT '订单id',
+  id CHAR(30) PRIMARY KEY COMMENT '订单id', -- prefix with 'WDR'
   account_id INT UNSIGNED NOT NULL COMMENT '提现账号',
   bankcard_id INT UNSIGNED NOT NULL COMMENT '提现到银行号id',
   amount DECIMAL(12, 2) NOT NULL COMMENT '提现金额',
@@ -73,7 +73,7 @@ CREATE TABLE withdraw(
 
 
 CREATE TABLE refund(
-  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, -- prefix with 'RFD'
   transaction_id CHAR(30) NOT NULL,
   payer_account_id INT UNSIGNED NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,

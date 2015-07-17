@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from api.attr_dict import AttrDict
+from api.util.attr_dict import AttrDict
 from tools.dbi import from_db
 
 

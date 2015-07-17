@@ -79,34 +79,46 @@ def _debit_credit_bookkeeping(event, debit_items, credit_items):
     :param credit_items: 贷记事项((account, amount), ...)
     :return:
     """
-    amount = event['amount']
-    debits_amount = sum(a for _, a in debit_items)
-    credits_amount = sum(a for _, a in credit_items)
-    if not amount == debits_amount == credits_amount:
+    if not _is_balanced(event.amount, debit_items, credit_items):
         raise ValueError('event, debit and credit amount are not equal.')
 
-    created_on = event['created_on']
-    account_id = event['account_id']
+    created_on = event.created_on
+    account_id = event.account_id
 
-    db = from_db()
-    event_id = db.insert('event', returns_id=True, **event)
+    event_id = _create_event(event)
+    _record_debit(event_id, account_id, debit_items, created_on)
+    _record_credit(event_id, account_id, credit_items, created_on)
 
+
+def _is_balanced(event_amount, debit_items, credit_items):
+    debits_amount = sum(a for _, a in debit_items)
+    credits_amount = sum(a for _, a in credit_items)
+    return event_amount == debits_amount == credits_amount
+
+
+def _create_event(event):
+    return from_db().insert('event', returns_id=True, **event.items)
+
+
+def _record_debit(event_id, account_id, debit_items, created_on):
     for account, amount in debit_items:
         account_log = {
             'event_id': event_id,
             'account_id': account_id,
-            'side': 'debit',  # 借
+            'side': 'debit',
             'amount': amount,
             'created_on': created_on
         }
-        db.insert(account + '_account_transaction_log', **account_log)
+        from_db().insert(account + '_account_transaction_log', **account_log)
 
+
+def _record_credit(event_id, account_id, credit_items, created_on):
     for account, amount in credit_items:
         account_log = {
             'event_id': event_id,
             'account_id': account_id,
-            'side': 'credit',  # 贷
+            'side': 'credit',
             'amount': amount,
             'created_on': created_on
         }
-        db.insert(account + '_account_transaction_log', **account_log)
+        from_db().insert(account + '_account_transaction_log', **account_log)

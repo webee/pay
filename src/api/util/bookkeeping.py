@@ -24,7 +24,7 @@ class Event(object):
 
 
 def get_debit_and_credit_both_increased(account_a, account_b):
-    """ 都减少
+    """ 都增加
     """
     debit_accounts, credit_accounts = get_debit_and_credit_accounts((account_a, account_b), ())
 
@@ -32,7 +32,7 @@ def get_debit_and_credit_both_increased(account_a, account_b):
 
 
 def get_debit_and_credit_both_decreased(account_a, account_b):
-    """ 都增加
+    """ 都减少
     """
     debit_accounts, credit_accounts = get_debit_and_credit_accounts((), (account_a, account_b))
 

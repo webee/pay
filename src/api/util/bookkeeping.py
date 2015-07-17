@@ -68,6 +68,8 @@ def bookkeeping(event, account_a, account_b):
         debit_account, credit_account = _get_debit_and_credit_both_increased(account_b, account_a)
     elif sa == '-' and sb == '-':
         debit_account, credit_account = _get_debit_and_credit_both_decreased(account_b, account_a)
+    else:
+        raise ValueError('bad accounts format.')
     amount = event['amount']
     return _debit_credit_bookkeeping(event, ((debit_account, amount),), ((credit_account, amount),))
 

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from api.util.uuid import encode_uuid
 from .lianlian_api import request
 from .lianlian_config import config
 from .util import datetime_to_str, generate_notification_url
@@ -18,10 +17,6 @@ def refund(refund_id, refunded_on, amount, paybill_id):
         'notify_url': notification_url
     }
     return request(config.refund.url, params)
-
-
-def _encode_uuid(refund_id):
-    return encode_uuid('%0.8d' % refund_id)
 
 
 def _generate_refund_notification_url(id):

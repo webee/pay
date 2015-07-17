@@ -59,10 +59,10 @@ def get_debit_and_credit_accounts(increased_accounts, decreased_accounts):
 
 def two_accounts_bookkeeping(event, debit_account, credit_account):
     amount = event['amount']
-    return debit_credit_bookkeeping(event, ((debit_account, amount),), ((credit_account, amount),))
+    return _debit_credit_bookkeeping(event, ((debit_account, amount),), ((credit_account, amount),))
 
 
-def debit_credit_bookkeeping(event, debit_items, credit_items):
+def _debit_credit_bookkeeping(event, debit_items, credit_items):
     """ 复式记账法
     :param event: 事件
     :param debit_items: 借记事项[(account, amount), ...]
@@ -85,7 +85,7 @@ def debit_credit_bookkeeping(event, debit_items, credit_items):
         account_log = {
             'event_id': event_id,
             'account_id': account_id,
-            'side': 'debit',  # 借
+            'side': 'debit',
             'amount': amount,
             'created_on': created_on
         }
@@ -95,7 +95,7 @@ def debit_credit_bookkeeping(event, debit_items, credit_items):
         account_log = {
             'event_id': event_id,
             'account_id': account_id,
-            'side': 'credit',  # 贷
+            'side': 'credit',
             'amount': amount,
             'created_on': created_on
         }

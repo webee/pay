@@ -8,8 +8,7 @@ from . import account_mod as mod
 from . import accounts
 from api.account.bankcard import get_user_bankcards, get_bankcard
 from tools.utils import to_int, to_float
-from .withdraw import create_withdraw_order, get_withdraw_order, withdraw_request_failed, withdraw_order_end
-from .withdraw import freeze_withdraw_cash
+from .withdraw import create_withdraw_order_and_freeze_cash, get_withdraw_order, withdraw_request_failed, withdraw_order_end
 from api.util.ipay import transaction
 from api.util.api import return_json
 from api.constant import response as resp
@@ -38,19 +37,23 @@ def withdraw(account_id):
     amount = to_float(data.get('amount'))
     if amount <= 0:
         return resp.FALSE_AMOUNT_VALUE_ERROR
+
+    # TODO: 从这开始加锁，同时只能有一个在执行操作account_id的cash账户
     balance = accounts.cash_account_balance(account_id)
     if amount > balance:
         return resp.FALSE_INSUFFICIENT_BALANCE
 
     order_info = "提现"
     host_url = current_app.config.get('HOST_URL')
-    notify_url = host_url + url_for('account.notify_withdraw', uuid=transaction.encode_uuid(order_id))
 
-    # 1. 生成提现订单
-    order_id = create_withdraw_order(account_id, bankcard.id, amount, callback_url)
-    # 2. 冻结金额
-    freeze_withdraw_cash(account_id, order_id, amount)
+    # 1. 生成提现订单并冻结金额
+    order_id = create_withdraw_order_and_freeze_cash(account_id, bankcard.id, amount, callback_url)
+    if order_id is None:
+        return resp.FALSE_ERROR_CREATING_ORDER
+    # TODO: 这里要释放锁
+
     # 3. 发送请求
+    notify_url = host_url + url_for('account.notify_withdraw', uuid=transaction.encode_uuid(order_id))
     data = transaction.pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
 
     logger.info(json.dumps(data))
@@ -58,7 +61,11 @@ def withdraw(account_id):
     if data['ret']:
         return resp.TRUE_JUST_OK
 
-    withdraw_request_failed(order_id)
+    try:
+        withdraw_request_failed(order_id)
+    except Exception as e:
+        # TODO: do something.
+        logger.error(e.message)
     return resp.FALSE_REQUEST_FAILED
 
 
@@ -87,7 +94,7 @@ def notify_withdraw(uuid):
     result = data['result_pay']
     settle_date = data.get('settle_date', '')
 
-    withdraw_order_end(order_id, paybill_id, result, failure_info, settle_date)
+    withdraw_order_end(withdraw_order, paybill_id, result, failure_info, settle_date)
 
     return pay_resp.SUCCESS
 

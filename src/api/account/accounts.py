@@ -1,4 +1,5 @@
 # coding=utf-8
+from tools.dbi import from_db
 
 
 def cash_account_balance(account_id):
@@ -6,4 +7,5 @@ def cash_account_balance(account_id):
     :param account_id:
     :return:
     """
+    db = from_db()
     return 100

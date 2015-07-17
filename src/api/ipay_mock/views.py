@@ -40,7 +40,7 @@ def cardandpay():
         'no_order': req_data['no_order'],
         'dt_order': req_data['dt_order'],
         'money_order': req_data['money_order'],
-        'oid_paybill': id.generate(random.randint(1, 1000000), 'LPB'),
+        'oid_paybill': _generate_id(random.randint(1, 1000000)),
         'result_pay': 'SUCCESS',
         'settle_date': now_date_str()
     }
@@ -57,3 +57,8 @@ def notify_test():
     data = transaction.parse_request_data(raw_data)
     logger.info(json.dumps(data, ensure_ascii=False))
     return pay_resp.SUCCESS
+
+
+
+def _generate_id(base_id):
+    return 'LPB' + datetime.now().strftime("%Y%m%d%H%M%S%f") + '%0.7d' % base_id

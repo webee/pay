@@ -22,7 +22,7 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
     payer_account_id = find_or_create_account(client_id, payer_user_id)
     payee_account_id = find_or_create_account(client_id, payee_user_id)
 
-    payment_id = id.generate(payer_account_id)
+    payment_id = id.pay_id(payer_account_id)
     payment_fields = {
         'id': payment_id,
         'client_id': client_id,

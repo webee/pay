@@ -17,7 +17,7 @@ def create_withdraw_order(account_id, bandcard_id, amount, callback_url):
     :param callback_url: 请求方回调通知url
     :return:
     """
-    order_id = id.generate(account_id)
+    order_id = id.withdraw_id(account_id)
     fields = {
         'id': order_id,
         'account_id': account_id,

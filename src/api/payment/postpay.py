@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from api.constant import SourceType, WithdrawStep
+from api.constant import SourceType, PayStep
 from api.util.bookkeeping import bookkeeping, Event
 from api.util.uuid import decode_uuid
 from tools.dbi import from_db, transactional
@@ -30,9 +30,8 @@ def succeed_transaction(payment_id, paybill_id):
     _update_payment(payment_id, paybill_id)
 
     payment = find_payment(payment_id)
-    amount = payment['amount']
     bookkeeping(
-        Event(payment['payee_account_id'], SourceType.WITHDRAW, WithdrawStep.FROZEN, payment_id, amount),
+        Event(payment['payee_account_id'], SourceType.PAY, PayStep.SECURED, payment_id, payment['amount']),
         '+secured', '+asset'
     )
 

@@ -15,11 +15,11 @@ ACCOUNTS_SIDES = {
 
 class Event(object):
     def __init__(self, account_id, source_type, step, source_id, amount):
-        self.account_id = account_id,
-        self.source_type = source_type,
-        self.step = step,
-        self.source_id = source_id,
-        self.amount = amount,
+        self.account_id = account_id
+        self.source_type = source_type
+        self.step = step
+        self.source_id = source_id
+        self.amount = amount
         self.created_on = datetime.now()
 
 
@@ -36,7 +36,7 @@ def bookkeeping(event, account_a, account_b):
         debit_account, credit_account = _get_debit_and_credit_both_decreased(account_b, account_a)
     else:
         raise ValueError('bad accounts format.')
-    amount = event['amount']
+    amount = event.amount
     return _debit_credit_bookkeeping(event, ((debit_account, amount),), ((credit_account, amount),))
 
 
@@ -99,7 +99,7 @@ def _is_balanced(event_amount, debit_items, credit_items):
 
 
 def _create_event(event):
-    return from_db().insert('event', returns_id=True, **event.items)
+    return from_db().insert('event', returns_id=True, **event.__dict__)
 
 
 def _record_debit(event_id, account_id, debit_items, created_on):

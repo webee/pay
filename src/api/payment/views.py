@@ -9,6 +9,7 @@ from .pay import pay_by_uuid
 from .postpay import *
 from api.util.ipay import transaction
 from flask import jsonify, request, Response
+import json
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ def pay(uuid):
 
 @mod.route('/pay/<uuid>/result', methods=['POST'])
 def notify_payment(uuid):
-    request_values = request.values
+    request_values = json.loads(request.data)
     partner_oid = request_values['oid_partner']
     order_no = request_values['no_order']
     amount = Decimal(request_values['money_order'])

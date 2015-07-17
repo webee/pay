@@ -7,12 +7,12 @@
 <body>
     <ul>
         <li>
-            <form action="/sample/pay-one-cent" method="POST">
+            <form action="{{ url_for('sample.pay_one_cent') }}" method="POST">
                 <input type="submit" value="Pay 0.01 Yuan" /> {{ pay_result }}
             </form>
         </li>
         <li>
-            <form action="/sample/refund-one-cent" method="POST">
+            <form action="{{ url_for('sample.refund_one_cent') }}" method="POST">
                 <input type="submit" value="Refund 0.01 Yuan" /> {{ refund_result }}
             </form>
         </li>

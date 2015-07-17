@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-from api.util.attr_dict import AttrDict
 from .configs import config, mock_config
 
 configs = {

@@ -29,7 +29,7 @@ def init_errors(app):
 def register_mods(app):
     from website.sample import sample_mod
 
-    app.register_blueprint(sample_mod, url_prefix='/sample')
+    app.register_blueprint(sample_mod, url_prefix='/site/sample')
 
 
 def create_app(config_name):

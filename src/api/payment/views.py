@@ -15,13 +15,13 @@ log = logging.getLogger(__name__)
 
 @mod.route('/pre-pay', methods=['POST'])
 def prepay():
-    request_values = request.values
-    client_id = request_values['client_id']
-    payer_id = request_values['payer']
-    payee_id = request_values['payee']
-    order = Order(request_values['order_no'], request_values['order_name'], request_values['order_desc'],
-                  request_values['ordered_on'])
-    amount = request_values['amount']
+    data = request.values
+    client_id = data['client_id']
+    payer_id = data['payer']
+    payee_id = data['payee']
+    order = Order(data['order_no'], data['order_name'], data['order_desc'],
+                  data['ordered_on'])
+    amount = data['amount']
 
     payment_id = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount)
     pay_url = transaction.generate_pay_url(payment_id)

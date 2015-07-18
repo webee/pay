@@ -11,11 +11,11 @@ log = logging.getLogger(__name__)
 
 @mod.route('/refund', methods=['POST'])
 def refund():
-    request_values = request.values
-    client_id = request_values['client_id']
-    payer_id = request_values['payer']
-    order_no = request_values['order_no']
-    amount = request_values['amount']
+    data = request.values
+    client_id = data['client_id']
+    payer_id = data['payer']
+    order_no = data['order_no']
+    amount = data['amount']
 
     try:
         refund_id = refund_transaction(client_id, payer_id, order_no, amount, request.url_root)

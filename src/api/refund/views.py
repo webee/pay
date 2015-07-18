@@ -43,6 +43,7 @@ def notify_refund_result(uuid):
         fail_refund(refund_id, refund_serial_no)
         return notification.fail()
 
+    succeed_refund(refund_id, refund_serial_no)
     return notification.succeed()
 
 

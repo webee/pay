@@ -54,7 +54,12 @@ def is_successful_refund(result):
 
 @transactional
 def fail_refund(refund_id, refund_serial_no):
-    _update_refund_state(refund_id, False, refund_serial_no)
+    _update_refund_state(id=refund_id, is_success=False, serial_no=refund_serial_no)
+
+
+@transactional
+def succeed_refund(refund_id, refund_serial_no):
+    _update_refund_state(id=refund_id, is_success=True, serial_no=refund_serial_no)
 
 
 def _send_refund_request(refund_id, refunded_on, amount, paybill_id):
@@ -100,11 +105,11 @@ def _apply_for_refund(payment_id, payer_account_id, amount):
     return refund_id, refunded_on
 
 
-def _update_refund_state(refund_id, is_success, serial_no):
+def _update_refund_state(id, is_success, serial_no):
     state = 1 if is_success else 0
     from_db().execute(
         """
             UPDATE refund SET success = %(state)s, transaction_ended_on = %(ended_on)s, refund_serial_no=%(serial_no)s
             WHERE id = %(id)s
         """,
-        id=refund_id, state=state, ended_on=datetime.now(), serial_no=serial_no)
+        id=id, state=state, ended_on=datetime.now(), serial_no=serial_no)

@@ -60,13 +60,20 @@ def fail_refund(refund_id, refund_serial_no):
     bookkeeping(
         Event(refund_record['payer_account_id'], SourceType.REFUND, RefundStep.FAILED,
               refund_id, refund_record['amount']),
-        '-frozen', '+secured'
+        '-frozen', '-asset'
     )
 
 
 @transactional
 def succeed_refund(refund_id, refund_serial_no):
     _update_refund_state(id=refund_id, is_success=True, serial_no=refund_serial_no)
+
+    refund_record = _find_refund(refund_id)
+    bookkeeping(
+        Event(refund_record['payer_account_id'], SourceType.REFUND, RefundStep.SUCCESS,
+              refund_id, refund_record['amount']),
+        '-frozen', '+secured'
+    )
 
 
 def _send_refund_request(refund_id, refunded_on, amount, paybill_id):

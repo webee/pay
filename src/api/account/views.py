@@ -3,12 +3,13 @@ from __future__ import unicode_literals, print_function, division
 
 import json
 
-from flask import request, jsonify, current_app
+from flask import request, current_app
 from . import account
 from . import account_mod as mod
-from .bankcard import list_all_bankcards, get_bankcard
+from .bankcard import list_all_bankcards, get_bankcard, new_bankcard, BankCard
 from tools.utils import to_int, to_float
 from .withdraw import create_withdraw_order_and_freeze_cash, get_withdraw_order, withdraw_request_failed, withdraw_order_end
+from api.util import response
 from api.util.ipay import transaction
 from api.util.api import return_json
 from api.constant import response as resp
@@ -108,5 +109,14 @@ def list_all_bankcards(account_id):
 @mod.route('/<int:account_id>/bankcards', methods=['POST'])
 def add_bankcard(account_id):
     data = request.values
+    card_no = data['card_no']
+    account_name = data['account_name']
+    is_corporate_account = bool(data['is_corporate_account'])
+    bank_code = data['bank_code']
+    province_code = data['province_code']
+    city_code = data['city_code']
+    branch_bank_name = data['branch_bank_name']
 
-    return jsonify(data=data)
+    card = BankCard(card_no, account_name, is_corporate_account, bank_code, province_code, city_code, branch_bank_name)
+    bankcard_id = new_bankcard(account_id, card)
+    return response.created(bankcard_id)

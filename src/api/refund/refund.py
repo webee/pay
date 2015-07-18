@@ -36,7 +36,7 @@ def refund_transaction(client_id, payer_id, order_no, amount, url_root):
 
     payer_account_id = find_account_id(client_id, payer_id)
     refund_id, refunded_on = _refund(payment['id'], payer_account_id, amount)
-    _send_refund_request(refund_id, refunded_on, amount, payment['paybill_id'], url_root)
+    _send_refund_request(refund_id, refunded_on, amount, payment['paybill_id'])
 
 
 def is_valid_refund(refund_id, uuid, refund_amount):
@@ -57,7 +57,7 @@ def fail_refund(refund_id, refund_serial_no):
     _update_refund_state(refund_id, False, refund_serial_no)
 
 
-def _send_refund_request(refund_id, refunded_on, amount, paybill_id, url_root):
+def _send_refund_request(refund_id, refunded_on, amount, paybill_id):
     resp = transaction.refund(refund_id, refunded_on, amount, paybill_id)
 
     if resp.status_code != 200:

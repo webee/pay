@@ -50,7 +50,7 @@ CREATE TABLE bankcard(
   city_code VARCHAR(12) NOT NULL COMMENT '开户行所在市编码',
   branch_bank_name VARCHAR(50) NOT NULL COMMENT '开户支行名称',
   created_on TIMESTAMP NOT NULL,
-  updated_on TIMESTAMP NOT NULL,
+
   FOREIGN KEY bankcard_account_id (account_id) REFERENCES account(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

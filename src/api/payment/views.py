@@ -44,7 +44,7 @@ def notify_payment(uuid):
     pay_result = data['result_pay']
     paybill_oid = data['oid_paybill']
 
-    if (not transaction.is_sending_to_me(partner_oid)) or (not is_valid_transaction(order_no, uuid, amount)):
+    if (not transaction.is_sending_to_me(partner_oid)) or (not is_valid_payment(order_no, uuid, amount)):
         return _response_invalid_notification()
 
     if not is_successful_payment(pay_result):

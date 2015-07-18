@@ -6,7 +6,7 @@ from api.util.uuid import decode_uuid
 from tools.dbi import from_db, transactional
 
 
-def is_valid_transaction(transaction_id, uuid, paid_amount):
+def is_valid_payment(transaction_id, uuid, paid_amount):
     if transaction_id != decode_uuid(uuid):
         return False
 

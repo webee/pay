@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, division
 import logging
 
 from . import refund_mod as mod
-from .refund import refund_transaction, NoTransactionFoundError, RefundFailedError
+from .refund import refund_transaction, NoPaymentFoundError, RefundFailedError
 from flask import jsonify, request, abort
 
 log = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ def refund():
     try:
         refund_id = refund_transaction(client_id, payer_id, order_no, amount, request.url_root)
         return _response_accepted(refund_id)
-    except NoTransactionFoundError:
+    except NoPaymentFoundError:
         return abort(404)
     except RefundFailedError, e:
         return _response_created(e.refund_id)

@@ -8,11 +8,11 @@ from api.account.account import find_account_id
 from tools.dbi import from_db, transactional
 
 
-class NoTransactionFoundError(Exception):
+class NoPaymentFoundError(Exception):
     def __init__(self, client_id, order_no):
         message = "Cannot find any valid pay transaction with [client_id={0}, order_no={1}]."\
             .format(client_id, order_no)
-        super(NoTransactionFoundError, self).__init__(message)
+        super(NoPaymentFoundError, self).__init__(message)
 
 
 class RefundFailedError(Exception):
@@ -29,7 +29,7 @@ RefundState = enum(Applied=0, InProcessing=1, Success=2, Failure=3)
 def refund_transaction(client_id, payer_id, order_no, amount, url_root):
     payment = _find_payment(client_id, order_no)
     if not payment:
-        raise NoTransactionFoundError(client_id, order_no)
+        raise NoPaymentFoundError(client_id, order_no)
 
     payer_account_id = find_account_id(client_id, payer_id)
     refund_id, refunded_on = _apply_for_refund(payment['id'], payer_account_id, amount)

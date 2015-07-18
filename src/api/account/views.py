@@ -3,10 +3,10 @@ from __future__ import unicode_literals, print_function, division
 
 import json
 
-from flask import request, jsonify, current_app, url_for
+from flask import request, jsonify, current_app
 from . import account
 from . import account_mod as mod
-from api.account.bankcard import get_user_bankcards, get_bankcard
+from .bankcard import list_all_bankcards, get_bankcard
 from tools.utils import to_int, to_float
 from .withdraw import create_withdraw_order_and_freeze_cash, get_withdraw_order, withdraw_request_failed, withdraw_order_end
 from api.util.ipay import transaction
@@ -101,11 +101,8 @@ def notify_withdraw(uuid):
 
 @mod.route('/<int:account_id>/bankcards', methods=['GET'])
 def list_all_bankcards(account_id):
-    bankcards = get_user_bankcards(account_id)
-    return jsonify(
-        ret=True,
-        bankcards=bankcards
-    )
+    bankcards = list_all_bankcards(account_id)
+    return json.dumps(bankcards), 200
 
 
 @mod.route('/<int:account_id>/bankcards', methods=['POST'])

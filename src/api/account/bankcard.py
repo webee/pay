@@ -35,11 +35,13 @@ class BankCard(object):
         self.branch_bank_name = branch_bank_name
 
     @property
-    def is_private_account(self):
+    def is_not_using_debit_card_as_private_account(self):
+        return self._is_private_account() and not self._is_debit_account()
+
+    def _is_private_account(self):
         return not self.is_corporate_account
 
-    @property
-    def is_debit_account(self):
+    def _is_debit_account(self):
         return self.card_type is not None and self.card_type.lower() == 'debit card'
 
 

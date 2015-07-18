@@ -123,7 +123,7 @@ def add_bankcard(account_id):
 
     card.set_details(account_name, is_corporate_account, province_code, city_code, branch_bank_name)
 
-    if card.is_private_account and not card.is_debit_account:
+    if card.is_not_using_debit_card_as_private_account:
         return response.bad_request("The bank card must be a Debit Card if it was added as private account.",
                                     card_no=card_no, is_corporate_account=is_corporate_account)
 

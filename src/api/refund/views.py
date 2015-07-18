@@ -34,11 +34,13 @@ def notify_refund_result(uuid):
     refund_id = data['no_refund']
     amount = data['money_refund']
     refund_result = data['sta_refund']
+    refund_serial_no = data['oid_refundno']
 
     if (not is_sending_to_me(partner_oid)) or (not is_valid_refund(refund_id, uuid, amount)):
         return notification.is_invalid()
 
     if not is_successful_refund(refund_result):
+        fail_refund(refund_id, refund_serial_no)
         return notification.fail()
 
     return notification.succeed()

@@ -6,15 +6,16 @@ import json
 from flask import request, current_app
 from . import account
 from . import account_mod as mod
-from .bankcard import list_all_bankcards, get_bankcard, new_bankcard, BankCard
-from tools.utils import to_int, to_float
+from .bankcard import *
 from .withdraw import create_withdraw_order_and_freeze_cash, get_withdraw_order, withdraw_request_failed, withdraw_order_end
+from api.constant import response as resp
 from api.util import response
 from api.util.ipay import transaction
 from api.util.api import return_json
-from api.constant import response as resp
 from api.util.ipay.constant import response as pay_resp
+from api.util.parser import to_bool
 from tools.mylog import get_logger
+from tools.utils import to_int, to_float
 
 logger = get_logger(__name__)
 
@@ -111,12 +112,20 @@ def add_bankcard(account_id):
     data = request.values
     card_no = data['card_no']
     account_name = data['account_name']
-    is_corporate_account = bool(data['is_corporate_account'])
-    bank_code = data['bank_code']
+    is_corporate_account = to_bool(data['is_corporate_account'])
     province_code = data['province_code']
     city_code = data['city_code']
     branch_bank_name = data['branch_bank_name']
 
-    card = BankCard(card_no, account_name, is_corporate_account, bank_code, province_code, city_code, branch_bank_name)
+    card = BankCard.query(card_no)
+    if card is None:
+        return response.bad_request("Invalid bank card.", card_no=card_no)
+
+    card.set_details(account_name, is_corporate_account, province_code, city_code, branch_bank_name)
+
+    if card.is_private_account and not card.is_debit_account:
+        return response.bad_request("The bank card must be a Debit Card if it was added as private account.",
+                                    card_no=card_no, is_corporate_account=is_corporate_account)
+
     bankcard_id = new_bankcard(account_id, card)
     return response.created(bankcard_id)

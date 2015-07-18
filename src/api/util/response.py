@@ -10,3 +10,9 @@ def created(id):
 
 def not_found():
     return abort(404)
+
+
+def bad_request(message, **request_params):
+    resp = jsonify({'error': message, 'params': str(request_params)})
+    resp.status_code = 400
+    return resp

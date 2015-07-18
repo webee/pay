@@ -8,7 +8,6 @@ def query_bankcard_bin(card_no):
     try:
         data = transaction.query_bankcard_bin(card_no)
         return AttrDict(
-            card_no=data['card_no'],
             bank_code=data['bank_code'],
             bank_name=data['bank_name'],
             card_type=_parse_card_type(int(data['card_type']))

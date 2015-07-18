@@ -1,23 +1,45 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from api.bankcard.bankcard_bin import query_bankcard_bin
 from api.util.attr_dict import AttrDict
 from api.util.enum import enum
 from tools.dbi import from_db, transactional
+
 
 BankAccount = enum(IsPrivateAccount=0, IsCorporateAccount=1)
 
 
 class BankCard(object):
-    def __init__(self, card_no, account_name, is_corporate_account, bank_code, province_code, city_code,
-                 branch_bank_name):
+    def __init__(self, card_no, bank_code, card_type):
         self.no = card_no
+        self.bank_code = bank_code
+        self.card_type = card_type
+        self.account_name = None
+        self.is_corporate_account = False
+        self.province_code = None
+        self.city_code = None
+        self.branch_bank_name = None
+
+    @staticmethod
+    def query(card_no):
+        bin = query_bankcard_bin(card_no)
+        return BankCard(card_no, bin.bank_code, bin.card_type) if bin else None
+
+    def set_details(self, account_name, is_corporate_account, province_code, city_code, branch_bank_name):
         self.account_name = account_name
         self.is_corporate_account = is_corporate_account
-        self.bank_code = bank_code
         self.province_code = province_code
         self.city_code = city_code
         self.branch_bank_name = branch_bank_name
+
+    @property
+    def is_private_account(self):
+        return not self.is_corporate_account
+
+    @property
+    def is_debit_account(self):
+        return self.card_type is not None and self.card_type.lower() == 'debit card'
 
 
 def list_all_bankcards(account_id):
@@ -45,6 +67,16 @@ def new_bankcard(account_id, bankcard):
         'created_on': datetime.now()
     }
     return from_db().insert('bankcard', returns_id=True, **fields)
+
+
+def query_bankcard(card_no):
+    bin = query_bankcard_bin(card_no)
+    BankCard(card_no=card_no, bank_code=bin.bank_code, card_type=bin.card_type)
+
+
+def is_debit_card(card_no):
+    bin = query_bankcard_bin(card_no)
+    return bin.card_type == 'Debit Card'
 
 
 def _gen_bankcard_from_dict(bankcard):

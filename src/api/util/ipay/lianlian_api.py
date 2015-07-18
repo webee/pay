@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 import json
 import requests
-from .lianlian_config import config
 
+from .error import ApiError, InvalidSignError
+from .lianlian_config import config
 from .sign import sign, verify
 
 
@@ -36,36 +37,23 @@ def request(api_url, params):
 
 
 def parse_request_data(raw_data):
-    parsed_data = _parse_data(raw_data)
-    data = None
-    msg = None
-    if parsed_data['ret']:
-        ret_data = parsed_data['data']
-        if 'sign_type' in ret_data and verify(ret_data, ret_data['sign_type']):
-            data = ret_data
-        else:
-            msg = "数据签名错误"
-    else:
-        msg = parsed_data['msg']
+    try:
+        parsed_data = _parse_data(raw_data)
+    except Exception, e:
+        raise ApiError(str(e))
 
-    if data:
-        return {'ret': True, 'data': data}
-    return {'ret': False, 'msg': msg}
+    if 'sign_type' in parsed_data and verify(parsed_data, parsed_data['sign_type']):
+        return parsed_data
+    else:
+        raise InvalidSignError(parsed_data['sign_type'], parsed_data)
 
 
 def _parse_data(raw_data):
-    data = None
-    try:
-        ret_data = json.loads(raw_data)
-        if isinstance(ret_data, dict):
-            data = ret_data
-        else:
-            msg = "数据错误"
-    except ValueError as e:
-        msg = "数据错误"
-    if data:
-        return {'ret': True, 'data': data}
-    return {'ret': False, 'msg': msg}
+    data = json.loads(raw_data)
+    if not isinstance(data, dict):
+        raise TypeError("Data [{0}] mst be a dict.".format(raw_data))
+
+    return data
 
 
 def _parse_response_data(raw_data):

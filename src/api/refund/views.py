@@ -19,7 +19,7 @@ def refund():
     amount = data['amount']
 
     try:
-        refund_id = refund_transaction(client_id, payer_id, order_no, amount, request.url_root)
+        refund_id = refund_transaction(client_id, payer_id, order_no, amount)
         return _response_accepted(refund_id)
     except NoPaymentFoundError:
         return abort(404)

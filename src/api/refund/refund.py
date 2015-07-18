@@ -29,7 +29,7 @@ class RefundFailedError(Exception):
         self.refund_id = refund_id
 
 
-def refund_transaction(client_id, payer_id, order_no, amount, url_root):
+def refund_transaction(client_id, payer_id, order_no, amount):
     payment = _find_payment(client_id, order_no)
     if not payment:
         raise NoPaymentFoundError(client_id, order_no)

@@ -9,7 +9,6 @@ from .pay import pay_by_uuid
 from .postpay import *
 from api.util.ipay import transaction
 from flask import jsonify, request, Response
-import json
 
 log = logging.getLogger(__name__)
 
@@ -38,12 +37,12 @@ def pay(uuid):
 
 @mod.route('/pay/<uuid>/result', methods=['POST'])
 def notify_payment(uuid):
-    request_values = json.loads(request.data)
-    partner_oid = request_values['oid_partner']
-    order_no = request_values['no_order']
-    amount = Decimal(request_values['money_order'])
-    pay_result = request_values['result_pay']
-    paybill_oid = request_values['oid_paybill']
+    data = transaction.parse_request_data(request.data)['data']
+    partner_oid = data['oid_partner']
+    order_no = data['no_order']
+    amount = Decimal(data['money_order'])
+    pay_result = data['result_pay']
+    paybill_oid = data['oid_paybill']
 
     if (not transaction.is_sending_to_me(partner_oid)) or (not is_valid_transaction(order_no, uuid, amount)):
         return _mark_as_invalid_notification()

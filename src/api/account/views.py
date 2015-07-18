@@ -4,8 +4,8 @@ from __future__ import unicode_literals, print_function, division
 import json
 
 from flask import request, jsonify, current_app, url_for
+from . import account
 from . import account_mod as mod
-from . import accounts
 from api.account.bankcard import get_user_bankcards, get_bankcard
 from tools.utils import to_int, to_float
 from .withdraw import create_withdraw_order_and_freeze_cash, get_withdraw_order, withdraw_request_failed, withdraw_order_end
@@ -39,7 +39,7 @@ def withdraw(account_id):
         return resp.FALSE_AMOUNT_VALUE_ERROR
 
     # TODO: 从这开始加锁，同时只能有一个在执行操作account_id的cash账户
-    balance = accounts.cash_account_balance(account_id)
+    balance = account.get_cash_balance(account_id)
     if amount > balance:
         return resp.FALSE_INSUFFICIENT_BALANCE
 

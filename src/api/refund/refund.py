@@ -8,18 +8,18 @@ from api.account.account import find_account_id
 from tools.dbi import from_db, transactional
 
 
-class NoTransactionFoundException(Exception):
+class NoTransactionFoundError(Exception):
     def __init__(self, client_id, order_no):
         message = "Cannot find any valid pay transaction with [client_id={0}, order_no={1}]."\
             .format(client_id, order_no)
-        super(NoTransactionFoundException, self).__init__(message)
+        super(NoTransactionFoundError, self).__init__(message)
 
 
-class RefundFailedException(Exception):
+class RefundFailedError(Exception):
     def __init__(self, refund_id):
         message = "Refund application has been created, but actual refunding is failed [refund_id={0}]."\
             .format(refund_id)
-        super(RefundFailedException, self).__init__(message)
+        super(RefundFailedError, self).__init__(message)
         self.refund_id = refund_id
 
 
@@ -29,7 +29,7 @@ RefundState = enum(Applied=0, InProcessing=1, Success=2, Failure=3)
 def refund_transaction(client_id, payer_id, order_no, amount, url_root):
     payment = _find_payment(client_id, order_no)
     if not payment:
-        raise NoTransactionFoundException(client_id, order_no)
+        raise NoTransactionFoundError(client_id, order_no)
 
     payer_account_id = find_account_id(client_id, payer_id)
     refund_id, refunded_on = _apply_for_refund(payment['id'], payer_account_id, amount)
@@ -41,10 +41,10 @@ def _apply_to_refund(refund_id, refunded_on, amount, paybill_id, url_root):
     resp = transaction.refund(refund_id, refunded_on, amount, paybill_id, url_root)
 
     if resp.status_code != 200:
-        raise RefundFailedException(refund_id)
+        raise RefundFailedError(refund_id)
     return_values = resp.json()
     if return_values['ret_code'] != '0000':
-        raise RefundFailedException(refund_id)
+        raise RefundFailedError(refund_id)
 
 
 def _find_payment(client_id, order_no):

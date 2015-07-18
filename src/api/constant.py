@@ -12,11 +12,8 @@ class SourceType(object):
 
 
 class WithdrawResult(object):
-    ## 提现冻结
     FROZEN = 'FROZEN'
-    ## 提现成功
     SUCCESS = 'SUCCESS'
-    ## 提现失败
     FAILED = 'FAILED'
 
 
@@ -29,6 +26,12 @@ class PayStep(object):
 class WithdrawStep(object):
     SECURED = "SECURED"
     EXPIRED = "EXPIRED"
+    FROZEN = "FROZEN"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+
+
+class RefundStep(object):
     FROZEN = "FROZEN"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"

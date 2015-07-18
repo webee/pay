@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-from lianlian_api import parse_request_data as _parse_request_data, request as _request
+from flask import request
+
+from lianlian_api import parse_and_verify_request_data as _parse_and_verify_request_data
 from .bankcard import query_bin as _query_bin
+from .notification import Notification
 from .pay import pay as _pay
 from .pay_to_bankcard import pay_to_bankcard as _pay_to_bankcard
 from .query_order import query_order as _query_order
@@ -10,12 +13,15 @@ from .util import generate_url as _generate_notification_url
 from api.util.uuid import decode_uuid
 
 
-def parse_request_data(raw_data):
-    return _parse_request_data(raw_data)
+notification = Notification()
 
 
-def request(api_url, params):
-    return _request(api_url, params)
+def parse_and_verify(notify):
+    def parser(**kwargs):
+        verified_data = _parse_and_verify_request_data(request.values, request.data)
+        request.__dict__['verified_data'] = verified_data
+        return notify(kwargs)
+    return parser
 
 
 def pay(payer_account_id, order_no, ordered_on, order_name, order_desc, amount, notification_url):
@@ -30,8 +36,8 @@ def pay_to_bankcard(no_order, money_order, info_order, notify_url, bankcard):
     return _pay_to_bankcard(no_order, money_order, info_order, notify_url, bankcard)
 
 
-def refund(refund_id, refunded_on, amount, paybill_id, url_root):
-    return _refund(refund_id, refunded_on, amount, paybill_id, url_root)
+def refund(refund_id, refunded_on, amount, paybill_id):
+    return _refund(refund_id, refunded_on, amount, paybill_id)
 
 
 def query_order():

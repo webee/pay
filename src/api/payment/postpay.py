@@ -6,7 +6,7 @@ from api.util.uuid import decode_uuid
 from tools.dbi import from_db, transactional
 
 
-def is_valid_transaction(transaction_id, uuid, paid_amount):
+def is_valid_payment(transaction_id, uuid, paid_amount):
     if transaction_id != decode_uuid(uuid):
         return False
 
@@ -20,23 +20,23 @@ def is_successful_payment(pay_result):
 
 
 @transactional
-def fail_transaction(transaction_id):
+def fail_payment(transaction_id):
     from_db().execute('UPDATE payment SET success = 0, transaction_ended_on = %(ended_on)s WHERE id = %(id)s',
                       id=transaction_id, ended_on=datetime.now())
 
 
 @transactional
-def succeed_transaction(payment_id, paybill_id):
+def succeed_payment(payment_id, paybill_id):
     _update_payment(payment_id, paybill_id)
 
-    payment = find_payment(payment_id)
+    payment = _find_payment(payment_id)
     bookkeeping(
         Event(payment['payee_account_id'], SourceType.PAY, PayStep.SECURED, payment_id, payment['amount']),
         '+secured', '+asset'
     )
 
 
-def find_payment(transaction_id):
+def _find_payment(transaction_id):
     return from_db().get('SELECT payee_account_id, amount FROM payment WHERE id=%(id)s', id=transaction_id)
 
 

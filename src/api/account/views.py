@@ -3,17 +3,20 @@ from __future__ import unicode_literals, print_function, division
 
 import json
 
-from flask import request, jsonify, current_app, url_for
+from flask import request, current_app
+from . import account
 from . import account_mod as mod
-from . import accounts
-from api.account.bankcard import get_user_bankcards, get_bankcard
-from tools.utils import to_int, to_float
+from .bankcard import *
 from .withdraw import create_withdraw_order_and_freeze_cash, get_withdraw_order, withdraw_request_failed, withdraw_order_end
-from api.util.ipay import transaction
-from api.util.api import return_json
 from api.constant import response as resp
+from api.util import response
+from api.util.ipay.transaction import parse_and_verify, is_valid_transaction, generate_pay_to_bankcard_notification_url, \
+    pay_to_bankcard
+from api.util.api import return_json
 from api.util.ipay.constant import response as pay_resp
+from api.util.parser import to_bool
 from tools.mylog import get_logger
+from tools.utils import to_int, to_float
 
 logger = get_logger(__name__)
 
@@ -39,7 +42,7 @@ def withdraw(account_id):
         return resp.FALSE_AMOUNT_VALUE_ERROR
 
     # TODO: 从这开始加锁，同时只能有一个在执行操作account_id的cash账户
-    balance = accounts.cash_account_balance(account_id)
+    balance = account.get_cash_balance(account_id)
     if amount > balance:
         return resp.FALSE_INSUFFICIENT_BALANCE
 
@@ -53,8 +56,8 @@ def withdraw(account_id):
     # TODO: 这里要释放锁
 
     # 3. 发送请求
-    notify_url = host_url + transaction.generate_pay_to_bankcard_notification_url(order_id)
-    res_data = transaction.pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
+    notify_url = host_url + generate_pay_to_bankcard_notification_url(order_id)
+    res_data = pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
 
     logger.info(json.dumps(res_data))
 
@@ -71,15 +74,14 @@ def withdraw(account_id):
 
 @mod.route('/withdraw/<uuid>/result', methods=['POST'])
 @return_json
+@parse_and_verify
 def notify_withdraw(uuid):
-    raw_data = request.data
-
-    data = transaction.parse_request_data(raw_data)
+    data = request.verified_data
     logger.info(json.dumps(data))
 
     oid_partner = data['oid_partner']
     order_id = data['no_order']
-    if not transaction.is_valid_transaction(oid_partner, order_id, uuid):
+    if not is_valid_transaction(oid_partner, order_id, uuid):
         return pay_resp.INVALID_NOTIFICATION
 
     amount = to_float(data['money_order'])
@@ -101,15 +103,29 @@ def notify_withdraw(uuid):
 
 @mod.route('/<int:account_id>/bankcards', methods=['GET'])
 def list_all_bankcards(account_id):
-    bankcards = get_user_bankcards(account_id)
-    return jsonify(
-        ret=True,
-        bankcards=bankcards
-    )
+    bankcards = list_all_bankcards(account_id)
+    return json.dumps(bankcards), 200
 
 
 @mod.route('/<int:account_id>/bankcards', methods=['POST'])
 def add_bankcard(account_id):
     data = request.values
+    card_no = data['card_no']
+    account_name = data['account_name']
+    is_corporate_account = to_bool(data['is_corporate_account'])
+    province_code = data['province_code']
+    city_code = data['city_code']
+    branch_bank_name = data['branch_bank_name']
 
-    return jsonify(data=data)
+    card = BankCard.query(card_no)
+    if card is None:
+        return response.bad_request("Invalid bank card.", card_no=card_no)
+
+    card.set_details(account_name, is_corporate_account, province_code, city_code, branch_bank_name)
+
+    if card.is_not_using_debit_card_as_private_account:
+        return response.bad_request("The bank card must be a Debit Card if it was added as private account.",
+                                    card_no=card_no, is_corporate_account=is_corporate_account)
+
+    bankcard_id = new_bankcard(account_id, card)
+    return response.created(bankcard_id)

@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 import json
 import requests
-from .lianlian_config import config
 
+from .error import *
+from .lianlian_config import config
 from .sign import sign, verify
 
 
@@ -29,66 +30,42 @@ def rsa_sign_params(params):
 def request(api_url, params):
     data = json.dumps(sign_params(params))
 
-    req = requests.post(api_url, data)
-    if req.status_code == 200:
-        return _parse_response_data(req.content)
-    return {'ret': False, 'msg': 'api http request failed.'}
+    resp = requests.post(api_url, data)
+    if resp.status_code == 200:
+        return _parse_response_data(resp.content)
+    return UnExpectedResponseError(resp.status_code, resp.content)
 
 
-def parse_request_data(raw_data):
-    parsed_data = _parse_data(raw_data)
-    data = None
-    msg = None
-    if parsed_data['ret']:
-        ret_data = parsed_data['data']
-        if 'sign_type' in ret_data and verify(ret_data, ret_data['sign_type']):
-            data = ret_data
-        else:
-            msg = "数据签名错误"
+
+def parse_and_verify_request_data(values, raw_data):
+    parsed_data = values if values else _parse_data(raw_data)
+    if _verify_sign(parsed_data):
+        return parsed_data
     else:
-        msg = parsed_data['msg']
+        raise InvalidSignError(parsed_data['sign_type'], parsed_data)
 
-    if data:
-        return {'ret': True, 'data': data}
-    return {'ret': False, 'msg': msg}
+
+def _verify_sign(data):
+    return 'sign_type' in data and verify(data, data['sign_type'])
 
 
 def _parse_data(raw_data):
-    data = None
-    try:
-        ret_data = json.loads(raw_data)
-        if isinstance(ret_data, dict):
-            data = ret_data
-        else:
-            msg = "数据错误"
-    except ValueError as e:
-        msg = "数据错误"
-    if data:
-        return {'ret': True, 'data': data}
-    return {'ret': False, 'msg': msg}
+    data = json.loads(raw_data)
+    if not isinstance(data, dict):
+        raise DictParsingError(raw_data)
+    return data
 
 
 def _parse_response_data(raw_data):
-    parsed_data = _parse_data(raw_data)
-    data = None
-    code = None
-    msg = None
-    if parsed_data['ret']:
-        ret_data = parsed_data['data']
-        if 'ret_code' in ret_data and ret_data['ret_code'] == '0000':
-            if 'sign_type' in ret_data:
-                if verify(ret_data, ret_data['sign_type']):
-                    data = ret_data
-                else:
-                    msg = "数据签名错误"
-            else:
-                data = {'ret_code': ret_data['ret_code'], 'ret_msg': ret_data.get('ret_msg')}
-        else:
-            code = ret_data.get('ret_code')
-            msg = ret_data.get('ret_msg')
-    else:
-        msg = parsed_data['msg']
+    try:
+        parsed_data = _parse_data(raw_data)
+    except Exception, e:
+        raise ApiError(str(e))
 
-    if data:
-        return {'ret': True, 'data': data}
-    return {'ret': False, 'code': code, 'msg': msg}
+    if 'ret_code' not in parsed_data or parsed_data['ret_code'] != '0000':
+        raise RequestFailedError(parsed_data.get('ret_code'), parsed_data.get('ret_msg'))
+
+    if 'sign_type' not in parsed_data or not verify(parsed_data, parsed_data['sign_type']):
+        InvalidSignError(parsed_data.get('sign_type'), parsed_data)
+
+    return parsed_data

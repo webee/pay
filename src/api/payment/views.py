@@ -7,25 +7,24 @@ from . import pay_mod as mod
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid
 from .postpay import *
-from api.util.ipay import transaction
+from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
 from flask import jsonify, request, Response
-import json
 
 log = logging.getLogger(__name__)
 
 
 @mod.route('/pre-pay', methods=['POST'])
 def prepay():
-    request_values = request.values
-    client_id = request_values['client_id']
-    payer_id = request_values['payer']
-    payee_id = request_values['payee']
-    order = Order(request_values['order_no'], request_values['order_name'], request_values['order_desc'],
-                  request_values['ordered_on'])
-    amount = request_values['amount']
+    data = request.values
+    client_id = data['client_id']
+    payer_id = data['payer']
+    payee_id = data['payee']
+    order = Order(data['order_no'], data['order_name'], data['order_desc'],
+                  data['ordered_on'])
+    amount = data['amount']
 
     payment_id = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount)
-    pay_url = transaction.generate_pay_url(payment_id)
+    pay_url = generate_pay_url(payment_id)
 
     return jsonify({'pay_url': pay_url})
 
@@ -37,37 +36,22 @@ def pay(uuid):
 
 
 @mod.route('/pay/<uuid>/result', methods=['POST'])
+@parse_and_verify
 def notify_payment(uuid):
-    request_values = json.loads(request.data)
-    partner_oid = request_values['oid_partner']
-    order_no = request_values['no_order']
-    amount = Decimal(request_values['money_order'])
-    pay_result = request_values['result_pay']
-    paybill_oid = request_values['oid_paybill']
+    data = request.verified_data
+    partner_oid = data['oid_partner']
+    order_no = data['no_order']
+    amount = Decimal(data['money_order'])
+    pay_result = data['result_pay']
+    paybill_oid = data['oid_paybill']
 
-    if (not transaction.is_sending_to_me(partner_oid)) or (not is_valid_transaction(order_no, uuid, amount)):
-        return _mark_as_invalid_notification()
+    if (not is_sending_to_me(partner_oid)) or (not is_valid_payment(order_no, uuid, amount)):
+        return notification.is_invalid()
 
     if not is_successful_payment(pay_result):
-        fail_transaction(order_no)
-        return _mark_as_failure()
+        fail_payment(order_no)
+        return notification.fail()
 
-    succeed_transaction(order_no, paybill_oid)
-    return _mark_as_success()
-
-
-def _mark_as_notified():
-    return jsonify({'ret_code': '0000', 'ret_msg': '重复通知'})
-
-
-def _mark_as_success():
-    return jsonify({'ret_code': '0000', 'ret_msg': '交易成功'})
-
-
-def _mark_as_failure():
-    return jsonify({'ret_code': '0000', 'ret_msg': '交易失败'})
-
-
-def _mark_as_invalid_notification():
-    return jsonify({'ret_code': '9999'})
+    succeed_payment(order_no, paybill_oid)
+    return notification.succeed()
 

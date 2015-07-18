@@ -48,9 +48,10 @@ CREATE TABLE bankcard(
   bank_code VARCHAR(12) NOT NULL COMMENT '银行编码',
   province_code VARCHAR(12) NOT NULL COMMENT '开户行所在省编码',
   city_code VARCHAR(12) NOT NULL COMMENT '开户行所在市编码',
+  bank_name VARCHAR(12) NOT NULL COMMENT '银行名称',
   branch_bank_name VARCHAR(50) NOT NULL COMMENT '开户支行名称',
   created_on TIMESTAMP NOT NULL,
-  updated_on TIMESTAMP NOT NULL,
+
   FOREIGN KEY bankcard_account_id (account_id) REFERENCES account(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -74,12 +75,15 @@ CREATE TABLE withdraw(
 
 CREATE TABLE refund(
   id CHAR(30) PRIMARY KEY,  -- prefix with 'RFD'
-  transaction_id CHAR(30) NOT NULL,
+  payment_id CHAR(30) NOT NULL,
   payer_account_id INT UNSIGNED NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
+  success SMALLINT , -- 0/1, FAIL/SUCCESS
+  refund_serial_no VARCHAR(16) COMMENT '退款流水号',
+  transaction_ended_on TIMESTAMP,
 
-  FOREIGN KEY transaction_id(transaction_id) REFERENCES payment(id),
+  FOREIGN KEY payment_id(payment_id) REFERENCES payment(id),
   FOREIGN KEY payer_account_id(payer_account_id) REFERENCES account(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

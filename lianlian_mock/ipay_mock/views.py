@@ -29,10 +29,7 @@ def cardandpay():
     data = transaction.parse_request_data(raw_data)
     logger.info(json.dumps(data, ensure_ascii=False))
 
-    if data['ret']:
-        return transaction.md5_sign_params({'ret_code': '0001', 'ret_msg': '请求数据错误'})
-
-    req_data = data['data']
+    req_data = data
 
     notify_url = req_data['notify_url']
     params = {

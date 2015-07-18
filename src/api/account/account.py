@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from tools.dbi import from_db
 
 
@@ -18,3 +19,12 @@ def find_account_id(client_id, user_id):
           SELECT id FROM account
             WHERE client_id = %(client_id)s AND user_id = %(user_id)s
         """, client_id=client_id, user_id=user_id)
+
+
+def get_cash_balance(account_id):
+    """ 得到用户的现金余额
+    :param account_id:
+    :return:
+    """
+    db = from_db()
+    return 100

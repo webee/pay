@@ -37,7 +37,7 @@ def pay(uuid):
 
 @mod.route('/pay/<uuid>/result', methods=['POST'])
 def notify_payment(uuid):
-    data = transaction.parse_request_data(request.data)['data']
+    data = transaction.parse_request_data(request.data)
     partner_oid = data['oid_partner']
     order_no = data['no_order']
     amount = Decimal(data['money_order'])

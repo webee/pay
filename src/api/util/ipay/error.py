@@ -22,3 +22,9 @@ class RequestFailedError(ApiError):
     def __init__(self, return_code, return_msg):
         message = "Request failed, because ReturnCode is {0} and Message is {1}.".format(return_code, return_msg)
         super(ApiError, self).__init__(message)
+
+
+class DictParsingError(ApiError):
+    def __init__(self, raw_data):
+        message = "Data [{0}] mst be a dict.".format(raw_data)
+        super(ApiError, self).__init__(message)

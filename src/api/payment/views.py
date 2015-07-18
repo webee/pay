@@ -7,7 +7,7 @@ from . import pay_mod as mod
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid
 from .postpay import *
-from api.util.ipay.transaction import generate_pay_url, parse_request_data, is_sending_to_me, notification
+from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
 from flask import jsonify, request, Response
 
 log = logging.getLogger(__name__)
@@ -36,8 +36,9 @@ def pay(uuid):
 
 
 @mod.route('/pay/<uuid>/result', methods=['POST'])
+@parse_and_verify
 def notify_payment(uuid):
-    data = parse_request_data(request.data)
+    data = request.verified_data
     partner_oid = data['oid_partner']
     order_no = data['no_order']
     amount = Decimal(data['money_order'])

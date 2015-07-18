@@ -5,7 +5,7 @@ import logging
 from . import refund_mod as mod
 from .refund import *
 from api.util import response
-from api.util.ipay.transaction import parse_request_data, is_sending_to_me, notification
+from api.util.ipay.transaction import is_sending_to_me, notification, parse_and_verify
 from flask import jsonify, request
 
 log = logging.getLogger(__name__)
@@ -29,8 +29,9 @@ def refund():
 
 
 @mod.route('/refund/<uuid>/result', methods=['POST'])
+@parse_and_verify
 def notify_refund_result(uuid):
-    data = parse_request_data(request.data)
+    data = request.verified_data
     partner_oid = data['oid_partner']
     refund_id = data['no_refund']
     amount = data['money_refund']

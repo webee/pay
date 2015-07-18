@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from lianlian_api import parse_request_data as _parse_request_data
+from flask import request
+
+from lianlian_api import parse_and_verify_request_data as _parse_and_verify_request_data
 from .bankcard import query_bin as _query_bin
 from .notification import Notification
 from .pay import pay as _pay
@@ -14,8 +16,12 @@ from api.util.uuid import decode_uuid
 notification = Notification()
 
 
-def parse_request_data(raw_data):
-    return _parse_request_data(raw_data)
+def parse_and_verify(notify):
+    def parser(**kwargs):
+        verified_data = _parse_and_verify_request_data(request.values, request.data)
+        request.__dict__['verified_data'] = verified_data
+        return notify(kwargs)
+    return parser
 
 
 def pay(payer_account_id, order_no, ordered_on, order_name, order_desc, amount, notification_url):

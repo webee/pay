@@ -10,7 +10,8 @@ from .bankcard import *
 from .withdraw import create_withdraw_order_and_freeze_cash, get_withdraw_order, withdraw_request_failed, withdraw_order_end
 from api.constant import response as resp
 from api.util import response
-from api.util.ipay import transaction
+from api.util.ipay.transaction import parse_and_verify, is_valid_transaction, generate_pay_to_bankcard_notification_url, \
+    pay_to_bankcard
 from api.util.api import return_json
 from api.util.ipay.constant import response as pay_resp
 from api.util.parser import to_bool
@@ -55,8 +56,8 @@ def withdraw(account_id):
     # TODO: 这里要释放锁
 
     # 3. 发送请求
-    notify_url = host_url + transaction.generate_pay_to_bankcard_notification_url(order_id)
-    res_data = transaction.pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
+    notify_url = host_url + generate_pay_to_bankcard_notification_url(order_id)
+    res_data = pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
 
     logger.info(json.dumps(res_data))
 
@@ -73,15 +74,14 @@ def withdraw(account_id):
 
 @mod.route('/withdraw/<uuid>/result', methods=['POST'])
 @return_json
+@parse_and_verify
 def notify_withdraw(uuid):
-    raw_data = request.data
-
-    data = transaction.parse_request_data(raw_data)
+    data = request.verified_data
     logger.info(json.dumps(data))
 
     oid_partner = data['oid_partner']
     order_id = data['no_order']
-    if not transaction.is_valid_transaction(oid_partner, order_id, uuid):
+    if not is_valid_transaction(oid_partner, order_id, uuid):
         return pay_resp.INVALID_NOTIFICATION
 
     amount = to_float(data['money_order'])

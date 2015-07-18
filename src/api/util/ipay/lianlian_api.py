@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import json
 import requests
 
-from .error import ApiError, InvalidSignError, UnExpectedResponseError, RequestFailedError
+from .error import *
 from .lianlian_config import config
 from .sign import sign, verify
 
@@ -36,23 +36,23 @@ def request(api_url, params):
     return UnExpectedResponseError(resp.status_code, resp.content)
 
 
-def parse_request_data(raw_data):
-    try:
-        parsed_data = _parse_data(raw_data)
-    except Exception, e:
-        raise ApiError(str(e))
 
-    if 'sign_type' in parsed_data and verify(parsed_data, parsed_data['sign_type']):
+def parse_and_verify_request_data(values, raw_data):
+    parsed_data = values if values else _parse_data(raw_data)
+    if _verify_sign(parsed_data):
         return parsed_data
     else:
         raise InvalidSignError(parsed_data['sign_type'], parsed_data)
 
 
+def _verify_sign(data):
+    return 'sign_type' in data and verify(data, data['sign_type'])
+
+
 def _parse_data(raw_data):
     data = json.loads(raw_data)
     if not isinstance(data, dict):
-        raise TypeError("Data [{0}] mst be a dict.".format(raw_data))
-
+        raise DictParsingError(raw_data)
     return data
 
 

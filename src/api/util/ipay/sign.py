@@ -6,6 +6,12 @@ from encrypt_utils import public_key
 from .lianlian_config import config
 
 
+class UnknownSignTypeError(Exception):
+    def __init__(self, sign_type):
+        message = "Unknown sign type [{0}].".format(sign_type)
+        super(UnknownSignTypeError, self).__init__(message)
+
+
 def _gen_sign_data(data):
     keys = data.keys()
     keys.sort(key=lambda x: x.lower())
@@ -92,4 +98,4 @@ def verify(data, sign_type):
         return _verify_md5_data(data, config.MD5_key)
     elif sign_type == config.sign_type.RSA:
         return _verify_rsa_data(data, config.YT_PUB_KEY)
-    raise Exception("unknown sign type: %s" % sign_type)
+    raise UnknownSignTypeError(sign_type)

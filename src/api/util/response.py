@@ -8,6 +8,12 @@ def created(id):
     return resp
 
 
+def accepted(id):
+    resp = jsonify({'id':id})
+    resp.status_code = 202
+    return resp
+
+
 def not_found():
     return abort(404)
 

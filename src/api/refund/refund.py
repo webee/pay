@@ -58,11 +58,11 @@ def _find_payment(client_id, order_no):
 
 
 @transactional
-def _apply_for_refund(transaction_id, payer_account_id, amount):
+def _apply_for_refund(payment_id, payer_account_id, amount):
     refunded_on = datetime.now()
     fields = {
         'id': id.refund_id(payer_account_id),
-        'transaction_id': transaction_id,
+        'payment_id': payment_id,
         'payer_account_id': payer_account_id,
         'amount': amount,
         'created_on': refunded_on

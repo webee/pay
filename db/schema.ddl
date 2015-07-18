@@ -74,12 +74,12 @@ CREATE TABLE withdraw(
 
 CREATE TABLE refund(
   id CHAR(30) PRIMARY KEY,  -- prefix with 'RFD'
-  transaction_id CHAR(30) NOT NULL,
+  payment_id CHAR(30) NOT NULL,
   payer_account_id INT UNSIGNED NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
 
-  FOREIGN KEY transaction_id(transaction_id) REFERENCES payment(id),
+  FOREIGN KEY payment_id(payment_id) REFERENCES payment(id),
   FOREIGN KEY payer_account_id(payer_account_id) REFERENCES account(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

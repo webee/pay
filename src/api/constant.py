@@ -34,6 +34,12 @@ class WithdrawStep(object):
     FAILED = "FAILED"
 
 
+class RefundStep(object):
+    FROZEN = "FROZEN"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+
+
 class response(object):
     TRUE_JUST_OK = {"ret": True}
     FALSE_REQUEST_FAILED = {"ret": False, "msg": "请求失败"}

@@ -78,6 +78,9 @@ CREATE TABLE refund(
   payer_account_id INT UNSIGNED NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
+  success SMALLINT , -- 0/1, FAIL/SUCCESS
+  refund_serial_no VARCHAR(16) COMMENT '退款流水号',
+  transaction_ended_on TIMESTAMP,
 
   FOREIGN KEY payment_id(payment_id) REFERENCES payment(id),
   FOREIGN KEY payer_account_id(payer_account_id) REFERENCES account(id)

@@ -3,7 +3,8 @@ from __future__ import unicode_literals, print_function, division
 import logging
 
 from . import refund_mod as mod
-from .refund import refund_transaction, NoPaymentFoundError, RefundFailedError
+from .refund import *
+from api.util.ipay.transaction import parse_request_data, is_sending_to_me, notification
 from flask import jsonify, request, abort
 
 log = logging.getLogger(__name__)
@@ -28,7 +29,19 @@ def refund():
 
 @mod.route('/refund/<uuid>/result', methods=['POST'])
 def notify_refund_result(uuid):
-    return jsonify({})
+    data = parse_request_data(request.data)
+    partner_oid = data['oid_partner']
+    refund_id = data['no_refund']
+    amount = data['money_refund']
+    refund_result = data['sta_refund']
+
+    if (not is_sending_to_me(partner_oid)) or (not is_valid_refund(refund_id, uuid, amount)):
+        return notification.is_invalid()
+
+    if not is_successful_refund(refund_result):
+        return notification.fail()
+
+    return notification.succeed()
 
 
 @mod.route('/client/<client_id>/order/<order_no>/refund', methods=['GET'])

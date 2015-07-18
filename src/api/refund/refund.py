@@ -6,8 +6,12 @@ from api.util import id
 from api.util.bookkeeping import bookkeeping, Event
 from api.util.enum import enum
 from api.util.ipay import transaction
+from api.util.uuid import decode_uuid
 from api.account.account import find_account_id
 from tools.dbi import from_db, transactional
+
+
+RefundState = enum(Applied=0, InProcessing=1, Success=2, Failure=3)
 
 
 class NoPaymentFoundError(Exception):
@@ -25,9 +29,6 @@ class RefundFailedError(Exception):
         self.refund_id = refund_id
 
 
-RefundState = enum(Applied=0, InProcessing=1, Success=2, Failure=3)
-
-
 def refund_transaction(client_id, payer_id, order_no, amount, url_root):
     payment = _find_payment(client_id, order_no)
     if not payment:
@@ -36,6 +37,19 @@ def refund_transaction(client_id, payer_id, order_no, amount, url_root):
     payer_account_id = find_account_id(client_id, payer_id)
     refund_id, refunded_on = _refund(payment['id'], payer_account_id, amount)
     _send_refund_request(refund_id, refunded_on, amount, payment['paybill_id'], url_root)
+
+
+def is_valid_refund(refund_id, uuid, refund_amount):
+    if refund_id != decode_uuid(uuid):
+        return False
+
+    amount = from_db().get_scalar('SELECT amount FROM refund WHERE id = %(id)s AND success IS NULL',
+                                  id=refund_id)
+    return amount == refund_amount
+
+
+def is_successful_refund(result):
+    return int(result) == RefundState.Success
 
 
 def _send_refund_request(refund_id, refunded_on, amount, paybill_id, url_root):

@@ -53,7 +53,7 @@ def is_successful_refund(result):
 
 
 def _send_refund_request(refund_id, refunded_on, amount, paybill_id, url_root):
-    resp = transaction.refund(refund_id, refunded_on, amount, paybill_id, url_root)
+    resp = transaction.refund(refund_id, refunded_on, amount, paybill_id)
 
     if resp.status_code != 200:
         raise RefundFailedError(refund_id)

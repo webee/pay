@@ -30,8 +30,8 @@ def pay_to_bankcard(no_order, money_order, info_order, notify_url, bankcard):
     return _pay_to_bankcard(no_order, money_order, info_order, notify_url, bankcard)
 
 
-def refund(refund_id, refunded_on, amount, paybill_id, url_root):
-    return _refund(refund_id, refunded_on, amount, paybill_id, url_root)
+def refund(refund_id, refunded_on, amount, paybill_id):
+    return _refund(refund_id, refunded_on, amount, paybill_id)
 
 
 def query_order():

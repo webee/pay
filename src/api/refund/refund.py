@@ -56,6 +56,13 @@ def is_successful_refund(result):
 def fail_refund(refund_id, refund_serial_no):
     _update_refund_state(id=refund_id, is_success=False, serial_no=refund_serial_no)
 
+    refund_record = _find_refund(refund_id)
+    bookkeeping(
+        Event(refund_record['payer_account_id'], SourceType.REFUND, RefundStep.FAILED,
+              refund_id, refund_record['amount']),
+        '-frozen', '+secured'
+    )
+
 
 @transactional
 def succeed_refund(refund_id, refund_serial_no):
@@ -113,3 +120,7 @@ def _update_refund_state(id, is_success, serial_no):
             WHERE id = %(id)s
         """,
         id=id, state=state, ended_on=datetime.now(), serial_no=serial_no)
+
+
+def _find_refund(id):
+    return from_db().get('SELECT * FROM refund WHERE id=%(id)s', id=id)

@@ -29,14 +29,14 @@ def fail_payment(transaction_id):
 def succeed_payment(payment_id, paybill_id):
     _update_payment(payment_id, paybill_id)
 
-    payment = find_payment(payment_id)
+    payment = _find_payment(payment_id)
     bookkeeping(
         Event(payment['payee_account_id'], SourceType.PAY, PayStep.SECURED, payment_id, payment['amount']),
         '+secured', '+asset'
     )
 
 
-def find_payment(transaction_id):
+def _find_payment(transaction_id):
     return from_db().get('SELECT payee_account_id, amount FROM payment WHERE id=%(id)s', id=transaction_id)
 
 

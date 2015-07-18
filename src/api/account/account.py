@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from tools.dbi import from_db
 
 

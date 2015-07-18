@@ -45,28 +45,28 @@ def notify_payment(uuid):
     paybill_oid = data['oid_paybill']
 
     if (not transaction.is_sending_to_me(partner_oid)) or (not is_valid_transaction(order_no, uuid, amount)):
-        return _mark_as_invalid_notification()
+        return _response_invalid_notification()
 
     if not is_successful_payment(pay_result):
         fail_transaction(order_no)
-        return _mark_as_failure()
+        return _response_failure()
 
     succeed_transaction(order_no, paybill_oid)
-    return _mark_as_success()
+    return _response_success()
 
 
-def _mark_as_notified():
+def _response_duplicate_notification():
     return jsonify({'ret_code': '0000', 'ret_msg': '重复通知'})
 
 
-def _mark_as_success():
+def _response_success():
     return jsonify({'ret_code': '0000', 'ret_msg': '交易成功'})
 
 
-def _mark_as_failure():
+def _response_failure():
     return jsonify({'ret_code': '0000', 'ret_msg': '交易失败'})
 
 
-def _mark_as_invalid_notification():
+def _response_invalid_notification():
     return jsonify({'ret_code': '9999'})
 

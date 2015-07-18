@@ -48,9 +48,9 @@ def notify_payment(uuid):
         return notification.is_invalid()
 
     if not is_successful_payment(pay_result):
-        fail_transaction(order_no)
+        fail_payment(order_no)
         return notification.fail()
 
-    succeed_transaction(order_no, paybill_oid)
+    succeed_payment(order_no, paybill_oid)
     return notification.succeed()
 

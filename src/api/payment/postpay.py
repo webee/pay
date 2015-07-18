@@ -20,13 +20,13 @@ def is_successful_payment(pay_result):
 
 
 @transactional
-def fail_transaction(transaction_id):
+def fail_payment(transaction_id):
     from_db().execute('UPDATE payment SET success = 0, transaction_ended_on = %(ended_on)s WHERE id = %(id)s',
                       id=transaction_id, ended_on=datetime.now())
 
 
 @transactional
-def succeed_transaction(payment_id, paybill_id):
+def succeed_payment(payment_id, paybill_id):
     _update_payment(payment_id, paybill_id)
 
     payment = find_payment(payment_id)

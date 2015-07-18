@@ -11,9 +11,10 @@ BankAccount = enum(IsPrivateAccount=0, IsCorporateAccount=1)
 
 
 class BankCard(object):
-    def __init__(self, card_no, bank_code, card_type):
+    def __init__(self, card_no, bank_code, bank_name, card_type):
         self.no = card_no
         self.bank_code = bank_code
+        self.bank_name = bank_name
         self.card_type = card_type
         self.account_name = None
         self.is_corporate_account = False
@@ -24,7 +25,7 @@ class BankCard(object):
     @staticmethod
     def query(card_no):
         bin = query_bankcard_bin(card_no)
-        return BankCard(card_no, bin.bank_code, bin.card_type) if bin else None
+        return BankCard(card_no, bin.bank_code, bin.bank_name, bin.card_type) if bin else None
 
     def set_details(self, account_name, is_corporate_account, province_code, city_code, branch_bank_name):
         self.account_name = account_name
@@ -63,6 +64,7 @@ def new_bankcard(account_id, bankcard):
         'bank_code': bankcard.bank_code,
         'province_code': bankcard.province_code,
         'city_code': bankcard.city_code,
+        'bank_name': bankcard.bank_name,
         'branch_bank_name': bankcard.branch_bank_name,
         'created_on': datetime.now()
     }

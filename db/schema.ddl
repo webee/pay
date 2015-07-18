@@ -48,6 +48,7 @@ CREATE TABLE bankcard(
   bank_code VARCHAR(12) NOT NULL COMMENT '银行编码',
   province_code VARCHAR(12) NOT NULL COMMENT '开户行所在省编码',
   city_code VARCHAR(12) NOT NULL COMMENT '开户行所在市编码',
+  bank_name VARCHAR(12) NOT NULL COMMENT '银行名称',
   branch_bank_name VARCHAR(50) NOT NULL COMMENT '开户支行名称',
   created_on TIMESTAMP NOT NULL,
 

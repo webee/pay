@@ -4,8 +4,9 @@ import logging
 
 from . import refund_mod as mod
 from .refund import *
+from api.util import response
 from api.util.ipay.transaction import parse_request_data, is_sending_to_me, notification
-from flask import jsonify, request, abort
+from flask import jsonify, request
 
 log = logging.getLogger(__name__)
 
@@ -22,7 +23,7 @@ def refund():
         refund_id = refund_transaction(client_id, payer_id, order_no, amount)
         return _response_accepted(refund_id)
     except NoPaymentFoundError:
-        return abort(404)
+        return response.not_found()
     except RefundFailedError, e:
         return _response_created(e.refund_id)
 

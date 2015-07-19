@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from datetime import datetime
 
-from tools.dbi import from_db
+from tools.dbe import from_db
 
 ACCOUNTS_SIDES = {
     'asset': {'+': 'd', '-': 'c'},

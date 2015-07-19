@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from tools.dbi import from_db
+from tools.dbe import require_db_context, db_operate
 
 
 def find_or_create_account(client_id, user_id):
@@ -9,22 +9,24 @@ def find_or_create_account(client_id, user_id):
             'client_id': client_id,
             'user_id': user_id
         }
-        account_id = from_db().insert('account', returns_id=True, **fields)
+        with require_db_context() as db:
+            account_id = db.insert('account', returns_id=True, **fields)
     return account_id
 
 
 def find_account_id(client_id, user_id):
-    return from_db().get_scalar(
-        """
-          SELECT id FROM account
-            WHERE client_id = %(client_id)s AND user_id = %(user_id)s
-        """, client_id=client_id, user_id=user_id)
+    with require_db_context() as db:
+        return db.get_scalar(
+            """
+              SELECT id FROM account
+                WHERE client_id = %(client_id)s AND user_id = %(user_id)s
+            """, client_id=client_id, user_id=user_id)
 
 
-def get_cash_balance(account_id):
+@db_operate
+def get_cash_balance(db, account_id):
     """ 得到用户的现金余额
     :param account_id:
     :return:
     """
-    db = from_db()
     return 100

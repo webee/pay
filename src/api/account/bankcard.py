@@ -4,7 +4,7 @@ from __future__ import unicode_literals, print_function
 from datetime import datetime
 from api.bankcard.bankcard_bin import query_bankcard_bin
 from api.util.enum import enum
-from tools.dbe import from_db, require_transaction_context, db_operate
+from tools.dbe import from_db, require_db_context, db_operate
 
 
 BankAccount = enum(IsPrivateAccount=0, IsCorporateAccount=1)
@@ -69,7 +69,7 @@ def new_bankcard(account_id, bankcard):
         'branch_bank_name': bankcard.branch_bank_name,
         'created_on': datetime.now()
     }
-    with require_transaction_context() as db:
+    with require_db_context() as db:
         return db.insert('bankcard', returns_id=True, **fields)
 
 

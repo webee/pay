@@ -8,7 +8,6 @@ from datetime import datetime
 from flask import request
 
 from . import ipay_mock_mod as mod
-from api.util.api import return_json
 from api.util.ipay import transaction
 from tools.mylog import get_logger
 from api.util.ipay.constant import response as pay_resp

@@ -215,7 +215,7 @@ def create_db_engine(**kwargs):
     return create_engine(url, pool_size=30, max_overflow=60, pool_recycle=3600, pool_timeout=60, **kwargs)
 
 
-engine = create_db_engine()
+engine = create_db_engine(strategy='threadlocal')
 
 
 def from_db():

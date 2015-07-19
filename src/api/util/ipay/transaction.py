@@ -55,6 +55,7 @@ def is_valid_transaction(oid_partner, transaction_id, uuid):
 def generate_pay_url(id):
     return _generate_notification_url(config.payment.redirect_url, id)
 
+
 def generate_pay_notification_url(id):
     return _generate_notification_url(config.payment.notify_url, id)
 

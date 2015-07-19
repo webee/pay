@@ -69,15 +69,12 @@ def freeze_dict_object(o):
 class DictObject(dict):
     def __init__(self, seq=None, **kwargs):
         super(DictObject, self).__init__(seq or (), **kwargs)
+        self.__dict__ = self
 
-    def __setattr__(self, name, value):
-        self[name] = value
-
-    def __getattr__(self, name):
-        try:
-            return self[name]
-        except KeyError:
-            raise AttributeError('"{}" object has no attribute "{}"'.format(self.__class__.__name__, name))
+    def __setitem__(self, key, value):
+        super(DictObject, self).__setitem__(key, value)
+        setattr(self, key, value)
+        self.__dict__ = self
 
 
 class FrozenDictObject(DictObject):

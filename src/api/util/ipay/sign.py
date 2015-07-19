@@ -90,7 +90,7 @@ def sign(data, sign_type):
         return _sign_md5_data(data, config.MD5_key)
     elif sign_type == config.sign_type.RSA:
         return _sign_rsa_data(data, config.TRADER_PRI_KEY)
-    raise Exception("unknown sign type: %s" % sign_type)
+    raise UnknownSignTypeError(sign_type)
 
 
 def verify(data, sign_type):

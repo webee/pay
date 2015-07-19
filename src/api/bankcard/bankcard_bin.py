@@ -14,6 +14,8 @@ def query_bankcard_bin(card_no):
         )
     except UnExpectedResponseError:
         return None
+    except ValueError:
+        return None
 
 
 def _parse_card_type(card_type):

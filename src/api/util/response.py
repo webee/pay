@@ -3,13 +3,13 @@ from flask import jsonify, abort
 
 
 def created(id):
-    resp = jsonify({'id':id})
+    resp = jsonify({'id': id})
     resp.status_code = 201
     return resp
 
 
 def accepted(id):
-    resp = jsonify({'id':id})
+    resp = jsonify({'id': id})
     resp.status_code = 202
     return resp
 

@@ -35,6 +35,9 @@ def require_db_context():
 def db_operate(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        if '_db' in kwargs:
+            db = kwargs.pop('_db')
+            return func(db, *args, **kwargs)
         with require_db_context() as db:
             return func(db, *args, **kwargs)
 

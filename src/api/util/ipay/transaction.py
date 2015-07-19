@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from flask import request
 
 from lianlian_api import parse_and_verify_request_data as _parse_and_verify_request_data
@@ -18,9 +19,12 @@ notification = Notification()
 
 def parse_and_verify(notify):
     def parser(**kwargs):
-        verified_data = _parse_and_verify_request_data(request.values, request.data)
-        request.__dict__['verified_data'] = verified_data
-        return notify(kwargs)
+        try:
+            verified_data = _parse_and_verify_request_data(request.values, request.data)
+            request.__dict__['verified_data'] = verified_data
+        except:
+            return notification.is_invalid()
+        return notify(**kwargs)
     return parser
 
 

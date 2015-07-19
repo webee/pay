@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+from __future__ import unicode_literals, print_function
 
+from datetime import datetime
 from api.bankcard.bankcard_bin import query_bankcard_bin
-from api.util.attr_dict import AttrDict
 from api.util.enum import enum
 from tools.dbe import from_db, require_transaction_context, db_operate
 
@@ -52,10 +52,8 @@ def list_all_bankcards(account_id):
 
 @db_operate
 def get_bankcard(db, account_id, bankcard_id):
-    bankcard = db.get("SELECT * FROM bankcard WHERE account_id=%(account_id)s AND id=%(bankcard_id)s",
-                      account_id=account_id, bankcard_id=bankcard_id)
-    if bankcard:
-        return _gen_bankcard_from_dict(bankcard)
+    return db.get("SELECT * FROM bankcard WHERE account_id=%(account_id)s AND id=%(bankcard_id)s",
+                  account_id=account_id, bankcard_id=bankcard_id)
 
 
 def new_bankcard(account_id, bankcard):
@@ -84,6 +82,3 @@ def is_debit_card(card_no):
     bankcard_bin = query_bankcard_bin(card_no)
     return bankcard_bin.card_type == 'Debit Card'
 
-
-def _gen_bankcard_from_dict(bankcard):
-    return AttrDict(**bankcard)

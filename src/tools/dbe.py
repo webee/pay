@@ -20,6 +20,15 @@ def require_transaction_context():
 def transactional(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        with require_transaction_context() as _:
+            return func(*args, **kwargs)
+
+    return wrapper
+
+
+def db_transactional(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
         with require_transaction_context() as db:
             return func(db, *args, **kwargs)
 

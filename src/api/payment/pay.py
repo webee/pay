@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from api.util.ipay import transaction
 from api.util.uuid import decode_uuid
-from tools.dbi import from_db
+from tools.dbe import from_db
 
 
 def pay_by_uuid(payment_uuid):

@@ -41,7 +41,7 @@ def parse_and_verify_request_data(values, raw_data):
     if _verify_sign(parsed_data):
         return parsed_data
     else:
-        raise InvalidSignError(parsed_data['sign_type'], parsed_data)
+        raise InvalidSignError(parsed_data.get('sign_type'), parsed_data)
 
 
 def _verify_sign(data):

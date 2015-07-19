@@ -3,7 +3,7 @@ from datetime import datetime
 from api.constant import SourceType, PayStep
 from api.util.bookkeeping import bookkeeping, Event
 from api.util.uuid import decode_uuid
-from tools.dbi import from_db, transactional
+from tools.dbe import from_db, transactional
 
 
 def is_valid_payment(transaction_id, uuid, paid_amount):

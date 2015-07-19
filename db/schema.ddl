@@ -67,7 +67,7 @@ CREATE TABLE withdraw(
   result ENUM('FROZEN', 'REQUEST_FAILED', 'SUCCESS', 'FAILED') NOT NULL COMMENT '提现结果',
   settle_date CHAR(8) COMMENT '成功支付，清算日期',
   failure_info VARCHAR(255) COMMENT '提现失败原因',
-  ended_on TIMESTAMP NOT NULL COMMENT '结束时间',
+  ended_on TIMESTAMP COMMENT '结束时间',
   FOREIGN KEY withdraw_account_id(account_id) REFERENCES account(id),
   FOREIGN KEY withdraw_bankcard_id(bankcard_id) REFERENCES bankcard(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -3,13 +3,12 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from api.util.ipay import transaction
-from flask import current_app
-from tools.dbe import transactional, db_operate
+from tools.dbe import db_transactional, db_operate
 from api.util import id
 from api import constant
 from api.util.bookkeeping import bookkeeping, Event
 from tools.mylog import get_logger
-from tools.utils import to_int, to_float
+from tools.utils import to_int
 from .bankcard import get_bankcard
 from tools.lock import require_user_account_locker
 from . import account
@@ -38,13 +37,13 @@ class AmountNotPositiveError(Exception):
 class InsufficientBalanceError(Exception):
     def __init__(self):
         message = "insufficient balance error."
-        super(AmountNotPositiveError, self).__init__(message)
+        super(InsufficientBalanceError, self).__init__(message)
 
 
 class WithDrawFailedError(Exception):
     def __init__(self, order_id):
         message = "withdraw failed: [{0}].".format(order_id)
-        super(AmountNotPositiveError, self).__init__(message)
+        super(WithDrawFailedError, self).__init__(message)
         self.order_id = order_id
 
 
@@ -77,11 +76,12 @@ def _apply_for_withdraw(order_id, amount, bankcard):
     notify_url = transaction.generate_pay_to_bankcard_notification_url(order_id)
     try:
         _ = transaction.pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
-    except:
-        raise WithDrawFailedError(order_id)
+    except Exception as e:
+        logger.warn(e.message)
+        # raise WithDrawFailedError(order_id)
 
 
-@transactional
+@db_transactional
 def _withdraw(db, account_id, bankcard_id, amount, callback_url):
     """ 新建提现订单并冻结金额
     :param account_id: 提现账户id
@@ -118,7 +118,7 @@ def _create_withdraw_order(db, account_id, bankcard_id, amount, callback_url):
     return order_id
 
 
-@transactional
+@db_transactional
 def _withdraw_request_failed(db, order_id):
     withdraw_order = get_withdraw_order(order_id, _db=db)
     if withdraw_order and withdraw_order.result == constant.WithdrawResult.FROZEN:
@@ -129,23 +129,25 @@ def _withdraw_request_failed(db, order_id):
         _unfrozen_back_withdraw_cash(withdraw_order)
 
 
-@transactional
+@db_transactional
 def succeed_withdraw(db, withdraw_order, paybill_id, settle_date):
-    db.execute("""update withdraw set paybill_id=%(paybill_id)s, result=%(result)s,
-settle_date=%()s, ended_on=%(ended_on)s where id=%(id)s""", paybill_id=paybill_id,
-               result=constant.WithdrawResult.SUCCESS, settle_date=settle_date,
-               ended_on=datetime.now(), id=withdraw_order['order_id'])
+    db.execute("""
+              update withdraw set paybill_id=%(paybill_id)s, result=%(result)s,
+              settle_date=%(settle_date)s, ended_on=%(ended_on)s where id=%(id)s
+              """, paybill_id=paybill_id, result=constant.WithdrawResult.SUCCESS, settle_date=settle_date,
+               ended_on=datetime.now(), id=withdraw_order['id'])
 
     _unfrozen_out_withdraw_cash(withdraw_order)
 
 
-@transactional
+@db_transactional
 def fail_withdraw(db, withdraw_order, paybill_id, failure_info):
-    db.execute("update withdraw set paybill_id=%(paybill_id)s, result=%(result)s,"
-               "failure_info=%(failure_info)s, ended_on=%(ended_on)s where id=%(id)s",
-               paybill_id=paybill_id, result=constant.WithdrawResult.FAILED,
+    db.execute("""
+              update withdraw set paybill_id=%(paybill_id)s, result=%(result)s,
+              failure_info=%(failure_info)s, ended_on=%(ended_on)s where id=%(id)s
+              """, paybill_id=paybill_id, result=constant.WithdrawResult.FAILED,
                failure_info=failure_info, ended_on=datetime.now(),
-               id=withdraw_order['order_id'])
+               id=withdraw_order['id'])
 
     _unfrozen_back_withdraw_cash(withdraw_order)
 
@@ -158,13 +160,13 @@ def _frozen_withdraw_cash(withdraw_order):
 
 def _unfrozen_back_withdraw_cash(withdraw_order):
     event = Event(withdraw_order['account_id'], constant.SourceType.WITHDRAW, constant.WithdrawStep.FAILED,
-                  withdraw_order['id'], withdraw_order['amount']),
+                  withdraw_order['id'], withdraw_order['amount'])
     bookkeeping(event, '-frozen', '+cash')
 
 
 def _unfrozen_out_withdraw_cash(withdraw_order):
     event = Event(withdraw_order['account_id'], constant.SourceType.WITHDRAW, constant.WithdrawStep.SUCCESS,
-                  withdraw_order['id'], withdraw_order['amount']),
+                  withdraw_order['id'], withdraw_order['amount'])
     bookkeeping(event, '-frozen', '-asset')
 
 

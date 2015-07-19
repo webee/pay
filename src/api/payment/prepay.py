@@ -2,10 +2,9 @@
 from datetime import datetime
 
 from api.util import id
-from api.util.uuid import encode_uuid
 from api.util.ipay import transaction
 from api.account.account import find_or_create_account
-from tools.dbi import from_db, transactional
+from tools.dbe import from_db, transactional
 
 
 class Order(object):

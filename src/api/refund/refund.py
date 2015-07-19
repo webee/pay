@@ -8,7 +8,7 @@ from api.util.enum import enum
 from api.util.ipay import transaction
 from api.util.uuid import decode_uuid
 from api.account.account import find_account_id
-from tools.dbi import from_db, transactional
+from tools.dbe import from_db, transactional
 
 
 RefundState = enum(Applied=0, InProcessing=1, Success=2, Failure=3)

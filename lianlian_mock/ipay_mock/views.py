@@ -22,7 +22,6 @@ def now_date_str():
 
 
 @mod.route('/cardandpay', methods=['POST'])
-@return_json
 def cardandpay():
     raw_data = request.data
 
@@ -47,7 +46,6 @@ def cardandpay():
 
 
 @mod.route('/notify_test', methods=['POST'])
-@return_json
 def notify_test():
     raw_data = request.data
 

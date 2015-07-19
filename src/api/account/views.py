@@ -13,7 +13,6 @@ from .withdraw import is_successful_result, fail_withdraw, succeed_withdraw
 from api.util import response
 from api.util.ipay.transaction import notification
 from api.util.ipay.transaction import parse_and_verify, is_valid_transaction
-from api.util.api import return_json
 from api.util.parser import to_bool
 from tools.mylog import get_logger
 from tools.utils import to_float
@@ -22,7 +21,6 @@ logger = get_logger(__name__)
 
 
 @mod.route('/<int:account_id>/withdraw', methods=['POST'])
-@return_json
 def withdraw(account_id):
     """ 提现接口
     POST: bankcard_id, amount, callback_url
@@ -62,7 +60,7 @@ def notify_withdraw(uuid):
 
     amount = to_float(data['money_order'])
     withdraw_order = get_withdraw_order(order_id)
-    if withdraw_order is None or amount != withdraw['amount']:
+    if withdraw_order is None or amount != withdraw_order['amount']:
         notification.is_invalid()
 
     # dt_order = data['dt_order']
@@ -112,5 +110,6 @@ def add_bankcard(account_id):
 @mod.route('/test', methods=['POST'])
 def test():
     data = {k: v for k, v in request.values.items()}
+    logger.info(json.dumps(data))
 
     return jsonify(data)

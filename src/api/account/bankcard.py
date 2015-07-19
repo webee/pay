@@ -4,7 +4,7 @@ from datetime import datetime
 from api.bankcard.bankcard_bin import query_bankcard_bin
 from api.util.attr_dict import AttrDict
 from api.util.enum import enum
-from tools.dbi import from_db, transactional
+from tools.dbe import from_db, require_transaction_context, db_operate
 
 
 BankAccount = enum(IsPrivateAccount=0, IsCorporateAccount=1)
@@ -24,8 +24,9 @@ class BankCard(object):
 
     @staticmethod
     def query(card_no):
-        bin = query_bankcard_bin(card_no)
-        return BankCard(card_no, bin.bank_code, bin.bank_name, bin.card_type) if bin else None
+        bankcard_bin = query_bankcard_bin(card_no)
+        return BankCard(card_no, bankcard_bin.bank_code,
+                        bankcard_bin.bank_name, bankcard_bin.card_type) if bankcard_bin else None
 
     def set_details(self, account_name, is_corporate_account, province_code, city_code, branch_bank_name):
         self.account_name = account_name
@@ -49,14 +50,14 @@ def list_all_bankcards(account_id):
     return from_db().list("SELECT * FROM bankcard WHERE account_id=%(account_id)s", account_id=account_id)
 
 
-def get_bankcard(account_id, bankcard_id):
-    bankcard = from_db().get('SELECT * FROM bankcard WHERE account_id=%(account_id)s AND id=%(bankcard_id)s',
-                             account_id=account_id, bankcard_id=bankcard_id)
+@db_operate
+def get_bankcard(db, account_id, bankcard_id):
+    bankcard = db.get("SELECT * FROM bankcard WHERE account_id=%(account_id)s AND id=%(bankcard_id)s",
+                      account_id=account_id, bankcard_id=bankcard_id)
     if bankcard:
         return _gen_bankcard_from_dict(bankcard)
 
 
-@transactional
 def new_bankcard(account_id, bankcard):
     fields = {
         'account_id': account_id,
@@ -70,17 +71,18 @@ def new_bankcard(account_id, bankcard):
         'branch_bank_name': bankcard.branch_bank_name,
         'created_on': datetime.now()
     }
-    return from_db().insert('bankcard', returns_id=True, **fields)
+    with require_transaction_context() as db:
+        return db.insert('bankcard', returns_id=True, **fields)
 
 
 def query_bankcard(card_no):
-    bin = query_bankcard_bin(card_no)
-    BankCard(card_no=card_no, bank_code=bin.bank_code, card_type=bin.card_type)
+    bankcard_bin = query_bankcard_bin(card_no)
+    BankCard(card_no=card_no, bank_code=bankcard_bin.bank_code, card_type=bankcard_bin.card_type)
 
 
 def is_debit_card(card_no):
-    bin = query_bankcard_bin(card_no)
-    return bin.card_type == 'Debit Card'
+    bankcard_bin = query_bankcard_bin(card_no)
+    return bankcard_bin.card_type == 'Debit Card'
 
 
 def _gen_bankcard_from_dict(bankcard):

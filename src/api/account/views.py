@@ -98,7 +98,7 @@ def notify_withdraw(uuid):
 
 @mod.route('/<int:account_id>/bankcards', methods=['GET'])
 def list_all_bankcards(account_id):
-    bankcards = list_all_bankcards(account_id)
+    bankcards = query_all_bankcards(account_id)
     return json.dumps(bankcards), 200
 
 

@@ -46,7 +46,7 @@ class BankCard(object):
         return self.card_type is not None and self.card_type.lower() == 'debit card'
 
 
-def list_all_bankcards(account_id):
+def query_all_bankcards(account_id):
     return from_db().list("SELECT * FROM bankcard WHERE account_id=%(account_id)s", account_id=account_id)
 
 

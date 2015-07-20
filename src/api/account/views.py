@@ -9,7 +9,7 @@ from .bankcard import *
 from tools.lock import require_user_account_locker
 from .withdraw import NoBankcardFoundError, AmountValueError, AmountNotPositiveError, InsufficientBalanceError
 from .withdraw import WithDrawFailedError
-from .withdraw import withdraw_transaction, get_frozen_withdraw_order
+from .withdraw import withdraw_transaction, get_frozen_withdraw_order, query_withdraw_order
 from .withdraw import is_successful_result, fail_withdraw, succeed_withdraw, notify_client
 from api.util import response
 from api.util.ipay.transaction import notification
@@ -46,6 +46,18 @@ def withdraw(account_id):
         return response.bad_request(e.message)
     except WithDrawFailedError as _:
         return response.bad_request("第三文支付请求失败", order_id=order_id)
+
+
+@mod.route('/<int:account_id>/withdraw/<order_id>', methods=['GET'])
+def query_withdraw(account_id, order_id):
+    withdraw_order = query_withdraw_order(account_id, order_id)
+    if withdraw_order is None:
+        return response.not_found()
+    withdraw_order = dict(withdraw_order)
+    withdraw_order['amount'] = float(withdraw_order['amount'])
+    withdraw_order.pop('paybill_id')
+    withdraw_order.pop('settle_date')
+    return jsonify(withdraw_order)
 
 
 @mod.route('/withdraw/<uuid>/result', methods=['POST'])
@@ -112,11 +124,3 @@ def add_bankcard(account_id):
 
     bankcard_id = new_bankcard(account_id, card)
     return response.created(bankcard_id)
-
-
-@mod.route('/test', methods=['POST'])
-def test():
-    data = {k: v for k, v in request.values.items()}
-    logger.info(json.dumps(data))
-
-    return jsonify(data)

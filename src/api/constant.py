@@ -19,6 +19,7 @@ class WithdrawResult(object):
 
 class PayStep(object):
     SECURED = 'SECURED'
+    CONFIRMED = 'CONFIRMED'
     SUCCESS = 'SUCCESS'
     FAILED = 'FAILED'
 

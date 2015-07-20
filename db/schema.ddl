@@ -34,8 +34,9 @@ CREATE TABLE payment(
   success SMALLINT , -- 0/1 = FAIL/SUCCESS
   paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,
-  auto_settled_on TIMESTAMP,
-  settlement_success SMALLINT DEFAULT 0, -- 0/1 = FAIL/SUCCESS
+  auto_confirm_expired_on TIMESTAMP,
+  confirm_success SMALLINT NOT NULL DEFAULT 0, -- 0/1 = FAIL/SUCCESS
+  confirmed_on TIMESTAMP,
 
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 );
@@ -106,7 +107,7 @@ CREATE TABLE account_balance(
 CREATE TABLE event(
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   account_id INT UNSIGNED NOT NULL,
-  source_type ENUM('PAY', 'WITHDRAW', 'REFUND', 'PREPAID', 'SETTLE') NOT NULL,
+  source_type ENUM('PAY', 'WITHDRAW', 'REFUND', 'SETTLE') NOT NULL,
   step VARCHAR(16) NOT NULL,
   source_id CHAR(30) NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,

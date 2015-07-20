@@ -2,6 +2,10 @@
 from flask import jsonify, abort
 
 
+def updated(ids):
+    return _response(200, {'ids': ids})
+
+
 def created(id):
     return _response(201, {'id': id})
 

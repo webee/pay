@@ -46,11 +46,11 @@ def _update_payment(transaction_id, paybill_id):
         """
             UPDATE payment
               SET success = 1, transaction_ended_on = %(ended_on)s, paybill_id=%(paybill_id)s,
-                  auto_settled_on=%(auto_settled_on)s
+                  auto_confirm_expired_on=%(expired_on)s
               WHERE id = %(id)s
         """,
-        id=transaction_id, paybill_id=paybill_id, ended_on=now, auto_settled_on=_few_days_after(now, 3))
+        id=transaction_id, paybill_id=paybill_id, ended_on=now, expired_on=_few_days_later(now, 3))
 
 
-def _few_days_after(from_datetime, days):
+def _few_days_later(from_datetime, days):
     return from_datetime + timedelta(days=days)

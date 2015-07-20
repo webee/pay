@@ -7,6 +7,8 @@ from . import pay_mod as mod
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid
 from .postpay import *
+from .confirm_pay import batch_confirm_pay_util_now
+from api.util import response
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
 from flask import jsonify, request, Response
 
@@ -55,3 +57,8 @@ def notify_payment(uuid):
     succeed_payment(order_no, paybill_oid)
     return notification.succeed()
 
+
+@mod.route('/pay/auto-confirm', methods=['POST'])
+def auto_confirm_pay():
+    confirmed_ids = batch_confirm_pay_util_now()
+    return response.updated(confirmed_ids)

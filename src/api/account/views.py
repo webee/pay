@@ -9,8 +9,8 @@ from .bankcard import *
 from tools.lock import require_user_account_locker
 from .withdraw import NoBankcardFoundError, AmountValueError, AmountNotPositiveError, InsufficientBalanceError
 from .withdraw import WithDrawFailedError
-from .withdraw import withdraw_transaction, get_withdraw_order, get_frozen_withdraw_order
-from .withdraw import is_successful_result, fail_withdraw, succeed_withdraw
+from .withdraw import withdraw_transaction, get_frozen_withdraw_order
+from .withdraw import is_successful_result, fail_withdraw, succeed_withdraw, notify_client
 from api.util import response
 from api.util.ipay.transaction import notification
 from api.util.ipay.transaction import parse_and_verify, is_valid_transaction
@@ -44,8 +44,8 @@ def withdraw(account_id):
         return response.bad_request(e.message)
     except InsufficientBalanceError as e:
         return response.bad_request(e.message)
-    except WithDrawFailedError as e:
-        return response.created(e.order_id)
+    except WithDrawFailedError as _:
+        return response.bad_request("第三文支付请求失败", order_id=order_id)
 
 
 @mod.route('/withdraw/<uuid>/result', methods=['POST'])
@@ -71,11 +71,16 @@ def notify_withdraw(uuid):
         result = data['result_pay']
         settle_date = data.get('settle_date', '')
 
+        callback_url = withdraw['callback_url']
         if not is_successful_result(result):
             fail_withdraw(withdraw_order, paybill_id, failure_info)
+            notify_params = {'code': 0, 'order_id': order_id}
+            notify_client(callback_url, notify_params)
             return notification.fail()
 
         succeed_withdraw(withdraw_order, paybill_id, settle_date)
+        notify_params = {'code': 1, 'msg': 'failed'}
+        notify_client(callback_url, notify_params)
         return notification.succeed()
 
 

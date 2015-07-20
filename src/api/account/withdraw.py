@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from datetime import datetime
 
+import requests
 from api.util.ipay import transaction
 from tools.dbe import db_transactional, db_operate
 from api.util import id
@@ -78,7 +79,7 @@ def _apply_for_withdraw(order_id, amount, bankcard):
         _ = transaction.pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
     except Exception as e:
         logger.warn(e.message)
-        # raise WithDrawFailedError(order_id)
+        raise WithDrawFailedError(order_id)
 
 
 @db_transactional
@@ -183,3 +184,14 @@ def get_frozen_withdraw_order(db, order_id, amount):
 
 def is_successful_result(result):
     return result.upper() == 'SUCCESS'
+
+
+def notify_client(url, params):
+    req = requests.post(url, params)
+    if req.status_code == 200:
+        data = req.json()
+        if data['code'] == 0:
+            # success
+            return
+    # other notify process.
+    # TODO

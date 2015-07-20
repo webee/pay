@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, division
 
 import json
 
-from flask import request, jsonify
+from flask import request, jsonify, json
 from . import account_mod as mod
 from .bankcard import *
 from tools.lock import require_user_account_locker
@@ -99,6 +99,7 @@ def notify_withdraw(uuid):
 @mod.route('/<int:account_id>/bankcards', methods=['GET'])
 def list_all_bankcards(account_id):
     bankcards = query_all_bankcards(account_id)
+    bankcards = [dict(bankcard) for bankcard in bankcards]
     return json.dumps(bankcards), 200
 
 

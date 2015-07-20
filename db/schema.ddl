@@ -31,10 +31,11 @@ CREATE TABLE payment(
   ordered_on TIMESTAMP NOT NULL ,
   created_on TIMESTAMP NOT NULL ,
   callback_url VARCHAR(128) ,
-  success SMALLINT , -- 0/1, FAIL/SUCCESS
+  success SMALLINT , -- 0/1 = FAIL/SUCCESS
   paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,
   auto_settled_on TIMESTAMP,
+  settlement_success SMALLINT DEFAULT 0, -- 0/1 = FAIL/SUCCESS
 
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 );

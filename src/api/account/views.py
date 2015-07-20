@@ -6,9 +6,10 @@ import json
 from flask import request, jsonify
 from . import account_mod as mod
 from .bankcard import *
+from tools.lock import require_user_account_locker
 from .withdraw import NoBankcardFoundError, AmountValueError, AmountNotPositiveError, InsufficientBalanceError
 from .withdraw import WithDrawFailedError
-from .withdraw import withdraw_transaction, get_withdraw_order
+from .withdraw import withdraw_transaction, get_withdraw_order, get_frozen_withdraw_order
 from .withdraw import is_successful_result, fail_withdraw, succeed_withdraw
 from api.util import response
 from api.util.ipay.transaction import notification
@@ -58,23 +59,24 @@ def notify_withdraw(uuid):
     if not is_valid_transaction(oid_partner, order_id, uuid):
         return notification.is_invalid()
 
-    amount = to_float(data['money_order'])
-    withdraw_order = get_withdraw_order(order_id)
-    if withdraw_order is None or amount != withdraw_order['amount']:
-        notification.is_invalid()
+    with require_user_account_locker(order_id, 'cash') as _:
+        amount = to_float(data['money_order'])
+        withdraw_order = get_frozen_withdraw_order(order_id, amount)
+        if withdraw_order is None:
+            notification.is_invalid()
 
-    # dt_order = data['dt_order']
-    paybill_id = data['oid_paybill']
-    failure_info = data.get('info_order', '')
-    result = data['result_pay']
-    settle_date = data.get('settle_date', '')
+        # dt_order = data['dt_order']
+        paybill_id = data['oid_paybill']
+        failure_info = data.get('info_order', '')
+        result = data['result_pay']
+        settle_date = data.get('settle_date', '')
 
-    if not is_successful_result(result):
-        fail_withdraw(withdraw_order, paybill_id, failure_info)
-        return notification.fail()
+        if not is_successful_result(result):
+            fail_withdraw(withdraw_order, paybill_id, failure_info)
+            return notification.fail()
 
-    succeed_withdraw(withdraw_order, paybill_id, settle_date)
-    return notification.succeed()
+        succeed_withdraw(withdraw_order, paybill_id, settle_date)
+        return notification.succeed()
 
 
 @mod.route('/<int:account_id>/bankcards', methods=['GET'])

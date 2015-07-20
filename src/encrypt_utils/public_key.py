@@ -24,12 +24,12 @@ class Key(object):
         """
         return self._key.has_private()
 
-    def key_data(self, pkcs=1):
+    def key_data(self, format='PEM', pkcs=1):
         """如果此含私钥，则返回私钥内容;
         否则返回公钥内容
         :return:
         """
-        return self._key.exportKey(pkcs=pkcs)
+        return self._key.exportKey(format, pkcs=pkcs)
 
     def export(self, fout):
         """导出key_data到fout

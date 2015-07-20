@@ -175,5 +175,11 @@ def get_withdraw_order(db, order_id):
     return db.get("select * from withdraw where id=%(id)s", id=order_id)
 
 
+@db_operate
+def get_frozen_withdraw_order(db, order_id, amount):
+    return db.get("select * from withdraw where id=%(id)s and result=%(result)s and amount=%(amount)s",
+                  id=order_id, result=constant.WithdrawResult.FROZEN, amount=amount)
+
+
 def is_successful_result(result):
     return result.upper() == 'SUCCESS'

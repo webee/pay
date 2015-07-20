@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from api.constant import SourceType, PayStep
 from api.util.bookkeeping import bookkeeping, Event
@@ -41,13 +41,16 @@ def _find_payment(transaction_id):
 
 
 def _update_payment(transaction_id, paybill_id):
+    now = datetime.now()
     from_db().execute(
         """
-            UPDATE payment SET success = 1, transaction_ended_on = %(ended_on)s, paybill_id=%(paybill_id)s
-            WHERE id = %(id)s
+            UPDATE payment
+              SET success = 1, transaction_ended_on = %(ended_on)s, paybill_id=%(paybill_id)s,
+                  auto_settled_on=%(auto_settled_on)s
+              WHERE id = %(id)s
         """,
-        id=transaction_id, ended_on=datetime.now(), paybill_id=paybill_id)
+        id=transaction_id, paybill_id=paybill_id, ended_on=now, auto_settled_on=_few_days_after(now, 3))
 
 
-
-
+def _few_days_after(from_datetime, days):
+    return from_datetime + timedelta(days=days)

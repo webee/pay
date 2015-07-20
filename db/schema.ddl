@@ -34,6 +34,7 @@ CREATE TABLE payment(
   success SMALLINT , -- 0/1, FAIL/SUCCESS
   paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,
+  auto_settled_on TIMESTAMP,
 
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 );

@@ -6,6 +6,7 @@ import os
 
 from flask.ext.script import Manager, Shell, Server
 from api import create_app
+import requests
 
 app = create_app(os.getenv('SYSTEM_CONFIG') or 'default')
 manager = Manager(app)
@@ -25,6 +26,15 @@ manager.add_command("runserver", server)
 def init_db():
     from ops.deploy.init_db import init_db
     init_db()
+
+
+@manager.command
+def confirm_to_pay_all():
+    resp = requests.post('http://localhost:5000/pay/auto-confirm')
+    if resp.status_code == 200:
+        print('Auto pay confirmation completed.')
+    else:
+        print('Auto pay confirmation failed...')
 
 
 if __name__ == '__main__':

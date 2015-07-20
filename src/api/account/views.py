@@ -6,7 +6,7 @@ from flask import request, jsonify, json
 from . import account_mod as mod
 from .balance import get_account_balance
 from .bankcard import *
-from tools.lock import require_user_account_locker
+from tools.lock import require_user_account_lock
 from .withdraw import NoBankcardFoundError, AmountValueError, AmountNotPositiveError, InsufficientBalanceError
 from .withdraw import WithDrawFailedError
 from .withdraw import withdraw_transaction, get_frozen_withdraw_order, query_withdraw_order
@@ -71,7 +71,7 @@ def notify_withdraw(uuid):
     if not is_valid_transaction(oid_partner, order_id, uuid):
         return notification.is_invalid()
 
-    with require_user_account_locker(order_id, 'cash') as _:
+    with require_user_account_lock(order_id, 'cash') as _:
         amount = to_float(data['money_order'])
         withdraw_order = get_frozen_withdraw_order(order_id, amount)
         if withdraw_order is None:

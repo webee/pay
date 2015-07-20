@@ -97,9 +97,8 @@ CREATE TABLE account_balance(
   account ENUM('CASH', 'FROZEN', 'BUSINESS', 'SECURED', 'ASSET') NOT NULL,
   side ENUM('DEBIT', 'CREDIT', 'BOTH') NOT NULL COMMENT '记账方向, both: 全额，其它：各方向发生额',
   balance DECIMAL(12, 2) NOT NULL COMMENT '余额',
-  settle_time TIMESTAMP NOT NULL COMMENT '结算日期时间',
   last_transaction_log_id BIGINT NOT NULL COMMENT '结算最后账户日志id',
-  created_on TIMESTAMP NOT NULL,
+  settle_time TIMESTAMP NOT NULL COMMENT '结算日期时间',
   FOREIGN KEY accounts_balance_account_id(account_id) REFERENCES account(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

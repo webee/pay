@@ -12,7 +12,7 @@ from api.util.bookkeeping import bookkeeping, Event
 from tools.mylog import get_logger
 from tools.utils import to_int
 from .bankcard import get_bankcard
-from tools.lock import require_user_account_locker
+from tools.lock import require_user_account_lock
 from . import account
 
 logger = get_logger(__name__)
@@ -92,7 +92,7 @@ def _withdraw(db, account_id, bankcard_id, amount, callback_url):
     :param callback_url: 请求方回调通知url
     :return:
     """
-    with require_user_account_locker(account_id, 'cash') as _:
+    with require_user_account_lock(account_id, 'cash') as _:
         balance = account.get_cash_balance(account_id)
         if amount > balance:
             raise InsufficientBalanceError()

@@ -100,7 +100,7 @@ def notify_withdraw(uuid):
 def list_all_bankcards(account_id):
     bankcards = query_all_bankcards(account_id)
     bankcards = [dict(bankcard) for bankcard in bankcards]
-    return json.dumps(bankcards), 200
+    return response.list(bankcards)
 
 
 @mod.route('/<int:account_id>/bankcards', methods=['POST'])

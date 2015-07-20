@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
-from flask import jsonify, abort
+import json
+from flask import jsonify, Response
 
 
 def updated(ids):
     return _response(200, {'ids': ids})
+
+
+def list(items):
+    js = json.dump(items)
+    return Response(js, status=200, mimetype='application/json')
 
 
 def created(id):

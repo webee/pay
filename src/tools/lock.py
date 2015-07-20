@@ -1,4 +1,5 @@
 # coding=utf-8
+from __future__ import unicode_literals
 import contextlib
 from .mylog import get_logger
 
@@ -29,8 +30,12 @@ class CheckLockError(LockError):
 
 
 class _Locker(object):
+    _id_locks = {
+    }
+
     def __init__(self, db):
         self.db = db
+        self.id = self.who_am_i()
 
     def sleep(self, duration):
         self.db.sleep(duration)
@@ -42,12 +47,19 @@ class _Locker(object):
         elif ret is None:
             raise GetLockError(name)
 
+        _Locker._id_locks[self.id] = name
+
     def release_lock(self, name):
         ret = self.db.get_scalar("select RELEASE_LOCK(%s)", (name,))
         if ret == 0:
             logger.warn("lock [{0}] not established by this thread.".format(name, ))
         elif ret is None:
             logger.warn("lock [{0}] did not exists.".format(name, ))
+
+        try:
+            _Locker._id_locks.pop(self.id)
+        except:
+            pass
 
     def is_lock_free(self, name):
         ret = self.db.get_scalar("select IS_FREE_LOCK(%s)", (name,))
@@ -67,14 +79,24 @@ class _Locker(object):
 
     @contextlib.contextmanager
     def lock(self, name, timeout=-1):
-        self.get_lock(name, timeout)
-
-        try:
+        if self.id in _Locker._id_locks:
+            # already has a lock.
+            lock_name = _Locker._id_locks[self.id]
+            if lock_name != name:
+                # try another lock
+                raise LockError('already hold a lock: %s' % lock_name)
+        if self.i_hold_the_lock(name):
+            # nested the same lock.
             yield
-        except:
-            raise
-        finally:
-            self.release_lock(name)
+        else:
+            self.get_lock(name, timeout)
+
+            try:
+                yield
+            except:
+                raise
+            finally:
+                self.release_lock(name)
 
     @contextlib.contextmanager
     def user_account_lock(self, user_account_id, account_name, timeout=-1):

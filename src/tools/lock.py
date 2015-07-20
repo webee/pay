@@ -78,12 +78,12 @@ class _Locker(object):
 
     @contextlib.contextmanager
     def user_account_lock(self, user_account_id, account_name, timeout=-1):
-        with self.lock(_generate_user_account_lock_name(user_account_id, account_name), timeout):
+        with self.lock(_generate_user_lock_name(user_account_id, account_name), timeout):
             yield
 
 
-def _generate_user_account_lock_name(user_account_id, account_name):
-    return 'lvye_pay.{0}_{1}'.format(user_account_id, account_name)
+def _generate_user_lock_name(user_account_id, name):
+    return 'lvye_pay.{0}_{1}'.format(user_account_id, name)
 
 
 @contextlib.contextmanager
@@ -97,5 +97,11 @@ def require_locker(name, timeout=-1):
 
 @contextlib.contextmanager
 def require_user_account_locker(user_account_id, account_name, timeout=-1):
-    with require_locker(_generate_user_account_lock_name(user_account_id, account_name), timeout) as locker:
+    with require_locker(_generate_user_lock_name(user_account_id, account_name), timeout) as locker:
+        yield locker
+
+
+@contextlib.contextmanager
+def require_user_locker(user_account_id, name, timeout=-1):
+    with require_locker(_generate_user_lock_name(user_account_id, name), timeout) as locker:
         yield locker

@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 
 import requests
 from api.util.ipay import transaction
@@ -54,8 +55,8 @@ def withdraw_transaction(account_id, bankcard_id, amount, callback_url):
         raise NoBankcardFoundError(account_id, bankcard_id)
 
     try:
-        amount_value = float(amount)
-    except ValueError:
+        amount_value = Decimal(amount)
+    except InvalidOperation:
         raise AmountValueError(amount)
 
     if amount_value <= 0:

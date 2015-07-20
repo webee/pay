@@ -15,7 +15,9 @@ def accepted(id):
 
 
 def not_found():
-    return abort(404)
+    resp = jsonify({})
+    resp.status_code = 404
+    return resp
 
 
 def bad_request(message, **request_params):

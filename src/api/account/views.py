@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-import json
 
 from flask import request, jsonify, json
 from . import account_mod as mod
+from .balance import get_account_balance
 from .bankcard import *
 from tools.lock import require_user_account_locker
 from .withdraw import NoBankcardFoundError, AmountValueError, AmountNotPositiveError, InsufficientBalanceError
@@ -125,3 +125,9 @@ def add_bankcard(account_id):
 
     bankcard_id = new_bankcard(account_id, card)
     return response.created(bankcard_id)
+
+
+@mod.route('/<int:account_id>/balance', methods=['GET'])
+def get_balance(account_id):
+    balance = get_account_balance(account_id)
+    return response.ok(balance=balance)

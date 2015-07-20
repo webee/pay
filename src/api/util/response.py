@@ -4,12 +4,16 @@ from flask import jsonify, Response
 
 
 def updated(ids):
-    return _response(200, {'ids': ids})
+    return ok(ids=ids)
 
 
 def list(items):
     js = json.dump(items)
     return Response(js, status=200, mimetype='application/json')
+
+
+def ok(**params):
+    return _response(200, params)
 
 
 def created(id):

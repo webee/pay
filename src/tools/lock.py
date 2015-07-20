@@ -40,7 +40,7 @@ class _Locker(object):
     def sleep(self, duration):
         self.db.sleep(duration)
 
-    def get_lock(self, name, timeout):
+    def get_lock(self, name, timeout=-1):
         ret = self.db.get_scalar("select GET_LOCK(%s, %s)", (name, timeout))
         if ret == 0:
             raise GetLockTimeoutError(name, timeout)
@@ -49,7 +49,8 @@ class _Locker(object):
 
         _Locker._id_locks[self.id] = name
 
-    def release_lock(self, name):
+    def release_lock(self, name=None):
+        name = _Locker._id_locks.get(self.id) or name
         ret = self.db.get_scalar("select RELEASE_LOCK(%s)", (name,))
         if ret == 0:
             logger.warn("lock [{0}] not established by this thread.".format(name, ))
@@ -109,7 +110,7 @@ def _generate_user_lock_name(user_account_id, name):
 
 
 @contextlib.contextmanager
-def require_locker(name, timeout=-1):
+def require_lock(name, timeout=-1):
     from .dbe import require_db_context
     with require_db_context() as db:
         locker = _Locker(db)
@@ -118,12 +119,12 @@ def require_locker(name, timeout=-1):
 
 
 @contextlib.contextmanager
-def require_user_account_locker(user_account_id, account_name, timeout=-1):
-    with require_locker(_generate_user_lock_name(user_account_id, account_name), timeout) as locker:
+def require_user_account_lock(user_account_id, account_name, timeout=-1):
+    with require_lock(_generate_user_lock_name(user_account_id, account_name), timeout) as locker:
         yield locker
 
 
 @contextlib.contextmanager
-def require_user_locker(user_account_id, name, timeout=-1):
-    with require_locker(_generate_user_lock_name(user_account_id, name), timeout) as locker:
+def require_user_lock(user_account_id, name, timeout=-1):
+    with require_lock(_generate_user_lock_name(user_account_id, name), timeout) as locker:
         yield locker

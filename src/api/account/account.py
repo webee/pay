@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from tools.dbe import require_db_context, db_operate, require_transaction_context
-from tools.lock import require_user_account_lock
+from __future__ import unicode_literals
+
+from decimal import Decimal
+from tools.dbe import require_db_context, db_operate
 from api.constant import BookkeepingSide
 
 
@@ -31,36 +33,41 @@ def get_cash_balance(db, account_id):
           select balance, last_transaction_log_id from account_balance
           where account_id=%(account_id)s and account='cash' and side='both'
           """, account_id=account_id)
-    balance_value = 0
+    balance_value = Decimal(0)
     last_transaction_log_id = 0
     if balance:
         balance_value = balance.balance
         last_transaction_log_id = balance.last_transaction_log_id
 
-    unsettled_balance = get_unsettled_balance(db, account_id, BookkeepingSide.BOTH, last_transaction_log_id)
+    unsettled_balance = get_unsettled_balance(db, account_id, 'cash', BookkeepingSide.BOTH, last_transaction_log_id)
+    unsettled_balance = Decimal(0) if unsettled_balance is None else unsettled_balance
     return balance_value + unsettled_balance
 
 
-def get_unsettled_balance(db, account_id, side, low_id, high_id=None):
+def get_unsettled_balance(db, account_id, account, side, low_id, high_id=None):
     if side == BookkeepingSide.BOTH:
         if high_id is None:
             return db.get_scalar("""
-                      select sum((CASE side WHEN 'debit' THEN -1 WHEN 'credit' THEN 1 END) * amount) from cash_account_transaction_log
+                      select sum((CASE side WHEN 'debit' THEN -1 WHEN 'credit' THEN 1 END) * amount)
+                      from """ + account + """_account_transaction_log
                       where account_id=%(account_id)s and id > %(low_id)s
                       """, account_id=account_id, low_id=low_id)
         else:
             return db.get_scalar("""
-                    select sum((CASE side WHEN 'debit' THEN -1 WHEN 'credit' THEN 1 END) * amount) from cash_account_transaction_log
+                    select sum((CASE side WHEN 'debit' THEN -1 WHEN 'credit' THEN 1 END) * amount)
+                    from """ + account + """_account_transaction_log
                     where account_id=%(account_id)s and id > %(low_id)s and id <= %(high_id)s
-                    """, account_id=account_id, lowd_id=low_id, high_id=high_id)
+                    """, account_id=account_id, low_id=low_id, high_id=high_id)
     else:
         if high_id is None:
             return db.get_scalar("""
-                      select sum((CASE side WHEN 'debit' THEN -1 WHEN 'credit' THEN 1 END) * amount) from cash_account_transaction_log
+                      select sum((CASE side WHEN 'debit' THEN -1 WHEN 'credit' THEN 1 END) * amount)
+                      from """ + account + """_account_transaction_log
                       where account_id=%(account_id)s and side=%(side)s and id > %(low_id)s
                       """, account_id=account_id, side=side, low_id=low_id)
         else:
             return db.get_scalar("""
-                    select sum((CASE side WHEN 'debit' THEN -1 WHEN 'credit' THEN 1 END) * amount) from cash_account_transaction_log
+                    select sum((CASE side WHEN 'debit' THEN -1 WHEN 'credit' THEN 1 END) * amount)
+                    from """ + account + """_account_transaction_log
                     where account_id=%(account_id)s and side=%(side)s and id > %(low_id)s and id <= %(high_id)s
-                    """, account_id=account_id, side=side, lowd_id=low_id, high_id=high_id)
+                    """, account_id=account_id, side=side, low_id=low_id, high_id=high_id)

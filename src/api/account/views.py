@@ -4,7 +4,7 @@ from __future__ import unicode_literals, print_function, division
 
 from flask import request, jsonify, json
 from . import account_mod as mod
-from .balance import get_account_balance
+from .account import get_cash_balance
 from .bankcard import *
 from tools.lock import require_user_account_lock
 from .withdraw import NoBankcardFoundError, AmountValueError, AmountNotPositiveError, InsufficientBalanceError
@@ -100,7 +100,7 @@ def notify_withdraw(uuid):
 def list_all_bankcards(account_id):
     bankcards = query_all_bankcards(account_id)
     bankcards = [dict(bankcard) for bankcard in bankcards]
-    return response.list(bankcards)
+    return response.list_data(bankcards)
 
 
 @mod.route('/<int:account_id>/bankcards', methods=['POST'])
@@ -129,5 +129,5 @@ def add_bankcard(account_id):
 
 @mod.route('/<int:account_id>/balance', methods=['GET'])
 def get_balance(account_id):
-    balance = get_account_balance(account_id)
+    balance = get_cash_balance(account_id)
     return response.ok(balance=balance)

@@ -6,17 +6,15 @@ from flask import request, jsonify, json
 from . import account_mod as mod
 from .account import get_cash_balance, user_account_exists
 from .bankcard import *
-from tools.lock import require_user_account_lock
 from .withdraw import NoBankcardFoundError, AmountValueError, AmountNotPositiveError, InsufficientBalanceError
-from .withdraw import WithDrawFailedError
-from .withdraw import withdraw_transaction, get_frozen_withdraw_order, query_withdraw_order
-from .withdraw import is_successful_result, fail_withdraw, succeed_withdraw, notify_client
+from .withdraw import WithDrawFailedError, CreateWithDrawOrderError
+from .withdraw import withdraw_transaction, query_withdraw_order
+from .withdraw import handle_withdraw_notify
 from api.util import response
 from api.util.ipay.transaction import notification
 from api.util.ipay.transaction import parse_and_verify, is_valid_transaction
 from api.util.parser import to_bool
 from tools.mylog import get_logger
-from tools.utils import to_float
 
 logger = get_logger(__name__)
 
@@ -43,6 +41,8 @@ def withdraw(account_id):
     except AmountNotPositiveError as e:
         return response.bad_request(e.message)
     except InsufficientBalanceError as e:
+        return response.bad_request(e.message)
+    except CreateWithDrawOrderError as e:
         return response.bad_request(e.message)
     except WithDrawFailedError as e:
         return response.bad_request("第三文支付请求失败", order_id=e.order_id)
@@ -71,29 +71,7 @@ def notify_withdraw(uuid):
     if not is_valid_transaction(oid_partner, order_id, uuid):
         return notification.is_invalid()
 
-    with require_user_account_lock(order_id, 'cash') as _:
-        amount = to_float(data['money_order'])
-        withdraw_order = get_frozen_withdraw_order(order_id, amount)
-        if withdraw_order is None:
-            notification.is_invalid()
-
-        # dt_order = data['dt_order']
-        paybill_id = data['oid_paybill']
-        failure_info = data.get('info_order', '')
-        result = data['result_pay']
-        settle_date = data.get('settle_date', '')
-
-        callback_url = withdraw['callback_url']
-        if not is_successful_result(result):
-            fail_withdraw(withdraw_order, paybill_id, failure_info)
-            notify_params = {'code': 0, 'account_id': withdraw_order['account_id'], 'order_id': order_id}
-            notify_client(callback_url, notify_params)
-            return notification.fail()
-
-        succeed_withdraw(withdraw_order, paybill_id, settle_date)
-        notify_params = {'code': 1, 'msg': 'failed', 'account_id': withdraw_order['account_id'], 'order_id': order_id}
-        notify_client(callback_url, notify_params)
-        return notification.succeed()
+    return handle_withdraw_notify(order_id, data)
 
 
 @mod.route('/<int:account_id>/bankcards', methods=['GET'])

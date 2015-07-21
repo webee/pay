@@ -9,7 +9,7 @@
 <p>
     balance: <span id="balance"></span>
 </p>
-<form target="{{ url_for('sample.withdraw', account_id=1) }}" method="POST">
+<form action="{{ url_for('sample.withdraw', account_id=1) }}" method="POST">
     <label for="balance">
         amount:
         <input type="text" name="amount">
@@ -19,7 +19,7 @@
 <script>
     $(document).ready(function() {
         get_balance();
-        setInterval("get_balance()", 2000);
+        setInterval("get_balance()", 2500);
     });
     function get_balance() {
         $.ajax({

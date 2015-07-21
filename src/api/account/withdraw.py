@@ -12,7 +12,9 @@ from api.util.bookkeeping import bookkeeping, Event
 from tools.mylog import get_logger
 from tools.utils import to_int
 from .bankcard import get_bankcard
-from tools.lock import require_user_account_lock
+from tools.lock import require_user_account_lock, GetLockError, GetLockTimeoutError
+from api.util.ipay.transaction import notification
+from tools.utils import to_float
 from . import account
 
 logger = get_logger(__name__)
@@ -40,6 +42,12 @@ class InsufficientBalanceError(Exception):
     def __init__(self):
         message = "insufficient balance error."
         super(InsufficientBalanceError, self).__init__(message)
+
+
+class CreateWithDrawOrderError(Exception):
+    def __init__(self):
+        message = "create withdraw failed."
+        super(CreateWithDrawOrderError, self).__init__(message)
 
 
 class WithDrawFailedError(Exception):
@@ -92,15 +100,20 @@ def _withdraw(db, account_id, bankcard_id, amount, callback_url):
     :param callback_url: 请求方回调通知url
     :return:
     """
-    with require_user_account_lock(account_id, 'cash') as _:
-        balance = account.get_cash_balance(account_id)
-        if amount > balance:
-            raise InsufficientBalanceError()
-        order_id = _create_withdraw_order(db, account_id, bankcard_id, amount, callback_url)
-        withdraw_order = get_withdraw_order(order_id, _db=db)
-        _frozen_withdraw_cash(withdraw_order)
+    try:
+        with require_user_account_lock(account_id, 'cash') as _:
+            balance = account.get_cash_balance(account_id)
+            if amount > balance:
+                raise InsufficientBalanceError()
+            order_id = _create_withdraw_order(db, account_id, bankcard_id, amount, callback_url)
+            withdraw_order = get_withdraw_order(order_id, _db=db)
+            _frozen_withdraw_cash(withdraw_order)
 
-        return order_id
+            return order_id
+    except GetLockError:
+        raise CreateWithDrawOrderError()
+    except GetLockTimeoutError:
+        raise CreateWithDrawOrderError()
 
 
 def _create_withdraw_order(db, account_id, bankcard_id, amount, callback_url):
@@ -132,7 +145,7 @@ def _withdraw_request_failed(db, order_id):
 
 
 @db_transactional
-def succeed_withdraw(db, withdraw_order, paybill_id, settle_date):
+def _succeed_withdraw(db, withdraw_order, paybill_id, settle_date):
     db.execute("""
               update withdraw set paybill_id=%(paybill_id)s, result=%(result)s,
               settle_date=%(settle_date)s, ended_on=%(ended_on)s where id=%(id)s
@@ -143,7 +156,7 @@ def succeed_withdraw(db, withdraw_order, paybill_id, settle_date):
 
 
 @db_transactional
-def fail_withdraw(db, withdraw_order, paybill_id, failure_info):
+def _fail_withdraw(db, withdraw_order, paybill_id, failure_info):
     db.execute("""
               update withdraw set paybill_id=%(paybill_id)s, result=%(result)s,
               failure_info=%(failure_info)s, ended_on=%(ended_on)s where id=%(id)s
@@ -178,7 +191,7 @@ def get_withdraw_order(db, order_id):
 
 
 @db_operate
-def get_frozen_withdraw_order(db, order_id, amount):
+def _get_frozen_withdraw_order(db, order_id, amount):
     return db.get("select * from withdraw where id=%(id)s and result=%(result)s and amount=%(amount)s",
                   id=order_id, result=constant.WithdrawResult.FROZEN, amount=amount)
 
@@ -193,7 +206,39 @@ def is_successful_result(result):
     return result.upper() == 'SUCCESS'
 
 
-def notify_client(url, params):
+def handle_withdraw_notify(order_id, data):
+    try:
+        with require_user_account_lock(order_id, 'cash') as _:
+            # lock this order.
+            amount = to_float(data['money_order'])
+            withdraw_order = _get_frozen_withdraw_order(order_id, amount)
+            if withdraw_order is None:
+                notification.is_invalid()
+
+            # dt_order = data['dt_order']
+            paybill_id = data['oid_paybill']
+            failure_info = data.get('info_order', '')
+            result = data['result_pay']
+            settle_date = data.get('settle_date', '')
+
+            callback_url = withdraw_order['callback_url']
+            if not is_successful_result(result):
+                _fail_withdraw(withdraw_order, paybill_id, failure_info)
+                notify_params = {'code': 0, 'account_id': withdraw_order['account_id'], 'order_id': order_id}
+                _notify_client(callback_url, notify_params)
+                return notification.fail()
+
+            _succeed_withdraw(withdraw_order, paybill_id, settle_date)
+            notify_params = {'code': 1, 'msg': 'failed', 'account_id': withdraw_order['account_id'], 'order_id': order_id}
+            _notify_client(callback_url, notify_params)
+            return notification.succeed()
+    except GetLockError:
+        return notification.is_invalid()
+    except GetLockTimeoutError:
+        return notification.is_invalid()
+
+
+def _notify_client(url, params):
     req = requests.post(url, params)
     if req.status_code == 200:
         data = req.json()

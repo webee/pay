@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from decimal import Decimal
 from tools.dbe import require_db_context, require_transaction_context
-from tools.lock import require_user_lock
+from tools.lock import require_user_lock, GetLockError, GetLockTimeoutError
 from datetime import datetime
 from tools.mylog import get_logger
 from api.constant import BookkeepingSide
@@ -22,11 +22,16 @@ def settle_user_account_balance(account_id, account):
         logger.warn("{0} on {1} has no transaction log.".format(account_id, account))
         return
 
-    with require_user_lock(account_id, 'cash_balance'):
-        with require_transaction_context() as db:
-            _settle_user_account_side_balance(db, account_id, account, BookkeepingSide.DEBIT, max_transaction_log_id)
-            _settle_user_account_side_balance(db, account_id, account, BookkeepingSide.CREDIT, max_transaction_log_id)
-            _settle_user_account_side_balance(db, account_id, account, BookkeepingSide.BOTH, max_transaction_log_id)
+    try:
+        with require_user_lock(account_id, 'cash_balance'):
+            with require_transaction_context() as db:
+                _settle_user_account_side_balance(db, account_id, account, BookkeepingSide.DEBIT, max_transaction_log_id)
+                _settle_user_account_side_balance(db, account_id, account, BookkeepingSide.CREDIT, max_transaction_log_id)
+                _settle_user_account_side_balance(db, account_id, account, BookkeepingSide.BOTH, max_transaction_log_id)
+    except GetLockError as e:
+        logger.warn(e.message)
+    except GetLockTimeoutError as e:
+        logger.warn(e.message)
 
 
 def _settle_user_account_side_balance(db, account_id, account, side, max_transaction_log_id):

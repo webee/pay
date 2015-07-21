@@ -68,8 +68,13 @@ def test_transfer(from_id, to_id, amount):
             message = "insufficient balance error."
             super(InsufficientBalanceError, self).__init__(message)
 
+    class TransferError(Exception):
+        def __init__(self):
+            message = "transfer error."
+            super(TransferError, self).__init__(message)
+
     from tools.dbe import require_transaction_context
-    from tools.lock import require_user_account_lock
+    from tools.lock import require_user_account_lock, GetLockTimeoutError, GetLockError
     from api.account import account
     from api.constant import SourceType, TransferStep
     from api.util.bookkeeping import Event, bookkeeping
@@ -77,16 +82,21 @@ def test_transfer(from_id, to_id, amount):
     if amount <= 0:
         raise AmountNotPositiveError(amount)
 
-    with require_user_account_lock(from_id, 'cash') as _:
-        balance = account.get_cash_balance(from_id)
-        if amount > balance:
-            raise InsufficientBalanceError()
-        with require_transaction_context():
-            bookkeeping(Event(from_id, SourceType.TRANSFER, TransferStep.FROZEN, "", amount),
-                        '-cash', '+frozen')
+    try:
+        with require_user_account_lock(from_id, 'cash') as _:
+            balance = account.get_cash_balance(from_id)
+            if amount > balance:
+                raise InsufficientBalanceError()
+            with require_transaction_context():
+                bookkeeping(Event(from_id, SourceType.TRANSFER, TransferStep.FROZEN, "", amount),
+                            '-cash', '+frozen')
 
-            bookkeeping(Event(to_id, SourceType.TRANSFER, TransferStep.SUCCESS, "", amount),
-                        '-frozen', '+cash')
+                bookkeeping(Event(to_id, SourceType.TRANSFER, TransferStep.SUCCESS, "", amount),
+                            '-frozen', '+cash')
+    except GetLockTimeoutError:
+        raise TransferError()
+    except GetLockError:
+        raise TransferError()
 
 
 @manager.option('-i', '--id', type=long, dest="account_id", required=True)

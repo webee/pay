@@ -13,9 +13,9 @@ if [ $? -ne 0 ]; then
     exit 123
 fi
 
-site=$1
+site=${1:-api}
 
 host=${2:-'127.0.0.1'}
-port=${3:-2222}
+port=${3:-5000}
 
 python ./src/${site}_manager.py  runserver -h${host} -p${port} -r -d

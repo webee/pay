@@ -13,16 +13,12 @@ if [ $? -ne 0 ]; then
     exit 123
 fi
 
-if [ $# -lt 2 ]; then
-    echo "usage: $0 host port" >/dev/stderr
-    exit 123
-fi
-
-site=$1
-host=$2
-port=$3
+site=${1:-api}
+host=${2:-127.0.0.1}
+port=${3:-5000}
 
 cd src
 
 #exec uwsgi --http ${host}:${port} --module ${site}_wsgi --callable app --gevent 2000 -l 1000 -p 8 -L
-exec gunicorn -b$host:$port -w7 -kgevent ${site}_wsgi:app
+export SITE=${site}
+exec gunicorn -b$host:$port -w7 -kgevent wsgi:app

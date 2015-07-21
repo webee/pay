@@ -17,8 +17,9 @@ site=${1:-api}
 host=${2:-127.0.0.1}
 port=${3:-5000}
 
+mkdir -p logs
 cd src
 
 #exec uwsgi --http ${host}:${port} --module ${site}_wsgi --callable app --gevent 2000 -l 1000 -p 8 -L
 export SITE=${site}
-exec gunicorn -b$host:$port -w7 -kgevent wsgi:app
+exec gunicorn -b${host}:${port} -w7 -kgevent wsgi:app -ngunicorn-${site} --max-requests 100 -c ${root}/conf/gunicorn.conf.py

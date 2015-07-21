@@ -47,6 +47,7 @@ CREATE TABLE bankcard(
   account_id INT UNSIGNED NOT NULL COMMENT '银行卡对应的账号',
   flag TINYINT NOT NULL COMMENT '0-对私，1-对公',
   card_no VARCHAR(21) NOT NULL COMMENT '银行账号，对私必须是借记卡',
+  card_type ENUM('DEBIT', 'CREDIT') NOT NULL COMMENT '借记卡，或者信用卡',
   account_name VARCHAR(12) NOT NULL COMMENT '用户银行账号姓名',
   bank_code VARCHAR(12) NOT NULL COMMENT '银行编码',
   province_code VARCHAR(12) NOT NULL COMMENT '开户行所在省编码',

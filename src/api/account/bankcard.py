@@ -4,6 +4,7 @@ from __future__ import unicode_literals, print_function
 from datetime import datetime
 from api.bankcard.bankcard_bin import query_bankcard_bin
 from api.util.enum import enum
+from api.constant import BankcardType
 from tools.dbe import from_db, require_db_context, db_operate
 
 
@@ -43,7 +44,7 @@ class BankCard(object):
         return not self.is_corporate_account
 
     def _is_debit_account(self):
-        return self.card_type is not None and self.card_type.lower() == 'debit card'
+        return self.card_type is not None and self.card_type == BankcardType.DEBIT
 
 
 def query_all_bankcards(account_id):
@@ -60,6 +61,7 @@ def new_bankcard(account_id, bankcard):
     fields = {
         'account_id': account_id,
         'card_no': bankcard.no,
+        'card_type': bankcard.card_type,
         'account_name': bankcard.account_name,
         'flag': BankAccount.IsCorporateAccount if bankcard.is_corporate_account else BankAccount.IsPrivateAccount,
         'bank_code': bankcard.bank_code,
@@ -80,5 +82,5 @@ def query_bankcard(card_no):
 
 def is_debit_card(card_no):
     bankcard_bin = query_bankcard_bin(card_no)
-    return bankcard_bin.card_type == 'Debit Card'
+    return bankcard_bin.card_type == BankcardType.DEBIT
 

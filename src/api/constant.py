@@ -2,6 +2,11 @@
 from __future__ import unicode_literals
 
 
+class BankcardType(object):
+    DEBIT = 'DEBIT'
+    CREDIT = 'CREDIT'
+
+
 class BookkeepingSide(object):
     DEBIT = 'DEBIT'
     CREDIT = 'CREDIT'

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试提现</title>
+    <script type='text/javascript' src='http://ajax.useso.com/ajax/libs/jquery/1.7.2/jquery.min.js?ver=3.4.2'></script>
+</head>
+<body>
+<p>
+    balance: <span id="balance"></span>
+</p>
+<form target="{{ url_for('sample.withdraw', account_id=1) }}" method="POST">
+    <label for="balance">
+        amount:
+        <input type="text" name="amount">
+    </label>
+    <button name="withdraw">提现</button>
+</form>
+<script>
+    $(document).ready(function() {
+        get_balance();
+        setInterval("get_balance()", 2000);
+    });
+    function get_balance() {
+        $.ajax({
+            type: "get",
+            dataType: "json",
+            url: "{{ url_for('sample.cash_balance', account_id=account_id) }}",
+            success: function (data) {
+                $("#balance").text(data.balance);
+            }
+        });
+    }
+</script>
+</body>
+</html>

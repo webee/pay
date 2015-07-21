@@ -37,5 +37,64 @@ def confirm_to_pay_all():
         print('Auto pay confirmation failed...')
 
 
+####################
+# for test command.
+####################
+
+
+@manager.option('-i', '--id', type=long, dest="account_id", required=True)
+@manager.option('-a', '--amount', type=float, dest="amount", required=True)
+def test_prepaid(account_id, amount):
+    from tools.dbe import require_transaction_context
+    from api.constant import SourceType, PrepaidStep
+    from api.util.bookkeeping import Event, bookkeeping
+
+    with require_transaction_context():
+        bookkeeping(Event(account_id, SourceType.PREPAID, PrepaidStep.SUCCESS, "", amount),
+                    '+asset', '+cash')
+
+
+@manager.option('-f', '--from', type=long, dest="from_id", required=True)
+@manager.option('-t', '--to', type=long, dest="to_id", required=True)
+@manager.option('-a', '--amount', type=float, dest="amount", required=True)
+def test_transfer(from_id, to_id, amount):
+    class AmountNotPositiveError(Exception):
+        def __init__(self, amount):
+            message = "amount must be positive: [{0}]".format(amount)
+            super(AmountNotPositiveError, self).__init__(message)
+
+    class InsufficientBalanceError(Exception):
+        def __init__(self):
+            message = "insufficient balance error."
+            super(InsufficientBalanceError, self).__init__(message)
+
+    from tools.dbe import require_transaction_context
+    from tools.lock import require_user_account_lock
+    from api.account import account
+    from api.constant import SourceType, TransferStep
+    from api.util.bookkeeping import Event, bookkeeping
+
+    if amount <= 0:
+        raise AmountNotPositiveError(amount)
+
+    with require_user_account_lock(from_id, 'cash') as _:
+        balance = account.get_cash_balance(from_id)
+        if amount > balance:
+            raise InsufficientBalanceError()
+        with require_transaction_context():
+            bookkeeping(Event(from_id, SourceType.TRANSFER, TransferStep.FROZEN, "", amount),
+                        '-cash', '+frozen')
+
+            bookkeeping(Event(to_id, SourceType.TRANSFER, TransferStep.SUCCESS, "", amount),
+                        '-frozen', '+cash')
+
+
+@manager.option('-i', '--id', type=long, dest="account_id", required=True)
+def test_update_user_cash_balance(account_id):
+    from api.task.balance import settle_user_account_balance
+
+    settle_user_account_balance(account_id, 'cash')
+
+
 if __name__ == '__main__':
     manager.run()

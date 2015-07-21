@@ -14,7 +14,7 @@ class SourceType(object):
     REFUND = "REFUND"
     PREPAID = "PREPAID"
     SETTLE = "SETTLE"
-    TRANSFER = "转账"
+    TRANSFER = "TRANSFER"
 
 
 class WithdrawResult(object):
@@ -31,8 +31,6 @@ class PayStep(object):
 
 
 class WithdrawStep(object):
-    SECURED = "SECURED"
-    EXPIRED = "EXPIRED"
     FROZEN = "FROZEN"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
@@ -42,3 +40,12 @@ class RefundStep(object):
     FROZEN = "FROZEN"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
+
+
+class PrepaidStep(object):
+    SUCCESS = "SUCCESS"
+
+
+class TransferStep(object):
+    FROZEN = "FROZEN"
+    SUCCESS = "SUCCESS"

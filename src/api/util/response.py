@@ -10,7 +10,7 @@ class _DecimalEncoder(json.JSONEncoder):
         if isinstance(o, decimal.Decimal):
             return float(o)
         if isinstance(o, datetime.datetime):
-            return o.strftime('%Y%m%d %H%M%S.%f')
+            return o.strftime('%Y%m%d %H:%M:%S.%f')
         return super(_DecimalEncoder, self).default(o)
 
 

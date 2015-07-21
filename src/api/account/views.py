@@ -4,7 +4,7 @@ from __future__ import unicode_literals, print_function, division
 
 from flask import request, jsonify, json
 from . import account_mod as mod
-from .account import get_cash_balance
+from .account import get_cash_balance, user_account_exists
 from .bankcard import *
 from tools.lock import require_user_account_lock
 from .withdraw import NoBankcardFoundError, AmountValueError, AmountNotPositiveError, InsufficientBalanceError
@@ -44,8 +44,8 @@ def withdraw(account_id):
         return response.bad_request(e.message)
     except InsufficientBalanceError as e:
         return response.bad_request(e.message)
-    except WithDrawFailedError as _:
-        return response.bad_request("第三文支付请求失败", order_id=order_id)
+    except WithDrawFailedError as e:
+        return response.bad_request("第三文支付请求失败", order_id=e.order_id)
 
 
 @mod.route('/<int:account_id>/withdraw/<order_id>', methods=['GET'])
@@ -86,12 +86,12 @@ def notify_withdraw(uuid):
         callback_url = withdraw['callback_url']
         if not is_successful_result(result):
             fail_withdraw(withdraw_order, paybill_id, failure_info)
-            notify_params = {'code': 0, 'order_id': order_id}
+            notify_params = {'code': 0, 'account_id': withdraw_order['account_id'], 'order_id': order_id}
             notify_client(callback_url, notify_params)
             return notification.fail()
 
         succeed_withdraw(withdraw_order, paybill_id, settle_date)
-        notify_params = {'code': 1, 'msg': 'failed'}
+        notify_params = {'code': 1, 'msg': 'failed', 'account_id': withdraw_order['account_id'], 'order_id': order_id}
         notify_client(callback_url, notify_params)
         return notification.succeed()
 
@@ -128,6 +128,8 @@ def add_bankcard(account_id):
 
 
 @mod.route('/<int:account_id>/balance', methods=['GET'])
-def get_balance(account_id):
+def balance(account_id):
+    if not user_account_exists(account_id):
+        return response.not_found()
     balance = get_cash_balance(account_id)
     return response.ok(balance=balance)

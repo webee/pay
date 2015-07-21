@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import json
 from flask import Response
 import decimal
@@ -39,8 +41,8 @@ def accepted(id):
     return _response(202, {'id': id})
 
 
-def not_found():
-    return _response(404)
+def not_found(params=None):
+    return _response(404, {'error': 'not found', 'params': params})
 
 
 def bad_request(message, **request_params):

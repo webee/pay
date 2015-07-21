@@ -6,6 +6,11 @@ from tools.dbe import require_db_context, db_operate
 from api.constant import BookkeepingSide
 
 
+def user_account_exists(account_id):
+    with require_db_context() as db:
+        return db.exists("select 1 from account where id=%(account_id)s", account_id=account_id)
+
+
 def find_or_create_account(client_id, user_id):
     account_id = find_account_id(client_id, user_id)
     if not account_id:

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, print_function, division
 
+import os
 import inspect
 from functools import wraps
 from contextlib import contextmanager
@@ -8,7 +9,7 @@ from sqlalchemy import create_engine
 import file_config
 from mylog import get_logger
 
-LOGGER = get_logger(__name__)
+LOGGER = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 
 
 @contextmanager

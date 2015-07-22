@@ -108,14 +108,15 @@ def _refund(payment_id, payer_account_id, amount):
 
 def _apply_for_refund(payment_id, payer_account_id, amount):
     refunded_on = datetime.now()
+    refund_id = id.refund_id(payer_account_id),
     fields = {
-        'id': id.refund_id(payer_account_id),
+        'id': refund_id,
         'payment_id': payment_id,
         'payer_account_id': payer_account_id,
         'amount': amount,
         'created_on': refunded_on
     }
-    refund_id = from_db().insert('refund', returns_id=True, **fields)
+    from_db().insert('refund', returns_id=True, **fields)
     return refund_id, refunded_on
 
 

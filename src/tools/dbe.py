@@ -30,6 +30,11 @@ def transactional(func):
 def db_transactional(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        if '_db' in kwargs:
+            db = kwargs.pop('_db')
+            return func(db, *args, **kwargs)
+        if len(args) > 1 and isinstance(args[0], DatabaseInterface):
+            return func(*args, **kwargs)
         with require_transaction_context() as db:
             return func(db, *args, **kwargs)
 
@@ -48,6 +53,8 @@ def db_operate(func):
         if '_db' in kwargs:
             db = kwargs.pop('_db')
             return func(db, *args, **kwargs)
+        if len(args) > 1 and isinstance(args[0], DatabaseInterface):
+            return func(*args, **kwargs)
         with require_db_context() as db:
             return func(db, *args, **kwargs)
 

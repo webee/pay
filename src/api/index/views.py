@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-
-from . import main_mod as mod
+from . import index_mod as mod
 from flask import render_template
 
 

@@ -82,7 +82,7 @@ def withdraw_transaction(account_id, bankcard_id, amount, callback_url):
 
 
 def _apply_for_withdraw(order_id, amount, bankcard):
-    order_info = "提现"
+    order_info = "自游通提现"
     notify_url = transaction.generate_pay_to_bankcard_notification_url(order_id)
     try:
         _ = transaction.pay_to_bankcard(order_id, amount, order_info, notify_url, bankcard)
@@ -106,7 +106,7 @@ def _withdraw(db, account_id, bankcard_id, amount, callback_url):
             if amount > balance:
                 raise InsufficientBalanceError()
             order_id = _create_withdraw_order(db, account_id, bankcard_id, amount, callback_url)
-            withdraw_order = get_withdraw_order(order_id, _db=db)
+            withdraw_order = get_withdraw_order(db, order_id)
             _frozen_withdraw_cash(withdraw_order)
 
             return order_id
@@ -135,7 +135,7 @@ def _create_withdraw_order(db, account_id, bankcard_id, amount, callback_url):
 
 @db_transactional
 def _withdraw_request_failed(db, order_id):
-    withdraw_order = get_withdraw_order(order_id, _db=db)
+    withdraw_order = get_withdraw_order(db, order_id)
     if withdraw_order and withdraw_order.result == constant.WithdrawResult.FROZEN:
         db.execute("update withdraw set result=%(result)s, failure_info=%(failure_info)s, ended_on=%(ended_on)s"
                    "where id=%(id)s", result=constant.WithdrawResult.FAILED,

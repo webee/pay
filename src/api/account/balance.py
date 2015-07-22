@@ -1,8 +1,8 @@
 # coding=utf-8
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function
 
 from decimal import Decimal
-from tools.dbe import require_db_context, require_transaction_context
+from tools.dbe import require_transaction_context, db_operate
 from tools.lock import require_user_lock, GetLockError, GetLockTimeoutError
 from datetime import datetime
 from tools.mylog import get_logger
@@ -12,15 +12,8 @@ from api.constant import BookkeepingSide
 logger = get_logger(__name__)
 
 
-def settle_user_account_balance(account_id, account):
-    account_table = account + "_account_transaction_log"
-    with require_db_context() as db:
-        high_id = db.get_scalar("""
-                        select
-                            max(id)
-                        from """ + account_table + """
-                        where
-                            account_id=%(account_id)s""", account_id=account_id)
+def settle_user_account_balance(account_id, account, high_id=None):
+    high_id = _get_user_account_max_id(account) if high_id is None else high_id
 
     if high_id is None:
         logger.warn("{0} on {1} has no transaction log.".format(account_id, account))
@@ -38,6 +31,25 @@ def settle_user_account_balance(account_id, account):
         logger.warn(e.message)
 
 
+@db_operate
+def list_users_with_unsettled_cash(db):
+    return db.list("""
+            SELECT a.account_id, a.high_id
+              FROM
+                (SELECT account_id, MAX(id) AS high_id FROM cash_account_transaction_log GROUP BY account_id)a
+              LEFT JOIN
+                (SELECT account_id, MIN(last_transaction_log_id) AS low_id FROM account_balance GROUP BY account_id)b
+              ON a.account_id=b.account_id
+                WHERE
+                  b.low_id is null or a.high_id > b.low_id""")
+
+
+@db_operate
+def _get_user_account_max_id(db, account):
+    account_table = account + "_account_transaction_log"
+    return db.get_scalar("""SELECT MAX(id) FROM """ + account_table)
+
+
 def _settle_user_account_side_balance(db, account_id, account, side, high_id):
     balance_value, low_id = get_settled_balance_and_last_id(db, account_id, account, side, True)
     if low_id >= high_id:
@@ -48,10 +60,12 @@ def _settle_user_account_side_balance(db, account_id, account, side, high_id):
 
     now = datetime.now()
     rowcount = db.execute("""
-                update account_balance set balance=%(balance)s,
-                last_transaction_log_id=%(transaction_id)s, settle_time=%(settle_time)s
-                where account_id=%(account_id)s and account=%(account)s and side=%(side)s
-                and balance=%(old_balance)s and last_transaction_log_id=%(old_transaction_id)s""",
+                UPDATE account_balance
+                  SET
+                    balance=%(balance)s, last_transaction_log_id=%(transaction_id)s, settle_time=%(settle_time)s
+                  WHERE
+                    account_id=%(account_id)s AND account=%(account)s AND side=%(side)s
+                      AND balance=%(old_balance)s AND last_transaction_log_id=%(old_transaction_id)s""",
                           balance=new_balance, transaction_id=high_id, settle_time=now,
                           account_id=account_id, account=account, side=side, old_balance=balance_value,
                           old_transaction_id=low_id)
@@ -60,8 +74,10 @@ def _settle_user_account_side_balance(db, account_id, account, side, high_id):
 
 def get_settled_balance_and_last_id(db, account_id, account, side, create=False):
     balance = db.get("""
-                  select balance, last_transaction_log_id from account_balance
-                  where account_id=%(account_id)s and account=%(account)s and side=%(side)s
+                  SELECT balance, last_transaction_log_id
+                    FROM account_balance
+                    WHERE
+                      account_id=%(account_id)s and account=%(account)s and side=%(side)s
                   """, account_id=account_id, account=account, side=side)
 
     balance_value = Decimal(0)
@@ -81,40 +97,32 @@ def get_unsettled_balance(db, account_id, account, side, low_id, high_id=None):
     if side == BookkeepingSide.BOTH:
         if high_id is None:
             balance = db.get_scalar("""
-                  select
-                    sum((CASE side WHEN 'debit' THEN %(debit_sign)s WHEN 'credit' THEN %(credit_sign)s END) * amount)
-                  from """ + account_table + """
-                  where
-                        account_id=%(account_id)s and id > %(low_id)s
-                  """, debit_sign=debit_sign, credit_sign=credit_sign,
-                                 account_id=account_id, low_id=low_id)
+              SELECT SUM((CASE side WHEN 'debit' THEN %(debit_sign)s WHEN 'credit' THEN %(credit_sign)s END) * amount)
+                FROM """ + account_table + """
+                WHERE
+                  account_id=%(account_id)s and id > %(low_id)s
+              """, debit_sign=debit_sign, credit_sign=credit_sign, account_id=account_id, low_id=low_id)
         else:
             balance = db.get_scalar("""
-                select
-                    sum((CASE side WHEN 'debit' THEN %(debit_sign)s WHEN 'credit' THEN %(credit_sign)s END) * amount)
-                from """ + account_table + """
-                where
-                        account_id=%(account_id)s and id > %(low_id)s and id <= %(high_id)s
-                """, debit_sign=debit_sign, credit_sign=credit_sign,
-                                 account_id=account_id, low_id=low_id, high_id=high_id)
+            SELECT SUM((CASE side WHEN 'debit' THEN %(debit_sign)s WHEN 'credit' THEN %(credit_sign)s END) * amount)
+              FROM """ + account_table + """
+              WHERE
+                account_id=%(account_id)s and id > %(low_id)s and id <= %(high_id)s
+            """, debit_sign=debit_sign, credit_sign=credit_sign, account_id=account_id, low_id=low_id, high_id=high_id)
     else:
         if high_id is None:
             balance = db.get_scalar("""
-                      select
-                        SUM(amount)
-                      from
-                        """ + account_table + """
-                      where
-                            account_id=%(account_id)s and side=%(side)s and id > %(low_id)s
+                      SELECT SUM(amount)
+                        FROM """ + account_table + """
+                        WHERE
+                          account_id=%(account_id)s and side=%(side)s and id > %(low_id)s
                       """, account_id=account_id, side=side, low_id=low_id)
         else:
             balance = db.get_scalar("""
-                    select
-                        SUM(amount)
-                    from
-                      """ + account_table + """
-                    where
-                            account_id=%(account_id)s and side=%(side)s and id > %(low_id)s and id <= %(high_id)s
+                    SELECT SUM(amount)
+                      FROM """ + account_table + """
+                      WHERE
+                        account_id=%(account_id)s and side=%(side)s and id > %(low_id)s and id <= %(high_id)s
                     """, account_id=account_id, side=side, low_id=low_id, high_id=high_id)
 
     return Decimal(0) if balance is None else balance

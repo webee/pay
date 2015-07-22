@@ -5,8 +5,9 @@ from __future__ import unicode_literals, print_function
 import os
 
 from flask.ext.script import Manager, Shell, Server
-from api import create_app
 import requests
+
+from api import create_app
 
 app = create_app(os.getenv('SYSTEM_CONFIG') or 'default')
 manager = Manager(app)
@@ -100,8 +101,8 @@ def test_transfer(from_id, to_id, amount):
 
 
 @manager.option('-i', '--id', type=long, dest="account_id", required=True)
-def test_update_user_cash_balance(account_id):
-    from api.task.balance import settle_user_account_balance
+def test_settle_user_cash_balance(account_id):
+    from api.account.balance import settle_user_account_balance
 
     settle_user_account_balance(account_id, 'cash')
 

@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from decimal import Decimal
-
-from api.task.balance import get_unsettled_balance, get_settled_balance_and_last_id
+from api.account.balance import get_unsettled_balance, get_settled_balance_and_last_id
 from tools.dbe import require_db_context, db_operate
 from api.constant import BookkeepingSide
 

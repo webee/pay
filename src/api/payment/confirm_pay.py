@@ -3,7 +3,7 @@ from datetime import datetime
 
 from api.constant import SourceType, PayStep
 from api.util.bookkeeping import bookkeeping, Event
-from tools.dbe import from_db, transactional
+from tools.dbe import from_db, transactional, db_operate, require_db_context
 
 
 def batch_confirm_pay_util_now():
@@ -14,6 +14,12 @@ def batch_confirm_pay_util_now():
     return ids
 
 
+def confirm_payment(payment_id):
+    payment = _get_expired_payment(payment_id)
+    if payment:
+        return _confirm_to_pay(payment)
+
+
 def _list_expired_payments(timestamp):
     return from_db().list(
         """
@@ -22,6 +28,30 @@ def _list_expired_payments(timestamp):
               WHERE success = 1 AND confirm_success = 0
                 AND auto_confirm_expired_on < %(expired_on)s
         """, expired_on=timestamp
+    )
+
+
+@db_operate
+def list_expired_payment_ids(db, timestamp=None):
+    timestamp = timestamp if timestamp else datetime.now()
+    return db.list(
+        """
+            SELECT id
+              FROM payment
+              WHERE success = 1 AND confirm_success = 0
+                AND auto_confirm_expired_on < %(expired_on)s
+        """, expired_on=timestamp
+    )
+
+
+@db_operate
+def _get_expired_payment(db, payment_id):
+    return db.get(
+        """
+            SELECT id, payee_account_id, amount
+              FROM payment
+              WHERE id=%(id)s and success = 1 AND confirm_success = 0
+        """, id=payment_id
     )
 
 

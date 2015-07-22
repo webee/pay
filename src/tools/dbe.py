@@ -66,6 +66,11 @@ class DatabaseInterface(object):
         self.conn = conn
         self.is_engine = is_engine
 
+    def __eq__(self, other):
+        if other is None or not isinstance(other, DatabaseInterface):
+            return False
+        return self.conn == other.conn and self.is_engine == other.is_engine
+
     @property
     def connection(self):
         if self.is_engine:

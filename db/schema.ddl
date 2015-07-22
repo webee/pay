@@ -15,6 +15,7 @@ CREATE TABLE account(
   client_id INT UNSIGNED NOT NULL,
   user_id VARCHAR(32) NOT NULL,
 
+  UNIQUE KEY client_user_uiq_idx (client_id, user_id),
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

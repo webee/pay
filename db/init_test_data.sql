@@ -2,6 +2,7 @@ INSERT INTO client_info(name) VALUES('绿野活动');
 
 INSERT INTO account(client_id, user_id) VALUES(1, '1');
 INSERT INTO account(client_id, user_id) VALUES(1, '1001');
+INSERT INTO account(client_id, user_id) VALUES(1, '1002');
 
 INSERT INTO bankcard(id, account_id, flag, card_no, card_type, account_name, bank_code, province_code, city_code, bank_name,
                      branch_bank_name, created_on)

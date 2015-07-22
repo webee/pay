@@ -23,6 +23,16 @@ class Event(object):
         self.created_on = datetime.now()
 
 
+def get_account_side_sign(account):
+    sides = ACCOUNTS_SIDES[account]
+    positive_side, negative_side = sides['+'], sides['-']
+    if positive_side == 'd' and negative_side == 'c':
+        return 1, -1
+    elif negative_side == 'd' and positive_side == 'c':
+        return -1, 1
+    raise ValueError('impossible!')
+
+
 def bookkeeping(event, account_a, account_b):
     sa, account_a = account_a[0], account_a[1:]
     sb, account_b = account_b[0], account_b[1:]

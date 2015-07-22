@@ -7,6 +7,7 @@ from .refund import *
 from api.util import response
 from api.util.ipay.transaction import is_sending_to_me, notification, parse_and_verify
 from flask import jsonify, request
+from tools.utils import to_float
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +18,7 @@ def refund():
     client_id = data['client_id']
     payer_id = data['payer']
     order_no = data['order_no']
-    amount = data['amount']
+    amount = to_float(data['amount'])
 
     try:
         refund_id = refund_transaction(client_id, payer_id, order_no, amount)

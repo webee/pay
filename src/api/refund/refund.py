@@ -77,12 +77,9 @@ def succeed_refund(refund_id, refund_serial_no):
 
 
 def _send_refund_request(refund_id, refunded_on, amount, paybill_id):
-    resp = transaction.refund(refund_id, refunded_on, amount, paybill_id)
-
-    if resp.status_code != 200:
-        raise RefundFailedError(refund_id)
-    return_values = resp.json()
-    if return_values['ret_code'] != '0000':
+    try:
+        resp = transaction.refund(refund_id, refunded_on, amount, paybill_id)
+    except:
         raise RefundFailedError(refund_id)
 
 
@@ -108,7 +105,7 @@ def _refund(payment_id, payer_account_id, amount):
 
 def _apply_for_refund(payment_id, payer_account_id, amount):
     refunded_on = datetime.now()
-    refund_id = id.refund_id(payer_account_id),
+    refund_id = id.refund_id(payer_account_id)
     fields = {
         'id': refund_id,
         'payment_id': payment_id,

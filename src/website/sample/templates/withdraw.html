@@ -9,7 +9,7 @@
 <p>
     balance: <span id="balance"></span>
 </p>
-<form action="{{ url_for('sample.withdraw', account_id=1) }}" method="POST">
+<form action="{{ url_for('sample.withdraw', account_id=account_id) }}" method="POST">
     <label for="balance">
         amount:
         <input type="text" name="amount">

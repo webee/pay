@@ -2,7 +2,7 @@
 from api.util.attr_dict import AttrDict
 
 config = AttrDict(
-    root_url='http://localhost:5000',
+    root_url='http://pay.lvye.com',
 
     platform='lvye.com',
     version='1.0',

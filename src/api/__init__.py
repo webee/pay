@@ -7,13 +7,13 @@ from config import PAY_API_CONFIG
 
 
 def register_mods(app):
-    from api.main import main_mod
+    from api.index import index_mod
     from api.payment import pay_mod
     from api.refund import refund_mod
     from api.bankcard import card_mod
     from api.account import account_mod
 
-    app.register_blueprint(main_mod)
+    app.register_blueprint(index_mod)
     app.register_blueprint(pay_mod)
     app.register_blueprint(refund_mod)
     app.register_blueprint(card_mod, url_prefix='/bankcards')

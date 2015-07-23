@@ -8,9 +8,7 @@ from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid, PaymentNotFoundError
 from .postpay import *
 from api.util.enum import enum
-from api.util.ipay.error import DictParsingError, InvalidSignError
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
-from api.util.ipay.transaction import parse_and_verify_request_data
 from flask import jsonify, request, Response, render_template, redirect
 
 log = logging.getLogger(__name__)

@@ -27,3 +27,7 @@ def create(id, client_id, payer_account_id, payee_account_id, order, amount, cal
         'created_on': datetime.now()
     }
     from_db().insert('payment', **payment_fields)
+
+
+def find(id):
+    return from_db().get('SELECT * FROM payment WHERE id = %(id)s', id=id)

@@ -40,10 +40,14 @@ def _format_time(t):
 def _generate_submit_form(req_params):
     submit_page = '<form id="payBillForm" action="{0}" method="POST">'.format(config.payment.url)
     for key in req_params:
-        submit_page += '<input type="hidden" name="{0}" value="{1}" />'.format(key, req_params[key])
+        submit_page += '<input type="hidden" name="{0}" value="{1}" />'.format(key, _encode_utf8(req_params[key]))
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'
     submit_page += '<script>document.forms["payBillForm"].submit();</script>'
     return submit_page
+
+
+def _encode_utf8(value):
+    return value.encode('utf-8')
 
 
 def _append_md5_sign(req_params):

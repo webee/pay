@@ -5,7 +5,6 @@ from api.util.ipay.transaction import generate_pay_return_url
 from api.util.uuid import decode_uuid
 from tools.dbe import from_db
 from api.util import req
-from flask import request
 
 
 class PaymentNotFoundError(Exception):
@@ -23,12 +22,15 @@ def pay_by_uuid(payment_uuid):
               WHERE id = %(id)s
         """,
         id=payment_id)
+
     if payment is None:
         raise PaymentNotFoundError(payment_uuid)
+
     payer_id = payment['payer_account_id']
     payer = from_db().get("""
         SELECT * FROM account WHERE id=%(id)s
     """, id=payer_id)
+
     return transaction.pay(
         payer=payer,
         ip=req.ip(),

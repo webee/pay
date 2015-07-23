@@ -38,20 +38,16 @@ def _gen_user_id(user):
 
 
 def _format_time(t):
-    t.strftime('%Y%m%d%H%M%S')
+    return t.strftime('%Y%m%d%H%M%S')
 
 
 def _generate_submit_form(req_params):
     submit_page = '<form id="payBillForm" action="{0}" method="POST">'.format(config.payment.url)
     for key in req_params:
-        submit_page += '<input type="hidden" name="{0}" value="{1}" />'.format(key, _encode_utf8(req_params[key]))
+        submit_page += '<input type="hidden" name="{0}" value="{1}" />'.format(key, req_params[key])
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'
     submit_page += '<script>document.forms["payBillForm"].submit();</script>'
     return submit_page
-
-
-def _encode_utf8(value):
-    return value.encode('utf-8')
 
 
 def _append_md5_sign(req_params):
@@ -63,7 +59,7 @@ def _append_md5_sign(req_params):
 def _get_risk_item(user):
     risk_item = {
         'user_info_mercht_userno': str(user.id),
-        'user_info_dt_register': _format_time(user.create_on),
+        'user_info_dt_register': _format_time(user.created_on),
         'frms_ware_category': '1999'
     }
     return json.dumps(risk_item)

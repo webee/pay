@@ -10,7 +10,7 @@ def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_
     req_params = {
         'version': config.version,
         'oid_partner': config.oid_partner,
-        'user_id': str(payer.id),
+        'user_id': _gen_user_id(payer),
         'sign_type': config.sign_type.MD5,
         'busi_partner': config.payment.busi_partner.virtual_goods,
         'no_order': order_no,
@@ -31,6 +31,10 @@ def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_
 
 def _encode_ip(ip):
     return ip.replace('.', '_')
+
+
+def _gen_user_id(user):
+    return '{0}_{1}_{2}'.format(user.id, user.client_id, user.user_id)
 
 
 def _format_time(t):

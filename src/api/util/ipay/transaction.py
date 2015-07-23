@@ -31,8 +31,8 @@ def parse_and_verify(f):
     return decorated_function
 
 
-def pay(payer_account_id, order_no, ordered_on, order_name, order_desc, amount, notification_url):
-    return _pay(payer_account_id, order_no, ordered_on, order_name, order_desc, amount, notification_url)
+def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notification_url):
+    return _pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notification_url)
 
 
 def query_bankcard_bin(card_no):
@@ -61,6 +61,10 @@ def is_valid_transaction(oid_partner, transaction_id, uuid):
 
 def generate_pay_url(id):
     return _generate_notification_url(config.payment.redirect_url, id)
+
+
+def generate_pay_return_url(id):
+    return _generate_notification_url(config.payment.return_url, id)
 
 
 def generate_pay_notification_url(id):

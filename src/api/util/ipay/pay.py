@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import json
-
 from .lianlian_config import config
 from .sign import md5_sign
 from .util import datetime_to_str, now_to_str
 
 
-def pay(payer_account_id, order_no, ordered_on, order_name, order_desc, amount, notification_url):
+def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, notification_url):
     req_params = {
         'version': config.version,
         'oid_partner': config.oid_partner,
-        'user_id': str(payer_account_id),
+        'user_id': str(payer.id),
         'sign_type': config.sign_type.MD5,
         'busi_partner': config.payment.busi_partner.virtual_goods,
         'no_order': order_no,
@@ -20,10 +20,10 @@ def pay(payer_account_id, order_no, ordered_on, order_name, order_desc, amount, 
         'money_order': str(amount),
         'notify_url': notification_url,
         'url_return': config.payment.return_url,
-        'userreq_ip': _encode_ip('61.148.57.6'),
+        'userreq_ip': _encode_ip(ip),
         'valid_order': config.payment.default_order_expiration,
         'timestamp': now_to_str(),
-        # 'risk_item': _get_risk_item(),
+        'risk_item': _get_risk_item(payer),
     }
     req_params = _append_md5_sign(req_params)
     return _generate_submit_form(req_params)
@@ -31,6 +31,10 @@ def pay(payer_account_id, order_no, ordered_on, order_name, order_desc, amount, 
 
 def _encode_ip(ip):
     return ip.replace('.', '_')
+
+
+def _format_time(t):
+    t.strftime('%Y%m%d%H%M%S')
 
 
 def _generate_submit_form(req_params):
@@ -48,9 +52,10 @@ def _append_md5_sign(req_params):
     return req_params
 
 
-def _get_risk_item():
+def _get_risk_item(user):
     risk_item = {
-        'user_info_full_name': 'Hello',
+        'user_info_mercht_userno': str(user.id),
+        'user_info_dt_register': _format_time(user.create_on),
         'frms_ware_category': '1999'
     }
     return json.dumps(risk_item)

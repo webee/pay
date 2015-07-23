@@ -30,8 +30,8 @@ config = AttrDict(
 
         url='https://yintong.com.cn/payment/bankgateway.htm',
         redirect_url='/pay/{uuid}',
-        notify_url='/pay/{uuid}/result',
-        return_url='http://www.baidu.com'
+        notify_url='/pay/{uuid}/notify',
+        return_url='/pay/{uuid}/result'
     ),
 
     bankcard=AttrDict(

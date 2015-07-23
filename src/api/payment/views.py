@@ -5,12 +5,12 @@ from decimal import Decimal
 
 from . import pay_mod as mod
 from .prepay import Order, generate_prepay_transaction
-from .pay import pay_by_uuid
+from .pay import pay_by_uuid, PaymentNotFoundError
 from .postpay import *
 from .confirm_pay import batch_confirm_pay_util_now
 from api.util import response
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
-from flask import jsonify, request, Response
+from flask import jsonify, request, Response, render_template
 
 log = logging.getLogger(__name__)
 
@@ -33,11 +33,23 @@ def prepay():
 
 @mod.route('/pay/<uuid>', methods=['GET'])
 def pay(uuid):
-    form_submit = pay_by_uuid(uuid)
-    return Response(form_submit, status=200, mimetype='text/html')
+    try:
+        form_submit = pay_by_uuid(uuid)
+        return Response(form_submit, status=200, mimetype='text/html')
+    except PaymentNotFoundError as e:
+        return render_template('pay_result.html', msg=e.message)
 
 
-@mod.route('/pay/<uuid>/result', methods=['POST'])
+@mod.route('/pay/<uuid>/result', methods=['GET'])
+def pay_result(uuid):
+    try:
+        form_submit = pay_by_uuid(uuid)
+        return Response(form_submit, status=200, mimetype='text/html')
+    except PaymentNotFoundError as e:
+        return render_template('pay_result.html', msg=e.message)
+
+
+@mod.route('/pay/<uuid>/notify', methods=['POST'])
 @parse_and_verify
 def notify_payment(uuid):
     data = request.verified_data

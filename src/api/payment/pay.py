@@ -1,7 +1,17 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from api.util.ipay import transaction
+from api.util.ipay.transaction import generate_pay_return_url
 from api.util.uuid import decode_uuid
 from tools.dbe import from_db
+from api.util import req
+from flask import request
+
+
+class PaymentNotFoundError(Exception):
+    def __init__(self, payment_uuid):
+        message = "payment: {0} not exists.".format(payment_uuid)
+        super(PaymentNotFoundError, self).__init__(message)
 
 
 def pay_by_uuid(payment_uuid):
@@ -13,12 +23,20 @@ def pay_by_uuid(payment_uuid):
               WHERE id = %(id)s
         """,
         id=payment_id)
+    if payment is None:
+        raise PaymentNotFoundError()
+    payer_id = payment['payer_account_id']
+    payer = from_db().get("""
+        SELECT * FROM account WHERE id=%(id)s
+    """, id=payer_id)
     return transaction.pay(
-        payer_account_id=payment['payer_account_id'],
+        payer=payer,
+        ip=req.ip(),
         order_no=payment_id,
         order_name=payment['product_name'],
         order_desc=payment['product_desc'],
         ordered_on=payment['ordered_on'],
         amount=payment['amount'],
+        return_url=generate_pay_return_url(payment_id),
         notification_url=payment['callback_url']
     )

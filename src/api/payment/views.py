@@ -40,7 +40,7 @@ def pay(uuid):
         return render_template('pay_result.html', msg=e.message)
 
 
-@mod.route('/pay/<uuid>/result', methods=['GET'])
+@mod.route('/pay/<uuid>/result', methods=['GET', 'POST'])
 def pay_result(uuid):
     return render_template('pay_result.html', msg='todo')
 

@@ -38,7 +38,6 @@ CREATE TABLE payment(
   paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,
   auto_confirm_expired_on TIMESTAMP,
-  confirm_success SMALLINT NOT NULL DEFAULT 0, -- 0/1 = FAIL/SUCCESS
   confirmed_on TIMESTAMP,
 
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)

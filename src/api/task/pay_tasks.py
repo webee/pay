@@ -1,9 +1,9 @@
 # coding=utf-8
 from __future__ import unicode_literals
+
 from . import make_celery_app
 from tools.mylog import get_logger
-from api.payment.confirm_pay import list_expired_payment_ids
-from api.payment.confirm_pay import confirm_payment
+from api.payment.confirm_pay import list_all_expired_payments, confirm_payment
 from api.account.balance import list_users_with_unsettled_cash
 from api.account.balance import settle_user_account_balance
 
@@ -13,15 +13,15 @@ app = make_celery_app('pay', 'api.task.config')
 
 @app.task
 def confirm_to_pay_all():
-    payment_ids = list_expired_payment_ids()
-    for payment_id in payment_ids:
-        _ = confirm_pay.apply_async(args=[payment_id], queue='confirm_pay', routing_key='confirm_pay')
-    return len(payment_ids)
+    pay_records = list_all_expired_payments
+    for pay_record in pay_records:
+        _ = confirm_pay.apply_async(args=[pay_record], queue='confirm_pay', routing_key='confirm_pay')
+    return len(pay_records)
 
 
 @app.task(ignore_result=False, queue='confirm_pay', routing_key='confirm_pay')
-def confirm_pay(payment_id):
-    return confirm_payment(payment_id)
+def confirm_pay(pay_record):
+    return confirm_payment(pay_record)
 
 
 @app.task

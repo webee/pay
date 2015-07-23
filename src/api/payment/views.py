@@ -4,12 +4,12 @@ import logging
 from decimal import Decimal
 
 from . import pay_mod as mod
+from api.util.ipay.error import DictParsingError, InvalidSignError
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid, PaymentNotFoundError
 from .postpay import *
-from .confirm_pay import batch_confirm_pay_util_now
-from api.util import response
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
+from api.util.ipay.transaction import parse_and_verify_request_data
 from flask import jsonify, request, Response, render_template
 
 log = logging.getLogger(__name__)
@@ -42,7 +42,11 @@ def pay(uuid):
 
 @mod.route('/pay/<uuid>/result', methods=['GET', 'POST'])
 def pay_result(uuid):
-    return render_template('pay_result.html', msg='todo')
+    try:
+        _ = parse_and_verify_request_data(request.values)
+    except (DictParsingError, InvalidSignError) as e:
+        return render_template('pay_result.html', msg='支付异常')
+    return render_template('pay_result.html', msg='支付成功')
 
 
 @mod.route('/pay/<uuid>/notify', methods=['POST'])

@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 from functools import wraps
 from flask import request
 
-from lianlian_api import parse_and_verify_request_data as _parse_and_verify_request_data
+from .error import *
+from lianlian_api import parse_and_verify_request_data
 from .bankcard import query_bin as _query_bin
-from .error import ApiError
 from .notification import Notification
 from .pay import pay as _pay
 from .pay_to_bankcard import pay_to_bankcard as _pay_to_bankcard
@@ -23,9 +23,9 @@ def parse_and_verify(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         try:
-            verified_data = _parse_and_verify_request_data(request.values, request.data)
+            verified_data = parse_and_verify_request_data(request.values, request.data)
             request.__dict__['verified_data'] = verified_data
-        except ApiError:
+        except (DictParsingError, InvalidSignError):
             return notification.is_invalid()
         return f(*args, **kwargs)
     return decorated_function

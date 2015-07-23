@@ -58,6 +58,8 @@ def fail_refund(refund_id, refund_serial_no):
     _update_refund_state(id=refund_id, is_success=False, serial_no=refund_serial_no)
 
     refund_record = _find_refund(refund_id)
+    payment.refund_failed(refund_record['payment_id'])
+
     bookkeeping(
         Event(refund_record['payer_account_id'], SourceType.REFUND, RefundStep.FAILED,
               refund_id, refund_record['amount']),

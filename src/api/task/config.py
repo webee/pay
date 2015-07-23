@@ -39,7 +39,7 @@ CELERYBEAT_SCHEDULE = {
 
     'settle_all_cash_balance-E0.5d': {
         'task': 'api.task.pay_tasks.settle_all_cash_balance',
-        'schedule': timedelta(seconds=5),
+        'schedule': timedelta(days=0.5),
         'kwargs': {},
         'relative': True,
         'options': {'queue': 'celery_periodic'}

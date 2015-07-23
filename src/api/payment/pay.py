@@ -15,21 +15,12 @@ class PaymentNotFoundError(Exception):
 
 def pay_by_uuid(payment_uuid):
     payment_id = decode_uuid(payment_uuid)
-    payment = from_db().get(
-        """
-            SELECT payer_account_id, order_id, product_name, product_desc, amount, ordered_on, callback_url
-              FROM payment
-              WHERE id = %(id)s
-        """,
-        id=payment_id)
-
+    payment = _find_payment(payment_id)
     if payment is None:
         raise PaymentNotFoundError(payment_uuid)
 
     payer_id = payment['payer_account_id']
-    payer = from_db().get("""
-        SELECT * FROM account WHERE id=%(id)s
-    """, id=payer_id)
+    payer = _find_account(payer_id)
 
     return transaction.pay(
         payer=payer,
@@ -42,3 +33,17 @@ def pay_by_uuid(payment_uuid):
         return_url=generate_pay_return_url(payment_id),
         notification_url=payment['callback_url']
     )
+
+
+def _find_account(id):
+    return from_db().get('SELECT * FROM account WHERE id=%(id)s', id=id)
+
+
+def _find_payment(payment_id):
+    return from_db().get(
+        """
+            SELECT payer_account_id, order_id, product_name, product_desc, amount, ordered_on, callback_url
+              FROM payment
+              WHERE id = %(id)s
+        """,
+        id=payment_id)

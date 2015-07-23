@@ -6,7 +6,7 @@ from .sign import md5_sign
 from .util import datetime_to_str, now_to_str
 
 
-def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, notification_url):
+def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notification_url):
     req_params = {
         'version': config.version,
         'oid_partner': config.oid_partner,
@@ -19,7 +19,7 @@ def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, notific
         'info_order': order_desc,
         'money_order': str(amount),
         'notify_url': notification_url,
-        'url_return': config.payment.return_url,
+        'url_return': return_url,
         'userreq_ip': _encode_ip(ip),
         'valid_order': config.payment.default_order_expiration,
         'timestamp': now_to_str(),

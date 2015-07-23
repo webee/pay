@@ -10,7 +10,7 @@ def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_
     req_params = {
         'version': config.version,
         'oid_partner': config.oid_partner,
-        'user_id': _gen_user_id(payer),
+        'user_id': str(payer.id),
         'sign_type': config.sign_type.MD5,
         'busi_partner': config.payment.busi_partner.virtual_goods,
         'no_order': order_no,
@@ -33,10 +33,6 @@ def _encode_ip(ip):
     return ip.replace('.', '_')
 
 
-def _gen_user_id(user):
-    return '{0}_{1}_{2}'.format(user.id, user.client_id, user.user_id)
-
-
 def _format_time(t):
     t.strftime('%Y%m%d%H%M%S')
 
@@ -44,7 +40,7 @@ def _format_time(t):
 def _generate_submit_form(req_params):
     submit_page = '<form id="payBillForm" action="{0}" method="POST">'.format(config.payment.url)
     for key in req_params:
-        submit_page += '<input type="hidden" name="{0}" value="{1}" />'.format(key, _encode_utf8(req_params[key]))
+        submit_page += '''<input type="hidden" name="{0}" value='{1}' />'''.format(key, _encode_utf8(req_params[key]))
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'
     submit_page += '<script>document.forms["payBillForm"].submit();</script>'
     return submit_page

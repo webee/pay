@@ -4,15 +4,19 @@ import logging
 from decimal import Decimal
 
 from . import pay_mod as mod
-from api.util.ipay.error import DictParsingError, InvalidSignError
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid, PaymentNotFoundError
 from .postpay import *
+from api.util.enum import enum
+from api.util.ipay.error import DictParsingError, InvalidSignError
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
 from api.util.ipay.transaction import parse_and_verify_request_data
 from flask import jsonify, request, Response, render_template
 
 log = logging.getLogger(__name__)
+
+
+PayResult = enum(Success=0, Failure=1, IsInvalidRequest=2)
 
 
 @mod.route('/pre-pay', methods=['POST'])
@@ -52,7 +56,16 @@ def pay_result(uuid):
 @mod.route('/pay/<uuid>/notify', methods=['POST'])
 @parse_and_verify
 def notify_payment(uuid):
-    data = request.verified_data
+    result = _notify_payment_result(uuid, request.verified_data)
+    if result == PayResult.IsInvalidRequest:
+        return notification.is_invalid()
+    elif result == PayResult.Failure:
+        return notification.fail()
+    else:
+        return notification.succeed()
+
+
+def _notify_payment_result(uuid, data):
     partner_oid = data['oid_partner']
     order_no = data['no_order']
     amount = Decimal(data['money_order'])

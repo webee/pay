@@ -17,7 +17,7 @@ class Order(object):
 
 
 @transactional
-def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, amount):
+def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, amount, client_success_return_url):
     payer_account_id = find_or_create_account(client_id, payer_user_id)
     payee_account_id = find_or_create_account(client_id, payee_user_id)
 
@@ -34,6 +34,7 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
         'amount': amount,
         'ordered_on': order.created_on,
         'callback_url': transaction.generate_pay_notification_url(payment_id),
+        'client_success_return_url': client_success_return_url,
 
         'created_on': datetime.now()
     }

@@ -28,8 +28,9 @@ def prepay():
     order = Order(data['order_no'], data['order_name'], data['order_desc'],
                   data['ordered_on'])
     amount = data['amount']
+    client_success_return_url = data['success_return_url']
 
-    payment_id = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount)
+    payment_id = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount, client_success_return_url)
     pay_url = generate_pay_url(payment_id)
 
     return jsonify({'pay_url': pay_url})
@@ -44,17 +45,8 @@ def pay(uuid):
         return render_template('pay_result.html', msg=e.message)
 
 
-@mod.route('/pay/<uuid>/result', methods=['GET', 'POST'])
-def pay_result(uuid):
-    try:
-        _ = parse_and_verify_request_data(request.values)
-    except (DictParsingError, InvalidSignError) as e:
-        return render_template('pay_result.html', msg='支付异常')
-    return render_template('pay_result.html', msg='支付成功')
-
-
 @mod.route('/pay/<uuid>/result', methods=['POST'])
-def pay_result(uuid):
+def post_pay_result(uuid):
     result = _notify_payment_result(uuid, request.verified_data)
     if result == PayResult.IsInvalidRequest:
         return notification.is_invalid()

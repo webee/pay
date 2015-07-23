@@ -64,9 +64,3 @@ def notify_payment(uuid):
 
     succeed_payment(order_no, paybill_oid)
     return notification.succeed()
-
-
-@mod.route('/pay/auto-confirm', methods=['POST'])
-def auto_confirm_pay():
-    confirmed_ids = batch_confirm_pay_util_now()
-    return response.updated(confirmed_ids)

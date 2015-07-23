@@ -3,7 +3,7 @@ from datetime import datetime
 
 from api.constant import SourceType, PayStep
 from api.util.bookkeeping import bookkeeping, Event
-from tools.dbe import from_db, transactional, db_operate, require_db_context
+from tools.dbe import from_db, transactional, db_operate
 
 
 def batch_confirm_pay_util_now():

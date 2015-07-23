@@ -24,7 +24,7 @@ def pay_by_uuid(payment_uuid):
         """,
         id=payment_id)
     if payment is None:
-        raise PaymentNotFoundError()
+        raise PaymentNotFoundError(payment_uuid)
     payer_id = payment['payer_account_id']
     payer = from_db().get("""
         SELECT * FROM account WHERE id=%(id)s

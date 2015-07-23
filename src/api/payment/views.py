@@ -42,11 +42,7 @@ def pay(uuid):
 
 @mod.route('/pay/<uuid>/result', methods=['GET'])
 def pay_result(uuid):
-    try:
-        form_submit = pay_by_uuid(uuid)
-        return Response(form_submit, status=200, mimetype='text/html')
-    except PaymentNotFoundError as e:
-        return render_template('pay_result.html', msg=e.message)
+    return render_template('pay_result.html', msg='todo')
 
 
 @mod.route('/pay/<uuid>/notify', methods=['POST'])

@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from api.constant import SourceType, RefundStep
+from api.payment import payment
 from api.util import id
 from api.util.bookkeeping import bookkeeping, Event
 from api.util.enum import enum
@@ -96,6 +97,7 @@ def _find_payment(client_id, order_no):
 @transactional
 def _refund(payment_id, payer_account_id, amount):
     refund_id, refunded_on = _apply_for_refund(payment_id, payer_account_id, amount)
+    payment.accept_refund(payment_id)
     bookkeeping(
         Event(payer_account_id, SourceType.REFUND, RefundStep.FROZEN, refund_id, amount),
         '-secured', '+frozen'

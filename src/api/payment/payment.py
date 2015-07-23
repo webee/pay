@@ -5,7 +5,7 @@ from api.util.enum import enum
 
 from tools.dbe import from_db
 
-PaymentState = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED', CONFIRMED='CONFIRMED')
+PaymentState = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED', CONFIRMED='CONFIRMED', REFUNDING='REFUNDING')
 
 
 def create(id, client_id, payer_account_id, payee_account_id, order, amount, callback_url,
@@ -61,15 +61,23 @@ def fail(id):
 
 
 def confirm(id):
+    return _transit_state(id, PaymentState.SUCCESS, PaymentState.CONFIRMED)
+
+
+def accept_refund(id):
+    return _transit_state(id, PaymentState.SUCCESS, PaymentState.REFUNDING)
+
+
+def _few_days_later(from_datetime, days):
+    return from_datetime + timedelta(days=days)
+
+
+def _transit_state(id, prev_state, new_state):
     rowcount = from_db().execute(
         """
           UPDATE payment SET state=%(new_state)s, confirmed_on=%(confirmed_on)s
             WHERE id=%(id)s AND state=%(prev_state)s
         """,
-        id=id, prev_state=PaymentState.SUCCESS, new_state=PaymentState.CONFIRMED, confirmed_on=datetime.now()
+        id=id, prev_state=prev_state, new_state=new_state, confirmed_on=datetime.now()
     )
     return rowcount > 0
-
-
-def _few_days_later(from_datetime, days):
-    return from_datetime + timedelta(days=days)

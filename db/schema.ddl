@@ -33,6 +33,7 @@ CREATE TABLE payment(
   ordered_on TIMESTAMP NOT NULL ,
   created_on TIMESTAMP NOT NULL ,
   callback_url VARCHAR(128) ,
+  client_success_return_url VARCHAR(128),
   success SMALLINT , -- 0/1 = FAIL/SUCCESS
   paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,

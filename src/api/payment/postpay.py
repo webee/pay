@@ -36,6 +36,11 @@ def succeed_payment(payment_id, paybill_id):
     )
 
 
+def get_payment_success_callback_interface_on_client(uuid):
+    payment_id = decode_uuid(uuid)
+    return from_db().get_scalar('SELECT client_success_return_url FROM payment WHERE id=%(id)s', id=payment_id)
+
+
 def _find_payment(transaction_id):
     return from_db().get('SELECT payee_account_id, amount FROM payment WHERE id=%(id)s', id=transaction_id)
 

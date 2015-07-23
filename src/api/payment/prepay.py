@@ -34,6 +34,7 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
         'amount': amount,
         'ordered_on': order.created_on,
         'callback_url': transaction.generate_pay_notification_url(payment_id),
+
         'created_on': datetime.now()
     }
     from_db().insert('payment', **payment_fields)

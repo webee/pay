@@ -11,7 +11,7 @@ from api.util.enum import enum
 from api.util.ipay.error import DictParsingError, InvalidSignError
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
 from api.util.ipay.transaction import parse_and_verify_request_data
-from flask import jsonify, request, Response, render_template
+from flask import jsonify, request, Response, render_template, redirect
 
 log = logging.getLogger(__name__)
 
@@ -51,6 +51,18 @@ def pay_result(uuid):
     except (DictParsingError, InvalidSignError) as e:
         return render_template('pay_result.html', msg='支付异常')
     return render_template('pay_result.html', msg='支付成功')
+
+
+@mod.route('/pay/<uuid>/result', methods=['POST'])
+def pay_result(uuid):
+    result = _notify_payment_result(uuid, request.verified_data)
+    if result == PayResult.IsInvalidRequest:
+        return notification.is_invalid()
+    elif result == PayResult.Failure:
+        return notification.fail()
+    else:
+        success_url = get_payment_success_callback_interface_on_client(uuid)
+        return redirect(success_url) if success_url else notification.succeed()
 
 
 @mod.route('/pay/<uuid>/notify', methods=['POST'])

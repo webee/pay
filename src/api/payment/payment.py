@@ -5,7 +5,8 @@ from api.util.enum import enum
 
 from tools.dbe import from_db
 
-PaymentState = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED', CONFIRMED='CONFIRMED', REFUNDING='REFUNDING')
+PaymentState = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED', CONFIRMED='CONFIRMED',
+                    REFUNDING='REFUNDING', REFUNDED='REFUNDED')
 
 
 def create(id, client_id, payer_account_id, payee_account_id, order, amount, callback_url,
@@ -66,6 +67,10 @@ def confirm(id):
 
 def accept_refund(id):
     return _transit_state(id, PaymentState.SUCCESS, PaymentState.REFUNDING)
+
+
+def refund(id):
+    return _transit_state(id, PaymentState.REFUNDING, PaymentState.REFUNDED)
 
 
 def _few_days_later(from_datetime, days):

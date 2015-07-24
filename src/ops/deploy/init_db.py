@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from fabric.api import local
 from tools.log import *
-import file_config
-
-cfg = file_config.config()
+from top_config import db as db_config
 
 
 def init_db():
@@ -19,9 +17,9 @@ def recreate_db():
 
 def create_schema():
     info('creating schema ...')
-    local('mysql -u root {} -p < db/schema.ddl'.format(cfg.get('database', 'instance')))
+    local('mysql -u root {} -p < db/schema.ddl'.format(db_config.INSTANCE))
 
 
 def init_test_data():
     info('initing test data ...')
-    local('mysql -u root {} -p < db/init_test_data.sql'.format(cfg.get('database', 'instance')))
+    local('mysql -u root {} -p < db/init_test_data.sql'.format(db_config.INSTANCE))

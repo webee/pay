@@ -1,12 +1,10 @@
 from __future__ import unicode_literals, print_function, division
 
 import os
-import inspect
 from functools import wraps
 from contextlib import contextmanager
 import sqlalchemy
 from sqlalchemy import create_engine
-import file_config
 from mylog import get_logger
 
 LOGGER = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
@@ -206,34 +204,14 @@ class DatabaseInterface(object):
         return res.fetchall()
 
 
-class FunctionValueProvider(object):
-    def __init__(self, func):
-        self.func = func
-        self.multiple_args = len(inspect.getargspec(func).args) > 1
-
-    def __call__(self, obj):
-        if self.multiple_args:
-            return self.func(*obj)
-        else:
-            return self.func(obj)
-
-
-class ConstValueProvider(object):
-    def __init__(self, const):
-        self.const = const
-
-    def __call__(self, obj):
-        return self.const
-
-
 def create_db_engine(**kwargs):
-    cfg = file_config.config()
+    from top_config import db as db_config
     url = sqlalchemy.engine.url.URL('mysql',
-                                    cfg.get('database', 'username'),
-                                    cfg.get('database', 'password'),
-                                    cfg.get('database', 'host'),
-                                    int(cfg.get('database', 'port')) if cfg.get('database', 'port') else None,
-                                    cfg.get('database', 'instance'),
+                                    db_config.USERNAME,
+                                    db_config.PASSWORD,
+                                    db_config.HOST,
+                                    db_config.PORT,
+                                    db_config.INSTANCE,
                                     {'charset': 'utf8'}
                                     )
 

@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, division
 import hashlib
 import hmac
 from encoding import *
-from config import config
+from top_config import config
 
 
 def get_password_hash(password):

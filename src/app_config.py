@@ -39,18 +39,23 @@ class ProductionConfig(Config):
 
 PAY_CONFIG = {
     'development': DevelopmentConfig,
+    'dev': DevelopmentConfig,
     'testing': TestingConfig,
     'beta': BetaConfig,
     'production': ProductionConfig,
+    'prod': ProductionConfig,
 
-    'default': BetaConfig
+    'default': DevelopmentConfig
 }
 
 PAY_API_CONFIG = {
     'development': DevelopmentConfig,
+    'dev': DevelopmentConfig,
     'testing': TestingConfig,
     'beta': BetaConfig,
     'production': ProductionConfig,
+    'prod': ProductionConfig,
 
-    'default': BetaConfig
+    'default': DevelopmentConfig
 }
+

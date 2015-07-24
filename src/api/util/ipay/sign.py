@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import base64
 from hashlib import md5
 from encrypt_utils import public_key
-from .lianlian_config import config
+from .config import lianlian as config
 
 
 class UnknownSignTypeError(Exception):
@@ -86,16 +86,16 @@ def rsa_sign(data, key):
 
 
 def sign(data, sign_type):
-    if sign_type == config.sign_type.MD5:
-        return _sign_md5_data(data, config.MD5_key)
-    elif sign_type == config.sign_type.RSA:
-        return _sign_rsa_data(data, config.TRADER_PRI_KEY)
+    if sign_type == config.SignType.MD5:
+        return _sign_md5_data(data, config.MD5_KEY)
+    elif sign_type == config.SignType.RSA:
+        return _sign_rsa_data(data, config.LVYE_PRI_KEY)
     raise UnknownSignTypeError(sign_type)
 
 
 def verify(data, sign_type):
-    if sign_type == config.sign_type.MD5:
-        return _verify_md5_data(data, config.MD5_key)
-    elif sign_type == config.sign_type.RSA:
+    if sign_type == config.SignType.MD5:
+        return _verify_md5_data(data, config.MD5_KEY)
+    elif sign_type == config.SignType.RSA:
         return _verify_rsa_data(data, config.YT_PUB_KEY)
     raise UnknownSignTypeError(sign_type)

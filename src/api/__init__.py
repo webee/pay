@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, division
 
 from flask import Flask
 
-from config import PAY_API_CONFIG
+from app_config import PAY_API_CONFIG
 
 
 def register_mods(app):

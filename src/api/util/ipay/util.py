@@ -2,8 +2,8 @@
 from datetime import datetime
 from urlparse import urljoin
 
-from api.util.uuid import encode_uuid
-from .lianlian_config import config
+from ..uuid import encode_uuid
+from top_config import api as api_config
 
 
 def datetime_to_str(timestamp):
@@ -17,5 +17,5 @@ def now_to_str():
 def generate_url(relative_url, id):
     params = {'uuid': encode_uuid(id)}
     relative_url = relative_url.format(**params)
-    root_url = config.root_url
+    root_url = api_config.ROOT_URL
     return urljoin(root_url, relative_url)

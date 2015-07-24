@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from .lianlian_api import request
-from .lianlian_config import config
+import config
 
 
 def query_bin(card_no):
@@ -10,10 +10,9 @@ def query_bin(card_no):
     :param card_no: 银行卡号
     :return:
     """
-    # config = get_config()
     params = {
         'oid_partner': config.oid_partner,
         'sign_type': config.sign_type.MD5,
         'card_no': card_no
     }
-    return request(config.bankcard.bin_query_url, params)
+    return request(config.Bankcard.BIN_QUERY_URL, params)

@@ -11,8 +11,8 @@ from .pay import pay as _pay
 from .pay_to_bankcard import pay_to_bankcard as _pay_to_bankcard
 from .query_order import query_order as _query_order
 from .refund import refund as _refund
-from .lianlian_config import config
 from .util import generate_url as _generate_notification_url
+from .config import lianlian as config
 from api.util.uuid import decode_uuid
 
 
@@ -52,7 +52,7 @@ def query_order():
 
 
 def is_sending_to_me(partner_id):
-    return partner_id == config.oid_partner
+    return partner_id == config.OID_PARTNER
 
 
 def is_valid_transaction(oid_partner, transaction_id, uuid):
@@ -60,16 +60,16 @@ def is_valid_transaction(oid_partner, transaction_id, uuid):
 
 
 def generate_pay_url(id):
-    return _generate_notification_url(config.payment.redirect_url, id)
+    return _generate_notification_url(config.Payment.REDIRECT_URL, id)
 
 
 def generate_pay_return_url(id):
-    return _generate_notification_url(config.payment.return_url, id)
+    return _generate_notification_url(config.Payment.RETURN_URL, id)
 
 
 def generate_pay_notification_url(id):
-    return _generate_notification_url(config.payment.notify_url, id)
+    return _generate_notification_url(config.Payment.NOTIFY_URL, id)
 
 
 def generate_pay_to_bankcard_notification_url(id):
-    return _generate_notification_url(config.pay_to_bankcard.notify_url, id)
+    return _generate_notification_url(config.PayToBankcard.NOTIFY_URL, id)

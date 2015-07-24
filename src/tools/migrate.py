@@ -2,15 +2,14 @@
 from __future__ import unicode_literals, print_function, division
 import os
 import sys
-from tools.dbi import from_db
+from tools.dbe import from_db
 from log import *
 from fabric.api import local
-from config import config
 
 
 def migrate():
     versions = load_versions()
-    if len(versions)==0:
+    if len(versions) == 0:
         warn('No migration script found!')
         sys.exit(0)
     latest_version = get_database_latest_version()
@@ -31,20 +30,21 @@ def migrate():
 
 
 def execute_script(script_file_name):
-    cfg = config()
+    from top_config import db as db_config
     local('mysql -u {} -p{} {} < {}'.format(
-        cfg.get('database', 'username'),
-        cfg.get('database', 'password'),
-        cfg.get('database', 'instance'),
+        db_config.USERNAME,
+        db_config.PASSWORD,
+        db_config.INSTANCE,
         script_file_name)
     )
+
 
 def update_database_version(version):
     from_db().execute('update db_migration set latest_version=%(version)s', version=version)
 
 
 def get_database_latest_version():
-    return from_db().get_scalar('select latest_version from db_migration')
+    return from_db().get_scalar('SELECT latest_version FROM db_migration')
 
 
 def load_versions():

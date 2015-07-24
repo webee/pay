@@ -4,8 +4,8 @@ import json
 import requests
 
 from .error import *
-from .lianlian_config import config
 from .sign import sign, verify
+from .config import lianlian as config
 
 
 def sign_params(params):
@@ -16,13 +16,13 @@ def sign_params(params):
 
 
 def md5_sign_params(params):
-    params['sign_type'] = config.sign_type.MD5
+    params['sign_type'] = config.SignType.MD5
 
     return sign_params(params)
 
 
 def rsa_sign_params(params):
-    params['sign_type'] = config.sign_type.RSA
+    params['sign_type'] = config.SignType.RSA
 
     return sign_params(params)
 

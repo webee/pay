@@ -5,7 +5,7 @@ from email.utils import parseaddr, formataddr
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from config import config
+from top_config import config
 import json
 import re
 import textwrap

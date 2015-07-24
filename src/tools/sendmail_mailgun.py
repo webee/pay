@@ -4,7 +4,7 @@ import requests
 import json
 from werkzeug.datastructures import MultiDict
 import logging
-from config import config
+from top_config import config
 
 log = logging.getLogger(__name__)
 

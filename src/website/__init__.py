@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function, division
 
 from flask import Flask, render_template
-from config import PAY_CONFIG
+from app_config import PAY_CONFIG
 from tools.filters import register_filters, register_global_functions
 
 

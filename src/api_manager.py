@@ -24,6 +24,13 @@ manager.add_command("runserver", server)
 
 
 @manager.command
+def current_configs():
+    import top_config
+    for config in top_config.configs.keys():
+        print(config)
+
+
+@manager.command
 def init_db():
     from ops.deploy.init_db import init_db
     init_db()

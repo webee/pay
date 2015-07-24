@@ -2,6 +2,7 @@
 
 env.local.sh
 venv/
+null/
 .idea/
 logs/
 nohup.out

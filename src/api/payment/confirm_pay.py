@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from api.constant import SourceType, PayStep
-from api.util.bookkeeping import bookkeeping, Event
+from lianlian_api.constant import SourceType, PayStep
+from lianlian_api.util.bookkeeping import bookkeeping, Event
 from tools.dbe import from_db, transactional, db_operate
 
 

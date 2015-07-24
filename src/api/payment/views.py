@@ -51,7 +51,8 @@ def post_pay_result(uuid):
     elif result == PayResult.Failure:
         return notification.fail()
     else:
-        success_url = get_payment_success_callback_interface_on_client(uuid)
+        pay_record = find_payment_by_uuid(uuid)
+        success_url = pay_record['client_success_return_url']
         return redirect(success_url) if success_url else notification.succeed()
 
 

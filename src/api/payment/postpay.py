@@ -32,6 +32,6 @@ def succeed_payment(payment_id, paybill_id):
     )
 
 
-def get_payment_success_callback_interface_on_client(uuid):
+def find_payment_by_uuid(uuid):
     payment_id = decode_uuid(uuid)
-    return payment.find(payment_id)['client_success_return_url']
+    return payment.find(payment_id)

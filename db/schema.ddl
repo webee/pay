@@ -34,7 +34,7 @@ CREATE TABLE payment(
   created_on TIMESTAMP NOT NULL ,
   callback_url VARCHAR(128) ,
   client_success_return_url VARCHAR(128),
-  state VARCHAR(16) NOT NULL DEFAULT 'CREATED',
+  state ENUM('CREATED', 'SUCCESS', 'FAILED', 'CONFIRMED', 'REFUNDING', 'REFUNDED', 'REFUND_FAILED') NOT NULL DEFAULT 'CREATED',
   paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,
   auto_confirm_expired_on TIMESTAMP,

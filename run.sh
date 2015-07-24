@@ -14,7 +14,7 @@ if [ $? -ne 0 ]; then
 fi
 
 site=${1:-api}
-host=${2:-127.0.0.1}
+host=${2:-0.0.0.0}
 port=${3:-5000}
 
 mkdir -p logs

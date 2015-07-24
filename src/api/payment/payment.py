@@ -10,7 +10,7 @@ PaymentState = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED', CONFI
 
 
 def create(id, client_id, payer_account_id, payee_account_id, order, amount, callback_url,
-           client_return_url_when_succeed):
+           client_callback_url):
     payment_fields = {
         'id': id,
         'client_id': client_id,
@@ -23,7 +23,7 @@ def create(id, client_id, payer_account_id, payee_account_id, order, amount, cal
         'amount': amount,
         'ordered_on': order.created_on,
         'callback_url': callback_url,
-        'client_success_return_url': client_return_url_when_succeed,
+        'client_callback_url': client_callback_url,
         'state': PaymentState.CREATED,
         'created_on': datetime.now()
     }

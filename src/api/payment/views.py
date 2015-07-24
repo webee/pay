@@ -26,9 +26,9 @@ def prepay():
     order = Order(data['order_no'], data['order_name'], data['order_desc'],
                   data['ordered_on'])
     amount = data['amount']
-    client_success_return_url = data['success_return_url']
+    client_callback_url = data['client_callback_url']
 
-    payment_id = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount, client_success_return_url)
+    payment_id = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount, client_callback_url)
     pay_url = generate_pay_url(payment_id)
 
     return jsonify({'pay_url': pay_url})
@@ -52,8 +52,8 @@ def post_pay_result(uuid):
         return notification.fail()
     else:
         pay_record = find_payment_by_uuid(uuid)
-        success_url = pay_record['client_success_return_url']
-        return redirect(success_url) if success_url else notification.succeed()
+        client_callback_url = pay_record['client_callback_url']
+        return redirect(client_callback_url) if client_callback_url else notification.succeed()
 
 
 @mod.route('/pay/<uuid>/notify', methods=['POST'])

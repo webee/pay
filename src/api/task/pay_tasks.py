@@ -2,21 +2,22 @@
 from __future__ import unicode_literals
 from . import make_celery_app
 from tools.mylog import get_logger
-from api.payment.confirm_pay import list_expired_payment_ids
+from api.payment.confirm_pay import list_all_expired_payments
 from api.payment.confirm_pay import confirm_payment
 from api.account.balance import list_users_with_unsettled_cash
 from api.account.balance import settle_user_account_balance
+from top_config import api_task_celery as config
 
 logger = get_logger(__name__)
-app = make_celery_app('pay', 'api.task.config.{0}'.format(os.getenv('SYSTEM_CONFIG', 'dev')))
+app = make_celery_app('pay', config)
 
 
 @app.task
 def confirm_to_pay_all():
-    payment_ids = list_expired_payment_ids()
-    for payment_id in payment_ids:
-        _ = confirm_pay.apply_async(args=[payment_id], queue='confirm_pay', routing_key='confirm_pay')
-    return len(payment_ids)
+    payments = list_all_expired_payments()
+    for payment in payments:
+        _ = confirm_pay.apply_async(args=[payment.id], queue='confirm_pay', routing_key='confirm_pay')
+    return len(payments)
 
 
 @app.task(ignore_result=False, queue='confirm_pay', routing_key='confirm_pay')

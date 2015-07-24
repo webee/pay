@@ -26,8 +26,8 @@ manager.add_command("runserver", server)
 @manager.command
 def current_configs():
     import top_config
-    for config in top_config.configs.keys():
-        print(config)
+    for k, v in top_config.configs.items():
+        print('{0}: {1}'.format(v['name'], k))
 
 
 @manager.command

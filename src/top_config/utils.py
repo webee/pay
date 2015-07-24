@@ -5,8 +5,14 @@ from tools.mylog import get_logger
 
 logger = get_logger(__name__)
 
+_profiles_mapping = {
+    'development': 'dev',
+    'testing': 'test',
+    'production': 'prod'
+}
 
-def register_config(parent, name):
+
+def register_config(parent, name, mapping=None):
     """ 注册配置
     :param parent: 所在包
     :param name: 模块名
@@ -19,7 +25,7 @@ def register_config(parent, name):
     setattr(config_package, '__members__', {})
     _register_config(config_package, config_package)
 
-    config_name = _get_config_name(name)
+    config_name = _get_config_name(name, mapping)
     if config_name != 'default':
         config_mod = _get_package_mod(config_package, config_name)
         if config_mod:
@@ -105,8 +111,16 @@ def _safe_del_attr(mod, name):
         delattr(mod, name)
 
 
-def _get_config_name(name='SYSTEM'):
-    return os.getenv('{0}_CONFIG'.format(name.upper()), os.getenv('SYSTEM_CONFIG', 'default'))
+def _get_config_name(name='SYSTEM', mapping=None):
+    config = os.getenv('{0}_CONFIG'.format(name.upper()), os.getenv('SYSTEM_CONFIG', 'default'))
+    config = _profiles_mapping.get(config, config)
+    if mapping is None:
+        return config
+    print mapping
+    for key, vs in mapping.items():
+        if config in vs:
+            return key
+    return config
 
 
 def get_project_root():

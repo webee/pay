@@ -52,6 +52,7 @@ PAY_API_CONFIG = {
     'development': DevelopmentConfig,
     'dev': DevelopmentConfig,
     'testing': TestingConfig,
+    'test': TestingConfig,
     'beta': BetaConfig,
     'production': ProductionConfig,
     'prod': ProductionConfig,

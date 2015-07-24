@@ -116,7 +116,6 @@ def _get_config_name(name='SYSTEM', mapping=None):
     config = _profiles_mapping.get(config, config)
     if mapping is None:
         return config
-    print mapping
     for key, vs in mapping.items():
         if config in vs:
             return key

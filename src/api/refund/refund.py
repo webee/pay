@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from api.constant import SourceType, RefundStep
+from api.payment import payment
 from api.util import id
 from api.util.bookkeeping import bookkeeping, Event
 from api.util.enum import enum
@@ -57,6 +58,8 @@ def fail_refund(refund_id, refund_serial_no):
     _update_refund_state(id=refund_id, is_success=False, serial_no=refund_serial_no)
 
     refund_record = _find_refund(refund_id)
+    payment.refund_failed(refund_record['payment_id'])
+
     bookkeeping(
         Event(refund_record['payer_account_id'], SourceType.REFUND, RefundStep.FAILED,
               refund_id, refund_record['amount']),
@@ -69,6 +72,8 @@ def succeed_refund(refund_id, refund_serial_no):
     _update_refund_state(id=refund_id, is_success=True, serial_no=refund_serial_no)
 
     refund_record = _find_refund(refund_id)
+    payment.refund(refund_record['payment_id'])
+
     bookkeeping(
         Event(refund_record['payer_account_id'], SourceType.REFUND, RefundStep.SUCCESS,
               refund_id, refund_record['amount']),
@@ -96,6 +101,7 @@ def _find_payment(client_id, order_no):
 @transactional
 def _refund(payment_id, payer_account_id, amount):
     refund_id, refunded_on = _apply_for_refund(payment_id, payer_account_id, amount)
+    payment.accept_refund(payment_id)
     bookkeeping(
         Event(payer_account_id, SourceType.REFUND, RefundStep.FROZEN, refund_id, amount),
         '-secured', '+frozen'

@@ -1,13 +1,11 @@
 # coding=utf-8
 from __future__ import unicode_literals
-
-import os
 from . import make_celery_app
 from tools.mylog import get_logger
-from lianlian_api.payment.confirm_pay import list_expired_payment_ids
-from lianlian_api.payment.confirm_pay import confirm_payment
-from lianlian_api.account.balance import list_users_with_unsettled_cash
-from lianlian_api.account.balance import settle_user_account_balance
+from api.payment.confirm_pay import list_expired_payment_ids
+from api.payment.confirm_pay import confirm_payment
+from api.account.balance import list_users_with_unsettled_cash
+from api.account.balance import settle_user_account_balance
 
 logger = get_logger(__name__)
 app = make_celery_app('pay', 'api.task.config.{0}'.format(os.getenv('SYSTEM_CONFIG', 'dev')))

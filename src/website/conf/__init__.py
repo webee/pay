@@ -18,7 +18,7 @@ class ZytSiteConfig(ConfigParser):
         return self._get_duration(self.get(section, option))
 
     def _get_duration(self, duration_str):
-        duration=0
+        duration = 0
         for raw in duration_str.split():
             duration += self._parse(raw)
         return duration
@@ -38,6 +38,6 @@ class ZytSiteConfig(ConfigParser):
             return int(raw)
 
 
-env = os.getenv('ENV') or 'dev'
+env = os.getenv('ENV')
 config = ZytSiteConfig()
 config.read((os.path.join(__path__[0], '%s.cfg' % env)))

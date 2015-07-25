@@ -2,18 +2,17 @@
 # coding=utf-8
 from __future__ import unicode_literals, print_function
 
-import os
-
-from flask.ext.script import Manager, Shell, Server
+from flask.ext.script import Manager, Server
 from website import create_app
 
-app = create_app(os.getenv('SYSTEM_CONFIG') or 'default')
-manager = Manager(app)
+
+manager = Manager(create_app)
+manager.add_option('-e', '--env', dest='env', required=False)
 
 
-def make_shell_context():
-    return dict(app=app)
-manager.add_command("shell", Shell(make_context=make_shell_context))
+# def make_shell_context():
+#     return dict(app=app)
+# manager.add_command("shell", Shell(make_context=make_shell_context))
 
 server = Server(host="0.0.0.0", port=5001)
 manager.add_command("runserver", server)

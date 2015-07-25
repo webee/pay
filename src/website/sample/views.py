@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-import requests
 from datetime import datetime
-from flask import render_template, redirect, request
 
-from .uuid import encode_uuid
+import requests
+from flask import render_template, redirect, request
+from website.util.uuid import encode_uuid
 from . import sample_mod as mod
 from tools.mylog import get_logger
-
 
 logger = get_logger(__name__)
 

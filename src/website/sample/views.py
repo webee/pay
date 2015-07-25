@@ -5,8 +5,7 @@ import requests
 from flask import render_template, redirect, request
 
 from . import sample_mod as mod
-from .pay import pay
-from website.util.uuid import encode_uuid
+from .pay import pay, response_pay_result_notification
 from tools.mylog import get_logger
 
 logger = get_logger(__name__)
@@ -30,15 +29,7 @@ def pay_one_cent():
 def pay_result():
     data = request.values
     order_no = data['order_no']
-    params = {
-        'oid_partner': '201507021000395502',
-        'no_order': order_no,
-        'money_order': 1.0,
-        'result_pay': 'SUCCESS',
-        'oid_paybill': '123456789'
-    }
-    uuid = encode_uuid(order_no)
-    resp = requests.post('http://localhost:5000/pay/{0}/result'.format(uuid), data=params)
+    resp = response_pay_result_notification(order_no)
     if resp.status_code == 200:
         result = 'SUCCESS'
     else:

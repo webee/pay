@@ -20,7 +20,8 @@
         </li>
         <li>
             <form action="{{ url_for('sample.refund_one_cent') }}" method="POST">
-                <input type="submit" value="Refund 0.01 Yuan" />
+                Order No: <input type="text" name="order_no" />
+                <input type="submit" value="Refund" />
             </form>
         </li>
     </ul>

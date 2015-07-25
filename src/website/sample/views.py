@@ -6,6 +6,7 @@ from flask import render_template, redirect, request
 
 from . import sample_mod as mod
 from .pay import pay, response_pay_result_notification
+from .refund import refund
 from tools.mylog import get_logger
 
 logger = get_logger(__name__)
@@ -27,8 +28,7 @@ def pay_one_cent():
 
 @mod.route('/pay-result', methods=['POST'])
 def pay_result():
-    data = request.values
-    order_no = data['order_no']
+    order_no = request.values['order_no']
     resp = response_pay_result_notification(order_no)
     if resp.status_code == 200:
         result = 'SUCCESS'
@@ -39,13 +39,8 @@ def pay_result():
 
 @mod.route('/refund-one-cent', methods=['POST'])
 def refund_one_cent():
-    params = {
-        'client_id': 1,
-        'payer': 2001,
-        'order_no': 111112,
-        'amount': 0.01
-    }
-    resp = requests.post('http://localhost:5000/refund', data=params)
+    order_no = request.values['order_no']
+    resp = refund(order_no)
     refund_result = 'FAILURE'
     if resp.status_code == 200:
         refund_result = 'SUCCESS'

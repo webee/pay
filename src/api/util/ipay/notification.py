@@ -14,3 +14,9 @@ class Notification(object):
 
     def fail(self):
         return jsonify({'ret_code': '0000', 'ret_msg': '交易失败'})
+
+    def accepted(self):
+        return jsonify({'ret_code': '0000', 'ret_msg': 'accepted'})
+
+    def refused(self):
+        return jsonify({'ret_code': '9999', 'ret_msg': 'refused'})

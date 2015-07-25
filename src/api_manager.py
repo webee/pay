@@ -109,7 +109,7 @@ def test_transfer(from_id, to_id, amount):
 
 @manager.option('-i', '--id', type=long, dest="account_id", required=True)
 def test_settle_user_cash_balance(account_id):
-    from api.account.balance import settle_user_account_balance
+    from api.account.account.balance import settle_user_account_balance
 
     settle_user_account_balance(account_id, 'cash')
 

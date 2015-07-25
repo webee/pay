@@ -22,7 +22,7 @@ class SourceType(object):
     TRANSFER = "TRANSFER"
 
 
-class WithdrawResult(object):
+class WithdrawState(object):
     FROZEN = 'FROZEN'
     SUCCESS = 'SUCCESS'
     FAILED = 'FAILED'
@@ -34,15 +34,12 @@ class WithdrawStep(object):
     FAILED = "FAILED"
 
 
-class PayState(object):
+class PaymentState(object):
     CREATED = 'CREATED'
     SECURED = 'SECURED'
     FAILED = 'FAILED'
     CONFIRMED = 'CONFIRMED'
-    REFUND_FROZEN = 'REFUND_FROZEN'
     REFUNDING = 'REFUNDING'
-    REFUNDED = 'REFUNDED'
-    REFUND_FAILED = 'REFUND_FAILED'
 
 
 class PayStep(object):
@@ -60,15 +57,16 @@ class RefundState(object):
 
 class RefundStep(object):
     FROZEN = 'FROZEN'
-    CANCELED = 'CANCELED'
     SUCCESS = 'SUCCESS'
     FAILED = 'FAILED'
 
 
 class PrepaidStep(object):
     SUCCESS = "SUCCESS"
+    FAILED = 'FAILED'
 
 
 class TransferStep(object):
     FROZEN = "FROZEN"
     SUCCESS = "SUCCESS"
+    FAILED = 'FAILED'

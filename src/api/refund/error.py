@@ -20,21 +20,20 @@ class RefundError(Exception):
 
 
 class RefundFailedError(RefundError):
-    def __init__(self, refund_id):
-        message = "apply for refund failed."
+    def __init__(self, message=None):
+        message = message or "apply for refund failed."
         super(RefundFailedError, self).__init__(message)
-        self.refund_id = refund_id
 
 
 class PaymentStateMissMatchError(RefundError):
-    def __init__(self):
-        message = "payment state miss match."
+    def __init__(self, message=None):
+        message = message or "payment state miss match."
         super(PaymentStateMissMatchError, self).__init__(message)
 
 
 class RefundStateMissMatchError(RefundError):
-    def __init__(self):
-        message = "refund state miss match."
+    def __init__(self, message=None):
+        message = message or "refund state miss match."
         super(RefundStateMissMatchError, self).__init__(message)
 
 

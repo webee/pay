@@ -29,8 +29,10 @@ def list_data(items):
     return Response(js, status=200, mimetype='application/json')
 
 
-def ok(**params):
-    return _response(200, params)
+def ok(*args, **kwargs):
+    if len(args) > 0:
+        return _response(200, args[0])
+    return _response(200, kwargs)
 
 
 def created(id):

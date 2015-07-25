@@ -39,7 +39,14 @@ class Bankcard:
 class PayToBankcard:
     VERSION = '1.2'
     URL = 'https://yintong.com.cn/traderapi/cardandpay.htm'
-    NOTIFY_URL = '/withdraw/{uuid}/result'
+    NOTIFY_URL = '/withdraw/{uuid}/notify'
+
+    class Result:
+        SUCCESS = 'SUCCESS'
+        WAITING = 'WAITING'
+        FAILURE = 'FAILURE'
+        CANCEL = 'CANCEL'
+        PROCESSING = 'PROCESSING'
 
 
 class Order:

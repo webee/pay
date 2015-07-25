@@ -4,8 +4,8 @@ from . import make_celery_app
 from tools.mylog import get_logger
 from api.payment.confirm_pay import list_all_expired_payments
 from api.payment.confirm_pay import confirm_payment
-from api.account.balance import list_users_with_unsettled_cash
-from api.account.balance import settle_user_account_balance
+from api.account.account.dba import list_users_with_unsettled_cash
+from api.account.account.balance import settle_user_account_balance
 from top_config import api_task_celery as config
 
 logger = get_logger(__name__)
@@ -37,3 +37,32 @@ def settle_all_cash_balance():
 @app.task(ignore_result=True, queue='settle_cash_balance', routing_key='settle_cash_balance')
 def settle_user_cash_balance(account_id, high_id=None):
     settle_user_account_balance(account_id, 'cash', high_id)
+
+
+@app.task(ignore_result=True, queue='withdraw_notify', routing_key='withdraw_notify')
+def withdraw_notify(url, params, next_time, count=1):
+    from api.account.withdraw.notify import notify_client
+    do_notify_client(refund_notify, notify_client, url, params, next_time, count)
+
+
+@app.task(ignore_result=True, queue='refund_notify', routing_key='refund_notify')
+def refund_notify(url, params, next_time, count=1):
+    from api.refund.notify import notify_client
+    do_notify_client(refund_notify, notify_client, url, params, next_time, count)
+
+
+def do_notify_client(task, notify_client, url, params, next_time, count):
+    from datetime import datetime, timedelta
+
+    # max execute 30 times.
+    if count > 30:
+        return
+
+    now = datetime.now()
+    if now < next_time:
+        task.delay(url, params, next_time, count=count)
+
+    if not notify_client(url, params):
+        # retry every two minutes.
+        next_time = timedelta(minutes=2)
+        task.delay(url, params, next_time, count=count + 1)

@@ -100,6 +100,7 @@ def _debit_credit_bookkeeping(event, debit_items, credit_items):
     event_id = _create_event(event)
     _record_debit(event_id, account_id, debit_items, created_on)
     _record_credit(event_id, account_id, credit_items, created_on)
+    return True
 
 
 def _is_balanced(event_amount, debit_items, credit_items):

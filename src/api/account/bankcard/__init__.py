@@ -83,4 +83,3 @@ def query_bankcard(card_no):
 def is_debit_card(card_no):
     bankcard_bin = query_bankcard_bin(card_no)
     return bankcard_bin.card_type == BankcardType.DEBIT
-

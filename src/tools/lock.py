@@ -105,6 +105,10 @@ class _Locker(object):
             yield
 
 
+def _generate_lock_name(name):
+    return 'lvye_pay.{0}'.format(name)
+
+
 def _generate_user_lock_name(user_account_id, name):
     return 'lvye_pay.{0}_{1}'.format(user_account_id, name)
 
@@ -127,4 +131,10 @@ def require_user_account_lock(user_account_id, account_name, timeout=-1):
 @contextlib.contextmanager
 def require_user_lock(user_account_id, name, timeout=-1):
     with require_lock(_generate_user_lock_name(user_account_id, name), timeout) as locker:
+        yield locker
+
+
+@contextlib.contextmanager
+def require_order_lock(order_id, timeout=-1):
+    with require_lock(_generate_lock_name(order_id), timeout) as locker:
         yield locker

@@ -36,7 +36,7 @@ CREATE TABLE payment(
   updated_on TIMESTAMP,
   callback_url VARCHAR(128) ,
   client_callback_url VARCHAR(128),
-  state ENUM('CREATED', 'SECURED', 'FAILED', 'CONFIRMED', 'REFUNDING', 'REFUNDED', 'REFUND_FAILED') NOT NULL DEFAULT 'CREATED',
+  state ENUM('CREATED', 'SECURED', 'FAILED', 'CONFIRMED', 'REFUNDING') NOT NULL DEFAULT 'CREATED',
   paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,
   auto_confirm_expired_on TIMESTAMP,
@@ -70,15 +70,16 @@ CREATE TABLE withdraw(
   account_id INT UNSIGNED NOT NULL COMMENT '提现账号',
   bankcard_id INT UNSIGNED NOT NULL COMMENT '提现到银行号id',
   amount DECIMAL(12, 2) NOT NULL,
+  callback_url VARCHAR(128),
   created_on TIMESTAMP NOT NULL,
-  callback_url VARCHAR(128) COMMENT '请求方回调通知url',
+  state ENUM('FROZEN', 'SUCCESS', 'FAILED') NOT NULL DEFAULT 'FROZEN',
+
   paybill_id VARCHAR(18) COMMENT '第三方交易订单id',
-  result ENUM('FROZEN', 'REQUEST_FAILED', 'SUCCESS', 'FAILED') NOT NULL COMMENT '提现结果',
-  settle_date CHAR(8) COMMENT '成功支付，清算日期',
   failure_info VARCHAR(255) COMMENT '提现失败原因',
-  ended_on TIMESTAMP COMMENT '结束时间',
-  FOREIGN KEY withdraw_account_id(account_id) REFERENCES account(id),
-  FOREIGN KEY withdraw_bankcard_id(bankcard_id) REFERENCES bankcard(id)
+  updated_on TIMESTAMP,
+
+  FOREIGN KEY account_id(account_id) REFERENCES account(id),
+  FOREIGN KEY bankcard_id(bankcard_id) REFERENCES bankcard(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -90,10 +91,9 @@ CREATE TABLE refund(
   amount DECIMAL(12, 2) NOT NULL,
   callback_url VARCHAR(128),
   created_on TIMESTAMP NOT NULL,
-  state ENUM('FROZEN', 'SUCCESS', 'FAILED') NOT NULL,
+  state ENUM('FROZEN', 'SUCCESS', 'FAILED') NOT NULL DEFAULT 'FROZEN',
 
   refund_serial_no VARCHAR(16) COMMENT '退款流水号',
-  settle_date CHAR(8) COMMENT '退款成功，清算日期',
   updated_on TIMESTAMP,
 
   FOREIGN KEY payment_id(payment_id) REFERENCES payment(id),

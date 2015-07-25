@@ -39,8 +39,8 @@ def query_bankcard_bin(card_no):
     return _query_bin(card_no)
 
 
-def pay_to_bankcard(no_order, money_order, info_order, notify_url, bankcard):
-    return _pay_to_bankcard(no_order, money_order, info_order, notify_url, bankcard)
+def pay_to_bankcard(withdraw_id, money_order, info_order, bankcard):
+    return _pay_to_bankcard(withdraw_id, money_order, info_order, bankcard)
 
 
 def refund(refund_id, refunded_on, amount, paybill_id):
@@ -70,6 +70,3 @@ def generate_pay_return_url(id):
 def generate_pay_notification_url(id):
     return _generate_notification_url(config.Payment.NOTIFY_URL, id)
 
-
-def generate_pay_to_bankcard_notification_url(id):
-    return _generate_notification_url(config.PayToBankcard.NOTIFY_URL, id)

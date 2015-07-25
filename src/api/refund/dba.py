@@ -28,7 +28,7 @@ def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, ca
         'callback_url': callback_url
     }
     db.insert('refund', returns_id=True, **fields)
-    return get_refund(refund_id)
+    return refund_id
 
 
 @db_operate
@@ -43,3 +43,12 @@ def get_payment(db, client_id, order_id):
               FROM payment
               WHERE client_id = %(client_id)s AND order_id = %(order_id)s
         """, client_id=client_id, order_id=order_id)
+
+
+@db_operate
+def set_refund_info(db, refund_id, refund_serial_no):
+    return db.execute("""
+            UPDATE refund
+                SET refund_serial_no=%(refund_serial_no)s, updated_on=%(updated_on)
+                WHERE id=%(id)s
+        """, id=refund_id, refund_serial_no=refund_serial_no, updated_on=datetime.now()) > 0

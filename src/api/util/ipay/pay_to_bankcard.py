@@ -2,11 +2,11 @@
 from __future__ import unicode_literals
 
 from .lianlian_api import request
-from .util import now_to_str
+from .util import now_to_str, generate_url
 from .config import lianlian as config
 
 
-def pay_to_bankcard(no_order, money_order, info_order, notify_url, bankcard):
+def pay_to_bankcard(no_order, money_order, info_order, bankcard):
     """ 代付
     :param no_order: 订单号
     :param money_order: 金额
@@ -30,7 +30,7 @@ def pay_to_bankcard(no_order, money_order, info_order, notify_url, bankcard):
         'province_code': bankcard.province_code,
         'city_code': bankcard.city_code,
         'brabank_name': bankcard.branch_bank_name,
-        'notify_url': notify_url,
+        'notify_url': generate_url(config.PayToBankcard.NOTIFY_URL, no_order),
         'api_version': config.PayToBankcard.VERSION,
         'prcptcd': ''
     }

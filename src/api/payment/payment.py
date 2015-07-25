@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 
+from api.payment.payment_db import transit_state
 from api.util.enum import enum
-
-from tools.dbe import from_db
+from tools.dbe import from_db, db_transactional
+from api.constant import PayState
+from . import payment_db
 
 PaymentState = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED', CONFIRMED='CONFIRMED',
                     REFUNDING='REFUNDING', REFUNDED='REFUNDED', REFUND_FAILED='REFUND_FAILED')
@@ -61,32 +63,23 @@ def fail(id):
                       id=id, new_state=PaymentState.FAILED, ended_on=datetime.now())
 
 
-def confirm(id):
-    return _transit_state(id, PaymentState.SUCCESS, PaymentState.CONFIRMED)
-
-
-def accept_refund(id):
-    return _transit_state(id, PaymentState.SUCCESS, PaymentState.REFUNDING)
-
-
-def refund(id):
-    return _transit_state(id, PaymentState.REFUNDING, PaymentState.REFUNDED)
-
-
-def refund_failed(id):
-    return _transit_state(id, PaymentState.REFUNDING, PaymentState.REFUND_FAILED)
-
-
 def _few_days_later(from_datetime, days):
     return from_datetime + timedelta(days=days)
 
 
-def _transit_state(id, prev_state, new_state):
-    rowcount = from_db().execute(
-        """
-          UPDATE payment SET state=%(new_state)s, confirmed_on=%(confirmed_on)s
-            WHERE id=%(id)s AND state=%(prev_state)s
-        """,
-        id=id, prev_state=prev_state, new_state=new_state, confirmed_on=datetime.now()
-    )
-    return rowcount > 0
+def confirm(id):
+    return payment_db.transit_state(id, PaymentState.SUCCESS, PaymentState.CONFIRMED)
+
+
+def refund_started(id):
+    return payment_db.transit_state(id, PayState.SECURED, PayState.REFUNDING)
+
+
+def refund_failed(id):
+    return payment_db.transit_state(id, PaymentState.REFUNDING, PaymentState.REFUND_FAILED)
+
+
+@db_transactional
+def refund_success(db, id, amount):
+    payment_db.set_refunded_amount(db, id, amount)
+    return payment_db.transit_state(db, id, PaymentState.REFUNDING, PaymentState.REFUNDED)

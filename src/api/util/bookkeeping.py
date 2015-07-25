@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from datetime import datetime
 
-from tools.dbe import from_db
+from tools.dbe import db_operate
 
 ACCOUNTS_SIDES = {
     'asset': {'+': 'd', '-': 'c'},
@@ -108,11 +108,13 @@ def _is_balanced(event_amount, debit_items, credit_items):
     return event_amount == debits_amount == credits_amount
 
 
-def _create_event(event):
-    return from_db().insert('event', returns_id=True, **event.__dict__)
+@db_operate
+def _create_event(db, event):
+    return db.insert('event', returns_id=True, **event.__dict__)
 
 
-def _record_debit(event_id, account_id, debit_items, created_on):
+@db_operate
+def _record_debit(db, event_id, account_id, debit_items, created_on):
     for account, amount in debit_items:
         account_log = {
             'event_id': event_id,
@@ -121,10 +123,11 @@ def _record_debit(event_id, account_id, debit_items, created_on):
             'amount': amount,
             'created_on': created_on
         }
-        from_db().insert(account + '_account_transaction_log', **account_log)
+        db.insert(account + '_account_transaction_log', **account_log)
 
 
-def _record_credit(event_id, account_id, credit_items, created_on):
+@db_operate
+def _record_credit(db, event_id, account_id, credit_items, created_on):
     for account, amount in credit_items:
         account_log = {
             'event_id': event_id,
@@ -133,4 +136,4 @@ def _record_credit(event_id, account_id, credit_items, created_on):
             'amount': amount,
             'created_on': created_on
         }
-        from_db().insert(account + '_account_transaction_log', **account_log)
+        db.insert(account + '_account_transaction_log', **account_log)

@@ -30,16 +30,19 @@ CREATE TABLE payment(
   payer_account_id INT NOT NULL ,
   payee_account_id INT NOT NULL ,
   amount DECIMAL(12, 2) NOT NULL ,
+  refunded_amount DECIMAL(12, 2) NOT NULL DEFAULT 0,
   ordered_on TIMESTAMP NOT NULL ,
   created_on TIMESTAMP NOT NULL ,
+  updated_on TIMESTAMP,
   callback_url VARCHAR(128) ,
   client_callback_url VARCHAR(128),
-  state ENUM('CREATED', 'SUCCESS', 'FAILED', 'CONFIRMED', 'REFUNDING', 'REFUNDED', 'REFUND_FAILED') NOT NULL DEFAULT 'CREATED',
+  state ENUM('CREATED', 'SECURED', 'FAILED', 'CONFIRMED', 'REFUNDING', 'REFUNDED', 'REFUND_FAILED') NOT NULL DEFAULT 'CREATED',
   paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,
   auto_confirm_expired_on TIMESTAMP,
   confirmed_on TIMESTAMP,
 
+  UNIQUE KEY client_order_uiq_idx (client_id, order_id),
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 );
 
@@ -83,14 +86,19 @@ CREATE TABLE refund(
   id CHAR(30) PRIMARY KEY,  -- prefix with 'RFD'
   payment_id CHAR(30) NOT NULL,
   payer_account_id INT UNSIGNED NOT NULL,
+  payee_account_id INT UNSIGNED NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
+  callback_url VARCHAR(128),
   created_on TIMESTAMP NOT NULL,
-  success SMALLINT , -- 0/1, FAIL/SUCCESS
+  state ENUM('FROZEN', 'SUCCESS', 'FAILED') NOT NULL,
+
   refund_serial_no VARCHAR(16) COMMENT '退款流水号',
-  transaction_ended_on TIMESTAMP,
+  settle_date CHAR(8) COMMENT '退款成功，清算日期',
+  updated_on TIMESTAMP,
 
   FOREIGN KEY payment_id(payment_id) REFERENCES payment(id),
-  FOREIGN KEY payer_account_id(payer_account_id) REFERENCES account(id)
+  FOREIGN KEY payer_account_id(payer_account_id) REFERENCES account(id),
+  FOREIGN KEY payee_account_id(payee_account_id) REFERENCES account(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

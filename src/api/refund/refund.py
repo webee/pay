@@ -1,137 +1,168 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from decimal import Decimal
 from api.constant import SourceType, RefundStep
 from api.payment import payment
-from api.util import id
+from api.refund.error import NoPaymentFoundError, RefundFailedError, PaymentStateMissMatchError, RefundAmountError
 from api.util.bookkeeping import bookkeeping, Event
-from api.util.enum import enum
 from api.util.ipay import transaction
-from api.util.uuid import decode_uuid
-from api.account.account import find_account_id
-from tools.dbe import from_db, transactional
+from api.util.ipay.error import ApiError
+from api.util.ipay.transaction import notification
+from tools.dbe import from_db, db_operate, transactional, db_transactional
+from api.constant import PayState, RefundState
+from top_config import lianlian
+from . import refund_db
 
 
-RefundState = enum(Applied=0, InProcessing=1, Success=2, Failure=3)
+def apply_for_refund(client_id, order_id, amount, callback_url):
+    payment_order = _get_payment_to_refund(client_id, order_id)
+    if amount >= payment_order.amount or amount <= 0:
+        raise RefundAmountError(amount)
+
+    refund_order = _create_refund_freezing(payment_order, amount, callback_url)
+
+    _request_refund(payment_order, refund_order)
+
+    return refund_order.id
 
 
-class NoPaymentFoundError(Exception):
-    def __init__(self, client_id, order_no):
-        message = "Cannot find any valid pay transaction with [client_id={0}, order_no={1}]."\
-            .format(client_id, order_no)
-        super(NoPaymentFoundError, self).__init__(message)
+def handle_refund_result(refund_id, data):
+    sta_refund = data['sta_refund']
+    oid_refundno = data['oid_refundno']
+    amount = Decimal(data['money_refund'])
+
+    refund_order = refund_db.get_refund(refund_id)
+    if refund_order.state != RefundState.FROZEN:
+        return notification.duplicate()
+
+    if refund_order.amount != amount:
+        return notification.is_invalid()
+
+    _set_refund_info(refund_id, oid_refundno)
+
+    if sta_refund == lianlian.Refund.Status.FAILED:
+        _fail_refund(refund_id)
+    elif sta_refund == lianlian.Refund.Status.SUCCESS:
+        _succeed_refund(refund_order)
+    return notification.succeed()
 
 
-class RefundFailedError(Exception):
-    def __init__(self, refund_id):
-        message = "Refund application has been created, but actual refunding is failed [refund_id={0}]."\
-            .format(refund_id)
-        super(RefundFailedError, self).__init__(message)
-        self.refund_id = refund_id
-
-
-def refund_transaction(client_id, payer_id, order_no, amount):
-    payment = _find_payment(client_id, order_no)
-    if not payment:
-        raise NoPaymentFoundError(client_id, order_no)
-
-    payer_account_id = find_account_id(client_id, payer_id)
-    refund_id, refunded_on = _refund(payment['id'], payer_account_id, amount)
-    _send_refund_request(refund_id, refunded_on, amount, payment['paybill_id'])
-
-
-def is_valid_refund(refund_id, uuid, refund_amount):
-    if refund_id != decode_uuid(uuid):
-        return False
-
-    amount = from_db().get_scalar('SELECT amount FROM refund WHERE id = %(id)s AND success IS NULL',
-                                  id=refund_id)
-    return amount == refund_amount
-
-
-def is_successful_refund(result):
-    return int(result) == RefundState.Success
+def query_refund(refund_id):
+    return refund_db.get_refund(refund_id)
 
 
 @transactional
-def fail_refund(refund_id, refund_serial_no):
-    _update_refund_state(id=refund_id, is_success=False, serial_no=refund_serial_no)
+def _fail_refund(refund_order):
+    payment.refund_failed(refund_order.payment_id)
 
-    refund_record = _find_refund(refund_id)
-    payment.refund_failed(refund_record['payment_id'])
+    _unfrozen_back_refund(refund_order)
 
+
+@db_transactional
+def _succeed_refund(db, refund_order):
+    payment.refund_success(db, refund_order.payment_id, refund_order.amount)
+
+    _unfrozen_out_refund(refund_order)
+
+
+def _get_payment_to_refund(client_id, order_id):
+    payment_order = refund_db.get_payment(client_id, order_id)
+    if not payment_order:
+        raise NoPaymentFoundError(client_id, order_id)
+    if payment_order.state != PayState.SECURED:
+        raise PaymentStateMissMatchError()
+    return payment_order
+
+
+@transactional
+def _create_refund_freezing(payment_order, amount, callback_url):
+    payment_id = payment_order.id
+    payer_account_id = payment_order.payer_account_id
+    payee_account_id = payment_order.payee_account_id
+
+    if not payment.refund_started(payment_id):
+        raise RefundFailedError()
+
+    refund_order = refund_db.create_refund(payment_id, payer_account_id, payee_account_id, amount, callback_url)
+    _frozen_refund(refund_order)
+
+    return refund_order
+
+
+def _request_refund(payment_order, refund_order):
+    refund_id = refund_order.id
+    created_on = refund_order.created_on
+    amount = refund_order.amount
+    paybill_id = payment_order.paybill_id
+    try:
+        res = transaction.refund(refund_id, created_on, amount, paybill_id)
+    except ApiError:
+        _refund_request_failed(refund_order)
+        raise RefundFailedError()
+
+    if 'oid_refundno' in res:
+        oid_refundno = res['oid_refundno']
+        _set_refund_info(refund_id, oid_refundno)
+
+
+@transactional
+def _refund_request_failed(payment_id, refund_id):
+    payment.refund_failed(payment_id)
+    _transit_refund_failed(refund_id)
+
+    refund_order = refund_db.get_refund(refund_id)
+    _unfrozen_back_refund(refund_order)
+
+
+@db_operate
+def _set_refund_info(db, refund_id, refund_serial_no):
+    return db.execute("""
+            UPDATE refund
+                SET refund_serial_no=%(refund_serial_no)s, updated_on=%(updated_on)
+                WHERE id=%(id)s
+        """, id=refund_id, refund_serial_no=refund_serial_no, updated_on=datetime.now()) > 0
+
+
+def _find_refund(client_id, refund_id):
+    return from_db().get(
+        """
+            SELECT *
+              FROM refund
+              WHERE client_id = %(client_id)s AND id = %(id)s
+        """,
+        client_id=client_id, id=refund_id)
+
+
+## refund events.
+def _frozen_refund(refund_order):
     bookkeeping(
-        Event(refund_record['payer_account_id'], SourceType.REFUND, RefundStep.FAILED,
-              refund_id, refund_record['amount']),
-        '-frozen', '-asset'
+        Event(refund_order.payee_account_id, SourceType.REFUND, RefundStep.FROZEN,
+              refund_order.id, refund_order.amount),
+        '-secured', '+frozen'
     )
 
 
-@transactional
-def succeed_refund(refund_id, refund_serial_no):
-    _update_refund_state(id=refund_id, is_success=True, serial_no=refund_serial_no)
-
-    refund_record = _find_refund(refund_id)
-    payment.refund(refund_record['payment_id'])
-
+def _unfrozen_back_refund(refund_order):
     bookkeeping(
-        Event(refund_record['payer_account_id'], SourceType.REFUND, RefundStep.SUCCESS,
-              refund_id, refund_record['amount']),
+        Event(refund_order.payee_account_id, SourceType.REFUND, RefundStep.FAILED,
+              refund_order.id, refund_order.amount),
         '-frozen', '+secured'
     )
 
 
-def _send_refund_request(refund_id, refunded_on, amount, paybill_id):
-    try:
-        resp = transaction.refund(refund_id, refunded_on, amount, paybill_id)
-    except:
-        raise RefundFailedError(refund_id)
-
-
-def _find_payment(client_id, order_no):
-    return from_db().get(
-        """
-            SELECT id, paybill_id
-              FROM payment
-              WHERE client_id = %(client_id)s AND order_id = %(order_id)s AND success = 1
-        """,
-        client_id=client_id, order_id=order_no)
-
-
-@transactional
-def _refund(payment_id, payer_account_id, amount):
-    refund_id, refunded_on = _apply_for_refund(payment_id, payer_account_id, amount)
-    payment.accept_refund(payment_id)
+def _unfrozen_out_refund(refund_order):
     bookkeeping(
-        Event(payer_account_id, SourceType.REFUND, RefundStep.FROZEN, refund_id, amount),
-        '-secured', '+frozen'
+        Event(refund_order.payee_account_id, SourceType.REFUND, RefundStep.SUCCESS,
+              refund_order.id, refund_order.amount),
+        '-frozen', '-asset'
     )
-    return refund_id, refunded_on
 
 
-def _apply_for_refund(payment_id, payer_account_id, amount):
-    refunded_on = datetime.now()
-    refund_id = id.refund_id(payer_account_id)
-    fields = {
-        'id': refund_id,
-        'payment_id': payment_id,
-        'payer_account_id': payer_account_id,
-        'amount': amount,
-        'created_on': refunded_on
-    }
-    from_db().insert('refund', returns_id=True, **fields)
-    return refund_id, refunded_on
+## refund state transition.
+def _transit_refund_failed(id):
+    return refund_db.transit_state(id, RefundState.FROZEN, RefundState.FAILED)
 
 
-def _update_refund_state(id, is_success, serial_no):
-    state = 1 if is_success else 0
-    from_db().execute(
-        """
-            UPDATE refund SET success = %(state)s, transaction_ended_on = %(ended_on)s, refund_serial_no=%(serial_no)s
-            WHERE id = %(id)s
-        """,
-        id=id, state=state, ended_on=datetime.now(), serial_no=serial_no)
-
-
-def _find_refund(id):
-    return from_db().get('SELECT * FROM refund WHERE id=%(id)s', id=id)
+def _transit_refund_success(id):
+    return refund_db.transit_state(id, RefundState.FROZEN, RefundState.SUCCESS)

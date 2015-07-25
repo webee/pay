@@ -48,4 +48,10 @@ class Order:
 
 class Refund:
     URL = 'https://yintong.com.cn/traderapi/refund.htm'
-    NOTIFY_URL = '/refund/{uuid}/result'
+    NOTIFY_URL = '/refund/{uuid}/notify'
+
+    class Status:
+        APPLY = '0'
+        PROCESSING = '1'
+        SUCCESS = '2'
+        FAILED = '3'

@@ -6,7 +6,7 @@ from decimal import Decimal, InvalidOperation
 import requests
 from api.util.ipay import transaction
 from tools.dbe import db_transactional, db_operate
-from api.util import id
+from api.util import oid
 from api import constant
 from api.util.bookkeeping import bookkeeping, Event
 from tools.mylog import get_logger
@@ -117,7 +117,7 @@ def _withdraw(db, account_id, bankcard_id, amount, callback_url):
 
 
 def _create_withdraw_order(db, account_id, bankcard_id, amount, callback_url):
-    order_id = id.withdraw_id(account_id)
+    order_id = oid.withdraw_id(account_id)
     fields = {
         'id': order_id,
         'account_id': account_id,
@@ -137,9 +137,12 @@ def _create_withdraw_order(db, account_id, bankcard_id, amount, callback_url):
 def _withdraw_request_failed(db, order_id):
     withdraw_order = get_withdraw_order(db, order_id)
     if withdraw_order and withdraw_order.result == constant.WithdrawResult.FROZEN:
-        db.execute("update withdraw set result=%(result)s, failure_info=%(failure_info)s, ended_on=%(ended_on)s"
-                   "where id=%(id)s", result=constant.WithdrawResult.FAILED,
-                   failure_info='withdraw request failed.', ended_on=datetime.now(), id=order_id)
+        db.execute("""
+                  UPDATE withdraw
+                    SET result=%(result)s, failure_info=%(failure_info)s, ended_on=%(ended_on)s
+                    WHERE id=%(id)s
+                """, result=constant.WithdrawResult.FAILED, failure_info='withdraw request failed.',
+                   ended_on=datetime.now(), id=order_id)
 
         _unfrozen_back_withdraw_cash(withdraw_order)
 

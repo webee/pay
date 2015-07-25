@@ -15,7 +15,7 @@ def register_mods(app):
 
     app.register_blueprint(index_mod)
     app.register_blueprint(pay_mod)
-    app.register_blueprint(refund_mod)
+    app.register_blueprint(refund_mod, url_prefix='/refund')
     app.register_blueprint(card_mod, url_prefix='/bankcards')
     app.register_blueprint(account_mod, url_prefix='/accounts')
 

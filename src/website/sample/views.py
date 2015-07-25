@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-from datetime import datetime
-
 import requests
 from flask import render_template, redirect, request
-from website.util.uuid import encode_uuid
+
 from . import sample_mod as mod
+from .pay import pay
+from website.util.uuid import encode_uuid
 from tools.mylog import get_logger
 
 logger = get_logger(__name__)
@@ -19,23 +19,11 @@ def index():
 
 @mod.route('/pay-one-cent', methods=['POST'])
 def pay_one_cent():
-    order_no = 111112
-    params = {
-        'client_id': 1,
-        'payer': 2001,
-        'payee': 1001,
-        'order_no': order_no,
-        'order_name': 'Christmas gift',
-        'order_desc': 'Gift to my friend',
-        'ordered_on': datetime(2015, 6, 18, 18, 28, 35),
-        'amount': 0.01,
-        'success_return_url': 'http://localhost:5001/site/sample/pay/{0}/success'.format(order_no)
-    }
-    resp = requests.post('http://localhost:5000/pre-pay', data=params)
+    resp = pay(0.01)
     if resp.status_code == 200:
         content = resp.json()
         return redirect(content['pay_url'])
-    return render_template('omnipotent.html', execution_result='SUCCESS')
+    return redirect('/')
 
 
 @mod.route('/pay-result', methods=['POST'])

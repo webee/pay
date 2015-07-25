@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-import requests
 from flask import render_template, redirect, request
 
 from . import sample_mod as mod

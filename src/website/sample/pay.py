@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-import requests
 
+import requests
+from website.conf import config
 from website.util.uuid import encode_uuid
+
+
+_API_HOST = config.get('hosts', 'api_gateway')
+_SITE_HOST = config.get('hosts', 'site_gateway')
 
 
 def pay(amount):
@@ -16,9 +21,9 @@ def pay(amount):
         'order_desc': 'Gift to my friend',
         'ordered_on': datetime(2015, 6, 19, 18, 28, 35),
         'amount': amount,
-        'client_callback_url': 'http://localhost:5001/site/sample/pay/{0}/notify-result'.format(order_no)
+        'client_callback_url': '{0}/pay/{1}/notify-result'.format(_SITE_HOST, order_no)
     }
-    return requests.post('http://localhost:5000/pre-pay', data=params)
+    return requests.post('{0}/pre-pay'.format(_API_HOST), data=params)
 
 
 def response_pay_result_notification(order_no):
@@ -30,7 +35,7 @@ def response_pay_result_notification(order_no):
         'oid_paybill': '123456789'
     }
     uuid = encode_uuid(order_no)
-    return requests.post('http://localhost:5000/pay/{0}/result'.format(uuid), data=params)
+    return requests.post('{0}/pay/{1}/result'.format(_API_HOST, uuid), data=params)
 
 
 def _generate_order_id():

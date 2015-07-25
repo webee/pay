@@ -14,13 +14,13 @@
         </li>
         <li>
             <form action="{{ url_for('sample.pay_result') }}" method="POST">
-                Order No: <input type="text" name="order_no" />
+                Order No: <input type="text" name="order_no" value="{{ paid_amount }}" />
                 <input type="submit" value="Mock Pay Notification" />
             </form>
         </li>
         <li>
             <form action="{{ url_for('sample.refund_one_cent') }}" method="POST">
-                Order No: <input type="text" name="order_no" />
+                Order No: <input type="text" name="order_no" value="{{ paid_amount }}" />
                 <input type="submit" value="Refund" />
             </form>
         </li>

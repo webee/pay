@@ -5,15 +5,23 @@
     <title>Trade Sample through LianLian Pay</title>
 </head>
 <body>
+    <div> {{ execution_result }}</div>
     <ul>
         <li>
             <form action="{{ url_for('sample.pay_one_cent') }}" method="POST">
-                <input type="submit" value="Pay 0.01 Yuan" /> {{ pay_result }}
+                <input type="submit" value="Pay 0.01 Yuan" />
+            </form>
+        </li>
+        <li>
+            <form action="{{ url_for('sample.pay_result') }}" method="POST">
+                Order No: <input type="text" name="order_no" value="{{ paid_amount }}" />
+                <input type="submit" value="Mock Pay Notification" />
             </form>
         </li>
         <li>
             <form action="{{ url_for('sample.refund_one_cent') }}" method="POST">
-                <input type="submit" value="Refund 0.01 Yuan" /> {{ refund_result }}
+                Order No: <input type="text" name="order_no" value="{{ paid_amount }}" />
+                <input type="submit" value="Refund" />
             </form>
         </li>
     </ul>

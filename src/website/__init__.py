@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
+import os
 
 from flask import Flask, render_template
-from app_config import PAY_CONFIG
 from tools.filters import register_filters, register_global_functions
 
 
@@ -32,11 +32,11 @@ def register_mods(app):
     app.register_blueprint(sample_mod, url_prefix='/site/sample')
 
 
-def create_app(config_name):
-    app = Flask(__name__, template_folder='./templates')
-    app.config.from_object(PAY_CONFIG[config_name])
-    PAY_CONFIG[config_name].init_app(app)
+def create_app(env):
+    env = env.lower() if env else 'dev'
+    os.environ['ENV'] = env
 
+    app = Flask(__name__, template_folder='./templates')
     register_mods(app)
     init_template(app)
     init_errors(app)

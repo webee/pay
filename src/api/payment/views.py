@@ -45,6 +45,7 @@ def pay(uuid):
 
 
 @mod.route('/pay/<uuid>/result', methods=['POST'])
+@parse_and_verify
 def post_pay_result(uuid):
     result = _notify_payment_result(uuid, request.verified_data)
 
@@ -56,8 +57,7 @@ def post_pay_result(uuid):
         notify = notification.succeed
 
     pay_record = find_payment_by_uuid(uuid)
-    client_callback_url = pay_record['client_callback_url']
-    _post_pay_result_to_client_interface(client_callback_url, pay_record)
+    _post_pay_result_to_client_interface(pay_record)
     return notify()
 
 
@@ -81,17 +81,17 @@ def _notify_payment_result(uuid, data):
     paybill_oid = data['oid_paybill']
 
     if (not is_sending_to_me(partner_oid)) or (not is_valid_payment(order_no, uuid, amount)):
-        return notification.is_invalid()
+        return PayResult.IsInvalidRequest
 
     if not is_successful_payment(pay_result):
         fail_payment(order_no)
-        return notification.fail()
+        return PayResult.Failure
 
     succeed_payment(order_no, paybill_oid)
-    return notification.succeed()
+    return PayResult.Success
 
 
-def _post_pay_result_to_client_interface(client_callback_url, pay_record):
+def _post_pay_result_to_client_interface(pay_record):
     params = {
         'order_id': pay_record['order_id'],
         'trade_id': '',
@@ -99,9 +99,20 @@ def _post_pay_result_to_client_interface(client_callback_url, pay_record):
         'status': 'money_locked',
         'pay_type': '3rd_party_pay'
     }
-    resp = requests.post(client_callback_url, params)
-    if resp.status_code != 200:
-        data = {'url': client_callback_url, 'order_id': pay_record['order_id'], 'payment_id': pay_record['id']}
+    resp = requests.post(pay_record['client_callback_url'], params)
+    _log_post_result(resp.status_code, pay_record)
+
+
+def _log_post_result(status_code, pay_record):
+    data = {
+        'url': pay_record['client_callback_url'],
+        'order_id': pay_record['order_id'],
+        'payment_id': pay_record['id']
+    }
+    if status_code != 200:
         logger.warn("Post payment result failed: url='{url}', order_id='{order_id}', payment_id={payment_id}"
+                    .format(**data))
+    else:
+        logger.info("Posted payment result to url={url} with order_id='{order_id}' and payment_id={payment_id}"
                     .format(**data))
 

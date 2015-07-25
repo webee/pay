@@ -35,7 +35,7 @@ def find(id):
 
 
 def get_amount(id):
-    return from_db().get_scalar('SELECT amount FROM payment WHERE id = %(id)s AND success IS NULL', id=id)
+    return from_db().get_scalar('SELECT amount FROM payment WHERE id = %(id)s', id=id)
 
 
 def list_expired():

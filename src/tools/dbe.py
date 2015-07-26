@@ -60,29 +60,17 @@ def db_operate(func):
 
 
 class DatabaseInterface(object):
-    def __init__(self, conn, is_engine=False):
-        self.conn = conn
-        self.is_engine = is_engine
+    def __init__(self, conn):
+        self.conn = conn.execution_options(autocommit=True)
 
     def __eq__(self, other):
         if other is None or not isinstance(other, DatabaseInterface):
             return False
-        return self.conn == other.conn and self.is_engine == other.is_engine
-
-    @property
-    def connection(self):
-        if self.is_engine:
-            raise AttributeError('this database is engine based.')
-        return self.conn
-
-    @property
-    def engine(self):
-        if not self.is_engine:
-            raise AttributeError('this database is connection based.')
-        return self.conn
+        return self.conn == other.conn
 
     def sleep(self, duration):
-        self.conn.execute("select SLEEP(%s)", (duration,))
+        sql = "select SLEEP(%s)"
+        self.conn.execute(sql, (duration,))
 
     def has_rows(self, sql, **kwargs):
         return self.get_scalar('SELECT EXISTS ({})'.format(sql), **kwargs)
@@ -222,4 +210,4 @@ engine = create_db_engine(strategy='threadlocal')
 
 
 def from_db():
-    return DatabaseInterface(engine, is_engine=True)
+    return DatabaseInterface(engine.contextual_connect())

@@ -1,12 +1,14 @@
 # coding=utf-8
 from __future__ import unicode_literals, print_function
+import os
 
 __author__ = 'webee'
 
 import logging
 
 
-def get_logger(name='main', level=logging.DEBUG):
+def get_logger(name='main', level=None):
+    level = level if level else os.getenv('LOG_LEVEL', 'INFO')
     logger = logging.getLogger(name)
     logger.setLevel(level)
     if len(logger.handlers) > 0:

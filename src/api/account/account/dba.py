@@ -7,7 +7,7 @@ from tools.dbe import db_operate
 
 
 @db_operate
-def user_exists(db, account_id):
+def user_account_exists(db, account_id):
     return db.exists("select 1 from account where id=%(account_id)s", account_id=account_id)
 
 
@@ -32,9 +32,9 @@ def get_user_account_max_id(db, account):
 
 @db_operate
 def get_unsettled_balance(db, account_id, account, side, low_id, high_id=None):
-    debit_sign, credit_sign = get_account_side_sign(account)
     account_table = account + "_account_transaction_log"
     if side == BookkeepingSide.BOTH:
+        debit_sign, credit_sign = get_account_side_sign(account)
         if high_id is None:
             balance = db.get_scalar("""
               SELECT SUM((CASE side WHEN 'debit' THEN %(debit_sign)s WHEN 'credit' THEN %(credit_sign)s END) * amount)

@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 
 @mod.route('/<int:account_id>/balance', methods=['GET'])
 def balance(account_id):
-    if dba.user_account_exists(account_id):
+    if not dba.user_account_exists(account_id):
         return response.not_found()
 
     balance = account.get_cash_balance(account_id)

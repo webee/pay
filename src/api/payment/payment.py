@@ -36,7 +36,7 @@ def get_amount(id):
 
 def list_expired():
     return from_db().list('SELECT * FROM payment WHERE state = %(state)s AND auto_confirm_expired_on < %(expired_on)s',
-                          state=PaymentState.SUCCESS, expired_on=datetime.now()
+                          state=PaymentState.SECURED, expired_on=datetime.now()
                           )
 
 

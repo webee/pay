@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function
 
 from datetime import datetime
 
-from api.account.account import get_unsettled_balance, get_settled_balance_and_last_id
+from . import dba
 from api.account.account.dba import get_user_account_max_id
 from tools.dbe import require_transaction_context
 from tools.lock import require_user_lock, GetLockError, GetLockTimeoutError
@@ -33,11 +33,11 @@ def settle_user_account_balance(account_id, account, high_id=None):
 
 
 def _settle_user_account_side_balance(db, account_id, account, side, high_id):
-    balance_value, low_id = get_settled_balance_and_last_id(db, account_id, account, side, True)
+    balance_value, low_id = dba.get_settled_balance_and_last_id(db, account_id, account, side, True)
     if low_id >= high_id:
         return 0
 
-    unsettled_balance = get_unsettled_balance(db, account_id, account, side, low_id, high_id)
+    unsettled_balance = dba.get_unsettled_balance(db, account_id, account, side, low_id, high_id)
     new_balance = balance_value + unsettled_balance
 
     now = datetime.now()

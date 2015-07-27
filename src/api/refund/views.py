@@ -13,6 +13,36 @@ from . import refund
 log = logging.getLogger(__name__)
 
 
+@mod.route('/prepare', methods=['POST'])
+def prepare():
+    data = request.values
+    client_id = data['client_id']
+    order_no = data['order_no']
+
+    try:
+        refund.prepare(client_id, order_no)
+        return response.ok()
+    except RefundError as e:
+        return response.bad_request(e.message)
+    except Exception as e:
+        return response.bad_request(e.message)
+
+
+@mod.route('/cancel', methods=['POST'])
+def cancel():
+    data = request.values
+    client_id = data['client_id']
+    order_no = data['order_no']
+
+    try:
+        refund.cancel(client_id, order_no)
+        return response.ok()
+    except RefundError as e:
+        return response.bad_request(e.message)
+    except Exception as e:
+        return response.bad_request(e.message)
+
+
 @mod.route('/', methods=['POST'])
 def refund():
     data = request.values

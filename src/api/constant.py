@@ -40,6 +40,7 @@ class PaymentState(object):
     FAILED = 'FAILED'
     CONFIRMED = 'CONFIRMED'
     REFUNDING = 'REFUNDING'
+    REFUND_PREPARED = 'REFUND_PREPARED'
 
 
 class PayStep(object):

@@ -2,6 +2,7 @@
 
 from decimal import Decimal, InvalidOperation
 
+from contextlib import contextmanager
 from api.commons.error import AmountValueError, AmountNotPositiveError
 from api.refund.error import NoPaymentFoundError, RefundFailedError, PaymentStateMissMatchError, RefundAmountError
 from api.refund.dba import set_refund_info
@@ -14,6 +15,7 @@ from tools.lock import GetLockError, GetLockTimeoutError, require_order_lock
 from tools.mylog import get_logger
 from api.constant import PaymentState, RefundState
 from top_config import lianlian
+from api.payment import transit as payment_transit
 from . import dba
 from . import notify
 
@@ -21,25 +23,46 @@ from . import notify
 logger = get_logger(__name__)
 
 
-def apply_for_refund(client_id, order_id, amount, callback_url):
+@contextmanager
+def require_lock_payment_order(client_id, order_id):
     try:
-        with require_order_lock('{0}.{1}'.format(client_id, order_id)) as _:
-            payment_order = _get_payment_to_refund(client_id, order_id)
-            try:
-                amount_value = Decimal(amount)
-            except InvalidOperation:
-                raise AmountValueError(amount)
-            if amount_value <= 0:
-                raise AmountNotPositiveError(amount_value)
-
-            if amount_value + payment_order.refunded_amount >= payment_order.amount:
-                raise RefundAmountError(amount)
-
-            refund_order = _create_refund_freezing(payment_order, amount, callback_url)
+        with require_order_lock('{0}.{1}'.format(client_id, order_id)) as lock:
+            yield lock
     except GetLockError as e:
         raise RefundFailedError(e.message)
     except GetLockTimeoutError as e:
         raise RefundFailedError(e.message)
+
+
+def prepare(client_id, order_id):
+    with require_lock_payment_order(client_id, order_id):
+        payment_order = _get_payment_to_prepare_refund(client_id, order_id)
+
+        return payment_transit.refund_prepared(payment_order.id)
+
+
+def cancel(client_id, order_id):
+    with require_lock_payment_order(client_id, order_id):
+        payment_order = _get_payment_to_cancel_refund(client_id, order_id)
+
+        return payment_transit.refund_canceled(payment_order.id)
+
+
+def apply_for_refund(client_id, order_id, amount, callback_url):
+    with require_lock_payment_order(client_id, order_id):
+        payment_order = _get_payment_to_start_refund(client_id, order_id)
+        try:
+            amount_value = Decimal(amount)
+        except InvalidOperation:
+            raise AmountValueError(amount)
+        if amount_value <= 0:
+            raise AmountNotPositiveError(amount_value)
+
+        if amount_value + payment_order.refunded_amount >= payment_order.amount:
+            raise RefundAmountError(amount)
+
+        refund_order = _create_refund_freezing(payment_order, amount, callback_url)
+
     _request_refund(payment_order, refund_order)
 
     return refund_order.id
@@ -122,7 +145,25 @@ def _get_payment_to_refund(client_id, order_id):
     payment_order = dba.get_payment(client_id, order_id)
     if not payment_order:
         raise NoPaymentFoundError(client_id, order_id)
-    if payment_order.state == PaymentState.SECURED:
+    return payment_order
+
+
+def _get_payment_to_start_refund(client_id, order_id):
+    payment_order = _get_payment_to_start_refund(client_id, order_id)
+    if payment_order.state != PaymentState.REFUND_PREPARED:
         raise PaymentStateMissMatchError()
     return payment_order
 
+
+def _get_payment_to_prepare_refund(client_id, order_id):
+    payment_order = _get_payment_to_refund(client_id, order_id)
+    if payment_order.state != PaymentState.SECURED:
+        raise PaymentStateMissMatchError()
+    return payment_order
+
+
+def _get_payment_to_cancel_refund(client_id, order_id):
+    payment_order = _get_payment_to_refund(client_id, order_id)
+    if payment_order.state != PaymentState.REFUND_PREPARED:
+        raise PaymentStateMissMatchError()
+    return payment_order

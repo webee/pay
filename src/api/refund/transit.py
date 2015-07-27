@@ -7,8 +7,8 @@ from . import event
 
 
 @db_transactional
-def refund_frozen(db, payment_order, refund_order):
-    if payment_transit.refund_started(db, payment_order.id, payment_order.state):
+def refund_frozen(db, refund_order):
+    if payment_transit.refund_started(db, refund_order.payment_id):
         if dba.transit_state(db, refund_order.id, RefundState.FROZEN, RefundState.FROZEN):
             return event.frozen(refund_order.payee_acount_id, refund_order.id, refund_order.amount)
 

@@ -5,9 +5,18 @@ from tools.dbe import db_transactional
 
 
 @db_transactional
-def refund_started(db, id, state):
-    # state -> [SECURED, REFUNDED, REFUND_FAILED]
-    return dba.transit_state(db, id, state, PaymentState.REFUNDING)
+def refund_prepared(db, id):
+    return dba.transit_state(db, id, PaymentState.SECURED, PaymentState.REFUND_PREPARED)
+
+
+@db_transactional
+def refund_canceled(db, id):
+    return dba.transit_state(db, id, PaymentState.REFUND_PREPARED, PaymentState.SECURED)
+
+
+@db_transactional
+def refund_started(db, id):
+    return dba.transit_state(db, id, PaymentState.REFUND_PREPARED, PaymentState.REFUNDING)
 
 
 @db_transactional

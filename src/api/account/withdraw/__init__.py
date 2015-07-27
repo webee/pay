@@ -60,8 +60,23 @@ def handle_withdraw_notify(withdraw_id, data):
     return notification.refused()
 
 
-def query_withdraw(account_id, withdraw_id):
-    return dba.query_withdraw_order(account_id, withdraw_id)
+def query_order_to_update_state(account_id, withdraw_id):
+    withdraw_order = dba.get_account_withdraw(account_id, withdraw_id)
+    if withdraw_order is None or withdraw_order.state != WithdrawState.FROZEN:
+        return withdraw_order
+
+    try:
+        data = transaction.query_withdraw_order(withdraw_id)
+    except ApiError:
+        return withdraw_order
+
+    paybill_id = data['oid_paybill']
+    failure_info = data.get('info_order', '')
+    result = data['result_pay']
+    if _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
+        notify.try_notify_client(withdraw_id)
+        return dba.get_withdraw(withdraw_id)
+    return withdraw_order
 
 
 @db_transactional
@@ -97,14 +112,13 @@ def _process_request_failed(withdraw_id):
 
 @transactional
 def _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
-    dba.set_withdraw_info(withdraw_id, paybill_id, failure_info)
-
-    # process withdraw result.
-    if result == lianlian.PayToBankcard.Result.FAILURE:
-        transit.withdraw_failed(withdraw_id)
-    elif result == lianlian.PayToBankcard.Result.SUCCESS:
-        transit.withdraw_success(withdraw_id)
-    else:
-        logger.warn("withdraw notify result: [{0}], id=[{1}]".format(result, withdraw_id))
-        return False
-    return True
+    if dba.set_withdraw_info(withdraw_id, paybill_id, failure_info):
+        # process withdraw result.
+        if result == lianlian.PayToBankcard.Result.FAILURE:
+            transit.withdraw_failed(withdraw_id)
+        elif result == lianlian.PayToBankcard.Result.SUCCESS:
+            transit.withdraw_success(withdraw_id)
+        else:
+            logger.warn("withdraw notify result: [{0}], id=[{1}]".format(result, withdraw_id))
+            return False
+        return True

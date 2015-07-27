@@ -47,8 +47,8 @@ def refund(refund_id, refunded_on, amount, paybill_id):
     return _refund(refund_id, refunded_on, amount, paybill_id)
 
 
-def query_order():
-    return _query_order()
+def query_withdraw_order(withdraw_id):
+    return _query_order(withdraw_id, dt_order='', oid_paybill='', type_dc=config.Order.TypeDC.WITHDRAW)
 
 
 def is_sending_to_me(partner_id):

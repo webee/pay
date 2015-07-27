@@ -11,9 +11,9 @@ def get_withdraw(db, withdraw_id):
 
 
 @db_operate
-def query_withdraw_order(db, account_id, order_id):
-    return db.get("select * from withdraw where id=%(id)s and account_id=%(account_id)s",
-                  id=order_id, account_id=account_id)
+def get_account_withdraw(db, account_id, withdraw_id):
+    return db.get("select * from withdraw where account_id=%(account_id)s, id=%(id)s",
+                  account_id=account_id, id=withdraw_id)
 
 
 @db_operate
@@ -30,8 +30,9 @@ def set_withdraw_info(db, refund_id, paybill_id, failure_info):
     return db.execute("""
             UPDATE withdraw
                 SET paybill_id=%(paybill_id)s, failure_info=%(failure_info)s, updated_on=%(updated_on)
-                WHERE id=%(id)s
-        """, id=refund_id, paybill_id=paybill_id, failure_info=failure_info, updated_on=datetime.now()) > 0
+                WHERE id=%(id)s AND state=%(state)s
+        """, id=refund_id, state=WithdrawState.FROZEN,
+                      paybill_id=paybill_id, failure_info=failure_info, updated_on=datetime.now()) > 0
 
 
 def create_withdraw(db, account_id, bankcard_id, amount, callback_url):

@@ -51,6 +51,11 @@ class PayToBankcard:
 
 class Order:
     URL = "https://yintong.com.cn/traderapi/orderquery.htm"
+    QUERY_VERSION = "1.1"
+
+    class TypeDC:
+        PAY = "0"
+        WITHDRAW = "1"
 
 
 class Refund:

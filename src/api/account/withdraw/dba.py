@@ -12,7 +12,7 @@ def get_withdraw(db, withdraw_id):
 
 @db_operate
 def get_account_withdraw(db, account_id, withdraw_id):
-    return db.get("select * from withdraw where account_id=%(account_id)s, id=%(id)s",
+    return db.get("select * from withdraw where account_id=%(account_id)s and id=%(id)s",
                   account_id=account_id, id=withdraw_id)
 
 

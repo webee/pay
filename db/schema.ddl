@@ -75,6 +75,7 @@ CREATE TABLE withdraw(
   state ENUM('FROZEN', 'SUCCESS', 'FAILED') NOT NULL DEFAULT 'FROZEN',
 
   paybill_id VARCHAR(18) COMMENT '第三方交易订单id',
+  result VARCHAR(32),
   failure_info VARCHAR(255) COMMENT '提现失败原因',
   updated_on TIMESTAMP,
 

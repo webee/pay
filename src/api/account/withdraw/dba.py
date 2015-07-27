@@ -26,12 +26,12 @@ def transit_state(db, id, pre_state, new_state):
 
 
 @db_operate
-def set_withdraw_info(db, refund_id, paybill_id, failure_info):
+def set_withdraw_info(db, refund_id, paybill_id, result, failure_info):
     return db.execute("""
             UPDATE withdraw
-                SET paybill_id=%(paybill_id)s, failure_info=%(failure_info)s, updated_on=%(updated_on)s
+                SET paybill_id=%(paybill_id)s, result=%(result)s, failure_info=%(failure_info)s, updated_on=%(updated_on)s
                 WHERE id=%(id)s AND state=%(state)s
-        """, id=refund_id, state=WithdrawState.FROZEN,
+        """, id=refund_id, state=WithdrawState.FROZEN, result=result,
                       paybill_id=paybill_id, failure_info=failure_info, updated_on=datetime.now()) > 0
 
 

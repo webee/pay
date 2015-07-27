@@ -112,7 +112,7 @@ def _process_request_failed(withdraw_id):
 
 @transactional
 def _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
-    if dba.set_withdraw_info(withdraw_id, paybill_id, failure_info):
+    if dba.set_withdraw_info(withdraw_id, paybill_id, result, failure_info):
         # process withdraw result.
         if result == lianlian.PayToBankcard.Result.FAILURE:
             transit.withdraw_failed(withdraw_id)

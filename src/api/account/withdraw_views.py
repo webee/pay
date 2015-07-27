@@ -2,10 +2,11 @@
 from __future__ import unicode_literals, print_function, division
 
 from flask import request
+
 from . import account_mod as mod
 from api.account.error import NoBankcardFoundError, InsufficientBalanceError
 from api.commons.error import AmountError
-from .withdraw import WithdrawRequestFailedError, WithdrawError
+from .withdraw.error import WithdrawError, WithdrawRequestFailedError
 from . import withdraw
 from api.util import response
 from api.util.ipay.transaction import notification
@@ -16,7 +17,7 @@ logger = get_logger(__name__)
 
 
 @mod.route('/<int:account_id>/withdraw', methods=['POST'])
-def withdraw(account_id):
+def apply_for_withdraw(account_id):
     req_data = request.values
     bankcard_id = req_data.get('bankcard_id')
     callback_url = req_data.get('callback_url')

@@ -44,7 +44,7 @@ def cancel():
 
 
 @mod.route('/', methods=['POST'])
-def refund():
+def apply_for_refund():
     data = request.values
     client_id = data['client_id']
     order_no = data['order_no']

@@ -12,7 +12,7 @@ class WithdrawError(Exception):
 
 
 class WithdrawRequestFailedError(WithdrawError):
-    def __init__(self, withdraw_id):
-        message = "request withdraw failed: [{0}].".format(withdraw_id)
+    def __init__(self, withdraw_id, msg):
+        message = "request withdraw failed: [{0}] [{1}].".format(withdraw_id, msg)
         super(WithdrawRequestFailedError, self).__init__(message)
         self.withdraw_id = withdraw_id

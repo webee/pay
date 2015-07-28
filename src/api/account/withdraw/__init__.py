@@ -100,9 +100,9 @@ def _request_withdraw(withdraw_id, amount, bankcard):
     order_info = "自游通提现"
     try:
         _ = transaction.pay_to_bankcard(withdraw_id, amount, order_info, bankcard)
-    except ApiError:
+    except ApiError as e:
         _process_request_failed(withdraw_id)
-        raise WithdrawRequestFailedError(withdraw_id)
+        raise WithdrawRequestFailedError(withdraw_id, e.message)
 
 
 @transactional

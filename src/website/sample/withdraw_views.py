@@ -39,7 +39,7 @@ def withdraw_callback(account_id):
     logger.info('withdraw callback account_id={0}'.format(account_id))
     logger.info(json.dumps(data))
 
-    return jsonify(ret=0)
+    return jsonify(code=0)
 
 
 @mod.route('/accounts/<int:account_id>/cash_balance', methods=['GET'])

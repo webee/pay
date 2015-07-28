@@ -47,7 +47,7 @@ def withdraw_notify(url, params, next_time, count=1):
 
 @app.task(ignore_result=True, queue='refund_notify', routing_key='refund_notify')
 def refund_notify(url, params, next_time, count=1):
-    from api.refund.notify import notify_client
+    from api.commons.notify import notify_client
     do_notify_client(refund_notify, notify_client, url, params, next_time, count)
 
 

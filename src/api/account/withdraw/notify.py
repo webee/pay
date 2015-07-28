@@ -1,5 +1,6 @@
 # coding=utf-8
 from api.account.withdraw import dba
+from api.commons.notify import notify_client
 from api.constant import WithdrawState
 
 
@@ -17,13 +18,3 @@ def try_notify_client(withdraw_id):
     if not notify_client(url, params):
         # other notify process.
         pay_tasks.withdraw_notify.delay(url, params)
-
-
-def notify_client(url, params):
-    import requests
-
-    req = requests.post(url, params)
-    if req.status_code == 200:
-        data = req.json()
-        if data['code'] == 0:
-            return True

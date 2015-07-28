@@ -1,4 +1,6 @@
 # coding=utf-8
+import decimal
+
 
 def format_string(text):
     return "" if not text else text.strip()
@@ -16,3 +18,7 @@ def to_float(n, default=0):
         return float(n)
     except:
         return default
+
+
+def to_decimal(float_price):
+    return decimal.Decimal('%.2f' % float_price)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 from __future__ import unicode_literals, print_function
+from decimal import Decimal
 
 import os
 
@@ -51,7 +52,7 @@ def confirm_to_pay_all():
 
 
 @manager.option('-i', '--id', type=long, dest="account_id", required=True)
-@manager.option('-a', '--amount', type=float, dest="amount", required=True)
+@manager.option('-a', '--amount', type=Decimal, dest="amount", required=True)
 def test_prepaid(account_id, amount):
     """ 充值
     :param account_id:
@@ -68,7 +69,7 @@ def test_prepaid(account_id, amount):
 
 
 @manager.option('-i', '--id', type=long, dest="account_id", required=True)
-@manager.option('-a', '--amount', type=float, dest="amount", required=True)
+@manager.option('-a', '--amount', type=Decimal, dest="amount", required=True)
 def test_withdraw(account_id, amount):
     """ 直接提现
     :param account_id:
@@ -93,7 +94,7 @@ def test_withdraw(account_id, amount):
 
 @manager.option('-f', '--from', type=long, dest="from_id", required=True)
 @manager.option('-t', '--to', type=long, dest="to_id", required=True)
-@manager.option('-a', '--amount', type=float, dest="amount", required=True)
+@manager.option('-a', '--amount', type=Decimal, dest="amount", required=True)
 def test_transfer(from_id, to_id, amount):
     class AmountNotPositiveError(Exception):
         def __init__(self, amount):

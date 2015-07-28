@@ -12,16 +12,16 @@ def list_all_expired_payments():
 
 
 @transactional
-def confirm_payment(pay_record):
+def confirm_payment(payment_id):
+    pay_record = payment.find(payment_id)
     payment_id = pay_record['id']
     account_id = pay_record['payee_account_id']
     amount = pay_record['amount']
 
-    api.payment.transit.confirm(payment_id)
-    _charge_from_frozen_account_to_business(payment_id, account_id, amount)
-    _charge_from_business_account_to_cash(payment_id, account_id, amount)
-
-    return payment_id
+    if api.payment.transit.confirm(payment_id):
+        _charge_from_frozen_account_to_business(payment_id, account_id, amount)
+        _charge_from_business_account_to_cash(payment_id, account_id, amount)
+        return payment_id
 
 
 def _charge_from_frozen_account_to_business(payment_id, account_id, amount):

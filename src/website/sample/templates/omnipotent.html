@@ -9,6 +9,7 @@
     <ul>
         <li>
             <form action="{{ url_for('sample.pay_one_cent') }}" method="POST">
+                Amount: <input type="text" name="amount" value="0.01" />
                 <input type="submit" value="Pay 0.01 Yuan" />
             </form>
         </li>

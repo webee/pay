@@ -18,7 +18,8 @@ def index():
 
 @mod.route('/pay-one-cent', methods=['POST'])
 def pay_one_cent():
-    resp = pay(0.01)
+    amount = request.values.get('amount', 0.01)
+    resp = pay(amount)
     if resp.status_code == 200:
         content = resp.json()
         return redirect(content['pay_url'])

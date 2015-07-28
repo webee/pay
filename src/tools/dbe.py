@@ -60,8 +60,8 @@ def db_operate(func):
 
 
 class DatabaseInterface(object):
-    def __init__(self, conn):
-        self.conn = conn.execution_options(autocommit=True)
+    def __init__(self, conn=None):
+        self.conn = conn
 
     def __eq__(self, other):
         if other is None or not isinstance(other, DatabaseInterface):
@@ -70,14 +70,21 @@ class DatabaseInterface(object):
 
     def sleep(self, duration):
         sql = "select SLEEP(%s)"
-        self.conn.execute(sql, (duration,))
+        self._execute(sql, (duration,))
 
     def has_rows(self, sql, **kwargs):
         return self.get_scalar('SELECT EXISTS ({})'.format(sql), **kwargs)
 
+    def _execute(self, *args, **kwargs):
+        if self.conn is None:
+            with engine.contextual_connect() as conn:
+                return conn.execution_options(autocommit=True).execute(*args, **kwargs)
+        else:
+            return self.conn.execution_options(autocommit=True).execute(*args, **kwargs)
+
     def executemany(self, sql, seq_of_parameters):
         try:
-            res = self.conn.execute(sql, seq_of_parameters)
+            res = self._execute(sql, seq_of_parameters)
         except:
             LOGGER.exception(
                 'failed to executemany statement: sql is %(sql)s and seq_of_parameters are %(seq_of_parameters)s', {
@@ -89,7 +96,7 @@ class DatabaseInterface(object):
 
     def execute(self, sql, *args, **kwargs):
         try:
-            res = self.conn.execute(sql, args or kwargs)
+            res = self._execute(sql, args or kwargs)
         except:
             LOGGER.exception('failed to execute statement: sql is %(sql)s and args are %(args)s', {
                 'sql': sql,
@@ -168,7 +175,7 @@ class DatabaseInterface(object):
         sql = ''.join(fragments)
 
         try:
-            res = self.conn.execute(sql, fields)
+            res = self._execute(sql, fields)
         except:
             LOGGER.exception('failed to execute query: sql is %(sql)s and args are %(args)s', {
                 'sql': sql,
@@ -182,7 +189,7 @@ class DatabaseInterface(object):
 
     def _query(self, sql, *args, **kwargs):
         try:
-            res = self.conn.execute(sql, args or kwargs)
+            res = self._execute(sql, args or kwargs)
         except:
             LOGGER.exception('failed to execute query: sql is %(sql)s and args are %(args)s', {
                 'sql': sql,
@@ -210,4 +217,4 @@ engine = create_db_engine(strategy='threadlocal')
 
 
 def from_db():
-    return DatabaseInterface(engine.contextual_connect())
+    return DatabaseInterface()

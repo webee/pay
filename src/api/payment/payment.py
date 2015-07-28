@@ -49,7 +49,7 @@ def succeed(id, paybill_id):
                   auto_confirm_expired_on=%(expired_on)s
               WHERE id = %(id)s
         """,
-        id=id, new_state=PaymentState.SUCCESS, paybill_id=paybill_id, ended_on=now, expired_on=_few_days_later(now, 3))
+        id=id, new_state=PaymentState.SECURED, paybill_id=paybill_id, ended_on=now, expired_on=_few_days_later(now, 3))
 
 
 def fail(id):

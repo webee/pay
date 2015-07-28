@@ -36,14 +36,15 @@ def apply_for_withdraw(account_id, bankcard_id, amount, callback_url):
         raise AmountNotPositiveError(amount_value)
 
     withdraw_id = _create_withdraw_freezing(account_id, bankcard.id, amount_value, callback_url)
-    _request_withdraw(withdraw_id, amount, bankcard)
+    notify_url = transaction.generate_withdraw_notify_url(account_id, withdraw_id)
+    _request_withdraw(withdraw_id, amount, bankcard, notify_url)
 
     return withdraw_id
 
 
-def handle_withdraw_notify(withdraw_id, data):
+def handle_withdraw_notify(account_id, withdraw_id, data):
     amount = Decimal(data['money_order'])
-    withdraw_order = dba.get_withdraw(withdraw_id)
+    withdraw_order = dba.get_account_withdraw(account_id, withdraw_id)
     if withdraw_order is None:
         return notification.is_invalid()
     elif withdraw_order.state != WithdrawState.FROZEN:
@@ -96,10 +97,10 @@ def _create_withdraw_freezing(db, account_id, bankcard_id, amount, callback_url)
         raise WithdrawError(e.message)
 
 
-def _request_withdraw(withdraw_id, amount, bankcard):
+def _request_withdraw(withdraw_id, amount, bankcard, notify_url):
     order_info = "自游通提现"
     try:
-        _ = transaction.pay_to_bankcard(withdraw_id, amount, order_info, bankcard)
+        _ = transaction.pay_to_bankcard(withdraw_id, amount, order_info, bankcard, notify_url)
     except ApiError as e:
         _process_request_failed(withdraw_id)
         raise WithdrawRequestFailedError(withdraw_id, e.message)

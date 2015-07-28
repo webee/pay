@@ -14,8 +14,9 @@ def now_to_str():
     return datetime_to_str(datetime.now())
 
 
-def generate_url(relative_url, id):
+def generate_url(relative_url, id, **kwargs):
     params = {'uuid': encode_uuid(id)}
+    params.update(kwargs)
     relative_url = relative_url.format(**params)
     root_url = api_config.ROOT_URL
     return urljoin(root_url, relative_url)

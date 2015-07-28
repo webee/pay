@@ -40,9 +40,9 @@ def apply_for_withdraw(account_id):
         return response.bad_request(e.message)
 
 
-@mod.route('/withdraw/<uuid>/notify', methods=['POST'])
+@mod.route('/<int:account_id>/withdraw/<uuid>/notify', methods=['POST'])
 @parse_and_verify
-def notify_withdraw(uuid):
+def notify_withdraw(account_id, uuid):
     data = request.verified_data
 
     oid_partner = data['oid_partner']
@@ -50,7 +50,7 @@ def notify_withdraw(uuid):
     if not is_valid_transaction(oid_partner, withdraw_id, uuid):
         return notification.is_invalid()
 
-    return withdraw.handle_withdraw_notify(withdraw_id, data)
+    return withdraw.handle_withdraw_notify(account_id, withdraw_id, data)
 
 
 @mod.route('/<int:account_id>/withdraw/<withdraw_id>', methods=['GET'])

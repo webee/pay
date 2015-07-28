@@ -26,4 +26,4 @@ def refund_ended(db, id, amount):
 
 
 def confirm(id):
-    return dba.transit_state(id, PaymentState.SUCCESS, PaymentState.CONFIRMED)
+    return dba.transit_state(id, PaymentState.SECURED, PaymentState.CONFIRMED)

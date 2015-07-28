@@ -79,11 +79,11 @@ def test_withdraw(account_id, amount):
     from tools.dbe import require_transaction_context
     from api.constant import SourceType, PrepaidStep
     from api.util.bookkeeping import Event, bookkeeping
-    from api.account.withdraw import require_user_account_lock
+    from api.account.withdraw import require_lock_user_account
     from api.account.account import get_cash_balance
     from api.account.error import InsufficientBalanceError
 
-    with require_user_account_lock(account_id, 'cash'):
+    with require_lock_user_account(account_id, 'cash'):
         with require_transaction_context():
             balance = get_cash_balance(account_id)
             if amount > balance:
@@ -117,7 +117,7 @@ def test_transfer(from_id, to_id, amount):
     from api.constant import SourceType, TransferStep
     from api.util.bookkeeping import Event, bookkeeping
 
-    if amount <= 0:
+    if amount <= Decimal('0'):
         raise AmountNotPositiveError(amount)
 
     try:

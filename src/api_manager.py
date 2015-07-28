@@ -53,6 +53,11 @@ def confirm_to_pay_all():
 @manager.option('-i', '--id', type=long, dest="account_id", required=True)
 @manager.option('-a', '--amount', type=float, dest="amount", required=True)
 def test_prepaid(account_id, amount):
+    """ 充值
+    :param account_id:
+    :param amount:
+    :return:
+    """
     from tools.dbe import require_transaction_context
     from api.constant import SourceType, PrepaidStep
     from api.util.bookkeeping import Event, bookkeeping
@@ -60,6 +65,30 @@ def test_prepaid(account_id, amount):
     with require_transaction_context():
         bookkeeping(Event(account_id, SourceType.PREPAID, PrepaidStep.SUCCESS, "", amount),
                     '+asset', '+cash')
+
+
+@manager.option('-i', '--id', type=long, dest="account_id", required=True)
+@manager.option('-a', '--amount', type=float, dest="amount", required=True)
+def test_withdraw(account_id, amount):
+    """ 直接提现
+    :param account_id:
+    :param amount:
+    :return:
+    """
+    from tools.dbe import require_transaction_context
+    from api.constant import SourceType, PrepaidStep
+    from api.util.bookkeeping import Event, bookkeeping
+    from api.account.withdraw import require_user_account_lock
+    from api.account.account import get_cash_balance
+    from api.account.error import InsufficientBalanceError
+
+    with require_user_account_lock(account_id, 'cash'):
+        with require_transaction_context():
+            balance = get_cash_balance(account_id)
+            if amount > balance:
+                raise InsufficientBalanceError()
+            bookkeeping(Event(account_id, SourceType.WITHDRAW, PrepaidStep.SUCCESS, "", amount),
+                        '-cash', '-asset')
 
 
 @manager.option('-f', '--from', type=long, dest="from_id", required=True)

@@ -1,5 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals
+from contextlib import contextmanager
 from decimal import Decimal, InvalidOperation
 
 from api.account.withdraw import notify
@@ -20,6 +21,17 @@ from tools.mylog import get_logger
 from top_config import lianlian
 
 logger = get_logger(__name__)
+
+
+@contextmanager
+def require_lock_user_account(account_id, account):
+    try:
+        with require_user_account_lock(account_id, account) as lock:
+            yield lock
+    except GetLockError as e:
+        raise WithdrawError(e.message)
+    except GetLockTimeoutError as e:
+        raise WithdrawError(e.message)
 
 
 def apply_for_withdraw(account_id, bankcard_id, amount, callback_url):
@@ -82,19 +94,14 @@ def query_order_to_update_state(account_id, withdraw_id):
 
 @db_transactional
 def _create_withdraw_freezing(db, account_id, bankcard_id, amount, callback_url):
-    try:
-        with require_user_account_lock(account_id, 'cash') as _:
-            balance = account.get_cash_balance(account_id)
-            if amount > balance:
-                raise InsufficientBalanceError()
-            withdraw_id = dba.create_withdraw(db, account_id, bankcard_id, amount, callback_url)
-            transit.withdraw_frozen(withdraw_id)
+    with require_user_account_lock(account_id, 'cash'):
+        balance = account.get_cash_balance(account_id)
+        if amount > balance:
+            raise InsufficientBalanceError()
+        withdraw_id = dba.create_withdraw(db, account_id, bankcard_id, amount, callback_url)
+        transit.withdraw_frozen(withdraw_id)
 
-            return withdraw_id
-    except GetLockError as e:
-        raise WithdrawError(e.message)
-    except GetLockTimeoutError as e:
-        raise WithdrawError(e.message)
+        return withdraw_id
 
 
 def _request_withdraw(withdraw_id, amount, bankcard, notify_url):

@@ -11,9 +11,9 @@ log = logging.getLogger(__name__)
 
 
 @mod.route('/<int:client_id>/users/<user_id>/account', methods=['GET'])
-def get_account(client_id, user_id):
+def get_account_info(client_id, user_id):
     account = get_account(client_id, user_id)
     if not account:
-        response.not_found({'client_id':client_id, 'user_id':user_id})
+        response.not_found({'client_id': client_id, 'user_id': user_id})
 
     return response.ok(account_id=account['id'])

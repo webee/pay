@@ -9,7 +9,7 @@ from .pay import pay_by_uuid, PaymentNotFoundError
 from .postpay import *
 from api.util.enum import enum
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
-from flask import jsonify, request, Response, render_template
+from flask import jsonify, request, Response, render_template, stream_with_context
 import requests
 
 logger = logging.getLogger(__name__)
@@ -50,15 +50,12 @@ def post_pay_result(uuid):
     result = _notify_payment_result(uuid, request.verified_data)
 
     if result == PayResult.IsInvalidRequest:
-        notify = notification.is_invalid
+        return notification.is_invalid
     elif result == PayResult.Failure:
-        notify = notification.fail
+        return notification.fail
     else:
-        notify = notification.succeed
-
-    pay_record = find_payment_by_uuid(uuid)
-    _post_pay_result_to_client_interface(pay_record)
-    return notify()
+        pay_record = find_payment_by_uuid(uuid)
+        return _post_pay_result_to_client_interface(pay_record)
 
 
 @mod.route('/pay/<uuid>/notify', methods=['POST'])
@@ -99,20 +96,6 @@ def _post_pay_result_to_client_interface(pay_record):
         'status': 'money_locked',
         'pay_type': '3rd_party_pay'
     }
-    resp = requests.post(pay_record['client_callback_url'], params)
-    _log_post_result(resp.status_code, pay_record)
-
-
-def _log_post_result(status_code, pay_record):
-    data = {
-        'url': pay_record['client_callback_url'],
-        'order_id': pay_record['order_id'],
-        'payment_id': pay_record['id']
-    }
-    if status_code != 200:
-        logger.warn("Post payment result failed: url='{url}', order_id='{order_id}', payment_id={payment_id}"
-                    .format(**data))
-    else:
-        logger.info("Posted payment result to url={url} with order_id='{order_id}' and payment_id={payment_id}"
-                    .format(**data))
+    req = requests.post(pay_record['client_callback_url'], params)
+    return Response(stream_with_context(req.iter_content()), content_type=req.headers['content-type'])
 

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
-import logging
 from decimal import Decimal
+from flask import jsonify, request, Response, render_template
+import logging
+import requests
 
 from . import pay_mod as mod
 from .prepay import Order, generate_prepay_transaction
@@ -9,8 +11,6 @@ from .pay import pay_by_uuid, PaymentNotFoundError
 from .postpay import *
 from api.util.enum import enum
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
-from flask import jsonify, request, Response, render_template, stream_with_context
-import requests
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +96,6 @@ def _post_pay_result_to_client_interface(pay_record):
         'status': 'money_locked',
         'pay_type': '3rd_party_pay'
     }
-    req = requests.post(pay_record['client_callback_url'], params)
-    return Response(stream_with_context(req.iter_content()), content_type=req.headers['content-type'])
+    resp = requests.post(pay_record['client_callback_url'], params, allow_redirects=False)
+    return resp.text, resp.status_code, resp.headers.items()
 

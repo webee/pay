@@ -82,3 +82,8 @@ def get_settled_balance_and_last_id(db, account_id, account, side, create=False)
         balance_value = balance.balance
         last_transaction_log_id = balance.last_transaction_log_id
     return balance_value, last_transaction_log_id
+
+
+@db_operate
+def get_account(db, client_id, user_id):
+    return db.get('SELECT * FROM account WHERE client_id=%(client_id)s AND user_id=%(user_id)s', client_id=client_id, user_id=user_id)

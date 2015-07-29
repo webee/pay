@@ -16,4 +16,6 @@ def get_account_info(client_id, user_id):
     if not account:
         response.not_found({'client_id': client_id, 'user_id': user_id})
 
-    return response.ok(account_id=account['id'])
+    account_id = account['id']
+    balance = account.get_cash_balance(account_id)
+    return response.ok(account_id=account_id, balance=balance)

@@ -178,4 +178,32 @@ WEIXIN-PREPAID: 微信充值
 之后对微信来源的资金结算之后，提现，充值到连连，就完成了整个资金的转移了。
 
 
+## 接口说明
+### 提现相关
+#### 提现接口
+|接口|提现|
+|:---|:---|
+|url|http://pay.lvye.com/accounts/\account_id\/withdraw|
+|method|POST|
+|params:||
+|*bankcard_id*|绑定银行卡id|
+|*amount*|金额|
+|*callback_url*|回调地址|
+|ret:||
+|*id*|提现订单id|
+
+#### 提现结果回调
+|回调|提现结果|
+|:---|:---|
+|method|POST|
+|params:||
+```
+1. SUCCESS
+{'code': 0, 'account_id': account_id, 'order_id': withdraw_id, 'amount': amount}
+
+2. FAILED
+{'code': 1, 'msg': 'failed', 'account_id': account_id, 'order_id': withdraw_id, 'amount': amount}
+```
+
+
 Copyright (c) 2015 Copyright lvye.com All Rights Reserved.

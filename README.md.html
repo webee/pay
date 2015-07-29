@@ -89,8 +89,8 @@
 .markdown-preview dl dd > :last-child, .markdown-preview[data-use-github-style] dl dd > :last-child { margin-bottom: 0px; }
 .markdown-preview blockquote p, .markdown-preview[data-use-github-style] blockquote p { font-size: 16px; line-height: 1.5; }
 .markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { padding: 16px; overflow: auto; font-size: 84%; line-height: 1.45; border-radius: 3px; background-color: rgb(40, 44, 52); }
-.markdown-preview pre, .markdown-preview[data-use-github-style] pre, .markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { margin-bottom: 16px; word-break: normal; }
-.markdown-preview pre, .markdown-preview[data-use-github-style] pre, .markdown-preview code, .markdown-preview[data-use-github-style] code, .markdown-preview tt, .markdown-preview[data-use-github-style] tt, .markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { font-family: Consolas, 'Liberation Mono', Courier, monospace; }
+.markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { margin-bottom: 16px; word-break: normal; }
+.markdown-preview code, .markdown-preview[data-use-github-style] code, .markdown-preview tt, .markdown-preview[data-use-github-style] tt, .markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { font-family: Consolas, 'Liberation Mono', Courier, monospace; }
 .markdown-preview .emoji, .markdown-preview[data-use-github-style] .emoji { height: 20px; width: 20px; }
 .markdown-preview, .markdown-preview[data-use-github-style] { font-family: 'Helvetica Neue', Helvetica, 'Segoe UI', Arial, freesans, sans-serif; font-size: 16px; line-height: 1.6; word-wrap: break-word; overflow: scroll; box-sizing: border-box; padding: 20px; background-color: rgb(255, 255, 255); }
 .markdown-preview > :first-child, .markdown-preview[data-use-github-style] > :first-child { margin-top: 0px !important; }
@@ -178,8 +178,8 @@
 .markdown-preview dl dd > :last-child, .markdown-preview[data-use-github-style] dl dd > :last-child { margin-bottom: 0px; }
 .markdown-preview blockquote p, .markdown-preview[data-use-github-style] blockquote p { font-size: 16px; line-height: 1.5; }
 .markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { padding: 16px; overflow: auto; font-size: 84%; line-height: 1.45; border-radius: 3px; background-color: rgb(40, 44, 52); }
-.markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { margin-bottom: 16px; word-break: normal; }
-.markdown-preview code, .markdown-preview[data-use-github-style] code, .markdown-preview tt, .markdown-preview[data-use-github-style] tt, .markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { font-family: Consolas, 'Liberation Mono', Courier, monospace; }
+.markdown-preview pre, .markdown-preview[data-use-github-style] pre, .markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { margin-bottom: 16px; word-break: normal; }
+.markdown-preview pre, .markdown-preview[data-use-github-style] pre, .markdown-preview code, .markdown-preview[data-use-github-style] code, .markdown-preview tt, .markdown-preview[data-use-github-style] tt, .markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { font-family: Consolas, 'Liberation Mono', Courier, monospace; }
 .markdown-preview .emoji, .markdown-preview[data-use-github-style] .emoji { height: 20px; width: 20px; }
 .markdown-preview { font-size: 1.25em; color: rgb(200, 204, 213); background-color: rgb(47, 51, 61); }
 .markdown-preview h1, .markdown-preview h2 { color: inherit; border-color: rgb(24, 26, 31); }
@@ -1164,5 +1164,68 @@ pre.editor-colors .fold-marker:after,
 <p>我们提现全部在连连账户进行，上面流程说明通过连连支付/充值了200，通过微信支付/充值了100, 一共是300元现金可提现，然后提现250,
 由于此时连连账户只进行了200，不够提现，因此我们需要事先在连连账户中充值了10000元作为资金缓冲用。
 之后对微信来源的资金结算之后，提现，充值到连连，就完成了整个资金的转移了。</p>
-<p>Copyright (c) 2015 Copyright lvye.com All Rights Reserved.</p></body>
+<h2 id="-">接口说明</h2>
+<h3 id="-">提现相关</h3>
+<h4 id="-">提现接口</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">接口</th>
+<th style="text-align:left">提现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">url</td>
+<td style="text-align:left"><a href="http://pay.lvye.com/accounts/\account_id\/withdraw">http://pay.lvye.com/accounts/\account_id\/withdraw</a></td>
+</tr>
+<tr>
+<td style="text-align:left">method</td>
+<td style="text-align:left">POST</td>
+</tr>
+<tr>
+<td style="text-align:left">params:</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><em>bankcard_id</em></td>
+<td style="text-align:left">绑定银行卡id</td>
+</tr>
+<tr>
+<td style="text-align:left"><em>amount</em></td>
+<td style="text-align:left">金额</td>
+</tr>
+<tr>
+<td style="text-align:left"><em>callback_url</em></td>
+<td style="text-align:left">回调地址</td>
+</tr>
+<tr>
+<td style="text-align:left">ret:</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left"><em>id</em></td>
+<td style="text-align:left">提现订单id</td>
+</tr>
+</tbody>
+</table>
+<h4 id="-">提现结果回调</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">回调</th>
+<th style="text-align:left">提现结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">method</td>
+<td style="text-align:left">POST</td>
+</tr>
+<tr>
+<td style="text-align:left">params:</td>
+</tr>
+</tbody>
+</table>
+<pre class="editor-colors lang-text"><div class="line"><span class="text plain"><span class="meta paragraph text"><span>1.&nbsp;SUCCESS</span></span></span></div><div class="line"><span class="text plain"><span class="meta paragraph text"><span>{&#39;code&#39;:&nbsp;0,&nbsp;&#39;account_id&#39;:&nbsp;account_id,&nbsp;&#39;order_id&#39;:&nbsp;withdraw_id,&nbsp;&#39;amount&#39;:&nbsp;amount}</span></span></span></div><div class="line"><span class="text plain"><span>&nbsp;</span></span></div><div class="line"><span class="text plain"><span class="meta paragraph text"><span>2.&nbsp;FAILED</span></span></span></div><div class="line"><span class="text plain"><span class="meta paragraph text"><span>{&#39;code&#39;:&nbsp;1,&nbsp;&#39;msg&#39;:&nbsp;&#39;failed&#39;,&nbsp;&#39;account_id&#39;:&nbsp;account_id,&nbsp;&#39;order_id&#39;:&nbsp;withdraw_id,&nbsp;&#39;amount&#39;:&nbsp;amount}</span></span></span></div></pre><p>Copyright (c) 2015 Copyright lvye.com All Rights Reserved.</p></body>
 </html>

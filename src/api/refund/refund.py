@@ -10,7 +10,7 @@ from api.refund import transit
 from api.util.ipay import transaction
 from api.util.ipay.error import ApiError
 from api.util.ipay.transaction import notification
-from tools.dbe import transactional
+from tools.dbe import transactional, db_transactional
 from tools.lock import GetLockError, GetLockTimeoutError, require_order_lock
 from tools.mylog import get_logger
 from api.constant import PaymentState, RefundState
@@ -37,6 +37,8 @@ def require_lock_payment_order(client_id, order_id):
 def prepare(client_id, order_id):
     with require_lock_payment_order(client_id, order_id):
         payment_order = _get_payment_to_prepare_refund(client_id, order_id)
+        if payment_order.state == PaymentState.REFUND_PREPARED:
+            return True
 
         return payment_transit.refund_prepared(payment_order.id)
 
@@ -51,6 +53,7 @@ def cancel(client_id, order_id):
 def apply_for_refund(client_id, order_id, amount, callback_url):
     with require_lock_payment_order(client_id, order_id):
         payment_order = _get_payment_to_start_refund(client_id, order_id)
+
         try:
             amount_value = Decimal(amount)
         except InvalidOperation:
@@ -111,15 +114,18 @@ def _process_request_failure(refund_order):
     transit.refund_failed(refund_order)
 
 
-@transactional
-def _create_refund_freezing(payment_order, amount, callback_url):
+@db_transactional
+def _create_refund_freezing(db, payment_order, amount, callback_url):
+    if payment_order.state == PaymentState.SECURED:
+        payment_transit.refund_prepared(db, payment_order.id)
+
     payment_id = payment_order.id
     payer_account_id = payment_order.payer_account_id
     payee_account_id = payment_order.payee_account_id
 
-    refund_id = dba.create_refund(payment_id, payer_account_id, payee_account_id, amount, callback_url)
-    refund_order = dba.get_refund(refund_id)
-    if not transit.refund_frozen(payment_order, refund_order):
+    refund_id = dba.create_refund(db, payment_id, payer_account_id, payee_account_id, amount, callback_url)
+    refund_order = dba.get_refund(db, refund_id)
+    if not transit.refund_frozen(db, payment_order, refund_order):
         raise RefundFailedError()
 
     return refund_order
@@ -149,15 +155,15 @@ def _get_payment_to_refund(client_id, order_id):
 
 
 def _get_payment_to_start_refund(client_id, order_id):
-    payment_order = _get_payment_to_start_refund(client_id, order_id)
-    if payment_order.state != PaymentState.REFUND_PREPARED:
+    payment_order = _get_payment_to_refund(client_id, order_id)
+    if payment_order.state not in [PaymentState.REFUND_PREPARED, PaymentState.SECURED]:
         raise PaymentStateMissMatchError()
     return payment_order
 
 
 def _get_payment_to_prepare_refund(client_id, order_id):
     payment_order = _get_payment_to_refund(client_id, order_id)
-    if payment_order.state != PaymentState.SECURED:
+    if payment_order.state not in [PaymentState.SECURED, PaymentState.REFUND_PREPARED]:
         raise PaymentStateMissMatchError()
     return payment_order
 

@@ -85,3 +85,12 @@ def query_refund(refund_id):
     if refund_order is None:
         return response.not_found({'refund_id': refund_id})
     return response.ok(refund_order)
+
+
+@mod.route('/query', methods=['POST'])
+def query_refund_by_order_no():
+    data = request.values
+    client_id = data['client_id']
+    order_no = data['order_no']
+
+    #TODO

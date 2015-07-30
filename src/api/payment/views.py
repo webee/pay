@@ -94,7 +94,7 @@ def _post_pay_result_to_client_interface(pay_record):
         'trade_id': '',
         'amount': pay_record['amount'],
         'status': 'money_locked',
-        'pay_type': '3rd_party_pay'
+        'pay_type': 'newzyt'
     }
     resp = requests.post(pay_record['client_callback_url'], params, allow_redirects=False)
     return resp.text, resp.status_code, resp.headers.items()

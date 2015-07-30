@@ -9,6 +9,7 @@ from . import pay_mod as mod
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid, PaymentNotFoundError
 from .postpay import *
+from api.account.account.dba import get_account_by_id
 from api.util.enum import enum
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
 
@@ -89,12 +90,13 @@ def _notify_payment_result(uuid, data):
 
 
 def _post_pay_result_to_client_interface(pay_record):
+    account = get_account_by_id(pay_record['pay_account_id'])
     params = {
+        'user_id': account['user_id'],
         'order_id': pay_record['order_id'],
         'trade_id': '',
         'amount': pay_record['amount'],
-        'status': 'money_locked',
-        'pay_type': 'newzyt'
+        'status': 'money_locked'
     }
     resp = requests.post(pay_record['client_callback_url'], params, allow_redirects=False)
     return resp.text, resp.status_code, resp.headers.items()

@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 def get_account_info(client_id, user_id):
     account = get_account(client_id, user_id)
     if not account:
-        response.not_found({'client_id': client_id, 'user_id': user_id})
+        return response.not_found({'client_id': client_id, 'user_id': user_id})
 
     account_id = account['id']
     balance = get_cash_balance(account_id)

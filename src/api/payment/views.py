@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 from decimal import Decimal
-from flask import jsonify, request, Response, render_template
+from flask import jsonify, request, Response, render_template, redirect
 import logging
 import requests
 
@@ -56,7 +56,7 @@ def post_pay_result(uuid):
         return notification.fail
     else:
         pay_record = find_payment_by_uuid(uuid)
-        return _post_pay_result_to_client_interface(pay_record)
+        return _send_pay_result_to_client_interface(pay_record)
 
 
 @mod.route('/pay/<uuid>/notify', methods=['POST'])
@@ -89,15 +89,10 @@ def _notify_payment_result(uuid, data):
     return PayResult.Success
 
 
-def _post_pay_result_to_client_interface(pay_record):
+def _send_pay_result_to_client_interface(pay_record):
     account = get_account_by_id(pay_record['payer_account_id'])
-    params = {
-        'user_id': account['user_id'],
-        'order_id': pay_record['order_id'],
-        'trade_id': '',
-        'amount': pay_record['amount'],
-        'status': 'money_locked'
-    }
-    resp = requests.post(pay_record['client_callback_url'], params, allow_redirects=False)
-    return resp.text, resp.status_code, resp.headers.items()
+
+    return redirect('{0}?user_id={1}&order_id={2}&amount={3}&status=money_locked'
+                    .format(pay_record['client_callback_url'], account['user_id'], pay_record['order_id'],
+                            pay_record['amount']))
 

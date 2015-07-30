@@ -90,7 +90,7 @@ def _notify_payment_result(uuid, data):
 
 
 def _post_pay_result_to_client_interface(pay_record):
-    account = get_account_by_id(pay_record['pay_account_id'])
+    account = get_account_by_id(pay_record['payer_account_id'])
     params = {
         'user_id': account['user_id'],
         'order_id': pay_record['order_id'],

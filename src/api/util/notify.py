@@ -1,10 +1,6 @@
 # coding=utf-8
 
 
-if __name__ == '__main__':
-    pass
-
-
 def notify_client(url, params):
     import requests
 

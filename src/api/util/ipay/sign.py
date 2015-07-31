@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import base64
 from hashlib import md5
-from encrypt_utils import public_key
+from . import public_key
 from .config import lianlian as config
 
 

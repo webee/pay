@@ -1,6 +1,6 @@
 # coding=utf-8
 from api.account.withdraw import dba
-from api.commons.notify import notify_client
+from api.util.notify import notify_client
 from api.constant import WithdrawState
 
 

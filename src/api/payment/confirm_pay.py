@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from . import payment
+from .dba import find_payment_by_id, list_expired_payment
 from api.constant import SourceType, PayStep
 import api.payment.transit
 from api.util.bookkeeping import bookkeeping, Event
@@ -8,12 +8,12 @@ from tools.dbe import transactional
 
 
 def list_all_expired_payments():
-    return payment.list_expired()
+    return list_expired_payment()
 
 
 @transactional
 def confirm_payment(payment_id):
-    pay_record = payment.find(payment_id)
+    pay_record = find_payment_by_id(payment_id)
     payment_id = pay_record['id']
     account_id = pay_record['payee_account_id']
     amount = pay_record['amount']

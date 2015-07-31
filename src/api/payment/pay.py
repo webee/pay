@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from . import payment
+from .dba import find_payment_by_id
 from api.util.ipay import transaction
 from api.util.ipay.transaction import generate_pay_return_url
 from api.util.uuid import decode_uuid
@@ -17,7 +17,7 @@ class PaymentNotFoundError(Exception):
 
 def pay_by_uuid(payment_uuid):
     payment_id = decode_uuid(payment_uuid)
-    pay_record = payment.find(payment_id)
+    pay_record = find_payment_by_id(payment_id)
     if pay_record is None:
         raise PaymentNotFoundError(payment_uuid)
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from . import payment
+from .dba import create_payment
 from api.util import oid
 from api.util.ipay import transaction
 from api.account.account import find_or_create_account
@@ -22,7 +22,7 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
 
     payment_id = oid.pay_id(payer_account_id)
     callback_url = transaction.generate_pay_notification_url(payment_id),
-    payment.create(payment_id, client_id, payer_account_id, payee_account_id, order, amount, callback_url,
+    create_payment(payment_id, client_id, payer_account_id, payee_account_id, order, amount, callback_url,
                    client_callback_url)
 
     return payment_id

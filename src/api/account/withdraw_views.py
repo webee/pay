@@ -54,7 +54,7 @@ def notify_withdraw(account_id, uuid):
 
 
 @mod.route('/<int:account_id>/withdraw/<withdraw_id>', methods=['GET'])
-def query_withdraw(account_id, withdraw_id):
+def get_withdraw(account_id, withdraw_id):
     withdraw_order = withdraw.query_order_to_update_state(account_id, withdraw_id)
     if withdraw_order is None:
         return response.not_found()

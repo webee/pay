@@ -21,7 +21,7 @@ def generate_prepay_transaction(client_id, payer_user_id, payee_user_id, order, 
     payee_account_id = find_or_create_account(client_id, payee_user_id)
 
     payment_id = oid.pay_id(payer_account_id)
-    callback_url = transaction.generate_pay_notification_url(payment_id),
+    callback_url = transaction.generate_pay_notification_url(payment_id)
     create_payment(payment_id, client_id, payer_account_id, payee_account_id, order, amount, callback_url,
                    client_callback_url)
 

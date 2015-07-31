@@ -3,7 +3,7 @@
 from decimal import Decimal, InvalidOperation
 from contextlib import contextmanager
 
-from api.util.error import AmountValueError, AmountNotPositiveError
+from api.util.error import AmountValueError, NegativeAmountError
 from api.refund.error import NoPaymentFoundError, RefundFailedError, PaymentStateMissMatchError, RefundAmountError
 from api.refund.dba import set_refund_info
 from api.refund import transit
@@ -59,7 +59,7 @@ def apply_for_refund(client_id, order_id, amount, callback_url):
         except InvalidOperation:
             raise AmountValueError(amount)
         if amount_value <= 0:
-            raise AmountNotPositiveError(amount_value)
+            raise NegativeAmountError(amount_value)
 
         if amount_value + payment_order.refunded_amount >= payment_order.amount:
             raise RefundAmountError(amount)

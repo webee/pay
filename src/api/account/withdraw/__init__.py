@@ -45,7 +45,7 @@ def apply_for_withdraw(account_id, bankcard_id, amount, callback_url):
         raise AmountValueError(amount)
 
     if amount_value <= 0:
-        raise AmountNotPositiveError(amount_value)
+        raise NegativeAmountError(amount_value)
 
     withdraw_id = _create_withdraw_freezing(account_id, bankcard.id, amount_value, callback_url)
     notify_url = transaction.generate_withdraw_notify_url(account_id, withdraw_id)

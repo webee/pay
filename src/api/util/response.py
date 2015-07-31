@@ -7,19 +7,6 @@ import decimal
 import datetime
 
 
-class _DecimalEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, decimal.Decimal):
-            return float(o)
-        if isinstance(o, datetime.datetime):
-            return o.strftime('%Y-%m-%d %H:%M:%S.%f')
-        return super(_DecimalEncoder, self).default(o)
-
-
-def _dumps(obj):
-    return json.dumps(obj, cls=_DecimalEncoder)
-
-
 def updated(ids):
     return ok(ids=ids)
 
@@ -54,3 +41,16 @@ def bad_request(message, **request_params):
 def _response(status_code, obj=None):
     js = _dumps(obj if obj else {})
     return Response(js, status=status_code, mimetype='application/json')
+
+
+def _dumps(obj):
+    return json.dumps(obj, cls=_DecimalEncoder)
+
+
+class _DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            return float(o)
+        if isinstance(o, datetime.datetime):
+            return o.strftime('%Y-%m-%d %H:%M:%S.%f')
+        return super(_DecimalEncoder, self).default(o)

@@ -8,6 +8,7 @@ from api.account.error import NoBankcardFoundError, InsufficientBalanceError
 from api.util.error import AmountError
 from .withdraw.error import WithdrawError, WithdrawRequestFailedError
 from . import withdraw
+from .withdraw.dba import list_all_withdraw
 from api.util import response
 from api.util.ipay.transaction import notification
 from api.util.ipay.transaction import parse_and_verify, is_valid_transaction
@@ -51,6 +52,12 @@ def notify_withdraw(account_id, uuid):
         return notification.is_invalid()
 
     return withdraw.handle_withdraw_notify(account_id, withdraw_id, data)
+
+
+@mod.route('/<int:account_id>/withdraw', methods=['GET'])
+def list_withdraw(account_id):
+    withdraw_list = list_all_withdraw(account_id)
+    return response.ok(withdraw_list)
 
 
 @mod.route('/<int:account_id>/withdraw/<withdraw_id>', methods=['GET'])

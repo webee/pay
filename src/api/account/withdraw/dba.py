@@ -50,3 +50,18 @@ def create_withdraw(db, account_id, bankcard_id, amount, callback_url):
     db.insert('withdraw', fields)
 
     return order_id
+
+
+@db_context
+def list_all_withdraw(db, account_id):
+    return db.list(
+        """
+            SELECT withdraw.id,
+		           concat(bank_name, '(', right(card_no, 4), ')') AS card,
+		           withdraw.created_on AS withdrawed_on,
+		           if(withdraw.state = 'SUCCESS', withdraw.updated_on, null) AS received_on
+	        FROM withdraw
+                INNER JOIN bankcard ON withdraw.bankcard_id = bankcard.id
+            WHERE withdraw.account_id = %(account_id)s;
+        """,
+        account_id=account_id)

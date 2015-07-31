@@ -5,7 +5,7 @@ from flask import request
 
 from . import account_mod as mod
 from api.account.error import NoBankcardFoundError, InsufficientBalanceError
-from api.commons.error import AmountError
+from api.util.error import AmountError
 from .withdraw.error import WithdrawError, WithdrawRequestFailedError
 from . import withdraw
 from api.util import response

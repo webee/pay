@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, division
 import logging
 
 from . import refund_mod as mod
-from api.commons.error import AmountError
+from api.util.error import AmountError
 from api.util import response
 from api.util.ipay.transaction import notification, parse_and_verify, is_valid_transaction
 from flask import request

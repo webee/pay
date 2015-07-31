@@ -92,6 +92,11 @@ def query_order_to_update_state(account_id, withdraw_id):
     return withdraw_order
 
 
+def list_withdraw(account_id):
+    records = dba.list_all_withdraw(account_id)
+    return [dict(record) for record in records]
+
+
 @db_transactional
 def _create_withdraw_freezing(db, account_id, bankcard_id, amount, callback_url):
     with require_user_account_lock(account_id, 'cash'):

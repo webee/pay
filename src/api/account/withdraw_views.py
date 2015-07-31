@@ -57,7 +57,7 @@ def notify_withdraw(account_id, uuid):
 @mod.route('/<int:account_id>/withdraw', methods=['GET'])
 def list_withdraw(account_id):
     withdraw_list = list_all_withdraw(account_id)
-    return response.ok(withdraw_list)
+    return response.list_data(withdraw_list)
 
 
 @mod.route('/<int:account_id>/withdraw/<withdraw_id>', methods=['GET'])

@@ -6,7 +6,7 @@ import logging
 from api.util import response
 from flask import jsonify, request, Response, redirect
 from . import pay_mod as mod
-from .prepay import Order, generate_prepay_transaction
+from .prepay import Order, find_or_create_prepay_transaction
 from .pay import pay_by_uuid, PaymentNotFoundError
 from .postpay import *
 from api.account.account.dba import get_account_by_id
@@ -30,7 +30,7 @@ def prepay():
     amount = data['amount']
     client_callback_url = data['client_callback_url']
 
-    payment_id = generate_prepay_transaction(client_id, payer_id, payee_id, order, amount, client_callback_url)
+    payment_id = find_or_create_prepay_transaction(client_id, payer_id, payee_id, order, amount, client_callback_url)
     pay_url = generate_pay_url(payment_id)
 
     return jsonify({'pay_url': pay_url})

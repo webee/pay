@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from api.account.account import dba
-from tools.dbe import require_db_context, db_operate
+from tools.dbe import require_db_context, db_context
 from api.constant import BookkeepingSide
 
 
@@ -27,7 +27,7 @@ def find_account_id(client_id, user_id):
             """, client_id=client_id, user_id=user_id)
 
 
-@db_operate
+@db_context
 def get_cash_balance(db, account_id):
     balance_value, last_id = dba.get_settled_balance_and_last_id(db, account_id, 'cash', 'both')
     unsettled_balance = dba.get_unsettled_balance(db, account_id, 'cash', BookkeepingSide.BOTH, last_id)

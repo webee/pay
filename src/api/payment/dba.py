@@ -1,9 +1,9 @@
 # coding=utf-8
 from datetime import datetime
-from tools.dbe import db_operate
+from tools.dbe import db_context
 
 
-@db_operate
+@db_context
 def set_refunded_amount(db, id, amount):
     return db.execute("""
                     UPDATE payment
@@ -12,7 +12,7 @@ def set_refunded_amount(db, id, amount):
     """, id=id, amount=amount) > 0
 
 
-@db_operate
+@db_context
 def transit_state(db, id, prev_state, new_state):
     return db.execute("""
                     UPDATE payment

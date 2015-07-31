@@ -2,21 +2,21 @@
 from datetime import datetime
 from api.constant import WithdrawState
 from api.util import oid
-from tools.dbe import db_operate
+from tools.dbe import db_context
 
 
-@db_operate
+@db_context
 def get_withdraw(db, withdraw_id):
     return db.get("select * from withdraw where id=%(id)s", id=withdraw_id)
 
 
-@db_operate
+@db_context
 def get_account_withdraw(db, account_id, withdraw_id):
     return db.get("select * from withdraw where account_id=%(account_id)s and id=%(id)s",
                   account_id=account_id, id=withdraw_id)
 
 
-@db_operate
+@db_context
 def transit_state(db, id, pre_state, new_state):
     return db.execute("""
             UPDATE withdraw
@@ -25,7 +25,7 @@ def transit_state(db, id, pre_state, new_state):
     """, id=id, pre_state=pre_state, new_state=new_state, updated_on=datetime.now()) > 0
 
 
-@db_operate
+@db_context
 def set_withdraw_info(db, refund_id, paybill_id, result, failure_info):
     return db.execute("""
             UPDATE withdraw

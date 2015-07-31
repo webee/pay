@@ -3,15 +3,15 @@ from datetime import datetime
 from decimal import Decimal
 from api.constant import BookkeepingSide
 from api.util.bookkeeping import get_account_side_sign
-from tools.dbe import db_operate
+from tools.dbe import db_context
 
 
-@db_operate
+@db_context
 def user_account_exists(db, account_id):
     return db.exists("select 1 from account where id=%(account_id)s", account_id=account_id)
 
 
-@db_operate
+@db_context
 def list_users_with_unsettled_cash(db):
     return db.list("""
             SELECT a.account_id, a.high_id
@@ -24,13 +24,13 @@ def list_users_with_unsettled_cash(db):
                   b.low_id is null or a.high_id > b.low_id""")
 
 
-@db_operate
+@db_context
 def get_user_account_max_id(db, account):
     account_table = account + "_account_transaction_log"
     return db.get_scalar("""SELECT MAX(id) FROM """ + account_table)
 
 
-@db_operate
+@db_context
 def get_unsettled_balance(db, account_id, account, side, low_id, high_id=None):
     account_table = account + "_account_transaction_log"
     if side == BookkeepingSide.BOTH:
@@ -64,7 +64,7 @@ def get_unsettled_balance(db, account_id, account, side, low_id, high_id=None):
     return Decimal(0) if balance is None else balance
 
 
-@db_operate
+@db_context
 def get_settled_balance_and_last_id(db, account_id, account, side, create=False):
     balance = db.get("""
                   SELECT balance, last_transaction_log_id
@@ -84,11 +84,11 @@ def get_settled_balance_and_last_id(db, account_id, account, side, create=False)
     return balance_value, last_transaction_log_id
 
 
-@db_operate
+@db_context
 def get_account(db, client_id, user_id):
     return db.get('SELECT * FROM account WHERE client_id=%(client_id)s AND user_id=%(user_id)s', client_id=client_id, user_id=user_id)
 
 
-@db_operate
+@db_context
 def get_account_by_id(db, id):
     return db.get('SELECT * FROM account WHERE id=%(id)s', id=id)

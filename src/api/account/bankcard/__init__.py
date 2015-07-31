@@ -5,7 +5,7 @@ from datetime import datetime
 from api.bankcard.bankcard_bin import query_bankcard_bin
 from api.util.enum import enum
 from api.constant import BankcardType
-from tools.dbe import from_db, require_db_context, db_operate
+from tools.dbe import from_db, require_db_context, db_context
 
 
 BankAccount = enum(IsPrivateAccount=0, IsCorporateAccount=1)
@@ -51,7 +51,7 @@ def query_all_bankcards(account_id):
     return from_db().list("SELECT * FROM bankcard WHERE account_id=%(account_id)s", account_id=account_id)
 
 
-@db_operate
+@db_context
 def get_bankcard(db, account_id, bankcard_id):
     return db.get("SELECT * FROM bankcard WHERE account_id=%(account_id)s AND id=%(bankcard_id)s",
                   account_id=account_id, bankcard_id=bankcard_id)

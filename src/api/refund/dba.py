@@ -1,11 +1,11 @@
 # coding=utf-8
-from tools.dbe import db_operate
+from tools.dbe import db_context
 from api.constant import RefundState
 from datetime import datetime
 from api.util import oid
 
 
-@db_operate
+@db_context
 def transit_state(db, id, pre_state, new_state):
     return db.execute("""
             UPDATE refund
@@ -14,7 +14,7 @@ def transit_state(db, id, pre_state, new_state):
     """, id=id, pre_state=pre_state, new_state=new_state, updated_on=datetime.now()) > 0
 
 
-@db_operate
+@db_context
 def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, callback_url=None):
     refund_id = oid.refund_id(payer_account_id)
     fields = {
@@ -31,12 +31,12 @@ def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, ca
     return refund_id
 
 
-@db_operate
+@db_context
 def get_refund(db, id):
     return db.get('SELECT * FROM refund WHERE id=%(id)s', id=id)
 
 
-@db_operate
+@db_context
 def get_payment(db, client_id, order_id):
     return db.get("""
             SELECT *
@@ -45,7 +45,7 @@ def get_payment(db, client_id, order_id):
         """, client_id=client_id, order_id=order_id)
 
 
-@db_operate
+@db_context
 def set_refund_info(db, refund_id, refund_serial_no):
     return db.execute("""
             UPDATE refund

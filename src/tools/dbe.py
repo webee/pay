@@ -45,7 +45,7 @@ def require_db_context():
         yield DatabaseInterface(conn)
 
 
-def db_operate(func):
+def db_context(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         if '_db' in kwargs:

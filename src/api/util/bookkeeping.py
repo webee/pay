@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from datetime import datetime
 
-from tools.dbe import db_operate
+from tools.dbe import db_context
 
 ACCOUNTS_SIDES = {
     'asset': {'+': 'd', '-': 'c'},
@@ -109,12 +109,12 @@ def _is_balanced(event_amount, debit_items, credit_items):
     return event_amount == debits_amount == credits_amount
 
 
-@db_operate
+@db_context
 def _create_event(db, event):
     return db.insert('event', returns_id=True, **event.__dict__)
 
 
-@db_operate
+@db_context
 def _record_debit(db, event_id, account_id, debit_items, created_on):
     for account, amount in debit_items:
         account_log = {
@@ -127,7 +127,7 @@ def _record_debit(db, event_id, account_id, debit_items, created_on):
         db.insert(account + '_account_transaction_log', **account_log)
 
 
-@db_operate
+@db_context
 def _record_credit(db, event_id, account_id, credit_items, created_on):
     for account, amount in credit_items:
         account_log = {

@@ -54,7 +54,9 @@ def create_withdraw(db, account_id, bankcard_id, amount, callback_url):
 
 @db_context
 def list_all_withdraw(db, account_id):
-    return db.list(_sql_to_query_withdraw() + 'AND withdraw.account_id = %(account_id)s', account_id=account_id)
+    return db.list(_sql_to_query_withdraw()
+                   + 'AND withdraw.account_id = %(account_id)s ORDER BY withdraw.created_on DESC',
+                   account_id=account_id)
 
 
 @db_context

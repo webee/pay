@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 from decimal import Decimal
-from api.util import response
-from flask import jsonify, request, Response, render_template, redirect
 import logging
-import requests
 
+from api.util import response
+from flask import jsonify, request, Response, redirect
 from . import pay_mod as mod
 from .prepay import Order, generate_prepay_transaction
 from .pay import pay_by_uuid, PaymentNotFoundError

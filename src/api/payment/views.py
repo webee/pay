@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 from decimal import Decimal
+from api.util import response
 from flask import jsonify, request, Response, render_template, redirect
 import logging
 import requests
@@ -41,8 +42,8 @@ def pay(uuid):
     try:
         form_submit = pay_by_uuid(uuid)
         return Response(form_submit, status=200, mimetype='text/html')
-    except PaymentNotFoundError as e:
-        return render_template('pay_result.html', msg=e.message)
+    except PaymentNotFoundError:
+        return response.not_found({'uuid': uuid})
 
 
 @mod.route('/pay/<uuid>/result', methods=['POST'])

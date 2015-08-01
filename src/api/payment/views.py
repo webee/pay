@@ -72,16 +72,6 @@ def notify_payment(uuid):
         return notification.succeed()
 
 
-@mod.route('/pay/<uuid>/confirm', methods=['POST'])
-def confirm_to_pay(uuid):
-    pay_record = find_payment_by_uuid(uuid)
-    if not pay_record:
-        return response.not_found({'uuid': uuid})
-
-    payment_id = confirm_payment(pay_record)
-    return response.ok(id=payment_id)
-
-
 def _notify_payment_result(uuid, data):
     partner_oid = data['oid_partner']
     order_no = data['no_order']

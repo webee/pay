@@ -3,32 +3,23 @@
 from __future__ import unicode_literals, print_function
 from decimal import Decimal
 
-import os
-
 from flask.ext.script import Manager, Shell, Server
 import requests
 
 from api import create_app
 
-app = create_app(os.getenv('SYSTEM_CONFIG') or 'default')
-manager = Manager(app)
+manager = Manager(create_app)
+manager.add_option('-e', '--env', dest='env', required=False)
 
 
 def make_shell_context():
-    return dict(app=app)
+    return dict(app=manager.app)
 
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
 
 server = Server(host="0.0.0.0", port=5000)
 manager.add_command("runserver", server)
-
-
-@manager.command
-def current_configs():
-    import top_config
-    for k, v in top_config.configs.items():
-        print('{0}: {1}'.format(v['name'], k))
 
 
 @manager.command

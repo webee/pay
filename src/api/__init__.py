@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
+import os
 
 from flask import Flask
 
@@ -22,11 +23,11 @@ def register_mods(app):
     app.register_blueprint(client_mod, url_prefix='/clients')
 
 
-def create_app(config_name):
-    app = Flask(__name__)
-    app.config.from_object(PAY_API_CONFIG[config_name])
-    PAY_API_CONFIG[config_name].init_app(app)
+def create_app(env):
+    env = env.lower() if env else 'dev'
+    os.environ['ENV'] = env
 
+    app = Flask(__name__)
     register_mods(app)
 
     return app

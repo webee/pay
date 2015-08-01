@@ -6,6 +6,7 @@ import requests
 from .error import *
 from .sign import sign, verify
 from .conf import config
+from pytoolbox.conf import config as global_config
 
 
 def sign_params(params):
@@ -38,6 +39,9 @@ def request(api_url, params):
 
 def parse_and_verify_request_data(values, raw_data):
     parsed_data = values if values else _parse_data(raw_data)
+    if not _should_validate_signature():
+        return parsed_data
+
     if _verify_sign(parsed_data):
         return parsed_data
     else:
@@ -68,3 +72,8 @@ def _parse_response_data(raw_data):
         InvalidSignError(parsed_data.get('sign_type'), parsed_data)
 
     return parsed_data
+
+
+def _should_validate_signature():
+    validate_signature = global_config.get('zyt', 'validate_signature')
+    return validate_signature is not None and validate_signature.upper() == 'TRUE'

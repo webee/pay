@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from . import make_celery_app
 from tools.mylog import get_logger
 from api.payment.confirm_pay import list_all_expired_payments
-from api.payment.confirm_pay import confirm_payment
+from api.payment.confirm_pay import confirm_payment_by_id
 from api.account.account.dba import list_users_with_unsettled_cash
 from api.account.account.balance import settle_user_account_balance
 from top_config import api_task_celery as config
@@ -22,7 +22,7 @@ def confirm_to_pay_all():
 
 @app.task(ignore_result=False, queue='confirm_pay', routing_key='confirm_pay')
 def confirm_pay(payment_id):
-    return confirm_payment(payment_id)
+    return confirm_payment_by_id(payment_id)
 
 
 @app.task

@@ -12,7 +12,7 @@ def list_all_expired_payments():
 
 
 @transactional
-def confirm_payment(payment_id):
+def confirm_payment_by_id(payment_id):
     pay_record = find_payment_by_id(payment_id)
     payment_id = pay_record['id']
     account_id = pay_record['payee_account_id']

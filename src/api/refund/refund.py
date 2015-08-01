@@ -14,7 +14,7 @@ from tools.dbe import transactional, db_transactional
 from tools.lock import GetLockError, GetLockTimeoutError, require_order_lock
 from tools.mylog import get_logger
 from api.constant import PaymentState, RefundState
-from pytoolbox.conf import config
+from pytoolbox import config
 from api.payment import transit as payment_transit
 from . import dba
 from . import notify

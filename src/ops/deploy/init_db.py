@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from fabric.api import local
 from tools.log import *
-from pytoolbox.conf import config
+from pytoolbox import config
 
 
 db_instance = config.get('database', 'instance')

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from pytoolbox.conf import SectionReader, config as _config
+from pytoolbox import config as _config
+from pytoolbox.config import SectionReader
 
 
 class ZYTUrlReader(SectionReader):

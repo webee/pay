@@ -5,7 +5,7 @@ import sys
 from tools.dbe import from_db
 from log import *
 from fabric.api import local
-from pytoolbox.conf import config
+from pytoolbox import config
 
 
 def migrate():

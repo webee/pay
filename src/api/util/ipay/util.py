@@ -3,7 +3,7 @@ from datetime import datetime
 from urlparse import urljoin
 
 from ..uuid import encode_uuid
-from pytoolbox.conf import config
+from pytoolbox import config
 
 
 def datetime_to_str(timestamp):

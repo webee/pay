@@ -6,7 +6,7 @@ from contextlib import contextmanager
 import sqlalchemy
 from sqlalchemy import create_engine
 from mylog import get_logger
-from pytoolbox.conf import config
+from pytoolbox import config
 
 LOGGER = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 

@@ -6,7 +6,7 @@ import requests
 from .error import *
 from .sign import sign, verify
 from .conf import config
-from pytoolbox.conf import config as global_config
+from pytoolbox import config as global_config
 
 
 def sign_params(params):

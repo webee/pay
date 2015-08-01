@@ -9,7 +9,7 @@ import json
 import re
 import textwrap
 import logging
-from pytoolbox.conf import config
+from pytoolbox import config
 
 CHARSET_UTF8 = 'utf-8'
 log = logging.getLogger(__name__)

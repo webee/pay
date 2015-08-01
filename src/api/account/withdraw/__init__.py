@@ -18,7 +18,7 @@ from api.util.ipay.transaction import notification
 from . import dba, transit
 from .. import account
 from tools.mylog import get_logger
-from pytoolbox.conf import config
+from pytoolbox import config
 
 logger = get_logger(__name__)
 

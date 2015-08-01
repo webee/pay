@@ -8,7 +8,6 @@ from website.util.uuid import encode_uuid
 
 _API_HOST = config.get('hosts', 'api_gateway')
 _SITE_HOST = config.get('hosts', 'site_gateway')
-_MD5_KEY = config.get('lianlianpay', 'md5_key')
 
 
 def pay(amount):

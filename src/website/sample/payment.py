@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from tools.dbe import from_db
+from pytoolbox.util.dbe import from_db
 
 
 def find_by_orderno(order_no):

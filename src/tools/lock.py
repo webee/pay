@@ -115,7 +115,7 @@ def _generate_user_lock_name(user_account_id, name):
 
 @contextlib.contextmanager
 def require_lock(name, timeout=-1):
-    from .dbe import require_db_context
+    from pytoolbox.util.dbe import require_db_context
     with require_db_context() as db:
         locker = _Locker(db)
         with locker.lock(name, timeout):

@@ -1,7 +1,7 @@
 # coding=utf-8
 from api.constant import PaymentState
 from api.payment import dba
-from tools.dbe import db_transactional
+from pytoolbox.util.dbe import db_transactional
 
 
 @db_transactional

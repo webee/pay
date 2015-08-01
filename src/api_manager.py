@@ -50,7 +50,7 @@ def test_prepaid(account_id, amount):
     :param amount:
     :return:
     """
-    from tools.dbe import require_transaction_context
+    from pytoolbox.util.dbe import require_transaction_context
     from api.constant import SourceType, PrepaidStep
     from api.util.bookkeeping import Event, bookkeeping
 
@@ -67,7 +67,7 @@ def test_withdraw(account_id, amount):
     :param amount:
     :return:
     """
-    from tools.dbe import require_transaction_context
+    from pytoolbox.util.dbe import require_transaction_context
     from api.constant import SourceType, PrepaidStep
     from api.util.bookkeeping import Event, bookkeeping
     from api.account.withdraw import require_lock_user_account
@@ -102,7 +102,7 @@ def test_transfer(from_id, to_id, amount):
             message = "transfer error."
             super(TransferError, self).__init__(message)
 
-    from tools.dbe import require_transaction_context
+    from pytoolbox.util.dbe import require_transaction_context
     from tools.lock import require_user_account_lock, GetLockTimeoutError, GetLockError
     from api.account import account
     from api.constant import SourceType, TransferStep

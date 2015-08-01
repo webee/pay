@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function, division
 import os
 import sys
-from tools.dbe import from_db
+from pytoolbox.util.dbe import from_db
 from log import *
 from fabric.api import local
 from pytoolbox import config

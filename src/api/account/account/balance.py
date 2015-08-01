@@ -5,7 +5,7 @@ from datetime import datetime
 
 from . import dba
 from api.account.account.dba import get_user_account_max_id
-from tools.dbe import require_transaction_context
+from pytoolbox.util.dbe import require_transaction_context
 from tools.lock import require_user_lock, GetLockError, GetLockTimeoutError
 from tools.mylog import get_logger
 from api.constant import BookkeepingSide

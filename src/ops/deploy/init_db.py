@@ -4,7 +4,7 @@ from tools.log import *
 from pytoolbox.conf import config
 
 
-db_instance = config.get('hosts', 'instance')
+db_instance = config.get('database', 'instance')
 
 
 def init_db():

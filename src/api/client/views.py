@@ -22,11 +22,11 @@ def get_account_info(client_id, user_id):
     return response.ok(account_id=account_id)
 
 
-@mod.route('/<int:client_id>/orders/<order_id>/confirm-pay', methods=['POST'])
+@mod.route('/<int:client_id>/orders/<order_id>/confirm-pay', methods=['PUT'])
 def confirm_to_pay(client_id, order_id):
     pay_record = find_payment_by_order_no(client_id, order_id)
     if not pay_record:
         return response.not_found({'client_id': client_id, 'order_id': order_id})
 
     payment_id = confirm_payment(pay_record)
-    return response.ok(id=payment_id)
+    return response.ok(id=(payment_id or pay_record['id']))

@@ -1,3 +1,0 @@
-prod.host=a@b.com
-prod.code_dir=path_to_code_dir
-dev.code.dir=

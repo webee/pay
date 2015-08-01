@@ -2,7 +2,7 @@
 from datetime import datetime
 
 import requests
-from website.conf import config
+from pytoolbox.conf import config
 from website.util.uuid import encode_uuid
 
 

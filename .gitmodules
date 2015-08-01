@@ -1,3 +1,3 @@
 [submodule "pytoolbox"]
 	path = libraries/pytoolbox
-	url = git@gitlab.lvye.info:d-day/pytoolbox.git
+	url = http://gitlab.lvye.info/d-day/pytoolbox.git

@@ -55,13 +55,14 @@ def create_withdraw(db, account_id, bankcard_id, amount, callback_url):
 @db_context
 def list_all_withdraw(db, account_id):
     return db.list(_sql_to_query_withdraw()
-                   + 'AND withdraw.account_id = %(account_id)s ORDER BY withdraw.created_on DESC',
+                   + " WHERE withdraw.state <> 'FAILED' AND withdraw.account_id = %(account_id)s"
+                     " ORDER BY withdraw.created_on DESC",
                    account_id=account_id)
 
 
 @db_context
 def find_withdraw_by_id(db, id):
-    return db.get(_sql_to_query_withdraw() + 'AND withdraw.id = %(withdraw_id)s', withdraw_id=id)
+    return db.get(_sql_to_query_withdraw() + ' WHERE withdraw.id = %(withdraw_id)s', withdraw_id=id)
 
 
 def _sql_to_query_withdraw():
@@ -72,5 +73,4 @@ def _sql_to_query_withdraw():
                if(withdraw.state = 'SUCCESS', withdraw.updated_on, null) AS received_on
         FROM withdraw
           INNER JOIN bankcard ON withdraw.bankcard_id = bankcard.id
-        WHERE withdraw.state <> 'FAILED'
     """

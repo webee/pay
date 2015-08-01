@@ -5,6 +5,7 @@ import sys
 from tools.dbe import from_db
 from log import *
 from fabric.api import local
+from pytoolbox.conf import config
 
 
 def migrate():
@@ -30,13 +31,10 @@ def migrate():
 
 
 def execute_script(script_file_name):
-    from top_config import db as db_config
-    local('mysql -u {} -p{} {} < {}'.format(
-        db_config.USERNAME,
-        db_config.PASSWORD,
-        db_config.INSTANCE,
-        script_file_name)
-    )
+    db_instance = config.get('database', 'instance')
+    username = config.get('database', 'user')
+    password = config.get('database', 'password')
+    local('mysql -u {} -p{} {} < {}'.format(username, password, db_instance, script_file_name))
 
 
 def update_database_version(version):

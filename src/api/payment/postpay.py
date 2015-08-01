@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .dba import find_payment_by_id, succeed_payment, fail_payment
+from .dba import find_payment_by_id, succeed_payment as _succeed_payment, fail_payment as _fail_payment
 from api.constant import SourceType, PayStep
 from api.util.bookkeeping import bookkeeping, Event
 from api.util.uuid import decode_uuid
@@ -20,12 +20,12 @@ def is_successful_payment(pay_result):
 
 @transactional
 def fail_payment(payment_id):
-    fail_payment(payment_id)
+    _fail_payment(payment_id)
 
 
 @transactional
 def succeed_payment(payment_id, paybill_id):
-    succeed_payment(payment_id, paybill_id)
+    _succeed_payment(payment_id, paybill_id)
 
     pay_record = find_payment_by_id(payment_id)
     bookkeeping(

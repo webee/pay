@@ -4,6 +4,7 @@ import base64
 from hashlib import md5
 from . import public_key
 from .conf import config
+from pytoolbox.conf import config as global_config
 
 
 class UnknownSignTypeError(Exception):
@@ -33,7 +34,7 @@ def _sign_md5_data(data, key):
 
 
 def _verify_md5(src, key, signed):
-    return signed == _sign_md5(src, key)
+    return signed == _sign_md5(src, key) if _should_validate_signature() else True
 
 
 def _verify_md5_data(data, key):
@@ -66,8 +67,10 @@ def _verify_rsa(src, pub_key, signed):
     :param pub_key: 公钥
     :return:
     """
-    key = public_key.loads_key(base64.b64decode(pub_key))
-    return key.verify_md5_from_base64(src.encode('utf-8'), signed)
+    if _should_validate_signature():
+        key = public_key.loads_key(base64.b64decode(pub_key))
+        return key.verify_md5_from_base64(src.encode('utf-8'), signed)
+    return True
 
 
 def _verify_rsa_data(data, pub_key):
@@ -99,3 +102,8 @@ def verify(data, sign_type):
     elif sign_type == config.SignType.RSA:
         return _verify_rsa_data(data, config.rsa_yt_pub_key)
     raise UnknownSignTypeError(sign_type)
+
+
+def _should_validate_signature():
+    validate_signature = global_config.get('zyt', 'validate_signature')
+    return validate_signature is not None and validate_signature.upper() == 'TRUE'

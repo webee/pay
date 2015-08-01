@@ -3,7 +3,7 @@ from datetime import datetime
 from urlparse import urljoin
 
 from ..uuid import encode_uuid
-from top_config import api as api_config
+from pytoolbox.conf import config
 
 
 def datetime_to_str(timestamp):
@@ -18,5 +18,5 @@ def generate_url(relative_url, id, **kwargs):
     params = {'uuid': encode_uuid(id)}
     params.update(kwargs)
     relative_url = relative_url.format(**params)
-    root_url = api_config.ROOT_URL
+    root_url = config.get('hosts', 'api_gateway')
     return urljoin(root_url, relative_url)

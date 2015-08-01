@@ -14,13 +14,16 @@ from tools.dbe import transactional, db_transactional
 from tools.lock import GetLockError, GetLockTimeoutError, require_order_lock
 from tools.mylog import get_logger
 from api.constant import PaymentState, RefundState
-from top_config import lianlian
+from pytoolbox.conf import config
 from api.payment import transit as payment_transit
 from . import dba
 from . import notify
 
 
 logger = get_logger(__name__)
+
+_REFUND_STATUS_SUCCESS = config.get('lianlianpay', 'refund_status_success')
+_REFUND_STATUS_FAILED = config.get('lianlianpay', 'refund_status_failed')
 
 
 @contextmanager
@@ -99,9 +102,9 @@ def _process_refund_result(refund_order, oid_refundno, status):
     set_refund_info(refund_order.id, oid_refundno)
 
     # process refund status.
-    if status == lianlian.Refund.Status.FAILED:
+    if status == _REFUND_STATUS_FAILED:
         transit.refund_failed(refund_order)
-    elif status == lianlian.Refund.Status.SUCCESS:
+    elif status == _REFUND_STATUS_SUCCESS:
         transit.refund_success(refund_order)
     else:
         logger.warn("refund notify result: [{0}], id=[{1}]".format(status, refund_order.id))

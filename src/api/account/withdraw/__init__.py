@@ -18,9 +18,13 @@ from api.util.ipay.transaction import notification
 from . import dba, transit
 from .. import account
 from tools.mylog import get_logger
-from top_config import lianlian
+from pytoolbox.conf import config
 
 logger = get_logger(__name__)
+
+_PAY_TO_BANKCARD_RESULT_FAILURE = config.get('lianlianpay', 'pay_to_bankcard_result_failure')
+_PAY_TO_BANKCARD_RESULT_SUCCESS = config.get('lianlianpay', 'pay_to_bankcard_result_success')
+
 
 
 @contextmanager
@@ -131,9 +135,9 @@ def _process_request_failed(withdraw_id):
 def _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
     if dba.set_withdraw_info(withdraw_id, paybill_id, result, failure_info):
         # process withdraw result.
-        if result == lianlian.PayToBankcard.Result.FAILURE:
+        if result == _PAY_TO_BANKCARD_RESULT_FAILURE:
             transit.withdraw_failed(withdraw_id)
-        elif result == lianlian.PayToBankcard.Result.SUCCESS:
+        elif result == _PAY_TO_BANKCARD_RESULT_SUCCESS:
             transit.withdraw_success(withdraw_id)
         else:
             logger.warn("withdraw notify result: [{0}], id=[{1}]".format(result, withdraw_id))

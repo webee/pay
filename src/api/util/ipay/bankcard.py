@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from .lianlian_api import request
-from .config import lianlian as config
+from .conf import config
 
 
 def query_bin(card_no):
@@ -11,8 +11,8 @@ def query_bin(card_no):
     :return:
     """
     params = {
-        'oid_partner': config.OID_PARTNER,
-        'sign_type': config.SignType.MD5,
+        'oid_partner': config.oid_partner,
+        'sign_type': config.sign_type_md5,
         'card_no': card_no
     }
-    return request(config.Bankcard.BIN_QUERY_URL, params)
+    return request(config.url_query_bankcard_bin, params)

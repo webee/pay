@@ -5,7 +5,7 @@ import requests
 
 from .error import *
 from .sign import sign, verify
-from .config import lianlian as config
+from .conf import config
 
 
 def sign_params(params):
@@ -16,13 +16,13 @@ def sign_params(params):
 
 
 def md5_sign_params(params):
-    params['sign_type'] = config.SignType.MD5
+    params['sign_type'] = config.sign_type_md5
 
     return sign_params(params)
 
 
 def rsa_sign_params(params):
-    params['sign_type'] = config.SignType.RSA
+    params['sign_type'] = config.sign_type_rsa
 
     return sign_params(params)
 

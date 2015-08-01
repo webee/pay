@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 from .lianlian_api import request
-from .util import now_to_str, generate_url
-from .config import lianlian as config
+from .util import now_to_str
+from .conf import config
 
 
 def pay_to_bankcard(no_order, money_order, info_order, bankcard, notify_url):
@@ -16,9 +16,9 @@ def pay_to_bankcard(no_order, money_order, info_order, bankcard, notify_url):
     :return:
     """
     params = {
-        'platform': config.PLATFORM,
-        'oid_partner': config.OID_PARTNER,
-        'sign_type': config.SignType.RSA,
+        'platform': config.platform,
+        'oid_partner': config.oid_partner,
+        'sign_type': config.sign_type_rsa,
         'no_order': no_order,
         'dt_order': now_to_str(),
         'money_order': money_order,
@@ -31,10 +31,10 @@ def pay_to_bankcard(no_order, money_order, info_order, bankcard, notify_url):
         'city_code': bankcard.city_code,
         'brabank_name': bankcard.branch_bank_name,
         'notify_url': notify_url,
-        'api_version': config.PayToBankcard.VERSION,
+        'api_version': config.pay_to_bankcard_version,
         'prcptcd': ''
     }
     # TODO:
     # note: bankcode, 对公必须传
     # note: province_code, city_code, brabank_name, 工、农、中, 招,光大 浦发(对私打款),建行 (对公打款)可以不传, 其他银行必须传
-    return request(config.PayToBankcard.URL, params)
+    return request(config.url_pay_to_bankcard, params)

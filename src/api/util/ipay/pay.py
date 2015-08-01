@@ -3,16 +3,16 @@ from __future__ import unicode_literals
 import json
 from .sign import md5_sign
 from .util import datetime_to_str, now_to_str
-from .config import lianlian as config
+from .conf import config
 
 
 def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notification_url):
     req_params = {
-        'version': config.Payment.VERSION,
-        'oid_partner': config.OID_PARTNER,
+        'version': config.pay_version,
+        'oid_partner': config.oid_partner,
         'user_id': str(payer.id),
-        'sign_type': config.SignType.MD5,
-        'busi_partner': config.Payment.BusiPartner.VIRTUAL_GOODS,
+        'sign_type': config.sign_type_md5,
+        'busi_partner': config.pay_busipartner_virtual_goods,
         'no_order': order_no,
         'dt_order': datetime_to_str(ordered_on),
         'name_goods': order_name,
@@ -21,7 +21,7 @@ def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_
         'notify_url': notification_url,
         'url_return': return_url,
         'userreq_ip': _encode_ip(ip),
-        'valid_order': config.Payment.DEFAULT_ORDER_EXPIRATION,
+        'valid_order': config.pay_default_order_expiration,
         'timestamp': now_to_str(),
         'risk_item': _get_risk_item(payer),
     }
@@ -38,7 +38,7 @@ def _format_time(t):
 
 
 def _generate_submit_form(req_params):
-    submit_page = '<form id="payBillForm" action="{0}" method="POST">'.format(config.Payment.URL)
+    submit_page = '<form id="payBillForm" action="{0}" method="POST">'.format(config.url_pay)
     for key in req_params:
         submit_page += '''<input type="hidden" name="{0}" value='{1}' />'''.format(key, req_params[key])
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'
@@ -47,7 +47,7 @@ def _generate_submit_form(req_params):
 
 
 def _append_md5_sign(req_params):
-    digest = md5_sign(req_params, config.MD5_KEY)
+    digest = md5_sign(req_params, config.md5_key)
     req_params['sign'] = digest
     return req_params
 

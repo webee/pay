@@ -9,6 +9,7 @@ from . import pay_mod as mod
 from .prepay import Order, find_or_create_prepay_transaction
 from .pay import pay_by_uuid, PaymentNotFoundError
 from .postpay import *
+from .confirm_pay import confirm_payment
 from api.account.account.dba import get_account_by_id
 from api.util.enum import enum
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
@@ -69,6 +70,16 @@ def notify_payment(uuid):
         return notification.fail()
     else:
         return notification.succeed()
+
+
+@mod.route('/pay/<uuid>/confirm', methods=['POST'])
+def confirm_to_pay(uuid):
+    pay_record = find_payment_by_uuid(uuid)
+    if not pay_record:
+        return response.not_found({'uuid': uuid})
+
+    payment_id = confirm_payment(pay_record)
+    return response.ok(id=payment_id)
 
 
 def _notify_payment_result(uuid, data):

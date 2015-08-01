@@ -6,6 +6,7 @@ from contextlib import contextmanager
 import sqlalchemy
 from sqlalchemy import create_engine
 from mylog import get_logger
+from pytoolbox.conf import config
 
 LOGGER = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 
@@ -200,15 +201,12 @@ class DatabaseInterface(object):
 
 
 def create_db_engine(**kwargs):
-    from top_config import db as db_config
-    url = sqlalchemy.engine.url.URL('mysql',
-                                    db_config.USERNAME,
-                                    db_config.PASSWORD,
-                                    db_config.HOST,
-                                    db_config.PORT,
-                                    db_config.INSTANCE,
-                                    {'charset': 'utf8'}
-                                    )
+    db_host = config.get('database', 'host')
+    db_port = config.get('database', 'port')
+    db_instance = config.get('database', 'instance')
+    username = config.get('database', 'user')
+    password = config.get('database', 'password')
+    url = sqlalchemy.engine.url.URL('mysql', username, password, db_host, db_port, db_instance, {'charset': 'utf8'})
 
     return create_engine(url, pool_size=30, max_overflow=60, pool_recycle=3600, pool_timeout=60, **kwargs)
 

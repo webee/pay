@@ -5,11 +5,11 @@ from email.utils import parseaddr, formataddr
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from top_config import config
 import json
 import re
 import textwrap
 import logging
+from pytoolbox.conf import config
 
 CHARSET_UTF8 = 'utf-8'
 log = logging.getLogger(__name__)

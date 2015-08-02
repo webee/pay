@@ -94,8 +94,8 @@ def sign(data, sign_type):
 
 
 def verify(data, sign_type):
-    if sign_type == config.SignType.MD5:
+    if sign_type == config.sign_type_md5:
         return _verify_md5_data(data, config.md5_key)
-    elif sign_type == config.SignType.RSA:
+    elif sign_type == config.sign_type_rsa:
         return _verify_rsa_data(data, config.rsa_yt_pub_key)
     raise UnknownSignTypeError(sign_type)

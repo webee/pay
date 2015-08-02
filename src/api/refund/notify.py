@@ -9,17 +9,14 @@ def try_notify_client(refund_id):
 
     refund_order = dba.get_refund(refund_id)
     url = refund_order.callback_url
+    payment = dba.get_payment_by_id(refund_order.payment_id)
 
     if refund_order.state == RefundState.SUCCESS:
-        params = {'code': 0,
-                  'payer_account_id': refund_order['payer_account_id'],
-                  'payee_account_id': refund_order['payee_account_id'],
-                  'order_id': refund_id}
+        params = {'code': 0, 'client_id': payment.client_id, 'order_id': payment.order_id,
+                  'amount': refund_order.amount}
     elif refund_order.state == RefundState.FAILED:
-        params = {'code': 1, 'msg': 'failed',
-                  'payer_account_id': refund_order['payer_account_id'],
-                  'payee_account_id': refund_order['payee_account_id'],
-                  'order_id': refund_id}
+        params = {'code': 1, 'client_id': payment.client_id, 'order_id': payment.order_id,
+                  'amount': refund_order.amount}
 
     if not notify_client(url, params):
         # other notify process.

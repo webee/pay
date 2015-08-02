@@ -46,6 +46,15 @@ def get_payment(db, client_id, order_id):
 
 
 @db_context
+def get_payment_by_id(db, payment_id):
+    return db.get("""
+            SELECT *
+              FROM payment
+              WHERE payment_id = %(payment_id)s
+        """, payment_id=payment_id)
+
+
+@db_context
 def set_refund_info(db, refund_id, refund_serial_no):
     return db.execute("""
             UPDATE refund

@@ -9,7 +9,7 @@ from api.util import oid
 def transit_state(db, id, pre_state, new_state):
     return db.execute("""
             UPDATE refund
-              SET state=%(new_state)s, updated_on=%(ended_on)s
+              SET state=%(new_state)s, updated_on=%(updated_on)s
               WHERE id=%(id)s and state=%(pre_state)s
     """, id=id, pre_state=pre_state, new_state=new_state, updated_on=datetime.now()) > 0
 

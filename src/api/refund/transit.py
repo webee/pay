@@ -15,7 +15,7 @@ def refund_frozen(db, refund_order):
 
 @db_transactional
 def refund_failed(db, refund_order):
-    if payment_transit.refund_ended(db, refund_order.payment_id):
+    if payment_transit.refund_ended(db, refund_order.payment_id, refund_order.amount):
         if dba.transit_state(db, refund_order.id, RefundState.FROZEN, RefundState.FAILED):
             return event.unfrozen_back(refund_order.payee_account_id, refund_order.id, refund_order.amount)
 

@@ -84,7 +84,7 @@ def query_refund(refund_id):
     refund_order = refund.query_refund(refund_id)
     if refund_order is None:
         return response.not_found({'refund_id': refund_id})
-    return response.ok(refund_order)
+    return response.ok({k: v for k, v in refund_order.items()})
 
 
 @mod.route('/query', methods=['POST'])

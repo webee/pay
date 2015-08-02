@@ -58,6 +58,6 @@ def get_payment_by_id(db, payment_id):
 def set_refund_info(db, refund_id, refund_serial_no):
     return db.execute("""
             UPDATE refund
-                SET refund_serial_no=%(refund_serial_no)s, updated_on=%(updated_on)
+                SET refund_serial_no=%(refund_serial_no)s, updated_on=%(updated_on)s
                 WHERE id=%(id)s
         """, id=refund_id, refund_serial_no=refund_serial_no, updated_on=datetime.now()) > 0

@@ -53,7 +53,7 @@ def create_withdraw(db, account_id, bankcard_id, amount, callback_url):
 
 
 @db_context
-def list_all_withdraw(db, account_id):
+def list_all_unfailed_withdraw(db, account_id):
     return db.list(_sql_to_query_withdraw()
                    + " WHERE withdraw.state <> 'FAILED' AND withdraw.account_id = %(account_id)s"
                      " ORDER BY withdraw.created_on DESC",

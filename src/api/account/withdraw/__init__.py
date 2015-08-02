@@ -96,12 +96,12 @@ def query_order_to_update_state(account_id, withdraw_id):
     return withdraw_order
 
 
-def find_withdraw_by_id(id):
+def get_withdraw_by_id(id):
     return dba.find_withdraw_by_id(id)
 
 
-def list_withdraw(account_id):
-    records = dba.list_all_withdraw(account_id)
+def list_unfailed_withdraw(account_id):
+    records = dba.list_all_unfailed_withdraw(account_id)
     return [dict(record) for record in records]
 
 

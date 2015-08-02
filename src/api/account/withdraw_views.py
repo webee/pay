@@ -55,13 +55,13 @@ def notify_withdraw(account_id, uuid):
 
 @mod.route('/<int:account_id>/withdraw', methods=['GET'])
 def list_withdraw(account_id):
-    withdraw_list = withdraw.list_withdraw(account_id)
+    withdraw_list = withdraw.list_unfailed_withdraw(account_id)
     return response.list_data(withdraw_list)
 
 
 @mod.route('/<int:account_id>/withdraw/<withdraw_id>', methods=['GET'])
 def get_withdraw(account_id, withdraw_id):
-    withdraw_record = withdraw.find_withdraw_by_id(withdraw_id)
+    withdraw_record = withdraw.get_withdraw_by_id(withdraw_id)
     if not withdraw_record:
         return response.not_found({'withdraw_id': withdraw_id})
     return response.ok(dict(withdraw_record))

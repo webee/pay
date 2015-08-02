@@ -40,4 +40,4 @@ class RefundStateMissMatchError(RefundError):
 class RefundAmountError(RefundError):
     def __init__(self, amount):
         message = "refund amount error: [{0}].".format(amount)
-        super(RefundStateMissMatchError, self).__init__(message)
+        super(RefundAmountError, self).__init__(message)

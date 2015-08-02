@@ -14,4 +14,4 @@ def refund(refund_id, refunded_on, amount, paybill_id):
         'oid_paybill': paybill_id,
         'notify_url': generate_url(zyt_url.refund_notify, refund_id)
     }
-    return request(config.Refund.URL, params)
+    return request(config.url_refund, params)

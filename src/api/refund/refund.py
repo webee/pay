@@ -64,7 +64,7 @@ def apply_for_refund(client_id, order_id, amount, callback_url):
         if amount_value <= 0:
             raise NegativeAmountError(amount_value)
 
-        if amount_value + payment_order.refunded_amount >= payment_order.amount:
+        if amount_value + payment_order.refunded_amount > payment_order.amount:
             raise RefundAmountError(amount)
 
         refund_order = _create_refund_freezing(payment_order, amount, callback_url)

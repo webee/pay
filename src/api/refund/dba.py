@@ -50,8 +50,8 @@ def get_payment_by_id(db, payment_id):
     return db.get("""
             SELECT *
               FROM payment
-              WHERE payment_id = %(payment_id)s
-        """, payment_id=payment_id)
+              WHERE id = %(id)s
+        """, id=payment_id)
 
 
 @db_context

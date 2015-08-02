@@ -26,8 +26,7 @@ def prepay():
     client_id = data['client_id']
     payer_id = data['payer']
     payee_id = data['payee']
-    order = Order(data['order_no'], data['order_name'], data['order_desc'],
-                  data['ordered_on'])
+    order = Order(data['activity_id'], data['order_no'], data['order_name'], data['order_desc'], data['ordered_on'])
     amount = data['amount']
     client_callback_url = data['client_callback_url']
 

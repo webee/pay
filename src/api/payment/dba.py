@@ -25,7 +25,7 @@ def transit_state(db, id, prev_state, new_state):
 
 @db_context
 def create_payment(db, id, client_id, payer_account_id, payee_account_id, order, amount, callback_url,
-           client_callback_url):
+                   client_callback_url, created_on):
     payment_fields = {
         'id': id,
         'client_id': client_id,
@@ -40,9 +40,19 @@ def create_payment(db, id, client_id, payer_account_id, payee_account_id, order,
         'callback_url': callback_url,
         'client_callback_url': client_callback_url,
         'state': PaymentState.CREATED,
-        'created_on': datetime.now()
+        'created_on': created_on
     }
     db.insert('payment', **payment_fields)
+
+
+@db_context
+def group_payment(db, group_id, payment_id, created_on):
+    fields = {
+        'group_id': group_id,
+        'payment_id': payment_id,
+        'created_on': created_on
+    }
+    db.insert('payment_group', **fields)
 
 
 @db_context
@@ -59,7 +69,7 @@ def find_payment_by_order_no(db, client_id, order_no):
 @db_context
 def list_expired_payment(db):
     return db.list('SELECT * FROM payment WHERE state = %(state)s AND auto_confirm_expired_on < %(expired_on)s',
-                          state=PaymentState.SECURED, expired_on=datetime.now())
+                   state=PaymentState.SECURED, expired_on=datetime.now())
 
 
 @db_context
@@ -78,7 +88,7 @@ def succeed_payment(db, id, paybill_id):
 @db_context
 def fail_payment(db, id):
     db.execute('UPDATE payment SET state = %(new_state)s, transaction_ended_on = %(ended_on)s WHERE id = %(id)s',
-                      id=id, new_state=PaymentState.FAILED, ended_on=datetime.now())
+               id=id, new_state=PaymentState.FAILED, ended_on=datetime.now())
 
 
 def _few_days_later(from_datetime, days):

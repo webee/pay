@@ -46,6 +46,15 @@ CREATE TABLE payment(
   FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
 );
 
+CREATE TABLE payment_group(
+  group_id VARCHAR(16) NOT NULL,
+  payment_id CHAR(30) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  PRIMARY KEY payment_group_primary_key (group_id, payment_id),
+  FOREIGN KEY payment_id (payment_id) REFERENCES payment(id)
+);
+
 
 CREATE TABLE bankcard(
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

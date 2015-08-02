@@ -145,9 +145,9 @@ def _request_refund(payment_order, refund_order):
         if 'oid_refundno' in res:
             oid_refundno = res['oid_refundno']
             set_refund_info(refund_id, oid_refundno)
-    except (ApiError, Exception) as _:
+    except (ApiError, Exception) as e:
         _process_request_failure(refund_order)
-        raise RefundFailedError()
+        raise RefundFailedError(e.message)
 
 
 def _get_payment_to_refund(client_id, order_id):

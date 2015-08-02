@@ -73,7 +73,7 @@ def notify_refund(uuid):
     oid_partner = data['oid_partner']
     refund_id = data['no_refund']
 
-    if is_valid_transaction(oid_partner, refund_id, uuid):
+    if not is_valid_transaction(oid_partner, refund_id, uuid):
         return notification.is_invalid()
 
     return refund.handle_refund_notify(refund_id, data)

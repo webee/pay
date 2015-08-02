@@ -128,7 +128,7 @@ def _create_refund_freezing(db, payment_order, amount, callback_url):
 
     refund_id = dba.create_refund(db, payment_id, payer_account_id, payee_account_id, amount, callback_url)
     refund_order = dba.get_refund(db, refund_id)
-    if not transit.refund_frozen(db, payment_order, refund_order):
+    if not transit.refund_frozen(db, refund_order):
         raise RefundFailedError()
 
     return refund_order

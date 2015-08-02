@@ -32,10 +32,10 @@ def apply_for_withdraw(account_id):
         return response.bad_request(e.message)
     except InsufficientBalanceError as e:
         return response.bad_request(e.message)
-    except WithdrawError as e:
-        return response.bad_request(e.message)
     except WithdrawRequestFailedError as e:
         return response.bad_request(e.message, withraw_id=e.withdraw_id)
+    except WithdrawError as e:
+        return response.bad_request(e.message)
     except Exception as e:
         return response.bad_request(e.message)
 

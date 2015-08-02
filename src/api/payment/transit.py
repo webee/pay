@@ -20,7 +20,7 @@ def refund_started(db, id):
 
 
 @db_transactional
-def refund_ended(db, id, amount):
+def refund_ended(db, id, amount=0):
     if dba.set_refunded_amount(db, id, amount):
         return dba.transit_state(db, id, PaymentState.REFUNDING, PaymentState.SECURED)
 

@@ -60,8 +60,8 @@ def list_withdraw(account_id):
 
 
 @mod.route('/<int:account_id>/withdraw/<withdraw_id>', methods=['GET'])
-def get_withdraw(account_id, withdraw_id):
+def withdraw_detail(account_id, withdraw_id):
     withdraw_record = withdraw.get_withdraw_by_id(withdraw_id)
     if not withdraw_record:
-        return response.not_found({'withdraw_id': withdraw_id})
+        return response.not_found({'account_id': account_id, 'withdraw_id': withdraw_id})
     return response.ok(dict(withdraw_record))

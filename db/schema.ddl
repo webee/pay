@@ -4,20 +4,27 @@ CREATE TABLE db_migration (
 
 insert into db_migration values(0);
 
+CREATE TABLE user_domain(
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY ,
+  name VARCHAR(32) ,
+  created_at TIMESTAMP NOT NULL
+);
+
 CREATE TABLE client_info(
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY ,
+  user_domain_id INT UNSIGNED NOT NULL ,
   name VARCHAR(32) ,
   created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE account(
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  client_id INT UNSIGNED NOT NULL,
+  user_domain_id INT UNSIGNED NOT NULL,
   user_id VARCHAR(32) NOT NULL,
   created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  UNIQUE KEY client_user_uiq_idx (client_id, user_id),
-  FOREIGN KEY client_info_id (client_id) REFERENCES client_info(id)
+  UNIQUE KEY domain_user_uiq_idx (user_domain_id, user_id),
+  FOREIGN KEY user_domain_id (user_domain_id) REFERENCES user_domain(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE payment(

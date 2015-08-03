@@ -6,11 +6,18 @@ from pytoolbox.util.dbe import require_db_context, db_context
 from api.constant import BookkeepingSide
 
 
+@db_context
+def get_client_info(db, client_id):
+    return db.get("select * from client_info where id=%(id)s", id=client_id)
+
+
 def find_or_create_account(client_id, user_id):
-    account_id = find_account_id(client_id, user_id)
+    client_info = get_client_info(client_id)
+
+    account_id = find_account_by_domain_id(client_info.user_domain_id, user_id)
     if not account_id:
         fields = {
-            'client_id': client_id,
+            'user_domain_id': client_info.user_domain_id,
             'user_id': user_id
         }
         with require_db_context() as db:
@@ -18,13 +25,23 @@ def find_or_create_account(client_id, user_id):
     return account_id
 
 
-def find_account_id(client_id, user_id):
+def find_account_by_domain_id(user_domain_id, user_id):
     with require_db_context() as db:
         return db.get_scalar(
             """
               SELECT id FROM account
-                WHERE client_id = %(client_id)s AND user_id = %(user_id)s
-            """, client_id=client_id, user_id=user_id)
+                WHERE user_domain_id = %(user_domain_id)s AND user_id = %(user_id)s
+            """, user_domain_id=user_domain_id, user_id=user_id)
+
+
+def find_account_id(client_id, user_id):
+    client_info = get_client_info(client_id)
+    with require_db_context() as db:
+        return db.get_scalar(
+            """
+              SELECT id FROM account
+                WHERE user_domain_id = %(user_domain_id)s AND user_id = %(user_id)s
+            """, user_domain_id=client_info.user_domain_id, user_id=user_id)
 
 
 @db_context

@@ -28,6 +28,18 @@ def receive_pay_result(uuid):
         return _redirect_pay_result(pay_record)
 
 
+@mod.route('/pay/<uuid>/notify', methods=['POST'])
+@parse_and_verify
+def notify_payment(uuid):
+    result = _notify_payment_result(uuid, request.verified_data)
+    if result == PayResult.IsInvalidRequest:
+        return notification.is_invalid()
+    elif result == PayResult.Failure:
+        return notification.fail()
+    else:
+        return notification.succeed()
+
+
 def _notify_payment_result(uuid, data):
     partner_oid = data['oid_partner']
     order_no = data['no_order']

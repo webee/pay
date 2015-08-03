@@ -13,6 +13,12 @@ def init_db():
     init_test_data()
 
 
+def init_db_2():
+    recreate_db()
+    create_schema_2()
+    init_test_data()
+
+
 def recreate_db():
     info('recreating database ...')
     local('mysql -u root -p < db/init_db.sql')
@@ -21,6 +27,12 @@ def recreate_db():
 def create_schema():
     info('creating schema ...')
     local('mysql -u root {} -p < db/schema.ddl'.format(db_instance))
+
+
+def create_schema_2():
+    info('creating schema ...')
+    local('mysql -u root {} -p < db/schema_zyt_core.ddl'.format(db_instance))
+    local('mysql -u root {} -p < db/schema_zyt_guaranteed_pay.ddl'.format(db_instance))
 
 
 def init_test_data():

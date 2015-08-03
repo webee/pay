@@ -20,12 +20,12 @@ class Order(object):
 
 @transactional
 def find_or_create_prepay_transaction(client_id, payer_user_id, payee_user_id, order, amount, client_callback_url):
-    payer_account_id = find_or_create_account(client_id, payer_user_id)
-    payee_account_id = find_or_create_account(client_id, payee_user_id)
-
     pay_record = find_payment_by_order_no(client_id, order.no)
     if pay_record:
         return pay_record['id']
+
+    payer_account_id = find_or_create_account(client_id, payer_user_id)
+    payee_account_id = find_or_create_account(client_id, payee_user_id)
     return _new_payment(amount, client_callback_url, client_id, order, payee_account_id, payer_account_id)
 
 

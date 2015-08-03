@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from api2.guaranteed_pay.constant import PaymentState
 from pytoolbox.util.dbe import db_context
+
+
+class PaymentState(object):
+    CREATED = 'CREATED'
+    SECURED = 'SECURED'
+    FAILED = 'FAILED'
+    CONFIRMED = 'CONFIRMED'
+    REFUNDING = 'REFUNDING'
+    REFUND_PREPARED = 'REFUND_PREPARED'
 
 
 @db_context
@@ -62,3 +70,12 @@ def cache_secured_account_id(db, client_id, account_id):
         'created_on': datetime.now()
     }
     db.insert('payment_group', **fields)
+
+
+@db_context
+def update_payment_state(db, id, state):
+    return db.execute(
+        """
+            UPDATE payment SET state = %(state)s, updated_on = %(updated_on)s
+              WHERE id = %(id)s
+        """, id=id, state=state)

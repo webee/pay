@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-from .dba import find_payment_by_id
+from .dba import find_payment_by_id, update_payment_state, PaymentState
 from api2.account import get_account_by_id
+
+
+def guarantee_payment(pay_record_id):
+    update_payment_state(pay_record_id, PaymentState.SECURED)
 
 
 def get_sync_callback_url_of_payment(pay_record_id):

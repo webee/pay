@@ -25,7 +25,7 @@ def transit_state(db, id, prev_state, new_state):
 
 @db_context
 def create_payment(db, id, client_id, payer_account_id, payee_account_id, order, amount, callback_url,
-                   client_callback_url, created_on):
+                   client_callback_url, client_async_callback_url, created_on):
     payment_fields = {
         'id': id,
         'client_id': client_id,
@@ -39,6 +39,7 @@ def create_payment(db, id, client_id, payer_account_id, payee_account_id, order,
         'ordered_on': order.created_on,
         'callback_url': callback_url,
         'client_callback_url': client_callback_url,
+        'client_async_callback_url': client_async_callback_url,
         'state': PaymentState.CREATED,
         'created_on': created_on
     }

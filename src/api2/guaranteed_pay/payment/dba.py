@@ -37,6 +37,11 @@ def group_payment(db, group_id, payment_id, created_on):
 
 
 @db_context
+def find_payment_by_id(db, id):
+    return db.get('SELECT * FROM payment WHERE id = %(id)s', id=id)
+
+
+@db_context
 def find_payment_by_order_no(db, client_id, order_no):
     return db.get('SELECT * FROM payment WHERE client_id = %(client_id)s AND order_id=%(order_id)s',
                   client_id=client_id, order_id=order_no)

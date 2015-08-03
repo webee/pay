@@ -34,8 +34,10 @@ def parse_and_verify(f):
     return decorated_function
 
 
-def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notification_url):
-    return _pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notification_url)
+def pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount):
+    return_url = generate_pay_return_url(order_no)
+    notify_url = generate_pay_notification_url(order_no)
+    return _pay(payer, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url)
 
 
 def query_bankcard_bin(card_no):

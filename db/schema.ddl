@@ -43,6 +43,7 @@ CREATE TABLE payment(
   updated_on TIMESTAMP,
   callback_url VARCHAR(128) ,
   client_callback_url VARCHAR(128),
+  client_async_callback_url VARCHAR(128),
   state ENUM('CREATED', 'SECURED', 'FAILED', 'CONFIRMED', 'REFUND_PREPARED', 'REFUNDING') NOT NULL DEFAULT 'CREATED',
   paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,

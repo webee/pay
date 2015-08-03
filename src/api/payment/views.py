@@ -2,6 +2,7 @@
 from __future__ import unicode_literals, print_function, division
 from decimal import Decimal
 import logging
+import requests
 
 from api.util import response
 from flask import jsonify, request, Response, redirect
@@ -15,7 +16,6 @@ from api.util.enum import enum
 from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
 
 logger = logging.getLogger(__name__)
-
 
 PayResult = enum(Success=0, Failure=1, IsInvalidRequest=2)
 
@@ -56,9 +56,9 @@ def post_pay_result(uuid):
         return notification.is_invalid
     elif result == PayResult.Failure:
         return notification.fail
-    else:
-        pay_record = find_payment_by_uuid(uuid)
-        return _send_pay_result_to_client_interface(pay_record)
+    callback_url = _construct_pay_result_callback_url(uuid, callback_url_key='client_callback_url')
+    return redirect(callback_url)
+
 
 
 @mod.route('/pay/<uuid>/notify', methods=['POST'])
@@ -69,8 +69,13 @@ def notify_payment(uuid):
         return notification.is_invalid()
     elif result == PayResult.Failure:
         return notification.fail()
-    else:
-        return notification.succeed()
+    callback_url = _construct_pay_result_callback_url(uuid, callback_url_key='client_async_callback_url')
+    resp = requests.put(callback_url)
+    if resp.status_code == 200:
+        data = resp.json()
+        if data['code'] == 0 or data['code'] == '0':
+            return notification.succeed()
+    return notification.fail()
 
 
 def _notify_payment_result(uuid, data):
@@ -91,10 +96,10 @@ def _notify_payment_result(uuid, data):
     return PayResult.Success
 
 
-def _send_pay_result_to_client_interface(pay_record):
+def _construct_pay_result_callback_url(uuid, callback_url_key='client_callback_url'):
+    pay_record = find_payment_by_uuid(uuid)
     account = get_account_by_id(pay_record['payer_account_id'])
-
-    return redirect('{0}?user_id={1}&order_id={2}&amount={3}&status=money_locked'
-                    .format(pay_record['client_callback_url'], account['user_id'], pay_record['order_id'],
-                            pay_record['amount']))
-
+    return '{0}?user_id={1}&order_id={2}&amount={3}&status=money_locked'.format(pay_record[callback_url_key],
+                                                                                account['user_id'],
+                                                                                pay_record['order_id'],
+                                                                                pay_record['amount'])

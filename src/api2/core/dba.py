@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
-from api2.util.enum import enum
 from datetime import datetime
 
 from .util.oid import pay_id
@@ -11,7 +10,7 @@ from pytoolbox.util.dbe import db_context
 def new_payment(db, trade_id, payer_account_id, payee_account_id, amount):
     record_id = pay_id(payer_account_id)
     now = datetime.now()
-    payment_fields = {
+    fields = {
         'id': record_id,
         'trade_id': trade_id,
         'payer_account_id': payer_account_id,
@@ -20,7 +19,7 @@ def new_payment(db, trade_id, payer_account_id, payee_account_id, amount):
         'created_on': now,
         'updated_on': now
     }
-    db.insert('guaranteed_payment', **payment_fields)
+    db.insert('payment', **fields)
     return record_id
 
 
@@ -45,3 +44,15 @@ def succeed_payment(db, id, paybill_id):
 def fail_payment(db, id):
     db.execute("UPDATE payment SET state = 'FAILED', transaction_ended_on = %(ended_on)s WHERE id = %(id)s",
                id=id, ended_on=datetime.now())
+
+
+@db_context
+def new_transfer(db, trade_id, payer_account_id, payee_account_id, amount):
+    fields = {
+        'trade_id': trade_id,
+        'payer_account_id': payer_account_id,
+        'payee_account_id': payee_account_id,
+        'amount': amount,
+        'created_on': datetime.now()
+    }
+    db.insert('guaranteed_payment', **fields)

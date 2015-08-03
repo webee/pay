@@ -31,6 +31,8 @@ def create_schema():
 
 def create_schema_2():
     info('creating schema ...')
+    local('mysql -u root {} -p < db/schema_zyt.ddl'.format(db_instance))
+    local('mysql -u root {} -p < db/schema_zyt_account.ddl'.format(db_instance))
     local('mysql -u root {} -p < db/schema_zyt_core.ddl'.format(db_instance))
     local('mysql -u root {} -p < db/schema_zyt_guaranteed_pay.ddl'.format(db_instance))
 

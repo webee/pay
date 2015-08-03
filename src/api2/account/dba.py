@@ -18,10 +18,14 @@ def find_or_create_account(db, client_id, user_id):
     if account:
         return account['id']
 
+    create_account(db, client_id, user_id)
+
+
+@db_context
+def create_account(db, client_id, user_id, desc):
     fields = {
         'client_id': client_id,
-        'user_id': user_id
+        'user_id': user_id,
+        'desc': desc
     }
-    account_id = db.insert('account', returns_id=True, **fields)
-    return account_id
-
+    return db.insert('account', returns_id=True, **fields)

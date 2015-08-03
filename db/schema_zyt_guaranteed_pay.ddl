@@ -29,6 +29,15 @@ CREATE TABLE payment_group(
   payment_id CHAR(30) NOT NULL,
   created_on TIMESTAMP NOT NULL,
 
-  PRIMARY KEY payment_group_primary_key (group_id, payment_id),
+  PRIMARY KEY primary_key (group_id, payment_id),
   FOREIGN KEY payment_id (payment_id) REFERENCES guaranteed_payment(id)
+);
+
+
+CREATE TABLE secured_account(
+  client_id INT UNSIGNED NOT NULL,
+  account_id INT UNSIGNED NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  UNIQUE KEY unique_key (client_id, account_id)
 );

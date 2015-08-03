@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 
 from api2.guaranteed_pay.constant import PaymentState
 from pytoolbox.util.dbe import db_context
@@ -45,3 +46,19 @@ def find_payment_by_id(db, id):
 def find_payment_by_order_no(db, client_id, order_no):
     return db.get('SELECT * FROM payment WHERE client_id = %(client_id)s AND order_id=%(order_id)s',
                   client_id=client_id, order_id=order_no)
+
+
+@db_context
+def find_secured_account_id(db, client_id):
+    return db.get_scalar('SELECT account_id FROM secured_account WHERE client_id = %(client_id)s',
+                         client_id)
+
+
+@db_context
+def cache_secured_account_id(db, client_id, account_id):
+    fields = {
+        'client_id': client_id,
+        'account_id': account_id,
+        'created_on': datetime.now()
+    }
+    db.insert('payment_group', **fields)

@@ -5,7 +5,7 @@ import os
 
 
 def register_mods(app):
-    from api2.face_views import mod
+    from api2.facade_views import mod
     from api2.core_views import core_mod
 
     app.register_blueprint(mod)

@@ -70,6 +70,7 @@ def _sql_to_query_withdraw():
         SELECT withdraw.id,
                concat(bank_name, '(', right(card_no, 4), ')') AS card,
                withdraw.created_on AS withdrawed_on,
+               withdraw.amount as amount,
                if(withdraw.state = 'SUCCESS', withdraw.updated_on, null) AS received_on
         FROM withdraw
           INNER JOIN bankcard ON withdraw.bankcard_id = bankcard.id

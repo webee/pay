@@ -6,8 +6,10 @@ import os
 
 def register_mods(app):
     from api2.face_views import mod
+    from api2.core_views import core_mod
 
     app.register_blueprint(mod)
+    app.register_blueprint(core_mod, url_prefix='/core')
 
 
 def create_app(env):

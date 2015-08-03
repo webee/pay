@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
+from api2.util.enum import enum
 from datetime import datetime
 
 from .util.oid import pay_id
@@ -21,3 +22,26 @@ def new_payment(db, trade_id, payer_account_id, payee_account_id, amount):
     }
     db.insert('guaranteed_payment', **payment_fields)
     return record_id
+
+
+@db_context
+def find_payment_by_id(db, id):
+    return db.get('SELECT * FROM payment WHERE id = %(id)s', id=id)
+
+
+@db_context
+def succeed_payment(db, id, paybill_id):
+    now = datetime.now()
+    db.execute(
+        """
+            UPDATE payment
+              SET state = 'SUCCESS', transaction_ended_on = %(ended_on)s, paybill_id = %(paybill_id)s
+              WHERE id = %(id)s
+        """,
+        id=id, paybill_id=paybill_id, ended_on=now)
+
+
+@db_context
+def fail_payment(db, id):
+    db.execute("UPDATE payment SET state = 'FAILED', transaction_ended_on = %(ended_on)s WHERE id = %(id)s",
+               id=id, ended_on=datetime.now())

@@ -11,3 +11,24 @@ CREATE TABLE payment(
   transaction_ended_on TIMESTAMP,
   confirmed_on TIMESTAMP
 );
+
+
+CREATE TABLE event(
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  source_type ENUM('PAY', 'WITHDRAW', 'REFUND', 'TRANSFER') NOT NULL,
+  source_id CHAR(30) NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE account_transaction_log(
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  event_id BIGINT UNSIGNED NOT NULL,
+  account_id INT UNSIGNED NOT NULL,
+  side ENUM('DEBIT', 'CREDIT') NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY event_id(event_id) REFERENCES event(id)
+);

@@ -56,6 +56,10 @@ def query_withdraw_order(withdraw_id):
     return _query_order(withdraw_id)
 
 
+def is_sending_to_me(partner_id):
+    return _is_sending_to_me(partner_id)
+
+
 def is_valid_transaction(oid_partner, transaction_id, uuid):
     return _is_sending_to_me(oid_partner) and transaction_id == decode_uuid(uuid)
 

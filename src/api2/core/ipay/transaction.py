@@ -61,10 +61,6 @@ def is_valid_transaction(oid_partner, transaction_id, uuid):
     return _is_sending_to_me(oid_partner) and transaction_id == decode_uuid(uuid)
 
 
-def generate_pay_url(id):
-    return _generate_notification_url(zyt_url.pay, id)
-
-
 def generate_pay_return_url(id):
     return _generate_notification_url(zyt_url.pay_return, id)
 

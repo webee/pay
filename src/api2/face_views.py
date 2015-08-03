@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, request, Response
 
-from api2.util import response
-from api2.guaranteed_pay.payment.prepay import Order, find_or_create_prepay_transaction, generate_pay_url
+from api2.account import get_account_by_user_info
+from api2.guaranteed_pay.payment.prepay import *
 from api2.guaranteed_pay.payment.pay import pay_by_uuid, PaymentNotFoundError
+from api2.util import response
 
 mod = Blueprint('api', __name__)
 
@@ -33,3 +34,13 @@ def pay(uuid):
         return Response(form_submit, status=200, mimetype='text/html')
     except PaymentNotFoundError:
         return response.not_found({'uuid': uuid})
+
+
+@mod.route('/accounts/<int:client_id>/users/<user_id>/account', methods=['GET'])
+def get_account_info(client_id, user_id):
+    account = get_account_by_user_info(client_id, user_id)
+    if not account:
+        return response.not_found({'client_id': client_id, 'user_id': user_id})
+
+    account_id = account['id']
+    return response.ok(account_id=account_id)

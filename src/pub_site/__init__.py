@@ -29,10 +29,10 @@ def init_errors(app):
 
 def register_mods(app):
     from pub_site.withdraw import withdraw_mod
-    from pub_site.authentication import login_mod
+    from pub_site.authentication import authentication_mod
 
     app.register_blueprint(withdraw_mod)
-    app.register_blueprint(login_mod)
+    app.register_blueprint(authentication_mod)
 
 
 # extensions.

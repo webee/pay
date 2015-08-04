@@ -12,12 +12,12 @@ def set_current_channel():
     g.current_channel = 'withdraw'
 
 
-@mod.route('/')
+@mod.route('/withdraw')
 def withdraw():
     return redirect(url_for('.bind_card'))
 
 
-@mod.route('/bind-card', methods= ['GET'])
+@mod.route('/withdraw/bind-card', methods= ['GET'])
 def bind_card():
     return render_template('bind-card.html')
 

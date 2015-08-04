@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from ..util import oid
 from pytoolbox.util.dbe import db_context
 
 
@@ -73,9 +74,23 @@ def cache_secured_account_id(db, client_id, account_id):
 
 
 @db_context
-def update_payment_state(db, id, state):
+def update_payment_state(db, _id, state):
     return db.execute(
         """
             UPDATE payment SET state = %(state)s, updated_on = %(updated_on)s
               WHERE id = %(id)s
-        """, id=id, state=state)
+        """, id=_id, state=state)
+
+
+@db_context
+def secure_payment(db, payment_id, payer_account_id, amount):
+    _id = oid.secured_pay_id(payer_account_id)
+    fields = {
+        'id': _id,
+        'guaranteed_payment_id': payment_id,
+        'payer_account_id': payer_account_id,
+        'amount': amount,
+        'created_on': datetime.now()
+    }
+    db.insert('payment_group', **fields)
+    return _id

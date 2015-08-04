@@ -40,3 +40,14 @@ CREATE TABLE secured_account(
 
   UNIQUE KEY unique_key (client_id, account_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE secure_payment(
+  id CHAR(30) PRIMARY KEY, -- prefix with 'SCP'
+  guaranteed_payment_id CHAR(30) NOT NULL,
+  payer_account_id INT NOT NULL ,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY guaranteed_payment_id(guaranteed_payment_id) REFERENCES guaranteed_payment(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

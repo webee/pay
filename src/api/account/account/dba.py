@@ -92,3 +92,9 @@ def get_account(db, client_id, user_id):
 @db_context
 def get_account_by_id(db, id):
     return db.get('SELECT * FROM account WHERE id=%(id)s', id=id)
+
+
+@db_context
+def get_account_by_user_id(db, user_domain_id, user_id):
+    return db.get('SELECT * FROM account WHERE user_domain_id=%(user_domain_id)s and user_id=%(user_id)s',
+                  user_domain_id=user_domain_id, user_id=user_id)

@@ -17,3 +17,13 @@ def balance(account_id):
 
     balance = account.get_cash_balance(account_id)
     return response.ok(balance=balance)
+
+
+@mod.route('/<int:user_domain_id>/<int:user_id>/balance', methods=['GET'])
+def user_balance(user_domain_id, user_id):
+    account = dba.get_account_by_user_id(user_domain_id, user_id)
+    if account is None:
+        return response.not_found()
+
+    balance = account.get_cash_balance(account.id)
+    return response.ok(balance=balance)

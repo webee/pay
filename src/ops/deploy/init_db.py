@@ -16,7 +16,7 @@ def init_db():
 def init_db_2():
     recreate_db()
     create_schema_2()
-    init_test_data()
+    inject_base_data()
 
 
 def recreate_db():
@@ -37,6 +37,11 @@ def create_schema_2():
     local('mysql -u root {} -p < db/schema_zyt_core.ddl'.format(db_instance))
     local('mysql -u root {} -p < db/schema_zyt_guaranteed_pay.ddl'.format(db_instance))
     local('mysql -u root {} -p < db/schema_zyt_pub_site.ddl'.format(db_instance))
+
+
+def inject_base_data():
+    info('injecting base data ...')
+    local('mysql -u root {} -p < db/base_data.sql'.format(db_instance))
 
 
 def init_test_data():

@@ -66,7 +66,7 @@ def register_config(parent_or_config, name=None, env=DEFAULT_ENV, mapping=None):
                                          'config': config_package.__env_name__,
                                          'members': config_package.__members__}
 
-    logger.info("use config : [{0}.{1}]".format(name, config_package.__env_name__))
+    logger.info("use config : [{0}.{1}]".format(config_package.__name__, config_package.__env_name__))
 
 
 def _get_parent_module(mod):

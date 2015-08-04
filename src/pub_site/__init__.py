@@ -32,10 +32,12 @@ def register_mods(app):
     from pub_site.auth import auth_mod
     from pub_site.main import main_mod
     from pub_site.withdraw import withdraw_mod
+    from pub_site.data import data_mod
 
     app.register_blueprint(auth_mod)
     app.register_blueprint(main_mod)
     app.register_blueprint(withdraw_mod)
+    app.register_blueprint(data_mod)
 
 
 # extensions.

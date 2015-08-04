@@ -51,8 +51,10 @@
         	<h2 class="padding20">自游通</h2>
             <ul class="listli">
             	<li class="padding20">账户余额与交易记录</li>
-                <li class="padding20">提现</li>
-                <li class="padding20 cur">付款给绿野</li>
+                <li class="padding20 {{ 'cur' if g.current_channel == 'withdraw' else ''}}">
+                    <a href="{{ url_for('withdraw.withdraw') }}">提现</a>
+                </li>
+                <li class="padding20">付款给绿野</li>
                 <li class="padding20">设置支付密码</li>
             </ul>
         </div>

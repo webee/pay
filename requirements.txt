@@ -30,3 +30,4 @@ redis==2.10.3
 requests==2.7.0
 uWSGI==2.0.11
 wsgiref==0.1.2
+flask-login==0.2.11

@@ -4,7 +4,7 @@ from decimal import Decimal, InvalidOperation
 from .balance import get_cash_balance
 from .bookkeeping import bookkeep, Event, SourceType
 from .dba import get_bankcard, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
-    get_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result
+    get_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result, list_all_unfailed_withdraw
 from .ipay import transaction
 from .ipay.error import TransactionApiError
 from .util.lock import require_user_account_lock
@@ -82,6 +82,11 @@ def handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info='
         try_to_notify_client(withdraw_id)
         return True
     return False
+
+
+def list_unfailed_withdraw(account_id):
+    records = list_all_unfailed_withdraw(account_id)
+    return [dict(record) for record in records]
 
 
 @transactional

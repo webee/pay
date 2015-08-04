@@ -3,7 +3,7 @@ from flask import Blueprint, request, Response
 
 from api2.account import get_account_by_user_info
 from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
-    ZytCoreError, apply_to_withdraw
+    ZytCoreError, apply_to_withdraw, list_unfailed_withdraw
 from api2.guaranteed_pay.payment.prepay import *
 from api2.guaranteed_pay.payment.pay import pay_by_uuid, PaymentNotFoundError
 from api2.guaranteed_pay.payment.confirm_pay import confirm_payment
@@ -105,3 +105,10 @@ def withdraw(account_id):
         return response.accepted(order_id)
     except ZytCoreError, e:
         return response.bad_request(e.message)
+
+
+@mod.route('/accounts/<int:account_id>/withdraw', methods=['GET'])
+def list_withdraw(account_id):
+    withdraw_list = list_unfailed_withdraw(account_id)
+    return response.list_data(withdraw_list)
+

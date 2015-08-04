@@ -134,3 +134,23 @@ def update_withdraw_result(db, _id, paybill_id, result, failure_info):
         """,
         id=_id, state=WITHDRAW_STATE.FROZEN, result=result, paybill_id=paybill_id, failure_info=failure_info,
         updated_on=datetime.now()) > 0
+
+
+@db_context
+def list_all_unfailed_withdraw(db, account_id):
+    return db.list(_sql_to_query_withdraw()
+                   + " WHERE withdraw.state <> 'FAILED' AND withdraw.account_id = %(account_id)s"
+                     " ORDER BY withdraw.created_on DESC",
+                   account_id=account_id)
+
+
+def _sql_to_query_withdraw():
+    return """
+        SELECT withdraw.id,
+               concat(bank_name, '(', right(card_no, 4), ')') AS card,
+               withdraw.created_on AS withdrawed_on,
+               withdraw.amount as amount,
+               if(withdraw.state = 'SUCCESS', withdraw.updated_on, null) AS received_on
+        FROM withdraw
+          INNER JOIN bankcard ON withdraw.bankcard_id = bankcard.id
+    """

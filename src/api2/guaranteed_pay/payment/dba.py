@@ -2,15 +2,11 @@
 from datetime import datetime
 
 from ..util import oid
+from api2.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
 
-class PaymentState(object):
-    CREATED = 'CREATED'
-    SECURED = 'SECURED'
-    FAILED = 'FAILED'
-    CONFIRMED = 'CONFIRMED'
-    REFUNDED = 'REFUNDED'
+PAYMENT_STATE = enum(CREATED='CREATED', SECURED='SECURED', FAILED='FAILED', CONFIRMED='CONFIRMED', REFUNDED='REFUNDED')
 
 
 @db_context
@@ -29,7 +25,7 @@ def create_payment(db, id, client_id, payer_account_id, payee_account_id, order,
         'ordered_on': order.created_on,
         'client_callback_url': client_callback_url,
         'client_async_callback_url': client_async_callback_url,
-        'state': PaymentState.CREATED,
+        'state': PAYMENT_STATE.CREATED,
         'created_on': created_on
     }
     db.insert('guaranteed_payment', **payment_fields)

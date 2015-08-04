@@ -2,13 +2,11 @@
 from datetime import datetime
 
 from ..util import oid
+from api2.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
 
-class RefundState(object):
-    CREATED = 'CREATED'
-    SUCCESS = 'SUCCESS'
-    FAILED = 'FAILED'
+_REFUND_STATE = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED')
 
 
 @db_context
@@ -20,7 +18,7 @@ def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, as
         'payer_account_id': payer_account_id,
         'payee_account_id': payee_account_id,
         'amount': amount,
-        'state': RefundState.CREATED,
+        'state': _REFUND_STATE.CREATED,
         'created_on': datetime.now(),
         'async_callback_url': async_callback_url
     }

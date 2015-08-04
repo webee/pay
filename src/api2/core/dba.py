@@ -2,11 +2,12 @@
 from __future__ import unicode_literals, print_function
 from datetime import datetime
 
-from .util.oid import pay_id
+from .util.oid import pay_id, withdraw_id
 from api2.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
 
+WITHDRAW_STATE = enum(FROZEN='FROZEN', SUCCESS='SUCCESS', FAILED='FAILED')
 _BANK_ACCOUNT = enum(IsPrivateAccount=0, IsCorporateAccount=1)
 
 
@@ -83,3 +84,41 @@ def new_bankcard(db, account_id, bankcard):
         'created_on': datetime.now()
     }
     return db.insert('bankcard', returns_id=True, **fields)
+
+
+@db_context
+def get_bankcard(db, bankcard_id):
+    return db.get('SELECT * FROM bankcard WHERE id=%(bankcard_id)s', bankcard_id=bankcard_id)
+
+
+@db_context
+def create_withdraw(db, account_id, bankcard_id, amount, callback_url):
+    _id = withdraw_id(account_id)
+    fields = {
+        'id': _id,
+        'account_id': account_id,
+        'bankcard_id': bankcard_id,
+        'amount': amount,
+        'created_on': datetime.now(),
+        'callback_url': callback_url,
+        'state': WITHDRAW_STATE.FROZEN
+    }
+
+    db.insert('withdraw', fields)
+    return _id
+
+
+@db_context
+def transit_withdraw_state(db, _id, pre_state, new_state):
+    return db.execute(
+        """
+            UPDATE withdraw
+              SET state=%(new_state)s, updated_on=%(updated_on)s
+              WHERE id=%(id)s and state=%(pre_state)s
+        """,
+        id=_id, pre_state=pre_state, new_state=new_state, updated_on=datetime.now()) > 0
+
+
+@db_context
+def get_withdraw_by_id(db, _id):
+    return db.get('SELECT * FROM withdraw WHERE id=%(id)s', id=_id)

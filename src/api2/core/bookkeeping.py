@@ -6,7 +6,9 @@ from pytoolbox.util.dbe import db_context
 
 class SourceType(object):
     PAY = 'PAY'
-    WITHDRAW = 'WITHDRAW'
+    WITHDRAW_FROZEN = 'WITHDRAW:FROZEN'
+    WITHDRAW_SUCCESS = 'WITHDRAW:SUCCESS'
+    WITHDRAW_FAILED = 'WITHDRAW:FAILED'
     REFUND = 'REFUND'
     TRANSFER = 'TRANSFER'
 

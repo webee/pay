@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
-import os
 
 from flask import Flask, render_template
+from flask.ext.login import LoginManager
 from tools.filters import register_filters, register_global_functions
+from tools import pmc_config
 
 
 def init_template(app):
@@ -28,15 +29,27 @@ def init_errors(app):
 
 def register_mods(app):
     from pub_site.withdraw import withdraw_mod
+    from pub_site.user import user_mod
 
     app.register_blueprint(withdraw_mod)
+    app.register_blueprint(user_mod)
 
 
-def create_app(env):
-    env = env.lower() if env else 'dev'
-    os.environ['ENV'] = env
+# extensions.
+login_manager = LoginManager()
+login_manager.session_protection = 'strong'
+login_manager.login_view = 'user.login'
+login_manager.login_message = None
 
+
+def create_app(env='dev'):
     app = Flask(__name__, template_folder='./templates')
+
+    from pub_site import config
+    pmc_config.register_config(config, env=env)
+
+    app.config.from_object(config)
+
     register_mods(app)
     init_template(app)
     init_errors(app)

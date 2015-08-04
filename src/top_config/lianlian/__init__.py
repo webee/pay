@@ -1,5 +1,5 @@
 # coding=utf-8
-from top_config.utils import read_string
+from tools.pmc_config import read_string
 PLATFORM = 'lvye.com'
 OID_PARTNER = '201507021000395502'
 

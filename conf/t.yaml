@@ -1,0 +1,10 @@
+prod:
+  IN_FILE: prod
+
+test:
+  IN_FILE: test
+
+
+etc:
+  AccountCenter:
+    CLIENT_ID: 456

@@ -4,8 +4,6 @@ import os
 
 from flask import Flask
 
-from app_config import PAY_API_CONFIG
-
 
 def register_mods(app):
     from api.index import index_mod

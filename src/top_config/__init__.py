@@ -1,5 +1,5 @@
 # coding=utf-8
-from .utils import register_config, get_project_root
+from tools.pmc_config import register_config, get_project_root
 
 configs = {}
 PROJECT_ROOT = get_project_root()

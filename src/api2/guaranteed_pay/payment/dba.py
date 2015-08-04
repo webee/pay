@@ -92,5 +92,19 @@ def secure_payment(db, payment_id, payer_account_id, amount):
         'amount': amount,
         'created_on': datetime.now()
     }
-    db.insert('payment_group', **fields)
+    db.insert('secure_payment', **fields)
+    return _id
+
+
+@db_context
+def confirm_to_pay(db, payment_id, payee_account_id, amount):
+    _id = oid.confirmed_pay_id(payee_account_id)
+    fields = {
+        'id': _id,
+        'guaranteed_payment_id': payment_id,
+        'payee_account_id': payee_account_id,
+        'amount': amount,
+        'created_on': datetime.now()
+    }
+    db.insert('confirm_payment', **fields)
     return _id

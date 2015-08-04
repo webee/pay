@@ -51,3 +51,14 @@ CREATE TABLE secure_payment(
 
   FOREIGN KEY guaranteed_payment_id(guaranteed_payment_id) REFERENCES guaranteed_payment(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE confirm_payment(
+  id CHAR(30) PRIMARY KEY, -- prefix with 'CFP'
+  guaranteed_payment_id CHAR(30) NOT NULL,
+  payee_account_id INT NOT NULL ,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY guaranteed_payment_id(guaranteed_payment_id) REFERENCES guaranteed_payment(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

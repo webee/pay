@@ -1,26 +1,16 @@
 # -*- coding: utf-8 -*-
-# from api.constant import SourceType, PayStep
-# from api.util.bookkeeping import bookkeeping, Event
+from .secured_account import get_secured_account_id
+from .dba import confirm_to_pay
+from api2 import core
 from pytoolbox.util.dbe import transactional
 
 
 @transactional
-def confirm_payment(pay_record):
+def confirm_payment(client_id, pay_record):
     payment_id = pay_record['id']
-    account_id = pay_record['payee_account_id']
+    secured_account_id = get_secured_account_id(client_id)
+    payee_account_id = pay_record['payee_account_id']
     amount = pay_record['amount']
 
-    if transit.confirm(payment_id):
-        _charge_from_frozen_account_to_business(payment_id, account_id, amount)
-        _charge_from_business_account_to_cash(payment_id, account_id, amount)
-        return payment_id
-
-
-def _charge_from_frozen_account_to_business(payment_id, account_id, amount):
-    bookkeeping(Event(account_id, SourceType.PAY, PayStep.CONFIRMED, payment_id, amount),
-                '-frozen', '+business')
-
-
-def _charge_from_business_account_to_cash(payment_id, account_id, amount):
-    bookkeeping(Event(account_id, SourceType.PAY, PayStep.SUCCESS, payment_id, amount),
-                '-business', '+cash')
+    confirm_to_pay_request_id = confirm_to_pay(payment_id, payee_account_id, amount)
+    core.transfer(confirm_to_pay_request_id, secured_account_id, payee_account_id, amount)

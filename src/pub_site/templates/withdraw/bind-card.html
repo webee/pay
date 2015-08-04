@@ -1,7 +1,8 @@
 {% extends 'layout.html' %}
 {% block title %}绑定银行卡{% endblock %}
 
-{% block js %}
+{% block inline_scripts %}
+    <script src="{{ url_for('static', filename='js/bind-card.js') }}"></script>
 {% endblock %}
 {% block content %}
     <div class="contRight payoffRight firstRight">
@@ -41,8 +42,8 @@
             <div class="line">
                 <label>{{ form.identifying_code.label }}</label>
                 {{ form.identifying_code(class="txk small" + (' orangetxk' if form.identifying_code.errors | length > 0 else ''), placeholder="123456") }}
-                <a href="###" class="hqyzm">获取验证码</a>
-                <em class="warn">验证码已发送至注册领队时所留手机号</em>
+                <a href="#" class="hqyzm">获取验证码</a>
+                <em class="identifying-code warn"></em>
                 {% for error in form.identifying_code.errors %}
                     <em class="mistake">{{ error }}</em>
                 {% endfor %}

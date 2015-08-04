@@ -19,6 +19,7 @@ SMS = {
 
 def generate_and_send():
     mobile = _get_user_contact_mobile()
+    # mobile = u"13522919293"
     identifying_code = _generate_identifying_code()
     message = _build_message(identifying_code)
     return _send_message(mobile, message)

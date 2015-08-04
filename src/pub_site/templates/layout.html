@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>{% block title %}{% endblock %}</title>
 
 {% block css %}
@@ -86,16 +87,24 @@
     {#    {{ super() }}#}
     <script src="{{ url_for('static', filename='js/jquery/jquery.min.js') }}"></script>
     <script>
-        $(function(){
-            $(".loginBtn .sx").hover(function(){
+        $(function () {
+            $(".loginBtn .sx").hover(function () {
                 $(this).find("ul").stop().fadeIn();
-                },function(){
-                    $(this).find("ul").stop().fadeOut();
-                    })
-		$(".loginBtn .yh").click(function(){
-			$(this).find("ul").stop().fadeIn();
-			})
-		});
+            }, function () {
+                $(this).find("ul").stop().fadeOut();
+            });
+            $(".loginBtn .yh").click(function () {
+                $(this).find("ul").stop().fadeIn();
+            });
+            var csrftoken = $('meta[name=csrf-token]').attr('content');
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+        });
     </script>
     {% block inline_scripts %}
     {% endblock %}

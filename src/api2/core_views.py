@@ -84,7 +84,7 @@ def notify_refund(uuid):
     elif refund_order.state != 'CREATED':
         return notification.duplicate()
 
-    return handle_refund_notification(refund_id, oid_refundno, sta_refund)
+    return handle_refund_notification(refund_order, oid_refundno, sta_refund)
 
 
 def _notify_payment_result(uuid, data):

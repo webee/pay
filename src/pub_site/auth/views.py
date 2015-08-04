@@ -92,4 +92,4 @@ def logout():
     logout_user()
     session.clear()
 
-    return redirect(config.UserCenter.LOGIN_URL)
+    return redirect(config.UserCenter.LOGOUT_URL)

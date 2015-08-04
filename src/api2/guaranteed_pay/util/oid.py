@@ -2,8 +2,8 @@
 from datetime import datetime
 
 
-def pay_id(account_id):
-    return _generate(account_id, 'PAY')
+def guaranteed_pay_id(account_id):
+    return _generate(account_id, 'GTP')
 
 
 def secured_pay_id(account_id):
@@ -12,10 +12,6 @@ def secured_pay_id(account_id):
 
 def confirmed_pay_id(account_id):
     return _generate(account_id, 'CFP')
-
-
-def withdraw_id(account_id):
-    return _generate(account_id, 'WDR')
 
 
 def refund_id(account_id):

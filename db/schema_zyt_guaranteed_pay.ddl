@@ -14,7 +14,7 @@ CREATE TABLE guaranteed_payment(
   updated_on TIMESTAMP,
   client_callback_url VARCHAR(128),
   client_async_callback_url VARCHAR(128),
-  state ENUM('CREATED', 'SECURED', 'FAILED', 'CONFIRMED', 'REFUND_PREPARED', 'REFUNDING') NOT NULL DEFAULT 'CREATED',
+  state ENUM('CREATED', 'SECURED', 'FAILED', 'CONFIRMED', 'REFUNDED') NOT NULL DEFAULT 'CREATED',
   paybill_id VARCHAR(32) ,
   transaction_ended_on TIMESTAMP,
   confirmed_on TIMESTAMP,
@@ -59,6 +59,23 @@ CREATE TABLE confirm_payment(
   payee_account_id INT NOT NULL ,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY guaranteed_payment_id(guaranteed_payment_id) REFERENCES guaranteed_payment(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE guaranteed_refund(
+  id CHAR(30) PRIMARY KEY,  -- prefix with 'GTR'
+  guaranteed_payment_id CHAR(30) NOT NULL,
+  payer_account_id INT UNSIGNED NOT NULL,
+  payee_account_id INT UNSIGNED NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  async_callback_url VARCHAR(128),
+  created_on TIMESTAMP NOT NULL,
+  state ENUM('CREATED', 'SUCCESS', 'FAILED') NOT NULL DEFAULT 'CREATED',
+
+  refund_serial_no VARCHAR(16) COMMENT '退款流水号',
+  updated_on TIMESTAMP,
 
   FOREIGN KEY guaranteed_payment_id(guaranteed_payment_id) REFERENCES guaranteed_payment(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;

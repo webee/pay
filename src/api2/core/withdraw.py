@@ -3,13 +3,13 @@ from decimal import Decimal, InvalidOperation
 
 from .balance import get_cash_balance
 from .bookkeeping import bookkeep, Event, SourceType
-from .dba import get_bankcard, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
-    get_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result, list_all_unfailed_withdraw, \
-    get_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id
+from .dba import find_bankcard_by_id, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
+    find_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result, list_all_unfailed_withdraw, \
+    find_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id
 from .ipay import transaction
 from .ipay.error import TransactionApiError
 from .util.lock import require_user_account_lock
-from .util.notify import try_to_notify_client
+from .util.notify import try_to_notify_withdraw_result_client
 from api2.core import ZytCoreError, ConditionalError
 from api2.util.parser import to_int
 from pytoolbox import config
@@ -54,7 +54,7 @@ class WithdrawRequestFailedError(ZytCoreError):
 
 
 def apply_to_withdraw(account_id, bankcard_id, amount, callback_url):
-    bankcard = get_bankcard(to_int(bankcard_id))
+    bankcard = find_bankcard_by_id(to_int(bankcard_id))
     if bankcard is None:
         raise BankcardNotFoundError(bankcard_id)
 
@@ -83,7 +83,7 @@ def get_withdraw_basic_info_by_id(withdraw_id):
 
 def handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info=''):
     if _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
-        try_to_notify_client(withdraw_id)
+        try_to_notify_withdraw_result_client(withdraw_id)
         return True
     return False
 

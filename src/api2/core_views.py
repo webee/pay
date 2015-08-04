@@ -3,6 +3,7 @@ from decimal import Decimal
 from flask import Blueprint, request, redirect
 
 from api2.core.postpay import *
+from api2.core.refund import get_refund_by_id, handle_refund_notification
 from api2.core.withdraw import get_withdraw_by_id, handle_withdraw_notification
 from api2.core.ipay.transaction import parse_and_verify, notification, is_sending_to_me, is_valid_transaction
 from api2.guaranteed_pay.callback_interface import get_sync_callback_url_of_payment, guarantee_payment
@@ -62,6 +63,28 @@ def notify_withdraw(uuid):
         return notification.duplicate()
 
     return handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info)
+
+
+@mod.route('/refund/<uuid>/notify', methods=['POST'])
+@parse_and_verify
+def notify_refund(uuid):
+    data = request.verified_data
+    oid_partner = data['oid_partner']
+    refund_id = data['no_refund']
+    amount = Decimal(data['money_refund'])
+    sta_refund = data['sta_refund']
+    oid_refundno = data['oid_refundno']
+
+    if not is_valid_transaction(oid_partner, refund_id, uuid):
+        return notification.is_invalid()
+
+    refund_order = get_refund_by_id(refund_id)
+    if not refund_order or refund_order.amount != amount:
+        return notification.is_invalid()
+    elif refund_order.state != 'CREATED':
+        return notification.duplicate()
+
+    return handle_refund_notification(refund_id, oid_refundno, sta_refund)
 
 
 def _notify_payment_result(uuid, data):

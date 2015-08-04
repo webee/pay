@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, request, Response
+from flask import Blueprint, request, redirect, Response
 
 from api2.account import get_account_by_user_info
 from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
@@ -7,10 +7,17 @@ from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankca
 from api2.guaranteed_pay.payment.prepay import *
 from api2.guaranteed_pay.payment.pay import pay_by_uuid, PaymentNotFoundError
 from api2.guaranteed_pay.payment.confirm_pay import confirm_payment
+from api2.guaranteed_pay.payment.postpay import get_secured_payment
+from api2.guaranteed_pay.refund.refund import apply_to_refund
 from api2.util import response
 from api2.util.parser import to_bool
 
 mod = Blueprint('api', __name__)
+
+
+@mod.route('/')
+def index():
+    return redirect('http://huodong.lvye.com')
 
 
 @mod.route('/pre-pay', methods=['POST'])
@@ -119,3 +126,19 @@ def withdraw_detail(account_id, withdraw_id):
     if not withdraw_record:
         return response.not_found({'account_id': account_id, 'withdraw_id': withdraw_id})
     return response.ok(dict(withdraw_record))
+
+
+@mod.route('/refund', methods=['POST'])
+def apply_for_refund():
+    data = request.values
+    client_id = data['client_id']
+    order_no = data['order_no']
+    amount = data['amount']
+    callback_url = data['callback_url']
+
+    pay_record = get_secured_payment(client_id, order_no)
+    if not pay_record:
+        return response.not_found({'client_id': client_id, 'order_no': order_no})
+
+    refund_id = apply_to_refund(pay_record, amount, callback_url)
+    return response.accepted(refund_id)

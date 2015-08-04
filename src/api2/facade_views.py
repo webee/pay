@@ -2,11 +2,13 @@
 from flask import Blueprint, request, Response
 
 from api2.account import get_account_by_user_info
-from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards
+from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
+    ZytCoreError
 from api2.guaranteed_pay.payment.prepay import *
 from api2.guaranteed_pay.payment.pay import pay_by_uuid, PaymentNotFoundError
 from api2.guaranteed_pay.payment.confirm_pay import confirm_payment
 from api2.util import response
+from api2.util.parser import to_bool
 
 mod = Blueprint('api', __name__)
 
@@ -71,3 +73,21 @@ def list_all_bankcards(account_id):
     bankcards = _list_all_bankcards(account_id)
     bankcards = [dict(bankcard) for bankcard in bankcards]
     return response.list_data(bankcards)
+
+
+@mod.route('/accounts/<int:account_id>/bankcards', methods=['POST'])
+def add_bankcard(account_id):
+    data = request.values
+    card_no = data['card_no']
+    account_name = data['account_name']
+    is_corporate_account = to_bool(data['is_corporate_account'])
+    province_code = data['province_code']
+    city_code = data['city_code']
+    branch_bank_name = data['branch_bank_name']
+
+    try:
+        bankcard_id = _add_bankcard(account_id, card_no, account_name, is_corporate_account, province_code, city_code,
+                                    branch_bank_name)
+        return response.created(bankcard_id)
+    except ZytCoreError, e:
+        return response.bad_request(e.message, card_no=card_no)

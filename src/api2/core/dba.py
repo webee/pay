@@ -3,7 +3,11 @@ from __future__ import unicode_literals, print_function
 from datetime import datetime
 
 from .util.oid import pay_id
+from api2.util.enum import enum
 from pytoolbox.util.dbe import db_context
+
+
+_BANK_ACCOUNT = enum(IsPrivateAccount=0, IsCorporateAccount=1)
 
 
 @db_context
@@ -61,3 +65,21 @@ def new_transfer(db, trade_id, payer_account_id, payee_account_id, amount):
 @db_context
 def query_all_bankcards(db, account_id):
     return db.list("SELECT * FROM bankcard WHERE account_id=%(account_id)s", account_id=account_id)
+
+
+@db_context
+def new_bankcard(db, account_id, bankcard):
+    fields = {
+        'account_id': account_id,
+        'card_no': bankcard.no,
+        'card_type': bankcard.card_type,
+        'account_name': bankcard.account_name,
+        'flag': _BANK_ACCOUNT.IsCorporateAccount if bankcard.is_corporate_account else _BANK_ACCOUNT.IsPrivateAccount,
+        'bank_code': bankcard.bank_code,
+        'province_code': bankcard.province_code,
+        'city_code': bankcard.city_code,
+        'bank_name': bankcard.bank_name,
+        'branch_bank_name': bankcard.branch_bank_name,
+        'created_on': datetime.now()
+    }
+    return db.insert('bankcard', returns_id=True, **fields)

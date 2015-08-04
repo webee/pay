@@ -9,7 +9,7 @@ from .dba import find_bankcard_by_id, create_withdraw, transit_withdraw_state, W
 from .ipay import transaction
 from .ipay.error import TransactionApiError
 from .util.lock import require_user_account_lock
-from .util.notify import try_to_notify_client
+from .util.notify import try_to_notify_withdraw_result_client
 from api2.core import ZytCoreError, ConditionalError
 from api2.util.parser import to_int
 from pytoolbox import config
@@ -83,7 +83,7 @@ def get_withdraw_basic_info_by_id(withdraw_id):
 
 def handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info=''):
     if _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
-        try_to_notify_client(withdraw_id)
+        try_to_notify_withdraw_result_client(withdraw_id)
         return True
     return False
 

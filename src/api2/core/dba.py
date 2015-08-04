@@ -8,8 +8,8 @@ from pytoolbox.util.dbe import db_context
 
 
 WITHDRAW_STATE = enum(FROZEN='FROZEN', SUCCESS='SUCCESS', FAILED='FAILED')
+REFUND_STATE = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED')
 _BANK_ACCOUNT = enum(IsPrivateAccount=0, IsCorporateAccount=1)
-_REFUND_STATE = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED')
 
 
 @db_context
@@ -165,7 +165,7 @@ def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, cr
         'payee_account_id': payee_account_id,
         'amount': amount,
         'created_on': created_on,
-        'state': _REFUND_STATE.CREATED
+        'state': REFUND_STATE.CREATED
     }
     db.insert('withdraw', fields)
     return _id
@@ -180,6 +180,22 @@ def update_refund_result(db, _id, refund_serial_no):
                 WHERE id=%(id)s
         """,
         id=_id, refund_serial_no=refund_serial_no, updated_on=datetime.now()) > 0
+
+
+@db_context
+def find_refund_by_id(db, id):
+    return db.get('SELECT * FROM refund WHERE id=%(id)s', id=id)
+
+
+@db_context
+def transit_refund_state(db, _id, pre_state, new_state):
+    return db.execute(
+        """
+            UPDATE refund
+              SET state=%(new_state)s, updated_on=%(updated_on)s
+              WHERE id=%(id)s and state=%(pre_state)s
+        """,
+        id=_id, pre_state=pre_state, new_state=new_state, updated_on=datetime.now()) > 0
 
 
 def _sql_to_query_withdraw():

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from ..dba import find_withdraw_by_id, WITHDRAW_STATE
+from ..dba import find_withdraw_by_id, WITHDRAW_STATE, find_refund_by_id
 from pytoolbox.util.log import get_logger
 
 _logger = get_logger(__name__)
 
 
-def try_to_notify_client(withdraw_id):
+def try_to_notify_withdraw_result_client(withdraw_id):
     from api.task import pay_tasks
 
     withdraw_order = find_withdraw_by_id(withdraw_id)
@@ -21,6 +21,11 @@ def try_to_notify_client(withdraw_id):
     if not _notify_client(url, params):
         # other notify process.
         pay_tasks.withdraw_notify.delay(url, params)
+
+
+def try_to_notify_refund_result_client(refund_id):
+    # TODO: async_callback_url should be saved in core module?
+    pass
 
 
 def _notify_client(url, params):

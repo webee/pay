@@ -39,3 +39,6 @@ def load_provinces_and_cities(filepath):
 
 class Data:
     PROVINCES_AND_CITIES = load_provinces_and_cities('conf/province_and_city_code.txt')
+
+class Services:
+    LEADER_SERVER = "http://tleader.lvye.com"

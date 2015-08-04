@@ -27,14 +27,21 @@ def withdraw():
 def bind_card():
     form = BindCardForm()
     if form.validate_on_submit():
-        return redirect(url_for('.withdraw'))
+        return redirect(url_for('.bind_card_succeed'))
     return render_template('withdraw/bind-card.html', form=form)
+
+
+@mod.route('/withdraw/bind-card-succeed', methods=['GET'])
+@login_required
+def bind_card_succeed():
+    return render_template('withdraw/bind-card-succeed.html')
 
 
 @mod.route('/withdraw/<transaction_id>/result')
 @login_required
 def show_withdraw_result_page(transaction_id):
     return render_template('withdraw/show-withdraw-result.html')
+
 
 @mod.route('/withdraw/generate-identifying-code', methods=['POST'])
 @login_required

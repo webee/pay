@@ -6,6 +6,7 @@ PROPAGATE_EXCEPTIONS = True
 TESTING = False
 DEBUG = True
 LOGIN_DISABLED = False
+WTF_CSRF_SECRET_KEY = 'a random string'
 
 
 class UserCenter:

@@ -61,4 +61,8 @@ def create_app(env='dev'):
     init_errors(app)
     login_manager.init_app(app)
 
+    from flask_wtf.csrf import CsrfProtect
+    csrf = CsrfProtect()
+    csrf.init_app(app)
+
     return app

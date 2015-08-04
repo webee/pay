@@ -5,7 +5,7 @@ from flask import Flask, render_template
 from flask.ext.login import LoginManager
 from tools.filters import register_filters, register_global_functions
 from tools import pmc_config
-
+from datetime import timedelta
 
 def init_template(app):
     @app.context_processor
@@ -29,21 +29,22 @@ def init_errors(app):
 
 def register_mods(app):
     from pub_site.withdraw import withdraw_mod
-    from pub_site.user import user_mod
+    from pub_site.authentication import login_mod
 
     app.register_blueprint(withdraw_mod)
-    app.register_blueprint(user_mod)
+    app.register_blueprint(login_mod)
 
 
 # extensions.
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
-login_manager.login_view = 'user.login'
+login_manager.login_view = 'login.do_login_action'
 login_manager.login_message = None
 
 
 def create_app(env='dev'):
     app = Flask(__name__, template_folder='./templates')
+    app.permanent_session_lifetime = timedelta(minutes=10)
 
     from pub_site import config
     pmc_config.register_config(config, env=env)
@@ -53,5 +54,7 @@ def create_app(env='dev'):
     register_mods(app)
     init_template(app)
     init_errors(app)
+
+    login_manager.init_app(app)
 
     return app

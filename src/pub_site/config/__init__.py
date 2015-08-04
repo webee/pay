@@ -6,7 +6,7 @@ PROPAGATE_EXCEPTIONS = True
 TESTING = True
 DEBUG = True
 IN_FILE = 'default'
-
+LOGIN_DISABLED=False
 
 class AccountCenter:
     CLIENT_ID = 123

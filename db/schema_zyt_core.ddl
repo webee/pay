@@ -32,7 +32,7 @@ CREATE TABLE event(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE transaction_log_between_accounts(
+CREATE TABLE cash_account_transaction_log(
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   event_id BIGINT UNSIGNED NOT NULL,
   account_id INT UNSIGNED NOT NULL,

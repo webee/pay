@@ -10,8 +10,7 @@ class PaymentState(object):
     SECURED = 'SECURED'
     FAILED = 'FAILED'
     CONFIRMED = 'CONFIRMED'
-    REFUNDING = 'REFUNDING'
-    REFUND_PREPARED = 'REFUND_PREPARED'
+    REFUNDED = 'REFUNDED'
 
 
 @db_context

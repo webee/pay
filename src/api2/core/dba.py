@@ -2,13 +2,14 @@
 from __future__ import unicode_literals, print_function
 from datetime import datetime
 
-from .util.oid import pay_id, withdraw_id
+from .util.oid import pay_id, withdraw_id, refund_id
 from api2.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
 
 WITHDRAW_STATE = enum(FROZEN='FROZEN', SUCCESS='SUCCESS', FAILED='FAILED')
 _BANK_ACCOUNT = enum(IsPrivateAccount=0, IsCorporateAccount=1)
+_REFUND_STATE = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED')
 
 
 @db_context
@@ -31,6 +32,11 @@ def new_payment(db, trade_id, payer_account_id, payee_account_id, amount):
 @db_context
 def find_payment_by_id(db, id):
     return db.get('SELECT * FROM payment WHERE id = %(id)s', id=id)
+
+
+@db_context
+def find_payment_by_trade_id(db, trade_id):
+    return db.get('SELECT * FROM payment WHERE trade_id = %(trade_id)s', trade_id=trade_id)
 
 
 @db_context
@@ -147,6 +153,33 @@ def list_all_unfailed_withdraw(db, account_id):
 @db_context
 def get_withdraw_basic_info_by_id(db, _id):
     return db.get(_sql_to_query_withdraw() + ' WHERE withdraw.id = %(withdraw_id)s', withdraw_id=_id)
+
+
+@db_context
+def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, created_on=datetime.now()):
+    _id = refund_id(payer_account_id)
+    fields = {
+        'id': _id,
+        'payment_id': payment_id,
+        'payer_account_id': payer_account_id,
+        'payee_account_id': payee_account_id,
+        'amount': amount,
+        'created_on': created_on,
+        'state': _REFUND_STATE.CREATED
+    }
+    db.insert('withdraw', fields)
+    return _id
+
+
+@db_context
+def update_refund_result(db, _id, refund_serial_no):
+    return db.execute(
+        """
+            UPDATE refund
+                SET refund_serial_no=%(refund_serial_no)s, updated_on=%(updated_on)s
+                WHERE id=%(id)s
+        """,
+        id=_id, refund_serial_no=refund_serial_no, updated_on=datetime.now()) > 0
 
 
 def _sql_to_query_withdraw():

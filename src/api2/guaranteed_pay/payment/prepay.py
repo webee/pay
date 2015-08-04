@@ -50,7 +50,7 @@ def _generate_notification_url(relative_url, id, **kwargs):
 
 def _new_payment(amount, client_callback_url, client_async_callback_url,
                  client_id, order, payee_account_id, payer_account_id):
-    payment_id = oid.pay_id(payer_account_id)
+    payment_id = oid.guaranteed_pay_id(payer_account_id)
     created_on = datetime.now()
 
     create_payment(payment_id, client_id, payer_account_id, payee_account_id, order, amount,

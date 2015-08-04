@@ -25,7 +25,9 @@ CREATE TABLE payment(
   updated_on TIMESTAMP NOT NULL,
   paybill_id VARCHAR(32),
   transaction_ended_on TIMESTAMP,
-  confirmed_on TIMESTAMP
+  confirmed_on TIMESTAMP,
+
+  UNIQUE KEY trade_id (trade_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -56,6 +58,21 @@ CREATE TABLE withdraw(
   FOREIGN KEY bankcard_id(bankcard_id) REFERENCES bankcard(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE refund(
+  id CHAR(30) PRIMARY KEY,  -- prefix with 'RFD'
+  payment_id CHAR(30) NOT NULL,
+  payer_account_id INT UNSIGNED NOT NULL,
+  payee_account_id INT UNSIGNED NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+  state ENUM('CREATED', 'SUCCESS', 'FAILED') NOT NULL DEFAULT 'CREATED',
+
+  refund_serial_no VARCHAR(16) COMMENT '退款流水号',
+  updated_on TIMESTAMP,
+
+  FOREIGN KEY payment_id(payment_id) REFERENCES payment(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE event(

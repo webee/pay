@@ -52,3 +52,8 @@ def list_unfailed_withdraw(account_id):
 def get_withdraw_basic_info_by_id(withdraw_id):
     from .withdraw import get_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id
     return _get_withdraw_basic_info_by_id(withdraw_id)
+
+
+def refund(payment_trade_id, amount):
+    from .refund import refund as _refund
+    return _refund(payment_trade_id, amount)

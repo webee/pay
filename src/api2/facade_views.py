@@ -2,6 +2,7 @@
 from flask import Blueprint, request, Response
 
 from api2.account import get_account_by_user_info
+from api2.core import query_bankcard_bin
 from api2.guaranteed_pay.payment.prepay import *
 from api2.guaranteed_pay.payment.pay import pay_by_uuid, PaymentNotFoundError
 from api2.guaranteed_pay.payment.confirm_pay import confirm_payment
@@ -55,3 +56,11 @@ def confirm_to_pay(client_id, order_id):
 
     payment_id = confirm_payment(client_id, pay_record)
     return response.ok(id=(payment_id or pay_record['id']))
+
+
+@mod.route('/bankcards/<card_no>/bin', methods=['GET'])
+def query_bin(card_no):
+    card = query_bankcard_bin(card_no)
+    if not card:
+        return response.not_found({'card_no': card_no})
+    return response.ok(card)

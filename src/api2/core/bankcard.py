@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from .util.attr_dict import AttrDict
+from .dba import query_all_bankcards
 from .ipay import transaction
 from .ipay.error import UnExpectedResponseError, ApiError
 from api2.util.enum import enum
@@ -24,6 +25,10 @@ def query_bankcard_bin(card_no):
     except ApiError as e:
         _logger.error('card_no: {0}, {1}'.format(card_no, e.message))
         return None
+
+
+def list_all_bankcards(account_id):
+    return query_all_bankcards(account_id)
 
 
 def _parse_card_type(card_type):

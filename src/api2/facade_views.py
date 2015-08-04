@@ -2,7 +2,7 @@
 from flask import Blueprint, request, Response
 
 from api2.account import get_account_by_user_info
-from api2.core import query_bankcard_bin
+from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards
 from api2.guaranteed_pay.payment.prepay import *
 from api2.guaranteed_pay.payment.pay import pay_by_uuid, PaymentNotFoundError
 from api2.guaranteed_pay.payment.confirm_pay import confirm_payment
@@ -38,7 +38,7 @@ def pay(uuid):
         return response.not_found({'uuid': uuid})
 
 
-@mod.route('/accounts/<int:client_id>/users/<user_id>/account', methods=['GET'])
+@mod.route('/clients/<int:client_id>/users/<user_id>/account', methods=['GET'])
 def get_account_info(client_id, user_id):
     account = get_account_by_user_info(client_id, user_id)
     if not account:
@@ -64,3 +64,10 @@ def query_bin(card_no):
     if not card:
         return response.not_found({'card_no': card_no})
     return response.ok(card)
+
+
+@mod.route('/accounts/<int:account_id>/bankcards', methods=['GET'])
+def list_all_bankcards(account_id):
+    bankcards = _list_all_bankcards(account_id)
+    bankcards = [dict(bankcard) for bankcard in bankcards]
+    return response.list_data(bankcards)

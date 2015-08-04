@@ -56,3 +56,8 @@ def new_transfer(db, trade_id, payer_account_id, payee_account_id, amount):
         'created_on': datetime.now()
     }
     db.insert('guaranteed_payment', **fields)
+
+
+@db_context
+def query_all_bankcards(db, account_id):
+    return db.list("SELECT * FROM bankcard WHERE account_id=%(account_id)s", account_id=account_id)

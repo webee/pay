@@ -3,7 +3,7 @@ from flask import Blueprint, request, Response
 
 from api2.account import get_account_by_user_info
 from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
-    ZytCoreError
+    ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id
 from api2.guaranteed_pay.payment.prepay import *
 from api2.guaranteed_pay.payment.pay import pay_by_uuid, PaymentNotFoundError
 from api2.guaranteed_pay.payment.confirm_pay import confirm_payment
@@ -91,3 +91,31 @@ def add_bankcard(account_id):
         return response.created(bankcard_id)
     except ZytCoreError, e:
         return response.bad_request(e.message, card_no=card_no)
+
+
+@mod.route('accounts/<int:account_id>/withdraw', methods=['POST'])
+def withdraw(account_id):
+    req_data = request.values
+    bankcard_id = req_data.get('bankcard_id')
+    callback_url = req_data.get('callback_url')
+    amount = req_data.get('amount')
+
+    try:
+        order_id = apply_to_withdraw(account_id, bankcard_id, amount, callback_url)
+        return response.accepted(order_id)
+    except ZytCoreError, e:
+        return response.bad_request(e.message)
+
+
+@mod.route('/accounts/<int:account_id>/withdraw', methods=['GET'])
+def list_withdraw(account_id):
+    withdraw_list = list_unfailed_withdraw(account_id)
+    return response.list_data(withdraw_list)
+
+
+@mod.route('/withdraw/<withdraw_id>', methods=['GET'])
+def withdraw_detail(account_id, withdraw_id):
+    withdraw_record = get_withdraw_basic_info_by_id(withdraw_id)
+    if not withdraw_record:
+        return response.not_found({'account_id': account_id, 'withdraw_id': withdraw_id})
+    return response.ok(dict(withdraw_record))

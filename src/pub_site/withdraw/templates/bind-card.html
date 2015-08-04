@@ -7,32 +7,53 @@
 {% block js %}
 {% endblock %}
 {% block content %}
-    <form class="bind-card">
+    <form class="bind-card" method="post" action="{{ url_for('.bind_card') }}">
         <h2 class="title">请绑定提现银行卡</h2>
 
         <p class="notice padding20">
             1. 请仔细填写账户信息，如果由于您填写错误导致资金流失，绿野概不负责；<br>
             2. 只支持提现到银行借记卡，不支持信用卡和存折。提现审核周期为3个工作日；
         </p>
-        <div class="line">
-            <label>卡号</label><input type="text" value="" placeholder="5800 8888 8888 8888"
-                                    class="txk greentxk orangetxk"><em class="warn">持卡人必须与注册领队时的身份证所有者一致。</em>
-            <em class="mistake">持卡人信息与领队备案信息不一致，请选择其他银行卡。</em>
+
+        <div class="line {{'orangetxk' if form.card_number.errors | length > 0 else '' }}">
+            <label>{{ form.card_number.label }}</label>
+            {{ form.card_number(class="txk", placeholder='5800 8888 8888 8888') }}
+            <em class="warn">持卡人必须与注册领队时的身份证所有者一致。</em>
+            {% for error in form.card_number.errors %}
+                <em class="mistake">{{ error }}</em>
+            {% endfor %}
         </div>
-        <div class="line">
-            <label>身份证号</label><input type="text" value="" placeholder="11011019******0888" class="txk"><em
-                class="warn">注册领队时所留身份证号</em>
+
+        <div class="line {{'orangetxk' if form.id_card_number.errors | length > 0 else '' }}">
+            <label>{{ form.id_card_number.label }}</label>
+            {{ form.id_card_number(class="txk", placeholder="11011019******0888") }}
+            <em class="warn">注册领队时所留身份证号</em>
+            {% for error in form.id_card_number.errors %}
+                <em class="mistake">{{ error }}</em>
+            {% endfor %}
         </div>
-        <div class="line">
-            <label>姓名</label><input type="text" value="" placeholder="李****多" class="txk"><em
-                class="warn">注册领队时所使用姓名</em>
+
+        <div class="line {{'orangetxk' if form.name.errors | length > 0 else '' }}">
+            <label>{{ form.name.label }}</label>
+            {{ form.name(class="txk", placeholder="李****多") }}
+            <em class="warn">注册领队时所使用姓名</em>
+            {% for error in form.name.errors %}
+                <em class="mistake">{{ error }}</em>
+            {% endfor %}
         </div>
+
+        <div class="line {{'orangetxk' if form.identifying_code.errors | length > 0 else '' }}">
+            <label>{{ form.identifying_code.label }}</label>
+            {{ form.identifying_code(class="txk small", placeholder="123456") }}
+            <a href="###" class="hqyzm">获取验证码</a>
+            <em class="warn">验证码已发送至注册领队时所留手机号</em>
+            {% for error in form.identifying_code.errors %}
+                <em class="mistake">{{ error }}</em>
+            {% endfor %}
+        </div>
+
         <div class="line">
-            <label>验证码</label><input type="text" value="" placeholder="123456" class="txk small orangetxk"><a href="###"
-                                                                                                              class="hqyzm">获取验证码</a><em
-                class="warn">验证码已发送至注册领队时所留手机号</em>
-            <em class="mistake">验证码输入不正确</em>
-            <input type="submit" value="提交" class="tijiao firsttj"/>
+            {{ form.submit(class="tijiao firsttj") }}
         </div>
     </form>
 {% endblock %}

@@ -28,7 +28,8 @@ def succeed_payment(payment_id, paybill_id):
 
     pay_record = find_payment_by_id(payment_id)
     bookkeep(Event(SourceType.PAY, payment_id, pay_record['amount']),
-             pay_record['payer_account_id'], pay_record['payee_account_id'])
+             (pay_record['payer_account_id'], '-cash'),
+             (pay_record['payee_account_id'], '+cash'))
     return pay_record
 
 

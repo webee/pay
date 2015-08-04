@@ -4,7 +4,7 @@ from flask import Blueprint, request, redirect
 
 from api2.core.postpay import *
 from api2.core.ipay.transaction import parse_and_verify, notification, is_sending_to_me
-from api2.guaranteed_pay.payment.postpay import get_sync_callback_url_of_payment, guarantee_payment
+from api2.guaranteed_pay.callback_interface import get_sync_callback_url_of_payment, guarantee_payment
 from api2.util.enum import enum
 
 core_mod = Blueprint('api', __name__)

@@ -34,14 +34,6 @@ def _create_event(db, event):
 @db_context
 def _record_debit(db, event_id, account_id, amount, created_on):
     _record_transaction(db, event_id, account_id, 'debit', amount, created_on)
-    account_log = {
-        'event_id': event_id,
-        'account_id': account_id,
-        'side': 'debit',
-        'amount': amount,
-        'created_on': created_on
-    }
-    db.insert('account_transaction_log', **account_log)
 
 
 @db_context
@@ -58,4 +50,4 @@ def _record_transaction(db, event_id, account_id, direction, amount, created_on)
         'amount': amount,
         'created_on': created_on
     }
-    db.insert('account_transaction_log', **account_log)
+    db.insert('transaction_log_between_accounts', **account_log)

@@ -159,6 +159,10 @@ footer{background:#333;height:60px;}
     cursor: pointer;
 }
 
+.bind-card > .line.orangetxk > .txk {
+    border: 1px solid #f97700;
+}
+
 
 
 

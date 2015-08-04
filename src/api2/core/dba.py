@@ -100,7 +100,7 @@ def create_withdraw(db, account_id, bankcard_id, amount, callback_url):
         'bankcard_id': bankcard_id,
         'amount': amount,
         'created_on': datetime.now(),
-        'callback_url': callback_url,
+        'async_callback_url': callback_url,
         'state': WITHDRAW_STATE.FROZEN
     }
 
@@ -122,3 +122,15 @@ def transit_withdraw_state(db, _id, pre_state, new_state):
 @db_context
 def get_withdraw_by_id(db, _id):
     return db.get('SELECT * FROM withdraw WHERE id=%(id)s', id=_id)
+
+
+@db_context
+def update_withdraw_result(db, _id, paybill_id, result, failure_info):
+    return db.execute(
+        """
+          UPDATE withdraw
+            SET paybill_id=%(paybill_id)s, result=%(result)s, failure_info=%(failure_info)s, updated_on=%(updated_on)s
+            WHERE id=%(id)s AND state=%(state)s
+        """,
+        id=_id, state=WITHDRAW_STATE.FROZEN, result=result, paybill_id=paybill_id, failure_info=failure_info,
+        updated_on=datetime.now()) > 0

@@ -3,13 +3,23 @@ from decimal import Decimal, InvalidOperation
 
 from .balance import get_cash_balance
 from .bookkeeping import bookkeep, Event, SourceType
-from .dba import get_bankcard, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, get_withdraw_by_id
+from .dba import get_bankcard, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
+    get_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result
 from .ipay import transaction
 from .ipay.error import TransactionApiError
 from .util.lock import require_user_account_lock
+from .util.notify import try_to_notify_client
 from api2.core import ZytCoreError, ConditionalError
 from api2.util.parser import to_int
+from pytoolbox import config
 from pytoolbox.util.dbe import transactional
+from pytoolbox.util.log import get_logger
+
+
+_logger = get_logger(__name__)
+
+_PAY_TO_BANKCARD_RESULT_SUCCESS = config.get('lianlianpay', 'pay_to_bankcard_result_success')
+_PAY_TO_BANKCARD_RESULT_FAILURE = config.get('lianlianpay', 'pay_to_bankcard_result_failure')
 
 
 class BankcardNotFoundError(ConditionalError):
@@ -43,7 +53,6 @@ class WithdrawRequestFailedError(ZytCoreError):
         self.withdraw_id = withdraw_id
 
 
-
 def apply_to_withdraw(account_id, bankcard_id, amount, callback_url):
     bankcard = get_bankcard(to_int(bankcard_id))
     if bankcard is None:
@@ -62,6 +71,17 @@ def apply_to_withdraw(account_id, bankcard_id, amount, callback_url):
     _request_withdraw(withdraw_id, amount, bankcard, notify_url)
 
     return withdraw_id
+
+
+def get_withdraw_by_id(withdraw_id):
+    return _get_withdraw_by_id(withdraw_id)
+
+
+def handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info=''):
+    if _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
+        try_to_notify_client(withdraw_id)
+        return True
+    return False
 
 
 @transactional
@@ -104,3 +124,19 @@ def _unfreeze_withdraw(db, withdraw_id, account_id, amount):
              Event(SourceType.WITHDRAW_FAILED, withdraw_id, amount),
              (account_id, '-frozen'),
              (account_id, '+cash'))
+
+
+@transactional
+def _process_withdraw_result(db, withdraw_id, paybill_id, result, failure_info):
+    update_withdraw_result(withdraw_id, paybill_id, result, failure_info)
+    _logger.warn("Withdraw notify result: [{0}], id=[{1}]".format(result, withdraw_id))
+
+    if result == _PAY_TO_BANKCARD_RESULT_FAILURE:
+        transit_withdraw_state(db, withdraw_id, WITHDRAW_STATE.FROZEN, WITHDRAW_STATE.FAILED)
+        return True
+
+    if result == _PAY_TO_BANKCARD_RESULT_SUCCESS:
+        transit_withdraw_state(db, withdraw_id, WITHDRAW_STATE.FROZEN, WITHDRAW_STATE.SUCCESS)
+        return True
+
+    return False

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, request, Response
+from flask import Blueprint, request, redirect, Response
 
 from api2.account import get_account_by_user_info
 from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
@@ -11,6 +11,11 @@ from api2.util import response
 from api2.util.parser import to_bool
 
 mod = Blueprint('api', __name__)
+
+
+@mod.route('/')
+def index():
+    return redirect('http://huodong.lvye.com')
 
 
 @mod.route('/pre-pay', methods=['POST'])

@@ -18,9 +18,16 @@ class UserCenter:
 
 HOST_URL = 'http://pay.lvye.com'
 
+# 绿野用户中心
+USER_DOMAIN_ID = 1
+
+
+## pay api
+class PayAPI:
+    GET_USER_BALANCE_URL = "http://pay.lvye.com/accounts/{user_domain_id}/{user_id}/balance"
+
 
 ##### data #######
-
 def load_provinces_and_cities(filepath):
     from tools import pmc_config
     from os import path

@@ -10,7 +10,7 @@ CREATE TABLE payment(
   paybill_id VARCHAR(32),
   transaction_ended_on TIMESTAMP,
   confirmed_on TIMESTAMP
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE transfer(
@@ -20,7 +20,7 @@ CREATE TABLE transfer(
   payee_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE event(
@@ -41,4 +41,4 @@ CREATE TABLE account_transaction_log(
   created_on TIMESTAMP NOT NULL,
 
   FOREIGN KEY event_id(event_id) REFERENCES event(id)
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -1,4 +1,3 @@
-
 CREATE TABLE guaranteed_payment(
   id CHAR(30) PRIMARY KEY , -- prefix with 'GTP'
   client_id INT UNSIGNED NOT NULL ,
@@ -21,7 +20,7 @@ CREATE TABLE guaranteed_payment(
   confirmed_on TIMESTAMP,
 
   UNIQUE KEY client_order_uiq_idx (client_id, order_id)
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE payment_group(
@@ -31,7 +30,7 @@ CREATE TABLE payment_group(
 
   PRIMARY KEY primary_key (group_id, payment_id),
   FOREIGN KEY payment_id (payment_id) REFERENCES guaranteed_payment(id)
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE secured_account(
@@ -40,4 +39,4 @@ CREATE TABLE secured_account(
   created_on TIMESTAMP NOT NULL,
 
   UNIQUE KEY unique_key (client_id, account_id)
-);
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

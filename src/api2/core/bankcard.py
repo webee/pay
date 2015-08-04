@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .util.attr_dict import AttrDict
-from .dba import query_all_bankcards, new_bankcard
+from .dba import query_all_bankcards, create_bankcard
 from .ipay import transaction
 from .ipay.error import UnExpectedResponseError, TransactionApiError
 from api2.core import ZytCoreError
@@ -53,7 +53,7 @@ def add_bankcard(account_id, card_no, account_name, is_corporate_account, provin
     if card.is_not_using_debit_card_as_private_account:
         raise TryToBindCreditCardToPrivateAccountError(card_no)
 
-    bankcard_id = new_bankcard(account_id, card)
+    bankcard_id = create_bankcard(account_id, card)
     return bankcard_id
 
 

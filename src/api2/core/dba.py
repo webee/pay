@@ -13,7 +13,7 @@ _REFUND_STATE = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED')
 
 
 @db_context
-def new_payment(db, trade_id, payer_account_id, payee_account_id, amount):
+def create_payment(db, trade_id, payer_account_id, payee_account_id, amount):
     record_id = pay_id(payer_account_id)
     now = datetime.now()
     fields = {
@@ -58,7 +58,7 @@ def fail_payment(db, id):
 
 
 @db_context
-def new_transfer(db, trade_id, payer_account_id, payee_account_id, amount):
+def create_transfer(db, trade_id, payer_account_id, payee_account_id, amount):
     fields = {
         'trade_id': trade_id,
         'payer_account_id': payer_account_id,
@@ -75,7 +75,7 @@ def query_all_bankcards(db, account_id):
 
 
 @db_context
-def new_bankcard(db, account_id, bankcard):
+def create_bankcard(db, account_id, bankcard):
     fields = {
         'account_id': account_id,
         'card_no': bankcard.no,
@@ -93,7 +93,7 @@ def new_bankcard(db, account_id, bankcard):
 
 
 @db_context
-def get_bankcard(db, bankcard_id):
+def find_bankcard_by_id(db, bankcard_id):
     return db.get('SELECT * FROM bankcard WHERE id=%(bankcard_id)s', bankcard_id=bankcard_id)
 
 
@@ -126,7 +126,7 @@ def transit_withdraw_state(db, _id, pre_state, new_state):
 
 
 @db_context
-def get_withdraw_by_id(db, _id):
+def find_withdraw_by_id(db, _id):
     return db.get('SELECT * FROM withdraw WHERE id=%(id)s', id=_id)
 
 
@@ -151,7 +151,7 @@ def list_all_unfailed_withdraw(db, account_id):
 
 
 @db_context
-def get_withdraw_basic_info_by_id(db, _id):
+def find_withdraw_basic_info_by_id(db, _id):
     return db.get(_sql_to_query_withdraw() + ' WHERE withdraw.id = %(withdraw_id)s', withdraw_id=_id)
 
 

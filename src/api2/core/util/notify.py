@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ..dba import get_withdraw_by_id, WITHDRAW_STATE
+from ..dba import find_withdraw_by_id, WITHDRAW_STATE
 from pytoolbox.util.log import get_logger
 
 _logger = get_logger(__name__)
@@ -8,7 +8,7 @@ _logger = get_logger(__name__)
 def try_to_notify_client(withdraw_id):
     from api.task import pay_tasks
 
-    withdraw_order = get_withdraw_by_id(withdraw_id)
+    withdraw_order = find_withdraw_by_id(withdraw_id)
     url = withdraw_order['async_callback_url']
     amount = withdraw_order.amount
     account_id = withdraw_order.account_id

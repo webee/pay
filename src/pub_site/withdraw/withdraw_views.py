@@ -5,6 +5,7 @@ from flask import render_template, url_for, redirect, g
 from . import withdraw_mod as mod
 from tools.mylog import get_logger
 from .forms import BindCardForm
+from identifying_code_manager import generate_and_send
 
 
 logger = get_logger(__name__)
@@ -28,10 +29,16 @@ def bind_card():
     if form.validate_on_submit():
 
         return redirect(url_for('.withdraw'))
-    return render_template('bind-card.html', form=form)
+    return render_template('withdraw/bind-card.html', form=form)
 
 
 @mod.route('/withdraw/<transaction_id>/result')
 @login_required
 def show_withdraw_result_page(transaction_id):
-    return render_template('show-withdraw-result.html')
+    return render_template('withdraw/show-withdraw-result.html')
+
+@mod.route('/withdraw/get-identifying-code', methods=['GET'])
+@login_required
+def get_identifying_code():
+    resp = generate_and_send()
+    return resp.content, resp.status_code

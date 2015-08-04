@@ -22,7 +22,7 @@ HOST_URL = 'http://pay.lvye.com'
 USER_DOMAIN_ID = 1
 
 
-## pay api
+# # pay api
 class PayAPI:
     GET_USER_BALANCE_URL = "http://pay.lvye.com/accounts/{user_domain_id}/{user_id}/balance"
 
@@ -33,6 +33,7 @@ def load_provinces_and_cities(filepath):
     from os import path
     from collections import OrderedDict
     import codecs
+
     UTF8Reader = codecs.getreader('utf-8')
 
     with UTF8Reader(open(path.join(pmc_config.get_project_root(), filepath))) as fin:
@@ -46,6 +47,7 @@ def load_provinces_and_cities(filepath):
 
 class Data:
     PROVINCES_AND_CITIES = load_provinces_and_cities('conf/province_and_city_code.txt')
+
 
 class Services:
     LEADER_SERVER = "http://tleader.lvye.com"

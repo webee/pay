@@ -27,6 +27,7 @@ def recreate_db():
 def create_schema():
     info('creating schema ...')
     local('mysql -u root {} -p < db/schema.ddl'.format(db_instance))
+    local('mysql -u root {} -p < db/schema_zyt_pub_site.ddl'.format(db_instance))
 
 
 def create_schema_2():
@@ -35,6 +36,7 @@ def create_schema_2():
     local('mysql -u root {} -p < db/schema_zyt_account.ddl'.format(db_instance))
     local('mysql -u root {} -p < db/schema_zyt_core.ddl'.format(db_instance))
     local('mysql -u root {} -p < db/schema_zyt_guaranteed_pay.ddl'.format(db_instance))
+    local('mysql -u root {} -p < db/schema_zyt_pub_site.ddl'.format(db_instance))
 
 
 def init_test_data():

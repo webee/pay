@@ -80,22 +80,23 @@
     </div>
 </footer>
 
-<script>
-	$(function(){
-		$(".loginBtn .sx").hover(function(){
-			$(this).find("ul").stop().fadeIn();
-			},function(){
-				$(this).find("ul").stop().fadeOut();
-				})
-		$(".loginBtn .yh").click(function(){
-			$(this).find("ul").stop().fadeIn();
-			})
-		})
-</script>
+
 
 {% block scripts %}
     {#    {{ super() }}#}
     <script src="{{ url_for('static', filename='js/jquery/jquery.min.js') }}"></script>
+    <script>
+        $(function(){
+            $(".loginBtn .sx").hover(function(){
+                $(this).find("ul").stop().fadeIn();
+                },function(){
+                    $(this).find("ul").stop().fadeOut();
+                    })
+		$(".loginBtn .yh").click(function(){
+			$(this).find("ul").stop().fadeIn();
+			})
+		});
+    </script>
     {% block inline_scripts %}
     {% endblock %}
 {% endblock %}

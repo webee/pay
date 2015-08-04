@@ -47,3 +47,8 @@ def apply_to_withdraw(account_id, bankcard_id, amount, callback_url):
 def list_unfailed_withdraw(account_id):
     from .withdraw import list_unfailed_withdraw as _list_unfailed_withdraw
     return _list_unfailed_withdraw(account_id)
+
+
+def get_withdraw_basic_info_by_id(withdraw_id):
+    from .withdraw import get_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id
+    return _get_withdraw_basic_info_by_id(withdraw_id)

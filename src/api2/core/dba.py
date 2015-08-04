@@ -144,6 +144,11 @@ def list_all_unfailed_withdraw(db, account_id):
                    account_id=account_id)
 
 
+@db_context
+def get_withdraw_basic_info_by_id(db, _id):
+    return db.get(_sql_to_query_withdraw() + ' WHERE withdraw.id = %(withdraw_id)s', withdraw_id=_id)
+
+
 def _sql_to_query_withdraw():
     return """
         SELECT withdraw.id,

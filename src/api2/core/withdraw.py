@@ -4,7 +4,8 @@ from decimal import Decimal, InvalidOperation
 from .balance import get_cash_balance
 from .bookkeeping import bookkeep, Event, SourceType
 from .dba import get_bankcard, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
-    get_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result, list_all_unfailed_withdraw
+    get_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result, list_all_unfailed_withdraw, \
+    get_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id
 from .ipay import transaction
 from .ipay.error import TransactionApiError
 from .util.lock import require_user_account_lock
@@ -14,7 +15,6 @@ from api2.util.parser import to_int
 from pytoolbox import config
 from pytoolbox.util.dbe import transactional
 from pytoolbox.util.log import get_logger
-
 
 _logger = get_logger(__name__)
 
@@ -75,6 +75,10 @@ def apply_to_withdraw(account_id, bankcard_id, amount, callback_url):
 
 def get_withdraw_by_id(withdraw_id):
     return _get_withdraw_by_id(withdraw_id)
+
+
+def get_withdraw_basic_info_by_id(withdraw_id):
+    return _get_withdraw_basic_info_by_id(withdraw_id)
 
 
 def handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info=''):

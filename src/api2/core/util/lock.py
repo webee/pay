@@ -1,7 +1,8 @@
 # coding=utf-8
 from __future__ import unicode_literals
 import contextlib
-from .mylog import get_logger
+from pytoolbox.util.log import get_logger
+
 
 logger = get_logger(__name__)
 

@@ -4,7 +4,7 @@ from __future__ import unicode_literals, print_function
 
 from flask.ext.script import Manager, Server
 
-from api import create_app
+from api2 import create_app
 
 
 manager = Manager(create_app)

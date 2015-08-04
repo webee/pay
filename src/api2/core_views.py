@@ -9,9 +9,8 @@ from api2.core.ipay.transaction import parse_and_verify, notification, is_sendin
 from api2.guaranteed_pay.callback_interface import get_sync_callback_url_of_payment, guarantee_payment
 from api2.util.enum import enum
 
-core_mod = Blueprint('api', __name__)
+core_mod = Blueprint('core_callback_response', __name__)
 mod = core_mod
-
 
 PayResult = enum(Success=0, Failure=1, IsInvalidRequest=2)
 

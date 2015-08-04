@@ -100,7 +100,7 @@ def add_bankcard(account_id):
         return response.bad_request(e.message, card_no=card_no)
 
 
-@mod.route('accounts/<int:account_id>/withdraw', methods=['POST'])
+@mod.route('/accounts/<int:account_id>/withdraw', methods=['POST'])
 def withdraw(account_id):
     req_data = request.values
     bankcard_id = req_data.get('bankcard_id')

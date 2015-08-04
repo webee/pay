@@ -63,7 +63,7 @@ def _parse_response_data(raw_data):
     try:
         parsed_data = _parse_data(raw_data)
     except Exception, e:
-        raise ApiError(str(e))
+        raise TransactionApiError(str(e))
 
     if 'ret_code' not in parsed_data or parsed_data['ret_code'] != '0000':
         raise RequestFailedError(parsed_data.get('ret_code'), parsed_data.get('ret_msg'))

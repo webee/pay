@@ -2,7 +2,7 @@
 from .util.attr_dict import AttrDict
 from .dba import query_all_bankcards, new_bankcard
 from .ipay import transaction
-from .ipay.error import UnExpectedResponseError, ApiError
+from .ipay.error import UnExpectedResponseError, TransactionApiError
 from api2.core import ZytCoreError
 from api2.util.enum import enum
 from pytoolbox.util.log import get_logger
@@ -35,7 +35,7 @@ def query_bankcard_bin(card_no):
     except UnExpectedResponseError as e:
         _logger.error('card_no: {0}, {1}'.format(card_no, e.message))
         return None
-    except ApiError as e:
+    except TransactionApiError as e:
         _logger.error('card_no: {0}, {1}'.format(card_no, e.message))
         return None
 

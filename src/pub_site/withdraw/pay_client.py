@@ -40,6 +40,14 @@ class PayClient:
         }
         return requests.post(url, data=data)
 
+
+    @handle_response
+    def get_bankcards(self):
+        uid = current_user.user_id
+        account_id = self.__get_account(uid)['account_id']
+        url = '%s/accounts/%s/bankcards' % (self.server, account_id)
+        return requests.get(url)
+
     def __get_account(self, uid):
         if uid in PayClient.accounts:
             return PayClient.accounts[uid]

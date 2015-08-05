@@ -21,7 +21,10 @@ def set_current_channel():
 @mod.route('/withdraw')
 @login_required
 def withdraw():
-    return redirect(url_for('.bind_card'))
+    result = PayClient().get_bankcards()
+    if len(result['data']) == 0:
+        return redirect(url_for('.bind_card'))
+    return render_template('withdraw/withdraw.html')
 
 
 @mod.route('/withdraw/bind-card', methods=['GET', 'POST'])

@@ -133,14 +133,14 @@ def withdraw_detail(account_id, withdraw_id):
 @mod.route('/refund', methods=['POST'])
 def apply_for_refund():
     data = request.values
-    client_id = data['client_id']
+    channel_id = data['client_id']
     order_no = data['order_no']
     amount = data['amount']
     callback_url = data['callback_url']
 
-    pay_record = get_secured_payment(client_id, order_no)
+    pay_record = get_secured_payment(channel_id, order_no)
     if not pay_record:
-        return response.not_found({'client_id': client_id, 'order_no': order_no})
+        return response.not_found({'client_id': channel_id, 'order_no': order_no})
 
     refund_id = apply_to_refund(pay_record, amount, callback_url)
     return response.accepted(refund_id)

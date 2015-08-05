@@ -169,7 +169,7 @@ def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, cr
         'created_on': created_on,
         'state': REFUND_STATE.CREATED
     }
-    db.insert('withdraw', fields)
+    db.insert('refund', fields)
     return _id
 
 

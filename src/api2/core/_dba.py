@@ -52,9 +52,9 @@ def succeed_payment(db, id, paybill_id):
 
 
 @db_context
-def fail_payment(db, id):
+def fail_payment(db, _id):
     db.execute("UPDATE payment SET state = 'FAILED', transaction_ended_on = %(ended_on)s WHERE id = %(id)s",
-               id=id, ended_on=datetime.now())
+               id=_id, ended_on=datetime.now())
 
 
 @db_context

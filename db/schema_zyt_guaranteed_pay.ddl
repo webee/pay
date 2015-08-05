@@ -15,9 +15,6 @@ CREATE TABLE guaranteed_payment(
   client_callback_url VARCHAR(128),
   client_async_callback_url VARCHAR(128),
   state ENUM('CREATED', 'SECURED', 'FAILED', 'CONFIRMED', 'REFUNDED') NOT NULL DEFAULT 'CREATED',
-  paybill_id VARCHAR(32) ,
-  transaction_ended_on TIMESTAMP,
-  confirmed_on TIMESTAMP,
 
   UNIQUE KEY order_uiq_idx (channel_id, order_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;

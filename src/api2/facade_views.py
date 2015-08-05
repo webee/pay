@@ -2,9 +2,9 @@
 from decimal import Decimal
 from flask import Blueprint, request, redirect, Response
 
-from api2.account import get_account_by_user_info
+from api2.account import get_account_by_user_info, get_account_by_id
 from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
-    ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id
+    ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance
 from api2.guaranteed_pay.payment.prepay import *
 from api2.guaranteed_pay.payment.pay import pay_by_id, PaymentNotFoundError
 from api2.guaranteed_pay.payment.confirm_pay import confirm_payment
@@ -101,6 +101,16 @@ def add_bankcard(account_id):
         return response.created(bankcard_id)
     except ZytCoreError, e:
         return response.bad_request(e.message, card_no=card_no)
+
+
+@mod.route('/accounts/<int:account_id>/balance', methods=['GET'])
+def account_balance(account_id):
+    account = get_account_by_id(account_id)
+    if not account:
+        return response.not_found()
+
+    balance = get_cash_balance(account_id)
+    return response.ok(balance=balance)
 
 
 @mod.route('/accounts/<int:account_id>/withdraw', methods=['POST'])

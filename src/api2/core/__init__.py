@@ -57,3 +57,8 @@ def get_withdraw_basic_info_by_id(withdraw_id):
 def refund(payment_trade_id, amount):
     from .refund import refund as _refund
     return _refund(payment_trade_id, amount)
+
+
+def get_cash_balance(account_id):
+    from .balance import get_cash_balance as _get_cash_balance
+    return _get_cash_balance(account_id)

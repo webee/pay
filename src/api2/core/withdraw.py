@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from decimal import Decimal, InvalidOperation
-
 from .balance import get_cash_balance
 from ._bookkeeping import bookkeep, Event, SourceType
 from ._dba import find_bankcard_by_id, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
@@ -13,8 +11,9 @@ from .util.lock import require_user_account_lock
 from api2.core import ZytCoreError, ConditionalError
 from api2.util.parser import to_int
 from pytoolbox import config
-from pytoolbox.util.dbe import transactional
+from pytoolbox.util.dbe import transactional, db_transactional
 from pytoolbox.util.log import get_logger
+
 
 _logger = get_logger(__name__)
 
@@ -61,7 +60,7 @@ def apply_to_withdraw(account_id, bankcard_id, amount, callback_url):
     if amount <= 0:
         raise NegativeAmountError(amount)
 
-    withdraw_id = _create_withdraw_freezing(account_id, bankcard.id, amount, callback_url)
+    withdraw_id = _create_withdraw(account_id, bankcard.id, amount, callback_url)
     notify_url = transaction.generate_withdraw_notification_url(account_id, withdraw_id)
     _request_withdraw(withdraw_id, amount, bankcard, notify_url)
 
@@ -88,16 +87,20 @@ def list_unfailed_withdraw(account_id):
     return [dict(record) for record in records]
 
 
-@transactional
-def _create_withdraw_freezing(account_id, bankcard_id, amount, callback_url):
+def _create_withdraw(account_id, bankcard_id, amount, callback_url):
     with require_user_account_lock(account_id, 'cash'):
         balance = get_cash_balance(account_id)
         if amount > balance:
             raise InsufficientBalanceError()
 
-        withdraw_id = create_withdraw(db, account_id, bankcard_id, amount, callback_url)
-        _freeze_withdraw(db, withdraw_id, account_id, amount)
-        return withdraw_id
+        return _create_withdraw_to_be_frozen(account_id, bankcard_id, amount, callback_url)
+
+
+@db_transactional
+def _create_withdraw_to_be_frozen(db, account_id, bankcard_id, amount, callback_url):
+    withdraw_id = create_withdraw(db, account_id, bankcard_id, amount, callback_url)
+    _freeze_withdraw(db, withdraw_id, account_id, amount)
+    return withdraw_id
 
 
 def _request_withdraw(withdraw_id, amount, bankcard, notify_url):

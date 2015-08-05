@@ -35,7 +35,7 @@ def find_or_create_prepay_transaction(channel_id, payer_user_id, payee_user_id, 
     if pay_record:
         return pay_record['id']
     return _new_payment(amount, client_callback_url, client_async_callback_url,
-                        client_id, order, payee_account_id, payer_account_id)
+                        channel_id, order, payee_account_id, payer_account_id)
 
 
 def generate_pay_url(id):
@@ -50,11 +50,11 @@ def _generate_notification_url(relative_url, id, **kwargs):
 
 
 def _new_payment(amount, client_callback_url, client_async_callback_url,
-                 client_id, order, payee_account_id, payer_account_id):
+                 channel_id, order, payee_account_id, payer_account_id):
     payment_id = oid.guaranteed_pay_id(payer_account_id)
     created_on = datetime.now()
 
-    create_payment(payment_id, client_id, payer_account_id, payee_account_id, order, amount,
+    create_payment(payment_id, channel_id, payer_account_id, payee_account_id, order, amount,
                    client_callback_url, client_async_callback_url, created_on)
     group_payment(order.activity_id, payment_id, created_on)
 

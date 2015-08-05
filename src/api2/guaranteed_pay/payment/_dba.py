@@ -10,11 +10,11 @@ PAYMENT_STATE = enum(CREATED='CREATED', SECURED='SECURED', FAILED='FAILED', CONF
 
 
 @db_context
-def create_payment(db, id, client_id, payer_account_id, payee_account_id, order, amount,
+def create_payment(db, id, channel_id, payer_account_id, payee_account_id, order, amount,
                    client_callback_url, client_async_callback_url, created_on):
     payment_fields = {
         'id': id,
-        'client_id': client_id,
+        'channel_id': channel_id,
         'order_id': order.no,
         'product_name': order.name,
         'product_category': order.category,
@@ -43,12 +43,12 @@ def group_payment(db, group_id, payment_id, created_on):
 
 @db_context
 def find_payment_by_id(db, id):
-    return db.get('SELECT * FROM payment WHERE id = %(id)s', id=id)
+    return db.get('SELECT * FROM guaranteed_payment WHERE id = %(id)s', id=id)
 
 
 @db_context
 def find_payment_by_order_no(db, channel_id, order_no):
-    return db.get('SELECT * FROM payment WHERE channel_id = %(channel_id)s AND order_id=%(order_id)s',
+    return db.get('SELECT * FROM guaranteed_payment WHERE channel_id = %(channel_id)s AND order_id=%(order_id)s',
                   channel_id=channel_id, order_id=order_no)
 
 
@@ -72,7 +72,7 @@ def cache_secured_account_id(db, client_id, account_id):
 def update_payment_state(db, _id, state):
     return db.execute(
         """
-            UPDATE payment SET state = %(state)s, updated_on = %(updated_on)s
+            UPDATE guaranteed_payment SET state = %(state)s, updated_on = %(updated_on)s
               WHERE id = %(id)s
         """, id=_id, state=state)
 

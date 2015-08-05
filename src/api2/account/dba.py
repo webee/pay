@@ -24,7 +24,7 @@ def find_or_create_account(db, user_domain_id, user_id):
     if account:
         return account['id']
 
-    _create_account(db, user_domain_id, user_id)
+    return _create_account(db, user_domain_id, user_id)
 
 
 @db_context

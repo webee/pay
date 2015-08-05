@@ -6,7 +6,7 @@ from pytoolbox import config
 from website.util.uuid import encode_uuid
 
 
-_API_HOST = 'http://localhost:5100' or config.get('hosts', 'api_gateway')
+_API_HOST = config.get('hosts', 'api_gateway')
 _SITE_HOST = config.get('hosts', 'site_gateway')
 
 

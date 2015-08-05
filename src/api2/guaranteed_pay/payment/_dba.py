@@ -74,7 +74,7 @@ def update_payment_state(db, _id, state):
         """
             UPDATE guaranteed_payment SET state = %(state)s, updated_on = %(updated_on)s
               WHERE id = %(id)s
-        """, id=_id, state=state)
+        """, id=_id, state=state, updated_on=datetime.now())
 
 
 @db_context

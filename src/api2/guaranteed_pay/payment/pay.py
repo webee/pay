@@ -20,7 +20,7 @@ class CorePayError(Exception):
         super(CorePayError, self).__init__(message)
 
 
-def pay_by_uuid(payment_id):
+def pay_by_id(payment_id):
     pay_record = find_payment_by_id(payment_id)
     if pay_record is None:
         raise PaymentNotFoundError(payment_id)

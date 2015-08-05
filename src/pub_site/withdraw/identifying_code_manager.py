@@ -17,12 +17,19 @@ SMS = {
 }
 
 
-def generate_and_send():
+def generate_and_send_identifying_code():
+    _clear_expired_identifying_code()
     mobile = _get_user_contact_mobile()
     # mobile = u"13522919293"
     identifying_code = _generate_identifying_code()
     message = _build_message(identifying_code)
     return _send_message(mobile, message)
+
+
+def _clear_expired_identifying_code():
+    now = datetime.fromtimestamp(time.time()).isoformat()
+    sql = "delete from identifying_code where user_id=%(user_id)s and expire_at<%(now)s"
+    from_db().execute(sql, user_id=current_user.user_id, now=now)
 
 
 def _send_message(mobile, messages):

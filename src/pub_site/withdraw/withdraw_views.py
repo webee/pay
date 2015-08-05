@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
-from flask.ext.login import login_required, current_user
+from flask.ext.login import login_required
 from flask import render_template, url_for, redirect, g
 from . import withdraw_mod as mod
 from tools.mylog import get_logger
 from .forms import BindCardForm
-from identifying_code_manager import generate_and_send
+from identifying_code_manager import generate_and_send_identifying_code
 
 
 logger = get_logger(__name__)
@@ -27,6 +27,8 @@ def withdraw():
 def bind_card():
     form = BindCardForm()
     if form.validate_on_submit():
+        # TODO: binding card
+
         return redirect(url_for('.bind_card_succeed'))
     return render_template('withdraw/bind-card.html', form=form)
 
@@ -46,5 +48,5 @@ def show_withdraw_result_page(transaction_id):
 @mod.route('/withdraw/generate-identifying-code', methods=['POST'])
 @login_required
 def generate_identifying_code():
-    resp = generate_and_send()
+    resp = generate_and_send_identifying_code()
     return resp.content, resp.status_code

@@ -1,6 +1,8 @@
 {% extends 'layout.html' %}
 {% block title %}绑定银行卡{% endblock %}
-
+{% block inline_css %}
+    <link href="{{ url_for('static', filename='css/withdraw.css') }}" rel="stylesheet">
+{% endblock %}
 {% block inline_scripts %}
     <script src="{{ url_for('static', filename='js/bind-card.js') }}"></script>
 {% endblock %}
@@ -36,6 +38,20 @@
                 {{ form.name(class="txk" + (' orangetxk' if form.name.errors | length > 0 else ''), placeholder="李****多") }}
                 <em class="warn">注册领队时所使用姓名</em>
                 {% for error in form.name.errors %}
+                    <em class="mistake">{{ error }}</em>
+                {% endfor %}
+            </div>
+            <div class="line">
+                <label>所属地区</label>
+                {{ form.province(class="txk small province") }}
+                {{ form.city(class="txk small city") }}
+                <em class="warn">银行卡所属省/市</em>
+            </div>
+            <div class="line">
+                <label>{{ form.subbranch_name.label }}</label>
+                {{ form.subbranch_name(class="txk" + (' orangetxk' if form.subbranch_name.errors | length > 0 else ''), placeholder="***银行****支行") }}
+                <em class="warn">银行卡的开户支行名称</em>
+                {% for error in form.subbranch_name.errors %}
                     <em class="mistake">{{ error }}</em>
                 {% endfor %}
             </div>

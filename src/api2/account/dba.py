@@ -28,6 +28,11 @@ def find_or_create_account(db, user_domain_id, user_id):
 
 
 @db_context
+def find_user_domain_id_by_channel(db, channel_id):
+    return db.get_scalar('SELECT user_domain_id FROM channel WHERE id=%(id)s', id=channel_id)
+
+
+@db_context
 def _create_account(db, client_id, user_id, desc):
     fields = {
         'client_id': client_id,

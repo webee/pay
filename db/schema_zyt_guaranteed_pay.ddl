@@ -1,6 +1,6 @@
 CREATE TABLE guaranteed_payment(
   id CHAR(30) PRIMARY KEY , -- prefix with 'GTP'
-  client_id INT UNSIGNED NOT NULL ,
+  channel_id INT UNSIGNED NOT NULL ,
   order_id VARCHAR(64) NOT NULL ,
   product_name VARCHAR(50) NOT NULL ,
   product_category VARCHAR(50) NOT NULL ,
@@ -19,7 +19,7 @@ CREATE TABLE guaranteed_payment(
   transaction_ended_on TIMESTAMP,
   confirmed_on TIMESTAMP,
 
-  UNIQUE KEY client_order_uiq_idx (client_id, order_id)
+  UNIQUE KEY order_uiq_idx (channel_id, order_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

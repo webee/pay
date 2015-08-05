@@ -47,9 +47,9 @@ def find_payment_by_id(db, id):
 
 
 @db_context
-def find_payment_by_order_no(db, client_id, order_no):
-    return db.get('SELECT * FROM payment WHERE client_id = %(client_id)s AND order_id=%(order_id)s',
-                  client_id=client_id, order_id=order_no)
+def find_payment_by_order_no(db, channel_id, order_no):
+    return db.get('SELECT * FROM payment WHERE channel_id = %(channel_id)s AND order_id=%(order_id)s',
+                  channel_id=channel_id, order_id=order_no)
 
 
 @db_context

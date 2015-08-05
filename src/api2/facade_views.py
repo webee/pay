@@ -23,7 +23,7 @@ def index():
 @mod.route('/pre-pay', methods=['POST'])
 def prepay():
     data = request.values
-    client_id = data['client_id']
+    channel_id = data['client_id']
     payer_id = data['payer']
     payee_id = data['payee']
     order = Order(data['activity_id'], data['order_no'], data['order_name'], data['order_desc'], data['ordered_on'])
@@ -31,7 +31,7 @@ def prepay():
     client_callback_url = data['client_callback_url']
     client_async_callback_url = data['client_async_callback_url']
 
-    payment_id = find_or_create_prepay_transaction(client_id, payer_id, payee_id, order,
+    payment_id = find_or_create_prepay_transaction(channel_id, payer_id, payee_id, order,
                                                    amount, client_callback_url, client_async_callback_url)
     pay_url = generate_pay_url(payment_id)
 

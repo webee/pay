@@ -12,5 +12,6 @@ logger = get_logger(__name__)
 @mod.route('/<int:account_id>/cash_events', methods=['GET'])
 def trading_records(account_id):
     cash_events = dba.get_cash_events(account_id)
+    cash_events = [dict(cash_event) for cash_event in cash_events]
 
     return response.list_data(cash_events)

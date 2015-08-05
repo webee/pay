@@ -6,10 +6,10 @@ from ._bookkeeping import bookkeep, Event, SourceType
 from ._dba import find_bankcard_by_id, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
     find_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result, list_all_unfailed_withdraw, \
     find_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id
+from ._notify import try_to_notify_withdraw_result_client
 from .ipay import transaction
 from .ipay.error import TransactionApiError
 from .util.lock import require_user_account_lock
-from .util.notify import try_to_notify_withdraw_result_client
 from api2.core import ZytCoreError, ConditionalError
 from api2.util.parser import to_int
 from pytoolbox import config

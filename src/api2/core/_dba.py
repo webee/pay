@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function
 from datetime import datetime
 
-from .util.oid import pay_id, withdraw_id, refund_id
+from .util.oid import pay_id, withdraw_id, refund_id, transfer_id
 from api2.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
@@ -59,14 +59,16 @@ def fail_payment(db, _id):
 
 @db_context
 def create_transfer(db, trade_id, payer_account_id, payee_account_id, amount):
+    _id = transfer_id(payer_account_id)
     fields = {
+        'id': _id,
         'trade_id': trade_id,
         'payer_account_id': payer_account_id,
         'payee_account_id': payee_account_id,
         'amount': amount,
         'created_on': datetime.now()
     }
-    db.insert('guaranteed_payment', **fields)
+    db.insert('transfer', **fields)
 
 
 @db_context

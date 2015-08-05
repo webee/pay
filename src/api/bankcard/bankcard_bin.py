@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from api.util.attr_dict import AttrDict
 from api.util.ipay import transaction
 from api.util.ipay.error import UnExpectedResponseError

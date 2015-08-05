@@ -98,4 +98,4 @@ class BankCard(object):
         return not self.is_corporate_account
 
     def _is_debit_account(self):
-        return self.card_type is not None and self.card_type == BankcardType.DEBIT
+        return self.card_type is not None and self.card_type == _BANKCARD_TYPE.DEBIT

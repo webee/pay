@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
+from decimal import Decimal
 from datetime import datetime
 
+from ._bookkeeping import get_account_side_sign
 from .util.oid import pay_id, withdraw_id, refund_id, transfer_id
 from api2.util.enum import enum
 from pytoolbox.util.dbe import db_context
@@ -9,6 +11,7 @@ from pytoolbox.util.dbe import db_context
 
 WITHDRAW_STATE = enum(FROZEN='FROZEN', SUCCESS='SUCCESS', FAILED='FAILED')
 REFUND_STATE = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED')
+BOOKKEEPING_SIDE = enum(CREDIT='CREDIT', DEBIT='DEBIT', BOTH='BOTH')
 _BANK_ACCOUNT = enum(IsPrivateAccount=0, IsCorporateAccount=1)
 
 
@@ -198,6 +201,67 @@ def transit_refund_state(db, _id, pre_state, new_state):
               WHERE id=%(id)s and state=%(pre_state)s
         """,
         id=_id, pre_state=pre_state, new_state=new_state, updated_on=datetime.now()) > 0
+
+
+@db_context
+def get_settled_balance_and_last_id(db, account_id, account, side):
+    settled_balance = db.get(
+        """
+          SELECT balance, last_transaction_log_id
+            FROM account_balance
+            WHERE account_id=%(account_id)s AND account=%(account)s AND side=%(side)s
+        """,
+        account_id=account_id, account=account, side=side)
+
+    balance_value = Decimal(0)
+    last_transaction_log_id = 0
+    if settled_balance:
+        balance_value = settled_balance['balance']
+        last_transaction_log_id = settled_balance['last_transaction_log_id']
+
+    return balance_value, last_transaction_log_id
+
+
+@db_context
+def get_unsettled_balance(db, account_id, account, side, low_id, high_id=None):
+    account_table = account + "_account_transaction_log"
+    if side == BOOKKEEPING_SIDE.BOTH:
+        debit_sign, credit_sign = get_account_side_sign(account)
+        if high_id is None:
+            balance = db.get_scalar(
+                """
+                  SELECT SUM((CASE side WHEN 'debit' THEN %(debit_sign)s WHEN 'credit' THEN %(credit_sign)s END) * amount)
+                    FROM """ + account_table + """
+                    WHERE account_id=%(account_id)s and id > %(low_id)s
+                """,
+                debit_sign=debit_sign, credit_sign=credit_sign, account_id=account_id, low_id=low_id)
+        else:
+            balance = db.get_scalar(
+                """
+                  SELECT SUM((CASE side WHEN 'debit' THEN %(debit_sign)s WHEN 'credit' THEN %(credit_sign)s END) * amount)
+                    FROM """ + account_table + """
+                    WHERE account_id=%(account_id)s and id > %(low_id)s and id <= %(high_id)s
+                """,
+                debit_sign=debit_sign, credit_sign=credit_sign, account_id=account_id, low_id=low_id, high_id=high_id)
+    else:
+        if high_id is None:
+            balance = db.get_scalar(
+                """
+                  SELECT SUM(amount)
+                    FROM """ + account_table + """
+                    WHERE account_id=%(account_id)s and side=%(side)s and id > %(low_id)s
+                """,
+                account_id=account_id, side=side, low_id=low_id)
+        else:
+            balance = db.get_scalar(
+                """
+                  SELECT SUM(amount)
+                    FROM """ + account_table + """
+                    WHERE account_id=%(account_id)s and side=%(side)s and id > %(low_id)s and id <= %(high_id)s
+                """,
+                account_id=account_id, side=side, low_id=low_id, high_id=high_id)
+
+    return Decimal(0) if balance is None else balance
 
 
 def _sql_to_query_withdraw():

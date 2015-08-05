@@ -75,6 +75,17 @@ CREATE TABLE refund(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+CREATE TABLE account_balance(
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  account_id INT UNSIGNED NOT NULL,
+  account ENUM('CASH', 'FROZEN', 'ASSET') NOT NULL,
+  side ENUM('DEBIT', 'CREDIT', 'BOTH') NOT NULL COMMENT '记账方向, both: 余额，其它：各方向发生额',
+  balance DECIMAL(12, 2) NOT NULL COMMENT '余额',
+  last_transaction_log_id BIGINT NOT NULL COMMENT '结算最后账户日志id',
+  settled_on TIMESTAMP NOT NULL COMMENT '结算日期时间'
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 CREATE TABLE event(
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   source_type ENUM('PAY', 'WITHDRAW', 'REFUND', 'TRANSFER') NOT NULL,

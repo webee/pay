@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decimal import Decimal
 from flask import Blueprint, request, redirect, Response
 
 from api2.account import get_account_by_user_info
@@ -104,10 +105,10 @@ def add_bankcard(account_id):
 
 @mod.route('/accounts/<int:account_id>/withdraw', methods=['POST'])
 def withdraw(account_id):
-    req_data = request.values
-    bankcard_id = req_data.get('bankcard_id')
-    callback_url = req_data.get('callback_url')
-    amount = req_data.get('amount')
+    data = request.values
+    bankcard_id = data['bankcard_id']
+    callback_url = data['callback_url']
+    amount = Decimal(data['amount'])
 
     try:
         order_id = apply_to_withdraw(account_id, bankcard_id, amount, callback_url)

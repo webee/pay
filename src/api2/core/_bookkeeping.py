@@ -13,6 +13,13 @@ class SourceType(object):
     TRANSFER = 'TRANSFER'
 
 
+_ACCOUNTS_SIDES = {
+    'asset': {'+': 'd', '-': 'c'},
+    'frozen': {'-': 'd', '+': 'c'},
+    'cash': {'-': 'd', '+': 'c'},
+}
+
+
 class Event(object):
     def __init__(self, source_type, source_id, amount):
         self.source_type = source_type
@@ -29,6 +36,16 @@ def bookkeep(db, event, credit_account, debit_account):
     event_id = _create_event(db, event)
     _credit(event_id, credit_account_id, credit_account_name, event.amount, event.created_on) # -
     _debit(event_id, debit_account_id, debit_account_name, event.amount, event.created_on) # +
+
+
+def get_account_side_sign(account):
+    sides = _ACCOUNTS_SIDES[account]
+    positive_side, negative_side = sides['+'], sides['-']
+    if positive_side == 'd' and negative_side == 'c':
+        return 1, -1
+    elif negative_side == 'd' and positive_side == 'c':
+        return -1, 1
+    raise ValueError('impossible!')
 
 
 @db_context

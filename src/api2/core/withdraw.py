@@ -58,15 +58,10 @@ def apply_to_withdraw(account_id, bankcard_id, amount, callback_url):
     if bankcard is None:
         raise BankcardNotFoundError(bankcard_id)
 
-    try:
-        amount_value = Decimal(amount)
-    except InvalidOperation:
-        raise AmountValueError(amount)
+    if amount <= 0:
+        raise NegativeAmountError(amount)
 
-    if amount_value <= 0:
-        raise NegativeAmountError(amount_value)
-
-    withdraw_id = _create_withdraw_freezing(account_id, bankcard.id, amount_value, callback_url)
+    withdraw_id = _create_withdraw_freezing(account_id, bankcard.id, amount, callback_url)
     notify_url = transaction.generate_withdraw_notification_url(account_id, withdraw_id)
     _request_withdraw(withdraw_id, amount, bankcard, notify_url)
 
@@ -94,7 +89,7 @@ def list_unfailed_withdraw(account_id):
 
 
 @transactional
-def _create_withdraw_freezing(db, account_id, bankcard_id, amount, callback_url):
+def _create_withdraw_freezing(account_id, bankcard_id, amount, callback_url):
     with require_user_account_lock(account_id, 'cash'):
         balance = get_cash_balance(account_id)
         if amount > balance:

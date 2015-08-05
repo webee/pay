@@ -17,7 +17,7 @@ CREATE TABLE account(
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   user_domain_id INT UNSIGNED NOT NULL,
   user_id VARCHAR(32) NOT NULL,
-  info VARCHAR(32),
+  info VARCHAR(32) DEFAULT '普通账户',
   created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   UNIQUE KEY domain_user_uiq_idx (user_domain_id, user_id),

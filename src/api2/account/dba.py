@@ -33,10 +33,9 @@ def find_user_domain_id_by_channel(db, channel_id):
 
 
 @db_context
-def _create_account(db, client_id, user_id, desc):
+def _create_account(db, user_domain_id, user_id):
     fields = {
-        'client_id': client_id,
-        'user_id': user_id,
-        'info': desc
+        'user_domain_id': user_domain_id,
+        'user_id': user_id
     }
     return db.insert('account', returns_id=True, **fields)

@@ -4,7 +4,7 @@ from datetime import datetime
 from ._dba import find_payment_by_trade_id, create_refund, update_refund_result, find_refund_by_id, REFUND_STATE, \
     transit_refund_state
 from .ipay import transaction
-from ._bookkeeping import cash_credit, Event, SourceType
+from ._bookkeeping import bookkeep, Event, SourceType
 from ._notify import try_to_notify_refund_result_client
 from pytoolbox import config
 from pytoolbox.util.dbe import transactional
@@ -60,7 +60,16 @@ def _process_refund_result(refund_record, refund_serial_no, status):
         return True
     if status == _REFUND_STATUS_SUCCESS:
         transit_refund_state(refund_id, REFUND_STATE.CREATED, REFUND_STATE.SUCCESS)
-        cash_credit(Event(SourceType.REFUND, refund_id, refund_record['amount']), refund_record['payer_account_id'])
+        _bookkeep(refund_record)
         return True
 
     return False
+
+
+def _bookkeep(refund_record):
+    pay_record = find_refund_by_id(refund_record['payment_id'])
+    payer_account_id = pay_record['payer_account_id']
+    payee_account_id = pay_record['payee_account_id']
+    bookkeep(Event(SourceType.REFUND, refund_record['id'], refund_record['amount']),
+             (payee_account_id, 'cash'),
+             (payer_account_id, 'asset'))

@@ -106,3 +106,15 @@ CREATE TABLE frozen_account_transaction_log(
 
   FOREIGN KEY event_id(event_id) REFERENCES event(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE asset_account_transaction_log(
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  event_id BIGINT UNSIGNED NOT NULL,
+  account_id INT UNSIGNED NOT NULL,
+  side ENUM('DEBIT', 'CREDIT') NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY event_id(event_id) REFERENCES event(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

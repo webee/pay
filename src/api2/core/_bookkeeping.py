@@ -32,18 +32,6 @@ def bookkeep(db, event, credit_account, debit_account):
 
 
 @db_context
-def cash_debit(db, event, debit_account_id):
-    event_id = _create_event(db, event)
-    _debit(event_id, debit_account_id, 'cash', event.amount, event.created_on) # +
-
-
-@db_context
-def cash_credit(db, event, credit_account_id):
-    event_id = _create_event(db, event)
-    _credit(event_id, credit_account_id, 'cash', event.amount, event.created_on) # -
-
-
-@db_context
 def _create_event(db, event):
     return db.insert('event', returns_id=True, **event.__dict__)
 

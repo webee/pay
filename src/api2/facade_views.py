@@ -63,7 +63,7 @@ def confirm_to_pay(client_id, order_id):
     if not pay_record:
         return response.not_found({'client_id': client_id, 'order_id': order_id})
 
-    payment_id = confirm_payment(client_id, pay_record)
+    payment_id = confirm_payment(pay_record)
     return response.ok(id=(payment_id or pay_record['id']))
 
 

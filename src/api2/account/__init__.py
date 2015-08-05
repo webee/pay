@@ -14,5 +14,5 @@ def find_or_create_account(client_id, user_id):
     return dba.find_or_create_account(client_id, user_id)
 
 
-def new_account(client_id, user_id, desc='Normal Account'):
-    return dba.create_account(client_id, user_id, desc)
+def get_secured_account_id():
+    return dba.find_secured_account()['id']

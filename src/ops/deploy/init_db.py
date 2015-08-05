@@ -41,7 +41,7 @@ def create_schema_2():
 
 def inject_base_data():
     info('injecting base data ...')
-    local('mysql -u root {} -p < db/base_data.sql'.format(db_instance))
+    local('mysql -u root {} -p < db/data_zyt_account.sql'.format(db_instance))
 
 
 def init_test_data():

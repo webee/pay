@@ -12,24 +12,17 @@ logger = get_logger(__name__)
 
 @mod.route('/provinces')
 def provinces():
-    data = config.Data.PROVINCES_AND_CITIES
-
-    provinces = [(p, pd['c']) for p, pd in data.items()]
-
-    return jsonify(ret=True, data=provinces, version=time.time())
+    data = [(key, value) for key, value in config.Data.PROVINCES.items()]
+    return jsonify(ret=True, data=data, version=time.time())
 
 
-@mod.route('/provinces/<province_name>/cities')
-def province_cities(province_name):
-    data = config.Data.PROVINCES_AND_CITIES
-
-    province = data.get(province_name)
+@mod.route('/provinces/<province_code>/cities')
+def province_cities(province_code):
+    province = config.Data.CITIES.get(province_code)
     if province is None:
         return not_found()
-
-    cities = [(c, cd['c']) for c, cd in province['cities'].items()]
-
-    return jsonify(ret=True, data=cities, version=time.time())
+    data = [(key, value) for key, value in province.items()]
+    return jsonify(ret=True, data=data, version=time.time())
 
 
 def not_found():
@@ -40,5 +33,4 @@ def not_found():
     }
     resp = jsonify(message)
     resp.status_code = 404
-
     return resp

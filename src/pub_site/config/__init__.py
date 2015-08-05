@@ -39,16 +39,18 @@ def load_provinces_and_cities(filepath):
     UTF8Reader = codecs.getreader('utf-8')
 
     with UTF8Reader(open(path.join(pmc_config.get_project_root(), filepath))) as fin:
-        data = OrderedDict()
+        provinces = OrderedDict()
+        cities = OrderedDict()
         for line in fin:
-            p, pc, c, cc = line.strip().split('\t')
-            pd = data.setdefault(p, {'c': pc, 'cities': OrderedDict()})
-            pd['cities'][c] = {'c': cc}
-    return data
+            province, province_code, city, city_code = line.strip().split('\t')
+            provinces.setdefault(province_code, province)
+            cities_in_current_province = cities.setdefault(province_code, OrderedDict())
+            cities_in_current_province.setdefault(city_code, city)
+    return provinces, cities
 
 
 class Data:
-    PROVINCES_AND_CITIES = load_provinces_and_cities('conf/province_and_city_code.txt')
+    PROVINCES, CITIES = load_provinces_and_cities('conf/province_and_city_code.txt')
 
 
 class Services:

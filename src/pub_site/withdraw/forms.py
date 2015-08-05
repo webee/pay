@@ -2,7 +2,6 @@
 
 from datetime import datetime
 import time
-
 from pub_site import config
 from flask.ext.wtf import Form
 from flask.ext.login import current_user
@@ -65,14 +64,12 @@ class BindCardForm(Form):
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self)
-        province_data = config.Data.PROVINCES_AND_CITIES
-        self.province.choices = [(pd['c'], p) for p, pd in province_data.items()]
+        self.province.choices = [(key, value) for key, value in config.Data.PROVINCES.items()]
         if not self.is_submitted():
             self.province.data = self.province.choices[0][0]
-        province = province_data.get(self.province.choices[0][1])
-        self.city.choices = [(cd['c'], c) for c, cd in province['cities'].items()]
-        # if not self.is_submitted():
-        self.city.data = self.city.choices[0][0]
+        self.city.choices = [(key, value) for key, value in config.Data.CITIES[self.province.data].items()]
+        if not self.is_submitted():
+            self.city.data = self.city.choices[0][0]
 
 
 class MyHiddenField(HiddenField):
@@ -98,11 +95,3 @@ class WithdrawForm(Form):
             preferred_bankcard_id = from_db().get_scalar(
                 'select bankcard_id from preferred_card where user_id=%(user_id)s', user_id=current_user.user_id)
             self.bankcard.data = preferred_bankcard_id
-
-
-
-
-
-
-
-

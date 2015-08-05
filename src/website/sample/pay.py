@@ -16,12 +16,14 @@ def pay(amount):
         'client_id': 1,
         'payer': 2001,
         'payee': 1001,
+        'activity_id': '200001',
         'order_no': order_no,
         'order_name': 'Christmas gift',
         'order_desc': 'Gift to my friend',
         'ordered_on': datetime(2015, 6, 19, 18, 28, 35),
         'amount': amount,
-        'client_callback_url': '{0}/pay/{1}/notify-result'.format(_SITE_HOST, order_no)
+        'client_callback_url': '{0}/pay/{1}/notify-result'.format(_SITE_HOST, order_no),
+        'client_async_callback_url': '{0}/pay/{1}/notify-result'.format(_SITE_HOST, order_no)
     }
     return requests.post('{0}/pre-pay'.format(_API_HOST), data=params)
 

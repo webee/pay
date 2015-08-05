@@ -21,9 +21,9 @@ def receive_pay_result(uuid):
     result = _notify_payment_result(uuid, request.verified_data)
 
     if result == PayResult.IsInvalidRequest:
-        return notification.is_invalid
+        return notification.is_invalid()
     elif result == PayResult.Failure:
-        return notification.fail
+        return notification.fail()
     else:
         pay_record = find_payment_by_uuid(uuid)
         return _redirect_pay_result(pay_record)

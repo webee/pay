@@ -1,11 +1,11 @@
 {% extends 'layout.html' %}
 {% block title %}提现{% endblock %}
 
-{% block css %}
-{% endblock %}
-
 {% block js %}
 {% endblock %}
 {% block content %}
+<div class="contRight payoffRight firstRight">
 提现页面
+    <a href="{{ url_for('.bind_card') }}">去绑卡</a>
+</div>
 {% endblock %}

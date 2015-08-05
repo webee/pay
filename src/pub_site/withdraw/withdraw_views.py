@@ -6,6 +6,8 @@ from . import withdraw_mod as mod
 from tools.mylog import get_logger
 from .forms import BindCardForm
 from identifying_code_manager import generate_and_send_identifying_code
+from pay_client import PayClient
+from flask import flash
 
 
 logger = get_logger(__name__)
@@ -19,7 +21,10 @@ def set_current_channel():
 @mod.route('/withdraw')
 @login_required
 def withdraw():
-    return redirect(url_for('.bind_card'))
+    result = PayClient().get_bankcards()
+    if len(result['data']) == 0:
+        return redirect(url_for('.bind_card'))
+    return render_template('withdraw/withdraw.html')
 
 
 @mod.route('/withdraw/bind-card', methods=['GET', 'POST'])
@@ -27,8 +32,21 @@ def withdraw():
 def bind_card():
     form = BindCardForm()
     if form.validate_on_submit():
-        # TODO: binding card
-
+        card_number = form.card_number.data
+        account_name = form.name.data
+        province_code = form.province.data
+        city_code = form.city.data
+        branch_bank_name = form.subbranch_name.data
+        result = PayClient().bind_bankcards(
+            card_number=card_number,
+            account_name=account_name,
+            province_code=province_code,
+            city_code=city_code,
+            branch_bank_name=branch_bank_name
+        )
+        if result['status_code'] != 201:
+            flash(result['data']['message'])
+            return redirect(url_for('.bind_card'))
         return redirect(url_for('.bind_card_succeed'))
     return render_template('withdraw/bind-card.html', form=form)
 

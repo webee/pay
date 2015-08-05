@@ -5,12 +5,13 @@ from api2.account import get_account_by_user_info
 from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
     ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id
 from api2.guaranteed_pay.payment.prepay import *
-from api2.guaranteed_pay.payment.pay import pay_by_uuid, PaymentNotFoundError
+from api2.guaranteed_pay.payment.pay import pay_by_id, PaymentNotFoundError
 from api2.guaranteed_pay.payment.confirm_pay import confirm_payment
 from api2.guaranteed_pay.payment.postpay import get_secured_payment
 from api2.guaranteed_pay.refund.refund import apply_to_refund
 from api2.util import response
 from api2.util.parser import to_bool
+from api2.util.uuid import decode_uuid
 
 mod = Blueprint('api', __name__)
 
@@ -23,7 +24,7 @@ def index():
 @mod.route('/pre-pay', methods=['POST'])
 def prepay():
     data = request.values
-    client_id = data['client_id']
+    channel_id = data['client_id']
     payer_id = data['payer']
     payee_id = data['payee']
     order = Order(data['activity_id'], data['order_no'], data['order_name'], data['order_desc'], data['ordered_on'])
@@ -31,7 +32,7 @@ def prepay():
     client_callback_url = data['client_callback_url']
     client_async_callback_url = data['client_async_callback_url']
 
-    payment_id = find_or_create_prepay_transaction(client_id, payer_id, payee_id, order,
+    payment_id = find_or_create_prepay_transaction(channel_id, payer_id, payee_id, order,
                                                    amount, client_callback_url, client_async_callback_url)
     pay_url = generate_pay_url(payment_id)
 
@@ -41,7 +42,8 @@ def prepay():
 @mod.route('/pay/<uuid>', methods=['GET'])
 def pay(uuid):
     try:
-        form_submit = pay_by_uuid(uuid)
+        payment_id = decode_uuid(uuid)
+        form_submit = pay_by_id(payment_id)
         return Response(form_submit, status=200, mimetype='text/html')
     except PaymentNotFoundError:
         return response.not_found({'uuid': uuid})
@@ -63,7 +65,7 @@ def confirm_to_pay(client_id, order_id):
     if not pay_record:
         return response.not_found({'client_id': client_id, 'order_id': order_id})
 
-    payment_id = confirm_payment(client_id, pay_record)
+    payment_id = confirm_payment(pay_record)
     return response.ok(id=(payment_id or pay_record['id']))
 
 

@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
+import time
+
 from pub_site import config
-from flask import url_for
 from flask.ext.wtf import Form
 from flask.ext.login import current_user
 from wtforms import StringField, SelectField, SubmitField, ValidationError
 from wtforms.validators import DataRequired
 import requests
 from pytoolbox.util.dbe import from_db
-from datetime import datetime
-import time
+from pay_client import PayClient
 
 
 def name_and_id_card_should_match(form, field):
@@ -32,12 +33,30 @@ def identifying_code_should_match(form, field):
         raise ValidationError(u"验证码错误")
 
 
+def card_number_should_be_legal(form, field):
+    url = '%s/bankcards/%s/bin' % (config.PayAPI.ROOT_URL, field.data)
+    resp = requests.get(url)
+    if resp.status_code != 200:
+        raise ValidationError(u"无效的银行卡")
+    card_type = resp.json().get('card_type')
+    if card_type != 'DEBIT':
+        raise ValidationError(u"银行卡必须为借记卡")
+
+
+def card_is_not_in_use(form, field):
+    result = PayClient().get_bankcards()
+    if result['status_code'] == 200:
+        for card in result['data']:
+            if card['card_no'] == field.data:
+                raise ValidationError(u"卡已绑定")
+
+
 class BindCardForm(Form):
-    card_number = StringField(u"卡号", validators=[DataRequired(u"卡号不能为空")])
+    card_number = StringField(u"卡号", validators=[DataRequired(u"卡号不能为空"), card_number_should_be_legal, card_is_not_in_use])
     id_card_number = StringField(u"身份证号", validators=[DataRequired(u"身份证号不能为空"), name_and_id_card_should_match])
     name = StringField(u"姓名", validators=[DataRequired(u"姓名不能为空"), name_and_id_card_should_match])
-    province = SelectField(u"省")
-    city = SelectField(u"市")
+    province = SelectField(u"省", coerce=str)
+    city = SelectField(u"市", coerce=str)
     subbranch_name = StringField(u"开户支行", validators=[DataRequired(u"开户支行不能为空")])
     identifying_code = StringField(u"验证码", validators=[DataRequired(u"验证码不能为空"), identifying_code_should_match])
     submit = SubmitField(u"提交")
@@ -46,10 +65,10 @@ class BindCardForm(Form):
         Form.__init__(self)
         province_data = config.Data.PROVINCES_AND_CITIES
         self.province.choices = [(pd['c'], p) for p, pd in province_data.items()]
-        self.province.data = self.province.choices[0]
-        province = province_data.get(self.province.data[1])
+        self.province.data = self.province.choices[0][0]
+        province = province_data.get(self.province.choices[0][1])
         self.city.choices = [(cd['c'], c) for c, cd in province['cities'].items()]
-        self.city.data = self.city.choices[0]
+        self.city.data = self.city.choices[0][0]
 
 
 

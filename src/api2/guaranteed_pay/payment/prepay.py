@@ -3,7 +3,7 @@ from urlparse import urljoin
 from datetime import datetime
 
 from ._dba import create_payment, group_payment, find_payment_by_order_no
-from api2.account import find_or_create_account
+from api2.account import find_or_create_account, find_user_domain_id_by_channel
 from api2.guaranteed_pay.util import oid
 from api2.util.uuid import encode_uuid
 from pytoolbox import config
@@ -25,16 +25,17 @@ class Order(object):
 
 
 @transactional
-def find_or_create_prepay_transaction(client_id, payer_user_id, payee_user_id, order, amount,
+def find_or_create_prepay_transaction(channel_id, payer_user_id, payee_user_id, order, amount,
                                       client_callback_url, client_async_callback_url):
-    payer_account_id = find_or_create_account(client_id, payer_user_id)
-    payee_account_id = find_or_create_account(client_id, payee_user_id)
+    user_domain_id = find_user_domain_id_by_channel(channel_id)
+    payer_account_id = find_or_create_account(user_domain_id, payer_user_id)
+    payee_account_id = find_or_create_account(user_domain_id, payee_user_id)
 
-    pay_record = find_payment_by_order_no(client_id, order.no)
+    pay_record = find_payment_by_order_no(channel_id, order.no)
     if pay_record:
         return pay_record['id']
     return _new_payment(amount, client_callback_url, client_async_callback_url,
-                        client_id, order, payee_account_id, payer_account_id)
+                        channel_id, order, payee_account_id, payer_account_id)
 
 
 def generate_pay_url(id):
@@ -49,11 +50,11 @@ def _generate_notification_url(relative_url, id, **kwargs):
 
 
 def _new_payment(amount, client_callback_url, client_async_callback_url,
-                 client_id, order, payee_account_id, payer_account_id):
+                 channel_id, order, payee_account_id, payer_account_id):
     payment_id = oid.guaranteed_pay_id(payer_account_id)
     created_on = datetime.now()
 
-    create_payment(payment_id, client_id, payer_account_id, payee_account_id, order, amount,
+    create_payment(payment_id, channel_id, payer_account_id, payee_account_id, order, amount,
                    client_callback_url, client_async_callback_url, created_on)
     group_payment(order.activity_id, payment_id, created_on)
 

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
-from flask.ext.login import login_required
+from flask.ext.login import login_required,current_user
 from flask import render_template, url_for, redirect, g
 from . import withdraw_mod as mod
+from pytoolbox.util.dbe import from_db
 from tools.mylog import get_logger
 from .forms import BindCardForm
 from identifying_code_manager import generate_and_send_identifying_code
@@ -47,14 +48,9 @@ def bind_card():
         if result['status_code'] != 201:
             flash(result['data']['message'])
             return redirect(url_for('.bind_card'))
-        return redirect(url_for('.bind_card_succeed'))
+        _update_preferred_card(result['data']['id'])
+        return redirect(url_for('.withdraw'))
     return render_template('withdraw/bind-card.html', form=form)
-
-
-@mod.route('/withdraw/bind-card-succeed', methods=['GET'])
-@login_required
-def bind_card_succeed():
-    return render_template('withdraw/bind-card-succeed.html')
 
 
 @mod.route('/withdraw/<transaction_id>/result')
@@ -68,3 +64,14 @@ def show_withdraw_result_page(transaction_id):
 def generate_identifying_code():
     resp = generate_and_send_identifying_code()
     return resp.content, resp.status_code
+
+
+def _update_preferred_card(card_id):
+    db = from_db()
+    current_user_id = current_user.user_id
+    user_id = db.exists('select user_id from preferred_card where user_id=%(user_id)s', user_id=current_user_id)
+    if user_id == 0:
+        db.insert('preferred_card', {"user_id": current_user_id, "bankcard_id": card_id})
+    else:
+        db.execute('update preferred_card set bankcard_id=%(card_id)s where user_id=%(user_id)s',
+                   card_id=card_id, user_id=current_user_id)

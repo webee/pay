@@ -1,11 +1,92 @@
 {% extends 'layout.html' %}
 {% block title %}提现{% endblock %}
 
-{% block js %}
+{% block inline_scripts %}
+    <script type="text/javascript">
+        $(function () {
+            $(".loginBtn .sx").hover(function () {
+                $(this).find("ul").stop().fadeIn();
+            }, function () {
+                $(this).find("ul").stop().fadeOut();
+            });
+            $(".loginBtn .yh").click(function () {
+                $(this).find("ul").stop().fadeIn();
+            });
+
+            /*提交*/
+            $(".cardInform em.choiceblue").click(function () {
+                $(".bgLayer,.choiceLayer").stop().fadeIn();
+            });
+            $(".choiceLayer a.close,.choiceLayer .stepBtn").click(function () {
+                $(".bgLayer,.choiceLayer").stop().fadeOut();
+            });
+
+            /*选择银行卡*/
+            $(".kindsCard li").click(function () {
+                $(this).addClass("cur").siblings().removeClass("cur");
+                var imgUrl = $(this).find("img").attr("src");
+                //alert(imgUrl);
+                $(".choiceLayer .stepBtn").click(function () {
+                    $(".bgLayer,.choiceLayer").stop().fadeOut();
+                    $(".cardInform img").attr("src", imgUrl);
+                });
+            });
+        })
+    </script>
 {% endblock %}
 {% block content %}
-<div class="contRight payoffRight firstRight">
-提现页面
-    <a href="{{ url_for('.bind_card') }}">去绑卡</a>
-</div>
+    <div class="contRight payoffRight firstRight txRight">
+        <h2 class="first">提现</h2>
+
+        <div class="line firstline">
+            <label>账户余额</label><span class="money">88,999,899.00 元</span>
+        </div>
+        <div class="line clearfix">
+            <label>提现银行卡</label>
+
+            <div class="cardInform">
+                <img src="{{ url_for('static', filename='images/card1.jpg') }}" width="266" height="152"/>
+                <em class="choiceblue">选择其他银行卡</em>
+            </div>
+            <div class="linkform">
+                <b style="font-weight:normal;">提现银行卡暂不支持解除绑定。<br>如需解除绑定，请联系绿野领队服务客服。</b>
+                <p class="pa">
+                    <span><em></em>400-000-1234</span>
+                    <span><em class="phone"></em>1234567890</span>
+                </p>
+            </div>
+        </div>
+        <div class="line">
+            <label>提现金额(元)</label>
+            <input type="text" value="" placeholder="18000" class="txk">
+            <em class="warn">最低限额：10元</em>
+        </div>
+        <div class="line">
+            <label>验证码</label><input type="text" value="" placeholder="123456" class="txk small orangetxk">
+            <a href="###" class="hqyzm">获取验证码</a>
+            <em class="warn">验证码已发送至注册领队时所留手机号</em>
+            <em class="mistake">验证码输入不正确</em>
+            <input type="submit" value="提交" class="tijiao firsttj"/>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block popup %}
+    <!--S遮罩层-->
+    <div class="bgLayer"></div>
+    <!--E遮罩层-->
+    <div class="choiceLayer">
+        <h2>选择银行卡：</h2>
+        <ul class="kindsCard clearfix">
+            <li class="cur"><img src="{{ url_for('static', filename='images/card1.jpg') }}" width="266" height="152"/><em></em></li>
+            <li><img src="{{ url_for('static', filename='images/card2.jpg') }}" width="266" height="152"/><em></em></li>
+            <li><img src="{{ url_for('static', filename='images/card3.jpg') }}" width="266" height="152"/><em></em></li>
+            <li><img src="{{ url_for('static', filename='images/card4.jpg') }}" width="266" height="152"/><em></em></li>
+            <li><img src="{{ url_for('static', filename='images/card5.jpg') }}" width="266" height="152"/><em></em></li>
+        </ul>
+        <a href="{{ url_for('.bind_card') }}" class="addimg"><img src="{{ url_for('static', filename='images/card6.jpg') }}" width="266" height="152"/></a>
+        <span class="stepBtn">下一步</span>
+        <a href="###" class="close"></a>
+    </div>
 {% endblock %}

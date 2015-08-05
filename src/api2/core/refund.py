@@ -5,7 +5,6 @@ from ._dba import find_payment_by_trade_id, create_refund, update_refund_result,
     transit_refund_state
 from .ipay import transaction
 from ._bookkeeping import bookkeep, Event, SourceType
-from ._notify import try_to_notify_refund_result_client
 from pytoolbox import config
 from pytoolbox.util.dbe import transactional
 from pytoolbox.util.log import get_logger
@@ -35,7 +34,7 @@ def get_refund_by_id(refund_id):
 
 def handle_refund_notification(refund_record, refund_serial_no, status):
     if _process_refund_result(refund_record, refund_serial_no, status):
-        try_to_notify_refund_result_client(refund_id)
+        # try_to_notify_refund_result_client(refund_id)
         return True
     return False
 

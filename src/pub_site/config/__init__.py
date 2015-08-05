@@ -25,6 +25,7 @@ USER_DOMAIN_ID = 1
 
 # # pay api
 class PayAPI:
+    ROOT_URL = "http://pay.lvye.com"
     GET_USER_BALANCE_URL = "http://pay.lvye.com/accounts/{user_domain_id}/{user_id}/balance"
 
 

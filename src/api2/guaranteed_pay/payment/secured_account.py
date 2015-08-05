@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from api2.account import new_account
-from .dba import find_secured_account_id, cache_secured_account_id
+from ._dba import find_secured_account_id, cache_secured_account_id
 from pytoolbox.util.dbe import transactional
 
 _SECURED_ACCOUNTS_USER_ID = 0

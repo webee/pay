@@ -2,7 +2,7 @@
 from urlparse import urljoin
 from datetime import datetime
 
-from .dba import create_payment, group_payment, find_payment_by_order_no
+from ._dba import create_payment, group_payment, find_payment_by_order_no
 from api2.account import find_or_create_account
 from api2.guaranteed_pay.util import oid
 from api2.util.uuid import encode_uuid

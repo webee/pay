@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .secured_account import get_secured_account_id
-from .dba import confirm_to_pay
+from ._dba import confirm_to_pay
 from api2 import core
 from pytoolbox.util.dbe import transactional
 

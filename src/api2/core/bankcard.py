@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .util.attr_dict import AttrDict
-from .dba import query_all_bankcards, create_bankcard
+from ._dba import query_all_bankcards, create_bankcard
 from .ipay import transaction
 from .ipay.error import UnExpectedResponseError, TransactionApiError
 from api2.core import ZytCoreError

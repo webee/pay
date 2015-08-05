@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from api2 import core
-from .dba import create_refund
+from ._dba import create_refund
 
 
 def apply_to_refund(pay_record, amount, async_callback_url):

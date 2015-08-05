@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
+import os
 from flask import Flask, render_template
 from flask.ext.login import LoginManager
 from tools.filters import register_filters, register_global_functions
@@ -52,6 +53,7 @@ def create_app(env='dev'):
     app.permanent_session_lifetime = timedelta(minutes=10)
 
     from pub_site import config
+    os.environ['ENV'] = env
     pmc_config.register_config(config, env=env)
 
     app.config.from_object(config)

@@ -10,6 +10,7 @@ from wtforms import StringField, SelectField, SubmitField, ValidationError
 from wtforms.validators import DataRequired
 import requests
 from pytoolbox.util.dbe import from_db
+from pay_client import PayClient
 
 
 def name_and_id_card_should_match(form, field):
@@ -42,8 +43,16 @@ def card_number_should_be_legal(form, field):
         raise ValidationError(u"银行卡必须为借记卡")
 
 
+def card_is_not_in_use(form, field):
+    result = PayClient().get_bankcards()
+    if result['status_code'] == 200:
+        for card in result['data']:
+            if card['card_no'] == field.data:
+                raise ValidationError(u"卡已绑定")
+
+
 class BindCardForm(Form):
-    card_number = StringField(u"卡号", validators=[DataRequired(u"卡号不能为空"), card_number_should_be_legal])
+    card_number = StringField(u"卡号", validators=[DataRequired(u"卡号不能为空"), card_number_should_be_legal, card_is_not_in_use])
     id_card_number = StringField(u"身份证号", validators=[DataRequired(u"身份证号不能为空"), name_and_id_card_should_match])
     name = StringField(u"姓名", validators=[DataRequired(u"姓名不能为空"), name_and_id_card_should_match])
     province = SelectField(u"省", coerce=str)

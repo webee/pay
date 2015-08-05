@@ -5,7 +5,7 @@ from flask import render_template, url_for, redirect, g
 from . import withdraw_mod as mod
 from pytoolbox.util.dbe import from_db
 from tools.mylog import get_logger
-from .forms import BindCardForm
+from .forms import BindCardForm, WithdrawForm
 from identifying_code_manager import generate_and_send_identifying_code
 from pay_client import PayClient
 from flask import flash
@@ -19,13 +19,17 @@ def set_current_channel():
     g.current_channel = 'withdraw'
 
 
-@mod.route('/withdraw')
+@mod.route('/withdraw', methods=['GET', 'POST'])
 @login_required
 def withdraw():
-    result = PayClient().get_bankcards()
-    if len(result['data']) == 0:
+    bankcards = PayClient().get_bankcards()['data']
+    if len(bankcards) == 0:
         return redirect(url_for('.bind_card'))
-    return render_template('withdraw/withdraw.html')
+    form = WithdrawForm()
+    selected_card = _find_selected_card(bankcards, long(form.bankcard.data))
+    if form.validate_on_submit():
+        return redirect(url_for('.show_withdraw_result_page', transaction_id='123456'))
+    return render_template('withdraw/withdraw.html', bankcards=bankcards, selected_card=selected_card, form=form)
 
 
 @mod.route('/withdraw/bind-card', methods=['GET', 'POST'])
@@ -75,3 +79,10 @@ def _update_preferred_card(card_id):
     else:
         db.execute('update preferred_card set bankcard_id=%(card_id)s where user_id=%(user_id)s',
                    card_id=card_id, user_id=current_user_id)
+
+
+def _find_selected_card(bankcards, selected_card_id):
+    for card in bankcards:
+        if card['id'] == selected_card_id:
+            return card
+    return None

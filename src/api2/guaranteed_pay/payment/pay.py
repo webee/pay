@@ -3,9 +3,8 @@ from __future__ import unicode_literals
 
 from ._dba import find_payment_by_id, PAYMENT_STATE, update_payment_state, secure_payment
 from api2 import core
-from api2.account import get_account_by_id
+from api2.account import get_account_by_id, get_secured_account_id
 from pytoolbox.util.dbe import transactional
-from .secured_account import get_secured_account_id
 from api.util import req
 
 
@@ -28,7 +27,7 @@ def pay_by_uuid(payment_id):
 
     payer_account_id = pay_record['payer_account_id']
     payer = get_account_by_id(payer_account_id)
-    secured_account_id = get_secured_account_id(payer['client_id'])
+    secured_account_id = get_secured_account_id()
     amount = pay_record['amount']
     pay_form = core.pay(
         trade_id=payment_id,

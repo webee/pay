@@ -43,12 +43,4 @@ def pay_by_id(payment_id):
     if not pay_form:
         raise CorePayError(payment_id)
 
-    _put_pay_to_be_secured(payment_id, payer_account_id, amount)
-
     return pay_form
-
-
-@transactional
-def _put_pay_to_be_secured(payment_id, payer_account_id, amount):
-    secure_payment(payment_id, payer_account_id, amount)
-    update_payment_state(payment_id, PAYMENT_STATE.SECURED)

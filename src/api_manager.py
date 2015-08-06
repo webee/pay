@@ -19,6 +19,5 @@ def init_db():
     from ops.deploy.init_db import init_db_2
     init_db_2()
 
-
 if __name__ == '__main__':
     manager.run()

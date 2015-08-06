@@ -11,7 +11,7 @@ def get_user_cash_account_records(account_id, page_no, page_size):
     # get source_type and source_id
     source_type_ids = {}
     for record in records:
-        source_type = record.source_type.split(':', 1)[0]
+        source_type = record.source_type
         ids = source_type_ids.setdefault(source_type, [])
         ids.append(record.source_id)
 

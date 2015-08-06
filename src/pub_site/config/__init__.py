@@ -50,7 +50,7 @@ def load_provinces_and_cities(filepath):
 
 
 class Data:
-    PROVINCES, CITIES = load_provinces_and_cities('conf/province_and_city_code.txt')
+    PROVINCES, CITIES = load_provinces_and_cities('conf/content/province_and_city_code.txt')
 
 
 class Services:

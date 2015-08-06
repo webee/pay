@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import json
-import requests
 
+import requests
 from ..error import *
 from .sign import sign, verify
-from . import config
 from pytoolbox import config as global_config
 
 
@@ -14,18 +13,6 @@ def sign_params(params):
     params['sign'] = sign(params, params['sign_type'])
 
     return params
-
-
-def md5_sign_params(params):
-    params['sign_type'] = config.sign_type_md5
-
-    return sign_params(params)
-
-
-def rsa_sign_params(params):
-    params['sign_type'] = config.sign_type_rsa
-
-    return sign_params(params)
 
 
 def request(api_url, params):

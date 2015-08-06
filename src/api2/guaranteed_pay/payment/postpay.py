@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from ._dba import find_payment_by_id, update_payment_state, PAYMENT_STATE, find_payment_by_order_no, secure_payment
+from ._dba import find_payment_by_id, update_payment_state, PAYMENT_STATE, find_payment_by_order_no, request_secured_payment
 from api2.account import get_account_by_id
 
 
 def guarantee_payment(pay_record_id):
     pay_record = find_payment_by_id(pay_record_id)
-    secure_payment(pay_record_id, pay_record['payer_account_id'], pay_record['amount'])
+    request_secured_payment(pay_record_id, pay_record['payer_account_id'], pay_record['amount'])
     update_payment_state(pay_record_id, PAYMENT_STATE.SECURED)
 
 

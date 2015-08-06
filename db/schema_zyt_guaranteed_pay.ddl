@@ -30,7 +30,7 @@ CREATE TABLE payment_group(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE secure_payment(
+CREATE TABLE request_secured_payment(
   id CHAR(30) PRIMARY KEY, -- prefix with 'SCP'
   guaranteed_payment_id CHAR(30) NOT NULL,
   payer_account_id INT NOT NULL,

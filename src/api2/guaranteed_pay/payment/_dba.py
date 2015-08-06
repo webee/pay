@@ -78,7 +78,7 @@ def update_payment_state(db, _id, state):
 
 
 @db_context
-def secure_payment(db, payment_id, payer_account_id, amount):
+def request_secured_payment(db, payment_id, payer_account_id, amount):
     _id = oid.secured_pay_id(payer_account_id)
     fields = {
         'id': _id,
@@ -87,7 +87,7 @@ def secure_payment(db, payment_id, payer_account_id, amount):
         'amount': amount,
         'created_on': datetime.now()
     }
-    db.insert('secure_payment', **fields)
+    db.insert('request_secured_payment', **fields)
     return _id
 
 

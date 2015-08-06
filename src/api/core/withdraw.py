@@ -103,7 +103,7 @@ def _create_withdraw_to_be_frozen(db, account_id, bankcard_id, amount, callback_
 
 
 def _request_withdraw(withdraw_id, amount, bankcard, notify_url):
-    order_info = '自游通提现'
+    order_info = u'自游通提现'
     try:
         transaction.pay_to_bankcard(withdraw_id, amount, order_info, bankcard, notify_url)
     except Exception, e:

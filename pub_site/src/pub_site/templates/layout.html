@@ -1,0 +1,115 @@
+<!DOCTYPE>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>{% block title %}{% endblock %}</title>
+
+{% block css %}
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    {% block inline_css %}
+    {% endblock %}
+{% endblock %}
+
+
+<!--[if lt IE 9]>
+<script src="{{ url_for('static',filename='js/html5.js') }}"></script>
+<![endif]-->
+{% block js %}{% endblock %}
+
+</head>
+
+<body>
+
+
+<header>
+	<div class="hdCont clearfix">
+    	<h1 class="logo">
+			<a href="http://www.lvye.cn" target="_blank">
+				<img src="http://www.lvye.cn/header/images/logo.png" class="pngfix" height="47" width="103" title="首页" alt="首页">
+			</a>
+		</h1>
+        <div class="loginBtn clearfix">
+        	<div class="sx">
+                <span class="emailBtn"></span>
+                <ul class="sEmail" style="display:none">
+                    <li><a href="###" target="_blank" title="">我的消息</a></li>
+                    <li><a class="warn" href="###" target="_blank" title="">我的提醒(10)</a></li>
+                    <em></em>
+                </ul>
+            </div>
+            <div class="yh">
+                <a class="userName" href="/">{{ current_user.user_name }}<em></em></a>
+                <ul class="userexit" style="display:none">
+                    <li><a href="{{ url_for('auth.logout') }}" title="">退出</a></li>
+                    <em></em>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</header>
+
+<div class="main">
+	<div class="mainCont clearfix">
+    	<div class="contLeft">
+        	<h2 class="padding20">自游通</h2>
+            <ul class="listli">
+            	<li class="padding20 {{ 'cur' if g.current_channel == 'main' else '' }}">
+                    <a href="{{ url_for('main.index') }}">我的自游通</a>
+                </li>
+                <li class="padding20 {{ 'cur' if g.current_channel == 'withdraw' else '' }}">
+                    <a href="{{ url_for('withdraw.withdraw') }}">提现</a>
+                </li>
+                <li class="padding20">付款给绿野</li>
+                <li class="padding20">设置支付密码</li>
+            </ul>
+        </div>
+            {% block content %}{% endblock %}
+    </div>
+</div>
+
+{% block popup %}{% endblock %}
+
+<footer>
+	<div class="ftCont clearfix">
+    	<ul class="cL">
+        	<li><a href="###" target="_blank">关于我们</a></li>
+            <li><a href="###" target="_blank">帮助中心</a></li>
+            <li><a href="###" target="_blank">实用工具</a></li>
+        </ul>
+        <p class="cR">Copyright  1999-2014  www.lvye.cn  绿野户外网版权所有</p>
+    </div>
+</footer>
+
+
+
+{% block scripts %}
+    {#    {{ super() }}#}
+    <script src="{{ url_for('static', filename='js/jquery/jquery.min.js') }}"></script>
+    <script>
+        $(function () {
+            $(".loginBtn .sx").hover(function () {
+                $(this).find("ul").stop().fadeIn();
+            }, function () {
+                $(this).find("ul").stop().fadeOut();
+            });
+            $(".loginBtn .yh").click(function () {
+                $(this).find("ul").stop().fadeIn();
+            });
+            var csrftoken = $('meta[name=csrf-token]').attr('content');
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+        });
+    </script>
+    {% block inline_scripts %}
+    {% endblock %}
+{% endblock %}
+
+</body>
+</html>

@@ -3,6 +3,7 @@
 from __future__ import unicode_literals, print_function
 
 from flask.ext.script import Manager, Server
+import sys
 
 from api import create_app
 
@@ -19,5 +20,12 @@ def init_db():
     from ops.deploy.init_db import init_db_2
     init_db_2()
 
-if __name__ == '__main__':
+
+def main():
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
     manager.run()
+
+
+if __name__ == '__main__':
+    main()

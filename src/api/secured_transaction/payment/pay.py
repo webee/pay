@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from ._dba import find_payment_by_id
-from api import core
+from api.core import pay as core_pay
 from api.account import get_account_by_id, get_secured_account_id
 from api.util import req
 
@@ -28,7 +28,7 @@ def pay_by_id(payment_id):
     payer = get_account_by_id(payer_account_id)
     secured_account_id = get_secured_account_id()
     amount = pay_record['amount']
-    pay_form = core.pay(
+    pay_form = core_pay(
         trade_id=payment_id,
         payer_account_id=payer_account_id,
         payer_created_on=payer['created_on'],

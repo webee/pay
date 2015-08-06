@@ -42,6 +42,7 @@ def _gen_vars_str(sql, *args):
     return (sql % tuple(strs)) % tuple(params)
 
 
+@db_context
 def get_orders_info_by_ids(db, order_type, ids):
     return db.list(_gen_vars_str("""
                 SELECT * FROM %s

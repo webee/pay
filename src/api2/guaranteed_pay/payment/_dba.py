@@ -28,7 +28,7 @@ def create_payment(db, id, channel_id, payer_account_id, payee_account_id, order
         'state': PAYMENT_STATE.CREATED,
         'created_on': created_on
     }
-    db.insert('guaranteed_payment', **payment_fields)
+    db.insert('secured_payment', **payment_fields)
 
 
 @db_context
@@ -43,12 +43,12 @@ def group_payment(db, group_id, payment_id, created_on):
 
 @db_context
 def find_payment_by_id(db, id):
-    return db.get('SELECT * FROM guaranteed_payment WHERE id = %(id)s', id=id)
+    return db.get('SELECT * FROM secured_payment WHERE id = %(id)s', id=id)
 
 
 @db_context
 def find_payment_by_order_no(db, channel_id, order_no):
-    return db.get('SELECT * FROM guaranteed_payment WHERE channel_id = %(channel_id)s AND order_id=%(order_id)s',
+    return db.get('SELECT * FROM secured_payment WHERE channel_id = %(channel_id)s AND order_id=%(order_id)s',
                   channel_id=channel_id, order_id=order_no)
 
 
@@ -72,7 +72,7 @@ def cache_secured_account_id(db, client_id, account_id):
 def update_payment_state(db, _id, state):
     return db.execute(
         """
-            UPDATE guaranteed_payment SET state = %(state)s, updated_on = %(updated_on)s
+            UPDATE secured_payment SET state = %(state)s, updated_on = %(updated_on)s
               WHERE id = %(id)s
         """, id=_id, state=state, updated_on=datetime.now())
 
@@ -82,7 +82,7 @@ def request_secured_payment(db, payment_id, payer_account_id, amount):
     _id = oid.secured_pay_id(payer_account_id)
     fields = {
         'id': _id,
-        'guaranteed_payment_id': payment_id,
+        'secured_payment_id': payment_id,
         'payer_account_id': payer_account_id,
         'amount': amount,
         'created_on': datetime.now()
@@ -96,7 +96,7 @@ def confirm_to_pay(db, payment_id, payee_account_id, amount):
     _id = oid.confirmed_pay_id(payee_account_id)
     fields = {
         'id': _id,
-        'guaranteed_payment_id': payment_id,
+        'secured_payment_id': payment_id,
         'payee_account_id': payee_account_id,
         'amount': amount,
         'created_on': datetime.now()

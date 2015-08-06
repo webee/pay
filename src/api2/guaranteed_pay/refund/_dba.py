@@ -14,7 +14,7 @@ def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, as
     refund_id = oid.refund_id(payer_account_id)
     fields = {
         'id': refund_id,
-        'guaranteed_payment_id': payment_id,
+        'secured_payment_id': payment_id,
         'payer_account_id': payer_account_id,
         'payee_account_id': payee_account_id,
         'amount': amount,

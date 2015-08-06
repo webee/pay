@@ -1,4 +1,4 @@
-CREATE TABLE guaranteed_payment(
+CREATE TABLE secured_payment(
   id CHAR(30) PRIMARY KEY, -- prefix with 'GTP'
   channel_id INT UNSIGNED NOT NULL,
   order_id VARCHAR(64) NOT NULL,
@@ -26,35 +26,35 @@ CREATE TABLE payment_group(
   created_on TIMESTAMP NOT NULL,
 
   PRIMARY KEY primary_key (group_id, payment_id),
-  FOREIGN KEY payment_id (payment_id) REFERENCES guaranteed_payment(id)
+  FOREIGN KEY payment_id (payment_id) REFERENCES secured_payment(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE request_secured_payment(
   id CHAR(30) PRIMARY KEY, -- prefix with 'SCP'
-  guaranteed_payment_id CHAR(30) NOT NULL,
+  secured_payment_id CHAR(30) NOT NULL,
   payer_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
 
-  FOREIGN KEY guaranteed_payment_id(guaranteed_payment_id) REFERENCES guaranteed_payment(id)
+  FOREIGN KEY secured_payment_id(secured_payment_id) REFERENCES secured_payment(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE confirm_payment(
   id CHAR(30) PRIMARY KEY, -- prefix with 'CFP'
-  guaranteed_payment_id CHAR(30) NOT NULL,
+  secured_payment_id CHAR(30) NOT NULL,
   payee_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
 
-  FOREIGN KEY guaranteed_payment_id(guaranteed_payment_id) REFERENCES guaranteed_payment(id)
+  FOREIGN KEY secured_payment_id(secured_payment_id) REFERENCES secured_payment(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE guaranteed_refund(
   id CHAR(30) PRIMARY KEY,  -- prefix with 'GTR'
-  guaranteed_payment_id CHAR(30) NOT NULL,
+  secured_payment_id CHAR(30) NOT NULL,
   payer_account_id INT UNSIGNED NOT NULL,
   payee_account_id INT UNSIGNED NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
@@ -65,5 +65,5 @@ CREATE TABLE guaranteed_refund(
   refund_serial_no VARCHAR(16) COMMENT '退款流水号',
   updated_on TIMESTAMP,
 
-  FOREIGN KEY guaranteed_payment_id(guaranteed_payment_id) REFERENCES guaranteed_payment(id)
+  FOREIGN KEY secured_payment_id(secured_payment_id) REFERENCES secured_payment(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;

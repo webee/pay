@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from .dba import find_payment_by_id, succeed_payment as _succeed_payment, fail_payment as _fail_payment
-from api.constant import SourceType, PayStep
-from api.util.bookkeeping import bookkeeping, Event
-from api.util.uuid import decode_uuid
+from old_api.constant import SourceType, PayStep
+from old_api.util.bookkeeping import bookkeeping, Event
+from old_api.util.uuid import decode_uuid
 from pytoolbox.util.dbe import transactional
 
 

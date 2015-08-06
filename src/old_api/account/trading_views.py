@@ -4,7 +4,7 @@ from __future__ import unicode_literals, print_function, division
 from . import account_mod as mod
 from tools.mylog import get_logger
 from .trading import dba
-from api.util import response
+from old_api.util import response
 
 logger = get_logger(__name__)
 

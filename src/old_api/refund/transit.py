@@ -1,7 +1,7 @@
 # coding=utf-8
 from pytoolbox.util.dbe import db_transactional
-from api.constant import RefundState
-from api.payment import transit as payment_transit
+from old_api.constant import RefundState
+from old_api.payment import transit as payment_transit
 from . import dba
 from . import event
 

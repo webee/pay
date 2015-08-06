@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 from ._dba import find_payment_by_id
-from api2 import core
-from api2.account import get_account_by_id, get_secured_account_id
+from api import core
+from api.account import get_account_by_id, get_secured_account_id
 from api.util import req
 
 

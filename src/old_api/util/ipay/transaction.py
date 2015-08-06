@@ -13,7 +13,7 @@ from .query_order import query_order as _query_order
 from .refund import refund as _refund
 from .util import generate_url as _generate_notification_url
 from .conf import config, zyt_url
-from api.util.uuid import decode_uuid
+from old_api.util.uuid import decode_uuid
 
 
 notification = Notification()

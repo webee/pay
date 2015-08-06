@@ -1,11 +1,11 @@
 # coding=utf-8
 from . import dba
-from api.commons.notify import notify_client
-from api.constant import RefundState
+from old_api.commons.notify import notify_client
+from old_api.constant import RefundState
 
 
 def try_notify_client(refund_id):
-    from api.task import pay_tasks
+    from old_api.task import pay_tasks
 
     refund_order = dba.get_refund(refund_id)
     url = refund_order.callback_url

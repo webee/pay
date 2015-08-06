@@ -40,8 +40,8 @@ def test_prepaid(account_id, amount):
     :return:
     """
     from pytoolbox.util.dbe import require_transaction_context
-    from api.constant import SourceType, PrepaidStep
-    from api.util.bookkeeping import Event, bookkeeping
+    from old_api.constant import SourceType, PrepaidStep
+    from old_api.util.bookkeeping import Event, bookkeeping
 
     with require_transaction_context():
         bookkeeping(Event(account_id, SourceType.PREPAID, PrepaidStep.SUCCESS, "", amount),
@@ -57,11 +57,11 @@ def test_withdraw(account_id, amount):
     :return:
     """
     from pytoolbox.util.dbe import require_transaction_context
-    from api.constant import SourceType, PrepaidStep
-    from api.util.bookkeeping import Event, bookkeeping
-    from api.account.withdraw import require_lock_user_account
-    from api.account.account import get_cash_balance
-    from api.account.error import InsufficientBalanceError
+    from old_api.constant import SourceType, PrepaidStep
+    from old_api.util.bookkeeping import Event, bookkeeping
+    from old_api.account.withdraw import require_lock_user_account
+    from old_api.account.account import get_cash_balance
+    from old_api.account.error import InsufficientBalanceError
 
     with require_lock_user_account(account_id, 'cash'):
         with require_transaction_context():
@@ -93,9 +93,9 @@ def test_transfer(from_id, to_id, amount):
 
     from pytoolbox.util.dbe import require_transaction_context
     from tools.lock import require_user_account_lock, GetLockTimeoutError, GetLockError
-    from api.account import account
-    from api.constant import SourceType, TransferStep
-    from api.util.bookkeeping import Event, bookkeeping
+    from old_api.account import account
+    from old_api.constant import SourceType, TransferStep
+    from old_api.util.bookkeeping import Event, bookkeeping
 
     if amount <= Decimal('0'):
         raise AmountNotPositiveError(amount)
@@ -119,7 +119,7 @@ def test_transfer(from_id, to_id, amount):
 
 @manager.option('-i', '--id', type=long, dest="account_id", required=True)
 def test_settle_user_cash_balance(account_id):
-    from api.account.account.balance import settle_user_account_balance
+    from old_api.account.account.balance import settle_user_account_balance
 
     settle_user_account_balance(account_id, 'cash')
 

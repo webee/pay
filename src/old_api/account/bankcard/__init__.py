@@ -2,9 +2,9 @@
 from __future__ import unicode_literals, print_function
 
 from datetime import datetime
-from api.bankcard.bankcard_bin import query_bankcard_bin
-from api.util.enum import enum
-from api.constant import BankcardType
+from old_api.bankcard.bankcard_bin import query_bankcard_bin
+from old_api.util.enum import enum
+from old_api.constant import BankcardType
 from pytoolbox.util.dbe import from_db, require_db_context, db_context
 
 

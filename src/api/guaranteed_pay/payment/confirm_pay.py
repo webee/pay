@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ._dba import confirm_to_pay, update_payment_state, PAYMENT_STATE
-from api2 import core
-from api2.account import get_secured_account_id
+from api import core
+from api.account import get_secured_account_id
 from pytoolbox.util.dbe import transactional
 
 

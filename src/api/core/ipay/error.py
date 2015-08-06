@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from api2.core import ZytCoreError
+from api.core import ZytCoreError
 
 
 class TransactionApiError(ZytCoreError):

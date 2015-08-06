@@ -1,7 +1,7 @@
 # coding=utf-8
 from datetime import datetime, timedelta
 
-from api.constant import PaymentState
+from old_api.constant import PaymentState
 from pytoolbox.util.dbe import db_context
 
 

@@ -2,7 +2,7 @@
 from datetime import datetime
 
 from ..util import oid
-from api2.util.enum import enum
+from api.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
 

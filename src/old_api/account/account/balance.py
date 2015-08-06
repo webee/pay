@@ -4,11 +4,11 @@ from __future__ import unicode_literals, print_function
 from datetime import datetime
 
 from . import dba
-from api.account.account.dba import get_user_account_max_id
+from old_api.account.account.dba import get_user_account_max_id
 from pytoolbox.util.dbe import require_transaction_context
 from tools.lock import require_user_lock, GetLockError, GetLockTimeoutError
 from tools.mylog import get_logger
-from api.constant import BookkeepingSide
+from old_api.constant import BookkeepingSide
 
 logger = get_logger(__name__)
 

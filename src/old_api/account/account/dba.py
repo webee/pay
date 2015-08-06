@@ -1,8 +1,8 @@
 # coding=utf-8
 from datetime import datetime
 from decimal import Decimal
-from api.constant import BookkeepingSide
-from api.util.bookkeeping import get_account_side_sign
+from old_api.constant import BookkeepingSide
+from old_api.util.bookkeeping import get_account_side_sign
 from pytoolbox.util.dbe import db_context
 
 

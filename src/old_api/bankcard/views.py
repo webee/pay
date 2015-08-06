@@ -5,7 +5,7 @@ import logging
 from flask import jsonify
 from . import card_mod as mod
 from .bankcard_bin import query_bankcard_bin
-from api.util import response
+from old_api.util import response
 
 log = logging.getLogger(__name__)
 

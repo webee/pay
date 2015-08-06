@@ -6,12 +6,11 @@ from ._dba import find_bankcard_by_id, create_withdraw, transit_withdraw_state, 
     find_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id
 from ._notify import try_to_notify_withdraw_result_client
 from .ipay import transaction
-from .ipay.error import TransactionApiError
 from .util.lock import require_user_account_lock
 from api.core import ZytCoreError, ConditionalError
 from api.util.parser import to_int
 from pytoolbox import config
-from pytoolbox.util.dbe import transactional, db_transactional
+from pytoolbox.util.dbe import db_transactional
 from pytoolbox.util.log import get_logger
 
 

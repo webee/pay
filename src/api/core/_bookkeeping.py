@@ -12,6 +12,14 @@ class SourceType(object):
     REFUND = 'REFUND'
     TRANSFER = 'TRANSFER'
 
+SOURCE_TYPE_TABLE_MAP = {SourceType.PAY: 'payment',
+                         SourceType.WITHDRAW_FROZEN: 'withdraw',
+                         SourceType.WITHDRAW_SUCCESS: 'withdraw',
+                         SourceType.WITHDRAW_FAILED: 'withdraw',
+                         SourceType.REFUND: 'refund',
+                         SourceType.TRANSFER: 'transfer',
+                         }
+
 
 _ACCOUNTS_SIDES = {
     'asset': {'+': 'd', '-': 'c'},

@@ -1,5 +1,6 @@
 # coding=utf-8
 from . import _dba
+from ._bookkeeping import SOURCE_TYPE_TABLE_MAP
 
 
 def get_user_cash_account_records(account_id, page_no, page_size):
@@ -17,7 +18,8 @@ def get_user_cash_account_records(account_id, page_no, page_size):
     # get order infos.
     orders_info = {}
     for source_type, ids in source_type_ids.items():
-        orders = _dba.get_orders_info_by_ids(source_type.lower(), ids)
+        table_name = SOURCE_TYPE_TABLE_MAP[source_type]
+        orders = _dba.get_orders_info_by_ids(table_name, ids)
         for order in orders:
             orders_info[order.id] = order
 

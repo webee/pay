@@ -43,10 +43,10 @@ def _gen_vars_str(sql, *args):
 
 
 @db_context
-def get_orders_info_by_ids(db, order_type, ids):
+def get_orders_info_by_ids(db, order_table, ids):
     return db.list(_gen_vars_str("""
                 SELECT * FROM %s
-                  WHERE id in (%s)""", _orig_vars([order_type]), _str_vars(ids)))
+                  WHERE id in (%s)""", _orig_vars([order_table]), _str_vars(ids)))
 
 
 @db_context

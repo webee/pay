@@ -68,7 +68,6 @@ def _process_refund_result(refund_record, refund_serial_no, status):
 def _bookkeep(refund_record):
     pay_record = find_refund_by_id(refund_record['payment_id'])
     payer_account_id = pay_record['payer_account_id']
-    payee_account_id = pay_record['payee_account_id']
     bookkeep(Event(SourceType.REFUND, refund_record['id'], refund_record['amount']),
-             (payee_account_id, '-cash'),
+             (payer_account_id, '-cash'),
              (payer_account_id, '-asset'))

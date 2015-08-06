@@ -115,7 +115,7 @@ def _request_withdraw(withdraw_id, amount, bankcard, notify_url):
 @transactional
 def _fail_withdraw(db, withdraw_id):
     withdraw_record = get_withdraw_by_id(withdraw_id)
-    _unfreeze_back_withdraw(db, withdraw_id, withdraw_record['account_id'], withdraw_record['amount'])
+    _unfreeze_withdraw_back_to_cash_account(db, withdraw_id, withdraw_record['account_id'], withdraw_record['amount'])
     transit_withdraw_state(db, withdraw_id, WITHDRAW_STATE.FROZEN, WITHDRAW_STATE.FAILED)
 
 
@@ -126,14 +126,14 @@ def _freeze_withdraw(db, withdraw_id, account_id, amount):
              (account_id, '+frozen'))
 
 
-def _unfreeze_back_withdraw(db, withdraw_id, account_id, amount):
+def _unfreeze_withdraw_back_to_cash_account(db, withdraw_id, account_id, amount):
     bookkeep(db,
              Event(SourceType.WITHDRAW_FAILED, withdraw_id, amount),
              (account_id, '-frozen'),
              (account_id, '+cash'))
 
 
-def _unfreeze_out_withdraw(db, withdraw_id, account_id, amount):
+def _unfreeze_withdraw_to_bankcard(db, withdraw_id, account_id, amount):
     bookkeep(db,
              Event(SourceType.WITHDRAW_SUCCESS, withdraw_id, amount),
              (account_id, '-frozen'),
@@ -148,13 +148,13 @@ def _process_withdraw_result(db, withdraw_id, paybill_id, result, failure_info):
     if result == _PAY_TO_BANKCARD_RESULT_FAILURE:
         withdraw_record = get_withdraw_by_id(withdraw_id)
         transit_withdraw_state(db, withdraw_id, WITHDRAW_STATE.FROZEN, WITHDRAW_STATE.FAILED)
-        _unfreeze_back_withdraw(db, withdraw_id, withdraw_record['account_id'], withdraw_record['amount'])
+        _unfreeze_withdraw_back_to_cash_account(db, withdraw_id, withdraw_record['account_id'], withdraw_record['amount'])
         return True
 
     if result == _PAY_TO_BANKCARD_RESULT_SUCCESS:
         withdraw_record = get_withdraw_by_id(withdraw_id)
         transit_withdraw_state(db, withdraw_id, WITHDRAW_STATE.FROZEN, WITHDRAW_STATE.SUCCESS)
-        _unfreeze_out_withdraw(db, withdraw_id, withdraw_record['account_id'], withdraw_record['amount'])
+        _unfreeze_withdraw_to_bankcard(db, withdraw_id, withdraw_record['account_id'], withdraw_record['amount'])
         return True
 
     return False

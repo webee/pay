@@ -37,8 +37,7 @@ def find_payment_by_uuid(uuid):
 
 
 def _bookkeep(pay_record):
-    payer_account_id = pay_record['payer_account_id']
     payee_account_id = pay_record['payee_account_id']
     bookkeep(Event(SourceType.PAY, pay_record['id'], pay_record['amount']),
-             (payer_account_id, '+asset'),
-             (payee_account_id, '-cash'))
+             (payee_account_id, '+asset'),
+             (payee_account_id, '+cash'))

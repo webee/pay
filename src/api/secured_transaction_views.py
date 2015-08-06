@@ -40,7 +40,6 @@ def confirm_to_pay(client_id, order_id):
     return response.ok(id=(payment_id or pay_record['id']))
 
 
-
 @mod.route('/refund', methods=['POST'])
 def apply_for_refund():
     data = request.values

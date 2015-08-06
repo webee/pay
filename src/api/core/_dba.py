@@ -16,6 +16,14 @@ _BANK_ACCOUNT = enum(IsPrivateAccount=0, IsCorporateAccount=1)
 
 
 @db_context
+def get_user_cash_account_log(db, account_id):
+    return db.list("""
+                SELECT * FROM cash_account_transaction_log c LEFT JOIN event e ON c.event_id=e.id
+                  WHERE c.account_id=%(account_id)s order by e.created_on desc;
+    """, account_id=account_id)
+
+
+@db_context
 def create_payment(db, trade_id, payer_account_id, payee_account_id, amount):
     record_id = pay_id(payer_account_id)
     now = datetime.now()

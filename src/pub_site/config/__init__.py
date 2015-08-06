@@ -1,12 +1,14 @@
 # coding=utf-8
 import os
 
-SECRET_KEY = os.environ.get('SECRET_KEY') or '.yek eyvl'
-PROPAGATE_EXCEPTIONS = True
-TESTING = False
-DEBUG = True
-LOGIN_DISABLED = False
-WTF_CSRF_SECRET_KEY = 'a random string'
+
+class App:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or '.yek eyvl'
+    PROPAGATE_EXCEPTIONS = True
+    TESTING = False
+    DEBUG = True
+    LOGIN_DISABLED = False
+    WTF_CSRF_SECRET_KEY = 'a random string'
 
 
 class UserCenter:
@@ -30,26 +32,26 @@ class PayAPI:
 
 
 ##### data #######
-def load_provinces_and_cities(filepath):
-    from tools import pmc_config
-    from os import path
-    from collections import OrderedDict
-    import codecs
-
-    UTF8Reader = codecs.getreader('utf-8')
-
-    with UTF8Reader(open(path.join(pmc_config.get_project_root(), filepath))) as fin:
-        provinces = OrderedDict()
-        cities = OrderedDict()
-        for line in fin:
-            province, province_code, city, city_code = line.strip().split('\t')
-            provinces.setdefault(province_code, province)
-            cities_in_current_province = cities.setdefault(province_code, OrderedDict())
-            cities_in_current_province.setdefault(city_code, city)
-    return provinces, cities
-
-
 class Data:
+    @staticmethod
+    def load_provinces_and_cities(filepath):
+        from tools import pmc_config
+        from os import path
+        from collections import OrderedDict
+        import codecs
+
+        UTF8Reader = codecs.getreader('utf-8')
+
+        with UTF8Reader(open(path.join(pmc_config.get_project_root(), filepath))) as fin:
+            provinces = OrderedDict()
+            cities = OrderedDict()
+            for line in fin:
+                province, province_code, city, city_code = line.strip().split('\t')
+                provinces.setdefault(province_code, province)
+                cities_in_current_province = cities.setdefault(province_code, OrderedDict())
+                cities_in_current_province.setdefault(city_code, city)
+        return provinces, cities
+
     PROVINCES, CITIES = load_provinces_and_cities('conf/content/province_and_city_code.txt')
 
 

@@ -1,6 +1,8 @@
 # coding=utf-8
 
-DEBUG = True
+
+class App:
+    DEBUG = True
 
 
 HOST_URL = 'http://dev_pay.lvye.com:5002'

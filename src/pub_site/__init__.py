@@ -56,7 +56,7 @@ def create_app(env='dev'):
     os.environ['ENV'] = env
     pmc_config.register_config(config, env=env)
 
-    app.config.from_object(config)
+    app.config.from_object(config.App)
 
     register_mods(app)
     init_template(app)

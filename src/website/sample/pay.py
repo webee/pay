@@ -25,7 +25,7 @@ def pay(amount):
         'client_callback_url': '{0}/pay/{1}/notify-result'.format(_SITE_HOST, order_no),
         'client_async_callback_url': '{0}/pay/{1}/notify-result'.format(_SITE_HOST, order_no)
     }
-    return requests.post('{0}/pre-pay'.format(_API_HOST), data=params)
+    return requests.post('{0}/secured/pre-pay'.format(_API_HOST), data=params)
 
 
 def response_pay_result_notification(order_no):
@@ -37,7 +37,7 @@ def response_pay_result_notification(order_no):
         'oid_paybill': '123456789'
     }
     uuid = encode_uuid(order_no)
-    return requests.post('{0}/pay/{1}/result'.format(_API_HOST, uuid), data=params)
+    return requests.post('{0}/secured/pay/{1}/result'.format(_API_HOST, uuid), data=params)
 
 
 def _generate_order_id():

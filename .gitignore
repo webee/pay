@@ -10,3 +10,4 @@ nohup.out
 *.pem
 
 .DS_Store
+tmp/

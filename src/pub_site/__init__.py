@@ -48,11 +48,12 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message = None
 
 
-def create_app(env='dev'):
+def create_app(env):
     app = Flask(__name__, template_folder='./templates')
     app.permanent_session_lifetime = timedelta(minutes=10)
 
     from pub_site import config
+    env = env or 'dev'
     os.environ['ENV'] = env
     pmc_config.register_config(config, env=env)
 

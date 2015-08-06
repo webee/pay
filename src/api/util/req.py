@@ -8,6 +8,6 @@ def ip():
     x_forwarded_for = request.headers.environ.get('X-Forwarded-For')
 
     ip = x_real_ip or x_forwarded_for or request.remote_addr
-    if ip.startswith('192.168'):
+    if not ip or ip.startswith('192.168'):
         ip = "61.148.57.6"
     return ip

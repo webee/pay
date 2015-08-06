@@ -38,10 +38,11 @@ def withdraw():
     selected_card = _find_selected_card(bankcards, long(form.bankcard.data))
     if form.validate_on_submit():
         result = PayClient().withdraw(form.amount.data, form.bankcard.data, "callback_url")
-        if result.status_code == 202:
+        if result['status_code'] == 202:
             _update_preferred_card(form.bankcard.data)
-            return redirect(url_for('.show_withdraw_result_page', transaction_id='123456'))
-        flash(u"提现失败，请稍后再试！")
+            flash(u"提现申请成功！绿野将于3-5个工作日内审核并处理。<a class='transactions' href='/'>查看交易记录</a>", category="success")
+            return redirect(url_for('.withdraw'))
+        flash(u"提现失败，请稍后再试！", category="error")
         return redirect(url_for('.withdraw'))
     return render_template('withdraw/withdraw.html', balance=balance, bankcards=bankcards,
                             selected_card=selected_card, form=form)
@@ -65,7 +66,7 @@ def bind_card():
             branch_bank_name=branch_bank_name
         )
         if result['status_code'] != 201:
-            flash(result['data']['message'])
+            flash(u"银行卡绑定失败，请稍后再试。", category="error")
             return redirect(url_for('.bind_card'))
         _update_preferred_card(result['data']['id'])
         return redirect(url_for('.withdraw'))

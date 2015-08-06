@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 from flask.ext.login import login_required,current_user
-from flask import render_template, url_for, redirect, g
+from flask import render_template, url_for, redirect, g, current_app
 from . import withdraw_mod as mod
 from pytoolbox.util.dbe import from_db
 from tools.mylog import get_logger
@@ -12,6 +12,14 @@ from flask import flash
 
 
 logger = get_logger(__name__)
+
+
+@mod.before_app_first_request
+def register_filters():
+    def _to_bankcard_mask(value):
+        return u"%s **** **** %s" % (value[:4], value[-4:])
+
+    current_app.jinja_env.filters['toBankcardMask'] = _to_bankcard_mask
 
 
 @mod.before_request

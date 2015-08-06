@@ -1,14 +1,26 @@
 $(document).ready(function () {
+    var provinceToCitiesMap = {};
+
+    function renderCitySelect(cities) {
+        var citySelect = $('.city');
+        citySelect.empty();
+        $.each(cities, function (index, city) {
+            citySelect.append($('<option></option>').attr('value', city[0]).text(city[1]));
+        });
+    }
+
     $('.province').change(function () {
         var selectedProvinceCode = $(this).children('option:selected').val();
-        $.get('/data/provinces/' + selectedProvinceCode + '/cities', function (result, textStatus) {
-            if (textStatus === 'success') {
-                var citySelect = $('.city');
-                citySelect.empty();
-                $.each(result.data, function (index, city) {
-                    citySelect.append($('<option></option>').attr('value', city[0]).text(city[1]));
-                });
-            }
-        });
+        if(!provinceToCitiesMap[selectedProvinceCode]) {
+            $.get('/data/provinces/' + selectedProvinceCode + '/cities', function (result, textStatus) {
+                if (textStatus === 'success') {
+                    provinceToCitiesMap[selectedProvinceCode] = result.data;
+                    renderCitySelect(provinceToCitiesMap[selectedProvinceCode]);
+                }
+            });
+        } else {
+            renderCitySelect(provinceToCitiesMap[selectedProvinceCode]);
+        }
+
     });
 });

@@ -28,7 +28,7 @@
                                 <br><em>储蓄卡</em>
                             </p>
                         </div>
-                        <div class="cardNum">{{ selected_card['card_no'] }}</div>
+                        <div class="cardNum">{{ selected_card['card_no'] | toBankcardMask }}</div>
                     </div>
                     <em class="choiceblue">选择其他银行卡</em>
                 </div>
@@ -80,16 +80,17 @@
                             <img class="bankIcon" src="{{ url_for('static', filename='images/'+ card['bank_name'] +'.png') }}" />
                             <p class="bankinds"><span class="bankname">{{ card['bank_name'] }}</span><br><i>储蓄卡</i></p>
                         </div>
-                        <div class="cardNum">{{ card['card_no'] }}</div>
+                        <div class="cardNum">{{ card['card_no'] | toBankcardMask}}</div>
                     </div>
                     <em></em>
                 </li>
             {% endfor %}
+            <li>
+                <a href="{{ url_for('.bind_card') }}">
+                    <img src="{{ url_for('static', filename='images/bind_card.jpg') }}" width="266" height="152"/>
+                </a>
+            </li>
         </ul>
-        <a href="{{ url_for('.bind_card') }}">
-            <img src="{{ url_for('static', filename='images/bind_card.jpg') }}" width="266" height="152"/>
-        </a>
-
         <span class="stepBtn">下一步</span>
         <a href="###" class="close"></a>
     </div>

@@ -30,6 +30,7 @@ def set_current_channel():
 @mod.route('/withdraw', methods=['GET', 'POST'])
 @login_required
 def withdraw():
+    balance = PayClient().get_balance()['data']['balance']
     bankcards = PayClient().get_bankcards()['data']
     if len(bankcards) == 0:
         return redirect(url_for('.bind_card'))
@@ -37,7 +38,8 @@ def withdraw():
     selected_card = _find_selected_card(bankcards, long(form.bankcard.data))
     if form.validate_on_submit():
         return redirect(url_for('.show_withdraw_result_page', transaction_id='123456'))
-    return render_template('withdraw/withdraw.html', bankcards=bankcards, selected_card=selected_card, form=form)
+    return render_template('withdraw/withdraw.html', balance=balance, bankcards=bankcards,
+                            selected_card=selected_card, form=form)
 
 
 @mod.route('/withdraw/bind-card', methods=['GET', 'POST'])

@@ -122,15 +122,15 @@ def _fail_withdraw(db, withdraw_id):
 def _freeze_withdraw(db, withdraw_id, account_id, amount):
     bookkeep(db,
              Event(SourceType.WITHDRAW_FROZEN, withdraw_id, amount),
-             (account_id, 'cash'),
-             (account_id, 'frozen'))
+             (account_id, '-cash'),
+             (account_id, '+frozen'))
 
 
 def _unfreeze_withdraw(db, withdraw_id, account_id, amount):
     bookkeep(db,
              Event(SourceType.WITHDRAW_FAILED, withdraw_id, amount),
-             (account_id, 'frozen'),
-             (account_id, 'cash'))
+             (account_id, '-frozen'),
+             (account_id, '+cash'))
 
 
 @transactional

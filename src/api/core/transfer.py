@@ -8,5 +8,5 @@ from pytoolbox.util.dbe import transactional
 def transfer(trade_id, payer_account_id, payee_account_id, amount):
     create_transfer(trade_id, payer_account_id, payee_account_id, amount)
     bookkeep(Event(SourceType.TRANSFER, trade_id, amount),
-             (payer_account_id, 'cash'),
-             (payee_account_id, 'cash'))
+             (payer_account_id, '-cash'),
+             (payee_account_id, '+cash'))

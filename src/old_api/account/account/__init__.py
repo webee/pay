@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from api.account.account import dba
+from old_api.account.account import dba
 from pytoolbox.util.dbe import require_db_context, db_context
-from api.constant import BookkeepingSide
+from old_api.constant import BookkeepingSide
 
 
 @db_context

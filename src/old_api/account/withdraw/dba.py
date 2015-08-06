@@ -1,7 +1,7 @@
 # coding=utf-8
 from datetime import datetime
-from api.constant import WithdrawState
-from api.util import oid
+from old_api.constant import WithdrawState
+from old_api.util import oid
 from pytoolbox.util.dbe import db_context
 
 

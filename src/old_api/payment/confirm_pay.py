@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from .dba import find_payment_by_id, list_expired_payment
-from api.constant import SourceType, PayStep
-from api.util.bookkeeping import bookkeeping, Event
+from old_api.constant import SourceType, PayStep
+from old_api.util.bookkeeping import bookkeeping, Event
 from pytoolbox.util.dbe import transactional
 import transit
 

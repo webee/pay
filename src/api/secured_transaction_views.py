@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, request, Response
 
-from api2.guaranteed_pay.payment.prepay import *
-from api2.guaranteed_pay.payment.pay import pay_by_id, PaymentNotFoundError
-from api2.guaranteed_pay.payment.postpay import get_secured_payment
-from api2.guaranteed_pay.refund.refund import apply_to_refund
-from api2.util import response
-from api2.util.uuid import decode_uuid
+from api.guaranteed_pay.payment.prepay import *
+from api.guaranteed_pay.payment.pay import pay_by_id, PaymentNotFoundError
+from api.guaranteed_pay.payment.postpay import get_secured_payment
+from api.guaranteed_pay.refund.refund import apply_to_refund
+from api.util import response
+from api.util.uuid import decode_uuid
 
 
 secured_mod = Blueprint('secured_transaction', __name__)

@@ -4,13 +4,13 @@ from __future__ import unicode_literals, print_function, division
 from flask import request
 
 from . import account_mod as mod
-from api.account.error import NoBankcardFoundError, InsufficientBalanceError
-from api.util.error import AmountError
+from old_api.account.error import NoBankcardFoundError, InsufficientBalanceError
+from old_api.util.error import AmountError
 from .withdraw.error import WithdrawError, WithdrawRequestFailedError
 from . import withdraw
-from api.util import response
-from api.util.ipay.transaction import notification
-from api.util.ipay.transaction import parse_and_verify, is_valid_transaction
+from old_api.util import response
+from old_api.util.ipay.transaction import notification
+from old_api.util.ipay.transaction import parse_and_verify, is_valid_transaction
 from tools.mylog import get_logger
 
 logger = get_logger(__name__)

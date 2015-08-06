@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 from . import make_celery_app
 from tools.mylog import get_logger
-from api.payment.confirm_pay import list_all_expired_payments
-from api.payment.confirm_pay import confirm_payment_by_id
-from api.account.account.dba import list_users_with_unsettled_cash
-from api.account.account.balance import settle_user_account_balance
+from old_api.payment.confirm_pay import list_all_expired_payments
+from old_api.payment.confirm_pay import confirm_payment_by_id
+from old_api.account.account.dba import list_users_with_unsettled_cash
+from old_api.account.account.balance import settle_user_account_balance
 
 logger = get_logger(__name__)
 app = make_celery_app('pay')
@@ -40,13 +40,13 @@ def settle_user_cash_balance(account_id, high_id=None):
 
 @app.task(ignore_result=True, queue='withdraw_notify', routing_key='withdraw_notify')
 def withdraw_notify(url, params, next_time, count=1):
-    from api.account.withdraw.notify import notify_client
+    from old_api.account.withdraw.notify import notify_client
     do_notify_client(refund_notify, notify_client, url, params, next_time, count)
 
 
 @app.task(ignore_result=True, queue='refund_notify', routing_key='refund_notify')
 def refund_notify(url, params, next_time, count=1):
-    from api.commons.notify import notify_client
+    from old_api.commons.notify import notify_client
     do_notify_client(refund_notify, notify_client, url, params, next_time, count)
 
 

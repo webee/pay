@@ -3,10 +3,10 @@ from __future__ import unicode_literals, print_function, division
 import logging
 
 from . import client_mod as mod
-from api.account.account.dba import get_account
-from api.payment.dba import find_payment_by_order_no
-from api.payment.confirm_pay import confirm_payment
-from api.util import response
+from old_api.account.account.dba import get_account
+from old_api.payment.dba import find_payment_by_order_no
+from old_api.payment.confirm_pay import confirm_payment
+from old_api.util import response
 
 
 log = logging.getLogger(__name__)

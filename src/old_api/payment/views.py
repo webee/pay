@@ -4,16 +4,16 @@ from decimal import Decimal
 import logging
 import requests
 
-from api.util import response
+from old_api.util import response
 from flask import jsonify, request, Response, redirect
 from . import pay_mod as mod
 from .prepay import Order, find_or_create_prepay_transaction
 from .pay import pay_by_uuid, PaymentNotFoundError
 from .postpay import *
 from .confirm_pay import confirm_payment
-from api.account.account.dba import get_account_by_id
-from api.util.enum import enum
-from api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
+from old_api.account.account.dba import get_account_by_id
+from old_api.util.enum import enum
+from old_api.util.ipay.transaction import generate_pay_url, is_sending_to_me, notification, parse_and_verify
 
 logger = logging.getLogger(__name__)
 

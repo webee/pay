@@ -2,7 +2,7 @@
 from datetime import datetime
 from urlparse import urljoin
 
-from api2.util.uuid import encode_uuid
+from api.util.uuid import encode_uuid
 from pytoolbox import config
 
 

@@ -4,8 +4,8 @@ from __future__ import unicode_literals, print_function, division
 from flask import request
 from . import account_mod as mod
 from .bankcard import *
-from api.util import response
-from api.util.parser import to_bool
+from old_api.util import response
+from old_api.util.parser import to_bool
 from tools.mylog import get_logger
 
 logger = get_logger(__name__)

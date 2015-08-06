@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from api.util.attr_dict import AttrDict
-from api.util.ipay import transaction
-from api.util.ipay.error import UnExpectedResponseError
-from api.util.ipay.transaction import ApiError
-from api.constant import BankcardType
+from old_api.util.attr_dict import AttrDict
+from old_api.util.ipay import transaction
+from old_api.util.ipay.error import UnExpectedResponseError
+from old_api.util.ipay.transaction import ApiError
+from old_api.constant import BankcardType
 from tools.mylog import get_logger
 
 

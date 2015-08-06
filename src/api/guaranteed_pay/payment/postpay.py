@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ._dba import find_payment_by_id, update_payment_state, PAYMENT_STATE, find_payment_by_order_no, request_secured_payment
-from api2.account import get_account_by_id
+from api.account import get_account_by_id
 
 
 def guarantee_payment(pay_record_id):

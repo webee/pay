@@ -3,9 +3,9 @@ from urlparse import urljoin
 from datetime import datetime
 
 from ._dba import create_payment, group_payment, find_payment_by_order_no
-from api2.account import find_or_create_account, find_user_domain_id_by_channel
-from api2.guaranteed_pay.util import oid
-from api2.util.uuid import encode_uuid
+from api.account import find_or_create_account, find_user_domain_id_by_channel
+from api.guaranteed_pay.util import oid
+from api.util.uuid import encode_uuid
 from pytoolbox import config
 from pytoolbox.util.dbe import transactional
 

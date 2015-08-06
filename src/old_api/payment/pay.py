@@ -2,11 +2,11 @@
 from __future__ import unicode_literals
 
 from .dba import find_payment_by_id
-from api.util.ipay import transaction
-from api.util.ipay.transaction import generate_pay_return_url
-from api.util.uuid import decode_uuid
+from old_api.util.ipay import transaction
+from old_api.util.ipay.transaction import generate_pay_return_url
+from old_api.util.uuid import decode_uuid
 from pytoolbox.util.dbe import from_db
-from api.util import req
+from old_api.util import req
 
 
 class PaymentNotFoundError(Exception):

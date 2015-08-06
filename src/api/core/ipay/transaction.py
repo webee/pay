@@ -14,7 +14,7 @@ from .lianlian.query_order import query_order as _query_order
 from .lianlian.refund import refund as _refund
 from .lianlian.validation import is_sending_to_me as _is_sending_to_me
 from . import zyt_url
-from api2.util.uuid import encode_uuid, decode_uuid
+from api.util.uuid import encode_uuid, decode_uuid
 from pytoolbox import config as _config
 
 

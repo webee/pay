@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from api2.core import refund as core_refund
+from api.core import refund as core_refund
 from ._dba import create_refund
 
 

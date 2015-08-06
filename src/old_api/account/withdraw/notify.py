@@ -1,11 +1,11 @@
 # coding=utf-8
-from api.account.withdraw import dba
-from api.commons.notify import notify_client
-from api.constant import WithdrawState
+from old_api.account.withdraw import dba
+from old_api.commons.notify import notify_client
+from old_api.constant import WithdrawState
 
 
 def try_notify_client(withdraw_id):
-    from api.task import pay_tasks
+    from old_api.task import pay_tasks
 
     withdraw_order = dba.get_withdraw(withdraw_id)
     url = withdraw_order.callback_url

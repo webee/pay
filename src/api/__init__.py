@@ -5,9 +5,9 @@ import os
 
 
 def register_mods(app):
-    from api2.facade_views import mod
-    from api2.core_views import core_mod
-    from api2.secured_transaction_views import secured_mod
+    from api.facade_views import mod
+    from api.core_views import core_mod
+    from api.secured_transaction_views import secured_mod
 
     app.register_blueprint(mod)
     app.register_blueprint(secured_mod, url_prefix='/secured')

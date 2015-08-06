@@ -2,13 +2,13 @@
 from decimal import Decimal
 
 from flask import Blueprint, request, redirect
-from api2.account import get_account_by_user_info, get_account_by_id
-from api2.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
+from api.account import get_account_by_user_info, get_account_by_id
+from api.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
     ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance
-from api2.guaranteed_pay.payment.prepay import *
-from api2.guaranteed_pay.payment.confirm_pay import confirm_payment
-from api2.util import response
-from api2.util.parser import to_bool
+from api.guaranteed_pay.payment.prepay import *
+from api.guaranteed_pay.payment.confirm_pay import confirm_payment
+from api.util import response
+from api.util.parser import to_bool
 
 mod = Blueprint('common_transaction', __name__)
 

@@ -28,11 +28,11 @@ def pay(uuid):
         return response.not_found({'uuid': uuid})
 
 
-@mod.route('/clients/<int:client_id>/users/<user_id>/account', methods=['GET'])
-def get_account_info(client_id, user_id):
-    account = get_account_by_user_info(client_id, user_id)
+@mod.route('/user_domains/<int:user_domain_id>/users/<user_id>/account', methods=['GET'])
+def get_account_info(user_domain_id, user_id):
+    account = get_account_by_user_info(user_domain_id, user_id)
     if not account:
-        return response.not_found({'client_id': client_id, 'user_id': user_id})
+        return response.not_found({'user_domain_id': user_domain_id, 'user_id': user_id})
 
     account_id = account['id']
     return response.ok(account_id=account_id)

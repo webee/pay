@@ -17,7 +17,7 @@ def get_user_cash_account_records(account_id, page_no, page_size):
     # get order infos.
     orders_info = {}
     for source_type, ids in source_type_ids.items():
-        orders = _dba.get_orders_info_by_ids(source_type, ids)
+        orders = _dba.get_orders_info_by_ids(source_type.lower(), ids)
         for order in orders:
             orders_info[order.id] = order
 

@@ -37,7 +37,12 @@ def withdraw():
     form = WithdrawForm()
     selected_card = _find_selected_card(bankcards, long(form.bankcard.data))
     if form.validate_on_submit():
-        return redirect(url_for('.show_withdraw_result_page', transaction_id='123456'))
+        result = PayClient().withdraw(form.amount.data, form.bankcard.data, "callback_url")
+        if result.status_code == 202:
+            _update_preferred_card(form.bankcard.data)
+            return redirect(url_for('.show_withdraw_result_page', transaction_id='123456'))
+        flash(u"提现失败，请稍后再试！")
+        return redirect(url_for('.withdraw'))
     return render_template('withdraw/withdraw.html', balance=balance, bankcards=bankcards,
                             selected_card=selected_card, form=form)
 

@@ -79,7 +79,7 @@ def update_payment_state(db, _id, state):
 
 @db_context
 def request_secured_payment(db, payment_id, payer_account_id, amount):
-    _id = oid.secured_pay_id(payer_account_id)
+    _id = oid.request_secured_pay_id(payer_account_id)
     fields = {
         'id': _id,
         'secured_payment_id': payment_id,

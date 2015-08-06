@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, request, Response
 
-from api.guaranteed_pay.payment.prepay import *
-from api.guaranteed_pay.payment.pay import pay_by_id, PaymentNotFoundError
-from api.guaranteed_pay.payment.postpay import get_secured_payment
-from api.guaranteed_pay.refund.refund import apply_to_refund
+from api.secured_transaction.payment.prepay import *
+from api.secured_transaction.payment.pay import pay_by_id, PaymentNotFoundError
+from api.secured_transaction.payment.postpay import get_secured_payment
+from api.secured_transaction.refund.refund import apply_to_refund
 from api.util import response
 from api.util.uuid import decode_uuid
 

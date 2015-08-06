@@ -6,7 +6,7 @@ from api.core.postpay import *
 from api.core.refund import get_refund_by_id, handle_refund_notification
 from api.core.withdraw import get_withdraw_by_id, handle_withdraw_notification
 from api.core.ipay.transaction import parse_and_verify, notification, is_sending_to_me, is_valid_transaction
-from api.guaranteed_pay.callback_interface import get_sync_callback_url_of_payment, guarantee_payment
+from api.secured_transaction.callback_interface import get_sync_callback_url_of_payment, guarantee_payment
 from api.util.enum import enum
 
 core_mod = Blueprint('core_callback_response', __name__)

@@ -4,7 +4,7 @@ from datetime import datetime
 
 from ._dba import create_payment, group_payment, find_payment_by_order_no
 from api.account import find_or_create_account, find_user_domain_id_by_channel
-from api.guaranteed_pay.util import oid
+from api.secured_transaction.util import oid
 from api.util.uuid import encode_uuid
 from pytoolbox import config
 from pytoolbox.util.dbe import transactional

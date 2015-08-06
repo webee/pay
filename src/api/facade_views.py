@@ -5,8 +5,8 @@ from flask import Blueprint, request, redirect
 from api.account import get_account_by_user_info, get_account_by_id
 from api.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
     ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance
-from api.guaranteed_pay.payment.prepay import *
-from api.guaranteed_pay.payment.confirm_pay import confirm_payment
+from api.secured_transaction.payment.prepay import *
+from api.secured_transaction.payment.confirm_pay import confirm_payment
 from api.util import response
 from api.util.parser import to_bool
 

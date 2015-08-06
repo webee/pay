@@ -6,7 +6,7 @@ def guaranteed_pay_id(account_id):
     return _generate(account_id, 'GTP')
 
 
-def secured_pay_id(account_id):
+def request_secured_pay_id(account_id):
     return _generate(account_id, 'SCP')
 
 

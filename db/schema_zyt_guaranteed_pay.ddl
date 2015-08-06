@@ -1,16 +1,16 @@
 CREATE TABLE guaranteed_payment(
-  id CHAR(30) PRIMARY KEY , -- prefix with 'GTP'
-  channel_id INT UNSIGNED NOT NULL ,
-  order_id VARCHAR(64) NOT NULL ,
-  product_name VARCHAR(50) NOT NULL ,
-  product_category VARCHAR(50) NOT NULL ,
-  product_desc VARCHAR(50) NOT NULL ,
-  payer_account_id INT NOT NULL ,
-  payee_account_id INT NOT NULL ,
-  amount DECIMAL(12, 2) NOT NULL ,
+  id CHAR(30) PRIMARY KEY, -- prefix with 'GTP'
+  channel_id INT UNSIGNED NOT NULL,
+  order_id VARCHAR(64) NOT NULL,
+  product_name VARCHAR(50) NOT NULL,
+  product_category VARCHAR(50) NOT NULL,
+  product_desc VARCHAR(50) NOT NULL,
+  payer_account_id INT NOT NULL,
+  payee_account_id INT NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
   refunded_amount DECIMAL(12, 2) NOT NULL DEFAULT 0,
-  ordered_on TIMESTAMP NOT NULL ,
-  created_on TIMESTAMP NOT NULL ,
+  ordered_on TIMESTAMP NOT NULL,
+  created_on TIMESTAMP NOT NULL,
   updated_on TIMESTAMP,
   client_callback_url VARCHAR(128),
   client_async_callback_url VARCHAR(128),
@@ -33,7 +33,7 @@ CREATE TABLE payment_group(
 CREATE TABLE secure_payment(
   id CHAR(30) PRIMARY KEY, -- prefix with 'SCP'
   guaranteed_payment_id CHAR(30) NOT NULL,
-  payer_account_id INT NOT NULL ,
+  payer_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
 
@@ -44,7 +44,7 @@ CREATE TABLE secure_payment(
 CREATE TABLE confirm_payment(
   id CHAR(30) PRIMARY KEY, -- prefix with 'CFP'
   guaranteed_payment_id CHAR(30) NOT NULL,
-  payee_account_id INT NOT NULL ,
+  payee_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
 

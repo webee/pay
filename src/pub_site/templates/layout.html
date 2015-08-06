@@ -39,9 +39,9 @@
                 </ul>
             </div>
             <div class="yh">
-                <a class="userName" href="/user/{{ current_user.user_id }}">{{ current_user.user_name }}<em></em></a>
+                <a class="userName" href="/">{{ current_user.user_name }}<em></em></a>
                 <ul class="userexit" style="display:none">
-                    <li><a href="###" target="_blank" title="">退出</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}" title="">退出</a></li>
                     <em></em>
                 </ul>
             </div>

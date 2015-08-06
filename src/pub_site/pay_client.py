@@ -19,3 +19,24 @@ def get_account_id(uid):
             res = req.json()
             _accounts[uid] = res['account_id']
     return _accounts.get(uid)
+
+
+def get_user_balance(uid):
+    account_id = get_account_id(uid)
+    url = _generate_api_url(config.PayAPI.GET_USER_BALANCE_URL, account_id=account_id)
+    req = requests.get(url)
+
+    if req.status_code == 200:
+        data = req.json()
+        return data['balance']
+
+
+def get_user_cash_records(uid):
+    account_id = get_account_id(uid)
+    url = _generate_api_url(config.PayAPI.GET_USER_CASH_RECORDS_URL, account_id=account_id)
+
+    req = requests.get(url)
+
+    if req.status_code == 200:
+        return req.json()
+    return []

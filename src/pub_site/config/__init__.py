@@ -31,9 +31,8 @@ class PayAPI:
     GET_USER_BALANCE_URL = "http://pay.lvye.com/accounts/{user_domain_id}/{user_id}/balance"
 
 
-##### data #######
+# #### data #######
 class Data:
-
     def load_provinces_and_cities(filepath):
         from tools import pmc_config
         from os import path
@@ -57,3 +56,9 @@ class Data:
 
 class Services:
     LEADER_SERVER = "http://tleader.lvye.com"
+
+
+class SMS:
+    URL = 'http://sdk999ws.eucp.b2m.cn:8080/sdkproxy/sendsms.action'
+    CD_KEY = '9SDK-EMY-0999-JBQOO'
+    PASSWORD = '506260'

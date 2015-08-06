@@ -10,13 +10,6 @@ from flask.ext.login import current_user
 from pytoolbox.util.dbe import from_db
 
 
-SMS = {
-    'url': 'http://sdk999ws.eucp.b2m.cn:8080/sdkproxy/sendsms.action',
-    'cdkey': '9SDK-EMY-0999-JBQOO',
-    'password': '506260',
-}
-
-
 def generate_and_send_identifying_code():
     _clear_expired_identifying_code()
     mobile = _get_user_contact_mobile()
@@ -28,20 +21,17 @@ def generate_and_send_identifying_code():
 
 def _clear_expired_identifying_code():
     now = datetime.fromtimestamp(time.time()).isoformat()
-    sql = "delete from identifying_code where user_id=%(user_id)s and expire_at<%(now)s"
-    from_db().execute(sql, user_id=current_user.user_id, now=now)
+    from_db().execute("delete from identifying_code where user_id=%(user_id)s and expire_at<%(now)s",
+                      user_id=current_user.user_id, now=now)
 
 
 def _send_message(mobile, messages):
-    msg = messages
-    resp = requests.post(
-        SMS['url'],
-        data={'cdkey': SMS['cdkey'],
-              'password': SMS['password'],
-              'phone': mobile,
-              'message': msg}
-    )
-    return resp
+    return requests.post(config.SMS.URL, data={
+        'cdkey': config.SMS.CD_KEY,
+        'password': config.SMS.PASSWORD,
+        'phone': mobile,
+        'message': messages
+    })
 
 
 def _get_user_contact_mobile():
@@ -50,9 +40,7 @@ def _get_user_contact_mobile():
     if resp.status_code != 200:
         return -1
     data = resp.json().get('data')
-    if not data:
-        return -1
-    return data["contactsMobile"]
+    return data["contactsMobile"] if data else -1
 
 
 def _generate_identifying_code():

@@ -9,10 +9,6 @@ $(function () {
             $(this).find("ul").stop().fadeIn();
         });
 
-        $(".alert .close").click(function() {
-           $(".alert").hide();
-        });
-
         function synchronizePreferredCardOnPanel() {
             $('.kindsCard li').removeClass('cur');
             var originPreferredCardId = $("#selected_bankcard").val();

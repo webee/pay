@@ -15,6 +15,7 @@
 <!--[if lt IE 9]>
 <script src="{{ url_for('static',filename='js/html5.js') }}"></script>
 <![endif]-->
+<script src="{{ url_for('static', filename='js/jquery/jquery.min.js') }}"></script>
 {% block js %}{% endblock %}
 
 </head>
@@ -85,8 +86,6 @@
 
 
 {% block scripts %}
-    {#    {{ super() }}#}
-    <script src="{{ url_for('static', filename='js/jquery/jquery.min.js') }}"></script>
     <script>
         $(function () {
             $(".loginBtn .sx").hover(function () {

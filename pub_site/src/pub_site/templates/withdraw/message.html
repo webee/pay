@@ -1,0 +1,61 @@
+<div class="message-container">
+    <style type="text/css">
+        .message-container {
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-error {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+
+        .alert-success {
+            color: #3c763d;
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+        }
+
+        .alert a {
+            color: inherit;
+        }
+
+        .alert a:hover {
+            text-decoration: underline;
+        }
+
+        .alert .close {
+            float: right;
+            -webkit-appearance: none;
+            padding: 0;
+            cursor: pointer;
+            background: transparent;
+            border: 0;
+        }
+    </style>
+    {% for message in get_flashed_messages(with_categories=True, category_filter=["success"]) %}
+        <div class="alert alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message[1] | safe }}
+        </div>
+    {% endfor %}
+    {% for message in get_flashed_messages(with_categories=True, category_filter=["error"]) %}
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message[1] | safe }}
+        </div>
+    {% endfor %}
+    <script>
+        $(".alert .close").click(function () {
+            $(".alert").hide();
+        });
+    </script>
+</div>

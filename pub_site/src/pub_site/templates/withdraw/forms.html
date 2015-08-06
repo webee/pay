@@ -1,0 +1,28 @@
+{% macro input(field, warning_message='') -%}
+    <div class="line">
+        <label>{{ field.label }}</label>
+        {{ field(class="txk " + (' orangetxk' if field.errors | length > 0 else '')) }}
+        <em class="warn">{{ warning_message }}</em>
+        {% for error in field.errors %}
+            <em class="mistake">{{ error }}</em>
+        {% endfor %}
+    </div>
+{%- endmacro %}
+
+{% macro identifying_code(field) -%}
+    <div class="line">
+        <label>{{ field.label }}</label>
+        {{ field(class="txk small" + (' orangetxk' if field.errors | length > 0 else '')) }}
+        <button class="hqyzm">获取验证码</button>
+        <em class="identifying-code warn"></em>
+        {% for error in field.errors %}
+            <em class="mistake">{{ error }}</em>
+        {% endfor %}
+    </div>
+{%- endmacro %}
+
+{% macro submit(field) -%}
+    <div class="line">
+        {{ field(class="tijiao firsttj") }}
+    </div>
+{%- endmacro %}

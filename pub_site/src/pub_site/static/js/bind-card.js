@@ -9,10 +9,6 @@ $(document).ready(function () {
         });
     }
 
-    $(".alert .close").click(function() {
-       $(".alert").hide();
-    });
-
     $('.province').change(function () {
         var selectedProvinceCode = $(this).children('option:selected').val();
         if(!provinceToCitiesMap[selectedProvinceCode]) {

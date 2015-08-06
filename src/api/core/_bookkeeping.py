@@ -41,13 +41,13 @@ def bookkeep(db, event, account_a, account_b):
     }
 
     if sa == '+' and sb == '-':
-        debit_account, credit_account = _get_debit_and_credit(account_a, account_b)
+        debit_account, credit_account = _get_debit_and_credit(account_name_a, account_name_b)
     elif sa == '-' and sb == '+':
-        debit_account, credit_account = _get_debit_and_credit(account_b, account_id_a)
+        debit_account, credit_account = _get_debit_and_credit(account_name_b, account_name_a)
     elif sa == '+' and sb == '+':
-        debit_account, credit_account = _get_debit_and_credit_both_increased(account_a, account_b)
+        debit_account, credit_account = _get_debit_and_credit_both_increased(account_name_a, account_name_b)
     elif sa == '-' and sb == '-':
-        debit_account, credit_account = _get_debit_and_credit_both_decreased(account_a, account_b)
+        debit_account, credit_account = _get_debit_and_credit_both_decreased(account_name_a, account_name_b)
     else:
         raise ValueError('bad accounts format.')
 

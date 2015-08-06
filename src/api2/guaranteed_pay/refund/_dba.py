@@ -22,5 +22,5 @@ def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, as
         'created_on': datetime.now(),
         'async_callback_url': async_callback_url
     }
-    db.insert('guaranteed_refund', returns_id=True, **fields)
+    db.insert('secured_refund', returns_id=True, **fields)
     return refund_id

@@ -52,7 +52,7 @@ CREATE TABLE confirm_payment(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE guaranteed_refund(
+CREATE TABLE secured_refund(
   id CHAR(30) PRIMARY KEY,  -- prefix with 'GTR'
   secured_payment_id CHAR(30) NOT NULL,
   payer_account_id INT UNSIGNED NOT NULL,

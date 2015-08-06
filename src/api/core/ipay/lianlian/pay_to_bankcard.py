@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from .api import request
+from .api_access import request
 from .util import now_to_str
 from . import config
 

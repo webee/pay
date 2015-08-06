@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .api import request
+from .api_access import request
 from . import config
 from .util import datetime_to_str
 

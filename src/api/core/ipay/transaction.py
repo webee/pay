@@ -5,7 +5,7 @@ from flask import request
 from urlparse import urljoin
 
 from .error import *
-from .lianlian.api import parse_and_verify_request_data
+from .lianlian.api_access import parse_and_verify_request_data
 from .lianlian.bankcard import query_bin as _query_bin
 from .lianlian.notification import Notification
 from .lianlian.pay import pay as _pay

@@ -24,7 +24,6 @@ class PayClient:
         self.server = server
         self.client_id = client_id
 
-
     @handle_response
     def bind_bankcards(self, card_number, account_name, province_code, city_code, branch_bank_name):
         uid = current_user.user_id
@@ -40,7 +39,6 @@ class PayClient:
         }
         return requests.post(url, data=data)
 
-
     @handle_response
     def get_bankcards(self):
         uid = current_user.user_id
@@ -48,12 +46,24 @@ class PayClient:
         url = '%s/accounts/%s/bankcards' % (self.server, account_id)
         return requests.get(url)
 
-
     @handle_response
-    def get_balance(self, uid):
+    def get_balance(self):
+        uid = current_user.user_id
         account_id = self._get_account(uid)['account_id']
         url = '%s/accounts/%s/balance' % (self.server, account_id)
         return requests.get(url)
+
+    @handle_response
+    def withdraw(self, amount, bankcard_id, callback_url):
+        uid = current_user.user_id
+        account_id = self.__get_account(uid)['account_id']
+        url = '%s/accounts/%s/withdraw' % (self.server, account_id)
+        data = {
+            'bankcard_id': bankcard_id,
+            'amount': amount,
+            'callback_url': callback_url
+        }
+        return requests.post(url, data=data)
 
     def _get_account(self, uid):
         if uid in PayClient.accounts:

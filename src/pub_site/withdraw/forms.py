@@ -2,12 +2,13 @@
 
 from datetime import datetime
 import time
+
 from pub_site import config
 from flask.ext.wtf import Form
 from flask.ext.login import current_user
 from wtforms import StringField, SelectField, SubmitField, HiddenField, FloatField, ValidationError
 from wtforms.compat import text_type
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, NumberRange
 import requests
 from pytoolbox.util.dbe import from_db
 from pay_client import PayClient
@@ -83,9 +84,18 @@ class MyHiddenField(HiddenField):
         return text_type(self.data) if self.data is not None else ''
 
 
+def amount_less_than_balance(form, field):
+    result = PayClient().get_balance()
+    if result['status_code'] == 200:
+        balance = result['data']['balance']
+        if float(field.data) > balance:
+            raise ValidationError(u"提现金额不能超过账户余额")
+
+
 class WithdrawForm(Form):
     bankcard = MyHiddenField()
-    amount = FloatField(u"提现金额(元)", validators=[DataRequired(u"提现金额不能为空")])
+    amount = FloatField(u"提现金额(元)", validators=[DataRequired(u"提现金额不能为空"), NumberRange(min=10, message=u"提现金额不能少于10元"),
+                                                amount_less_than_balance])
     identifying_code = StringField(u"验证码", validators=[DataRequired(u"验证码不能为空"), identifying_code_should_match])
     submit = SubmitField(u"提交")
 

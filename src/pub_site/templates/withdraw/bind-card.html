@@ -9,6 +9,20 @@
 {% endblock %}
 {% block content %}
     <div class="contRight payoffRight firstRight">
+        <div class="message-container">
+            {% for message in get_flashed_messages(with_categories=True, category_filter=["success"]) %}
+                <div class="alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message[1] | safe }}
+                </div>
+            {% endfor %}
+            {% for message in get_flashed_messages(with_categories=True, category_filter=["error"]) %}
+                <div class="alert alert-error">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message[1] | safe }}
+                </div>
+            {% endfor %}
+        </div>
         <form class="bind-card" method="post" action="{{ url_for('.bind_card') }}">
             {{ form.csrf_token }}
             <h2 class="first">请绑定提现银行卡</h2>

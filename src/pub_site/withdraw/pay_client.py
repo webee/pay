@@ -56,7 +56,7 @@ class PayClient:
     @handle_response
     def withdraw(self, amount, bankcard_id, callback_url):
         uid = current_user.user_id
-        account_id = self.__get_account(uid)['account_id']
+        account_id = self._get_account(uid)['account_id']
         url = '%s/accounts/%s/withdraw' % (self.server, account_id)
         data = {
             'bankcard_id': bankcard_id,

@@ -68,7 +68,7 @@ class PayClient:
     def _get_account(self, uid):
         if uid in PayClient.accounts:
             return PayClient.accounts[uid]
-        url = '%s/clients/%s/users/%s/account' % (self.server, self.client_id, uid)
+        url = '%s/user_domains/%s/users/%s/account' % (self.server, self.client_id, uid)
         resp = requests.get(url)
         if resp.status_code != 200:
             return {"account_id": 0}

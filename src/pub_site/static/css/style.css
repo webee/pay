@@ -52,6 +52,7 @@ footer{background:#333;height:60px;}
 /*提现申请成功页*/
 .main{min-height:860px;overflow-y:auto;}
 .mainCont{width:1170px;overflow:hidden;margin:0 auto;max-width:1200px;}
+.contLeft a {color: inherit;}
 .mainCont .contLeft,.mainCont .contRight{float:left;color:#595757;}
 .mainCont .contLeft{width:170px;background:#fafafa;padding-bottom:274px;}
 .mainCont .contRight{width:1000px;background:#fff;text-align:center;padding:106px 0 82px;}

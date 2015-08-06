@@ -8,10 +8,12 @@ from flask.ext.wtf import Form
 from flask.ext.login import current_user
 from wtforms import StringField, SelectField, SubmitField, HiddenField, FloatField, ValidationError
 from wtforms.compat import text_type
-from wtforms.validators import DataRequired, NumberRange
+from wtforms.validators import DataRequired, NumberRange, StopValidation
 import requests
 from pytoolbox.util.dbe import from_db
 from pay_client import PayClient
+import re
+from wtforms.compat import string_types
 
 
 def name_and_id_card_should_match(form, field):
@@ -89,13 +91,32 @@ def amount_less_than_balance(form, field):
     if result['status_code'] == 200:
         balance = result['data']['balance']
         if float(field.data) > balance:
-            raise ValidationError(u"提现金额不能超过账户余额")
+            raise StopValidation(u"提现金额不能超过账户余额")
+
+
+class MyRegexp(object):
+    def __init__(self, regex, flags=0, message=None):
+        if isinstance(regex, string_types):
+            regex = re.compile(regex, flags)
+        self.regex = regex
+        self.message = message
+
+    def __call__(self, form, field, message=None):
+        match = self.regex.match(str(field.data) or '')
+        if not match:
+            if message is None:
+                if self.message is None:
+                    message = field.gettext('Invalid input.')
+                else:
+                    message = self.message
+            raise StopValidation(message)
 
 
 class WithdrawForm(Form):
     bankcard = MyHiddenField()
-    amount = FloatField(u"提现金额(元)", validators=[DataRequired(u"提现金额不能为空"), NumberRange(min=10, message=u"提现金额不能少于10元"),
-                                                amount_less_than_balance])
+    amount = FloatField(u"提现金额(元)",
+                        validators=[DataRequired(u"请输入合法金额"), MyRegexp(r'^\d+(.\d{1,2})?$', message=u"请输入合法金额"),
+                                    amount_less_than_balance, NumberRange(min=10, message=u"提现金额不能少于10元")])
     identifying_code = StringField(u"验证码", validators=[DataRequired(u"验证码不能为空"), identifying_code_should_match])
     submit = SubmitField(u"提交")
 

@@ -1,6 +1,8 @@
 {% extends 'layout.html' %}
 {% block title %}提现{% endblock %}
-
+{% block inline_css %}
+    <link href="{{ url_for('static', filename='css/withdraw.css') }}" rel="stylesheet">
+{% endblock %}
 {% block inline_scripts %}
     <script src="{{ url_for('static', filename='js/identifying-code.js') }}"></script>
     <script src="{{ url_for('static', filename='js/withdraw.js') }}"></script>
@@ -12,7 +14,7 @@
         <h2 class="first">提现</h2>
 
         <div class="line firstline">
-            <label>账户余额</label><span class="money">88,999,899.00 元</span>
+            <label>账户余额</label><span class="money">{{ balance }} 元</span>
         </div>
         <form class="withdraw" method="post" action="{{ url_for('.withdraw') }}">
             {{ form.csrf_token }}

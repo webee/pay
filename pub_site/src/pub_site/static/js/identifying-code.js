@@ -1,5 +1,24 @@
 $(document).ready(function () {
+    var wait = 60;
+
+    function timing(btn) {
+        if (wait == 0) {
+            btn.removeAttribute("disabled");
+            btn.value = "获取验证码";
+            wait = 60;
+        } else {
+            btn.setAttribute("disabled", true);
+            btn.value = "重新发送(" + wait + ")";
+            wait--;
+            setTimeout(function () {
+                timing(btn)
+            }, 1000);
+        }
+    }
+
     $('.hqyzm').click(function () {
+        $('.identifying-code.warn').html('正在获取中......');
+        timing(this);
         $.ajax('/withdraw/generate-identifying-code', {
             type: 'post',
             success: function (data, textStatus) {

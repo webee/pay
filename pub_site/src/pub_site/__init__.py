@@ -49,7 +49,7 @@ login_manager.login_message = None
 
 
 def create_app(env):
-    from pytoolbox.conf import config_loader
+    from pytoolbox import conf
     from pub_site import config
 
     app = Flask(__name__, template_folder='./templates')
@@ -57,7 +57,7 @@ def create_app(env):
 
     env = env or 'dev'
     os.environ['ENV'] = env
-    config_loader.load(config, env=env)
+    conf.load(config, env=env)
 
     app.config.from_object(config.App)
 

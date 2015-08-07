@@ -23,6 +23,13 @@ server = Server(host="0.0.0.0", port=5002)
 manager.add_command("runserver", server)
 
 
+@manager.command
+def init_db():
+    from ops.deploy.init_db import init_db
+    init_db()
+
+
+
 def main():
     reload(sys)
     sys.setdefaultencoding('utf-8')

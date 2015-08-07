@@ -24,7 +24,7 @@
                     {{ form.bankcard(id="selected_bankcard") }}
                     <div class="bankcard">
                         <div class="line1 clearfix">
-                            <img class="bankIcon" src="{{ url_for('static', filename='images/'+ selected_card['bank_name'] +'.png') }}" />
+                            <img class="bankIcon" src="{{ url_for('static', filename=selected_card['bank_name'] | toBankLogo) }}" />
                             <p class="bankinds">
                                 <span class="bankname">{{ selected_card['bank_name'] }}</span>
                                 <br><em>储蓄卡</em>
@@ -44,7 +44,7 @@
                 </div>
             </div>
             {% from 'withdraw/forms.html' import input, identifying_code, submit %}
-            {{ input(form.amount, "每笔提现收取手续费2元") }}
+            {{ input(form.amount, "含手续费2元") }}
             {{ identifying_code(form.identifying_code) }}
             {{ submit(form.submit) }}
         </form>
@@ -63,7 +63,7 @@
                     <div class="bankcard">
                         <input class="cardId" type="hidden" value="{{ card['id'] }}"/>
                         <div class="line1 clearfix">
-                            <img class="bankIcon" src="{{ url_for('static', filename='images/'+ card['bank_name'] +'.png') }}" />
+                            <img class="bankIcon" src="{{ url_for('static', filename=card['bank_name'] | toBankLogo) }}" />
                             <p class="bankinds"><span class="bankname">{{ card['bank_name'] }}</span><br><i>储蓄卡</i></p>
                         </div>
                         <div class="cardNum">{{ card['card_no'] | toBankcardMask}}</div>

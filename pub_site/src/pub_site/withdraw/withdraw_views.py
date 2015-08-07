@@ -17,10 +17,18 @@ logger = get_logger(__name__)
 
 @mod.before_app_first_request
 def register_filters():
+    bank_names = ('上海银行', '中信银行', '中国人民银行', '中国农业银行', '中国工商银行', '中国建设银行', '中国银行', '交通银行',
+                  '兴业银行', '北京银行', '华夏银行', '天津银行', '工商银行', '平安银行', '广发银行', '光大银行', '恒丰银行',
+                  '招商银行', '民生银行', '浙商银行', '浦发银行', '渤海银行', '邮政储蓄', '重庆银行')
+
+    def _to_bank_logo(value):
+        return "images/%s.png" % (value if value in bank_names else '其他银行')
+
     def _to_bankcard_mask(value):
         return u"%s **** **** %s" % (value[:4], value[-4:])
 
     current_app.jinja_env.filters['toBankcardMask'] = _to_bankcard_mask
+    current_app.jinja_env.filters['toBankLogo'] = _to_bank_logo
 
 
 @mod.before_request

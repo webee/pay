@@ -49,7 +49,7 @@ login_manager.login_message = None
 
 
 def create_app(env):
-    from pytoolbox import conf
+    from pytoolbox.conf import config as conf
     from pub_site import config
 
     app = Flask(__name__, template_folder='./templates')

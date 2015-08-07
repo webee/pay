@@ -3,6 +3,7 @@ from __future__ import unicode_literals, print_function, division
 from flask import Flask
 import os
 from pytoolbox import conf
+from pytoolbox.util import dbe
 
 
 def register_mods(app):
@@ -24,6 +25,9 @@ def create_app(env):
     env = env or 'dev'
     os.environ['ENV'] = env
     conf.load(config, env=env)
+
+    dbe.create_db_engine(config.DataBase.HOST, config.DataBase.PORT, config.DataBase.INSTANCE,
+                         config.DataBase.USERNAME, config.DataBase.PASSWORD)
 
     register_mods(app)
 

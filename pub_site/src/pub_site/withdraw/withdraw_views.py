@@ -5,6 +5,7 @@ from flask import render_template, url_for, redirect, g, current_app
 from . import withdraw_mod as mod
 from pytoolbox.util.dbe import from_db
 from tools.mylog import get_logger
+from .import WITHDRAW_COMMISSION
 from .forms import BindCardForm, WithdrawForm
 from identifying_code_manager import generate_and_send_identifying_code
 from pay_client import PayClient
@@ -37,12 +38,14 @@ def withdraw():
     form = WithdrawForm()
     selected_card = _find_selected_card(bankcards, long(form.bankcard.data))
     if form.validate_on_submit():
+        actual_amount = form.amount.data - WITHDRAW_COMMISSION
         result = PayClient().withdraw(form.amount.data, form.bankcard.data, "callback_url")
         if result['status_code'] == 202:
             _update_preferred_card(form.bankcard.data)
-            flash(u"提现申请成功！绿野将于3-5个工作日内审核并处理。<a class='transactions' href='/'>查看交易记录</a>", category="success")
+            success_message = u"提现 %s元 申请成功！绿野将于3-5个工作日内审核并处理。" % actual_amount
+            flash(success_message, category="success")
             return redirect(url_for('.withdraw'))
-        flash(u"提现失败，请稍后再试！", category="error")
+        flash(u"提现失败，请核实账户信息！", category="error")
         return redirect(url_for('.withdraw'))
     return render_template('withdraw/withdraw.html', balance=balance, bankcards=bankcards,
                             selected_card=selected_card, form=form)

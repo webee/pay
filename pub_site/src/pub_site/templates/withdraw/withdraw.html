@@ -44,7 +44,7 @@
                 </div>
             </div>
             {% from 'withdraw/forms.html' import input, identifying_code, submit %}
-            {{ input(form.amount, "最低限额：10元") }}
+            {{ input(form.amount, "每笔提现收取手续费2元") }}
             {{ identifying_code(form.identifying_code) }}
             {{ submit(form.submit) }}
         </form>

@@ -9,12 +9,6 @@ db_instance = config.get('database', 'instance')
 
 def init_db():
     recreate_db()
-    create_schema()
-    init_test_data()
-
-
-def init_db_2():
-    recreate_db()
     create_schema_2()
     inject_base_data()
 
@@ -22,12 +16,6 @@ def init_db_2():
 def recreate_db():
     info('recreating database ...')
     local('mysql -u root -p < migration/init_db.sql')
-
-
-def create_schema():
-    info('creating schema ...')
-    local('mysql -u root {} -p < migration/schema.ddl'.format(db_instance))
-    local('mysql -u root {} -p < migration/schema_zyt_pub_site.ddl'.format(db_instance))
 
 
 def create_schema_2():
@@ -42,8 +30,3 @@ def create_schema_2():
 def inject_base_data():
     info('injecting base data ...')
     local('mysql -u root {} -p < migration/data_zyt_account.sql'.format(db_instance))
-
-
-def init_test_data():
-    info('initing test data ...')
-    local('mysql -u root {} -p < migration/init_test_data.sql'.format(db_instance))

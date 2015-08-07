@@ -17,8 +17,8 @@ manager.add_command("runserver", server)
 
 @manager.command
 def init_db():
-    from ops.deploy.init_db import init_db_2
-    init_db_2()
+    from ops.deploy.init_db import init_db
+    init_db()
 
 
 def main():

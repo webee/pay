@@ -7,7 +7,6 @@ import os
 from flask import Flask, render_template
 from flask.ext.login import LoginManager
 from tools.filters import register_filters, register_global_functions
-from pytoolbox import conf
 
 
 def init_template(app):
@@ -50,13 +49,15 @@ login_manager.login_message = None
 
 
 def create_app(env):
+    from pytoolbox.conf import config_loader
+    from pub_site import config
+
     app = Flask(__name__, template_folder='./templates')
     app.permanent_session_lifetime = timedelta(minutes=10)
 
-    from pub_site import config
     env = env or 'dev'
     os.environ['ENV'] = env
-    conf.load(config, env=env)
+    config_loader.load(config, env=env)
 
     app.config.from_object(config.App)
 

@@ -21,6 +21,7 @@ def create_schema():
     exec_sql_script('migration/schema_zyt_account.ddl')
     exec_sql_script('migration/schema_zyt_core.ddl')
     exec_sql_script('migration/schema_zyt_secured_transaction.ddl')
+    exec_sql_script('migration/schema_zyt_direct_transaction.ddl')
 
 
 def exec_sql_script(script_name):

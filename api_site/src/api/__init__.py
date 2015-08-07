@@ -10,10 +10,12 @@ def register_mods(app):
     from api.facade_views import mod
     from api.core_views import core_mod
     from api.secured_transaction_views import secured_mod
+    from api.direct_transaction_views import direct_mod
     from api.transaction_log_views import transaction_log_mod
 
     app.register_blueprint(mod)
     app.register_blueprint(secured_mod, url_prefix='/secured')
+    app.register_blueprint(direct_mod, url_prefix='/direct')
     app.register_blueprint(core_mod, url_prefix='/core')
     app.register_blueprint(transaction_log_mod)
 

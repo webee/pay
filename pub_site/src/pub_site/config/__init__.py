@@ -1,5 +1,6 @@
 # coding=utf-8
 import os
+from pytoolbox import conf
 
 
 class App:
@@ -42,7 +43,7 @@ def load_provinces_and_cities(filepath):
 
     UTF8Reader = codecs.getreader('utf-8')
 
-    with UTF8Reader(open(path.join(pmc_config.get_project_root(), filepath))) as fin:
+    with UTF8Reader(open(path.join(conf.project_root(), filepath))) as fin:
         provinces = OrderedDict()
         cities = OrderedDict()
         for line in fin:
@@ -54,7 +55,7 @@ def load_provinces_and_cities(filepath):
 
 
 class Data:
-    PROVINCES, CITIES = load_provinces_and_cities('conf/content/province_and_city_code.txt')
+    PROVINCES, CITIES = load_provinces_and_cities('conf/province_and_city_code.txt')
 
 
 class Services:

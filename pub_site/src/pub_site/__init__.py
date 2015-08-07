@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
+from datetime import timedelta
+
 import os
 from flask import Flask, render_template
 from flask.ext.login import LoginManager
 from tools.filters import register_filters, register_global_functions
-from tools import pmc_config
-from datetime import timedelta
+from pytoolbox import conf
 
 
 def init_template(app):
@@ -55,7 +56,7 @@ def create_app(env):
     from pub_site import config
     env = env or 'dev'
     os.environ['ENV'] = env
-    pmc_config.register_config(config, env=env)
+    conf.load(config, env=env)
 
     app.config.from_object(config.App)
 

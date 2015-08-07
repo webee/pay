@@ -4,12 +4,9 @@ from tools.log import *
 from api import config
 
 
-_db_instance = config.DataBase.INSTANCE
-
-
 def init_db():
-    recreate_db()
-    create_schema_2()
+    #recreate_db()
+    create_schema()
     inject_base_data()
 
 
@@ -18,15 +15,23 @@ def recreate_db():
     local('mysql -u root -p < migration/init_db.sql')
 
 
-def create_schema_2():
+def create_schema():
     info('creating schema ...')
-    local('mysql -u root {} -p < migration/schema_zyt.ddl'.format(_db_instance))
-    local('mysql -u root {} -p < migration/schema_zyt_account.ddl'.format(_db_instance))
-    local('mysql -u root {} -p < migration/schema_zyt_core.ddl'.format(_db_instance))
-    local('mysql -u root {} -p < migration/schema_zyt_secured_transaction.ddl'.format(_db_instance))
-    local('mysql -u root {} -p < migration/schema_zyt_pub_site.ddl'.format(_db_instance))
+    exec_sql_script('migration/schema_zyt.ddl')
+    exec_sql_script('migration/schema_zyt_account.ddl')
+    exec_sql_script('migration/schema_zyt_core.ddl')
+    exec_sql_script('migration/schema_zyt_secured_transaction.ddl')
+
+
+def exec_sql_script(script_name):
+    local('mysql -h {} -u {} -p{} {} < {}'.format(
+        config.DataBase.HOST,
+        config.DataBase.USERNAME,
+        config.DataBase.PASSWORD,
+        config.DataBase.INSTANCE,
+        script_name))
 
 
 def inject_base_data():
     info('injecting base data ...')
-    local('mysql -u root {} -p < migration/data_zyt_account.sql'.format(_db_instance))
+    exec_sql_script('migration/data_zyt_account.ddl')

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from fabric.api import local
 from tools.log import *
-from pytoolbox import config
+from pub_site import config
 
 
-db_instance = config.get('database', 'instance')
+_db_instance = config.DataBase.INSTANCE
 
 
 def init_db():
@@ -20,7 +20,7 @@ def recreate_db():
 
 def create_schema():
     info('creating schema ...')
-    local('mysql -u root {} -p < migration/schema_zyt_pub_site.ddl'.format(db_instance))
+    local('mysql -u root {} -p < migration/schema_zyt_pub_site.ddl'.format(_db_instance))
 
 
 def inject_base_data():

@@ -20,7 +20,7 @@ def get_user_cash_account_log(db, account_id, offset, limit):
     return db.list("""
                 SELECT e.id, e.source_type, e.source_id, c.side, c.amount, c.created_on FROM cash_account_transaction_log c LEFT JOIN event e ON c.event_id=e.id
                   WHERE c.account_id=%(account_id)s
-                  ORDER BY e.created_on DESC
+                  ORDER BY e.id DESC
                   LIMIT %(offset)s, %(limit)s
     """, account_id=account_id, offset=offset, limit=limit)
 

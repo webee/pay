@@ -4,11 +4,8 @@ from tools.log import *
 from pub_site import config
 
 
-_db_instance = config.DataBase.INSTANCE
-
-
 def init_db():
-    recreate_db()
+    # recreate_db()
     create_schema()
     inject_base_data()
 
@@ -20,7 +17,16 @@ def recreate_db():
 
 def create_schema():
     info('creating schema ...')
-    local('mysql -u root {} -p < migration/schema_zyt_pub_site.ddl'.format(_db_instance))
+    exec_sql_script('migration/schema_zyt_pub_site.ddl')
+
+
+def exec_sql_script(script_name):
+    local('mysql -h {} -u {} -p{} {} < {}'.format(
+        config.DataBase.HOST,
+        config.DataBase.USERNAME,
+        config.DataBase.PASSWORD,
+        config.DataBase.INSTANCE,
+        script_name))
 
 
 def inject_base_data():

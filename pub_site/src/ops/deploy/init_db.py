@@ -15,12 +15,12 @@ def init_db():
 
 def recreate_db():
     info('recreating database ...')
-    local('mysql -u root -p < db/init_db.sql')
+    local('mysql -u root -p < migration/init_db.sql')
 
 
 def create_schema():
     info('creating schema ...')
-    local('mysql -u root {} -p < db/schema_zyt_pub_site.ddl'.format(db_instance))
+    local('mysql -u root {} -p < migration/schema_zyt_pub_site.ddl'.format(db_instance))
 
 
 def inject_base_data():

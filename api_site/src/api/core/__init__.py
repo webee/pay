@@ -18,9 +18,9 @@ def pay(trade_id, payer_account_id, payer_created_on, payee_account_id, request_
                 product_desc, traded_on, amount)
 
 
-def transfer(trade_id, payer_account_id, payee_account_id, amount):
+def transfer(trade_id, trade_info, payer_account_id, payee_account_id, amount):
     from .transfer import transfer as _transfer
-    return _transfer(trade_id, payer_account_id, payee_account_id, amount)
+    return _transfer(trade_id, trade_info, payer_account_id, payee_account_id, amount)
 
 
 def query_bankcard_bin(card_no):

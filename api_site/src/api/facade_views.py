@@ -4,7 +4,7 @@ from decimal import Decimal
 from flask import Blueprint, request, redirect, Response
 from api.account import get_account_by_user_info, get_account_by_id
 from api.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
-    ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance
+    ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance, transfer
 from api.secured_transaction.payment.pay import pay_by_id, PaymentNotFoundError
 from api.util import response
 from api.util.parser import to_bool
@@ -107,3 +107,15 @@ def withdraw_detail(withdraw_id):
     if not withdraw_record:
         return response.not_found({'withdraw_id': withdraw_id})
     return response.ok(dict(withdraw_record))
+
+
+@mod.route('/accounts/<int:payer_account_id>/transfer', methods=['POST'])
+def transfer_to_lvye(payer_account_id):
+    data = request.values
+    order_no = data['order_no']
+    order_info = data['order_info']
+    payee_account_id = data['to_account_id']
+    amount = data['amount']
+    
+    _id = transfer(order_no, order_info, payer_account_id, payee_account_id, amount)
+    return response.ok(transfer_id=_id)

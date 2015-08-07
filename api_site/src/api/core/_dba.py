@@ -95,17 +95,19 @@ def fail_payment(db, _id):
 
 
 @db_context
-def create_transfer(db, trade_id, payer_account_id, payee_account_id, amount):
+def create_transfer(db, trade_id, trade_info, payer_account_id, payee_account_id, amount):
     _id = transfer_id(payer_account_id)
     fields = {
         'id': _id,
         'trade_id': trade_id,
+        'trade_info': trade_info,
         'payer_account_id': payer_account_id,
         'payee_account_id': payee_account_id,
         'amount': amount,
         'created_on': datetime.now()
     }
     db.insert('transfer', **fields)
+    return _id
 
 
 @db_context

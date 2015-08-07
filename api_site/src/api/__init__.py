@@ -2,6 +2,7 @@
 from __future__ import unicode_literals, print_function, division
 from flask import Flask
 import os
+from pytoolbox import conf
 
 
 def register_mods(app):
@@ -17,10 +18,13 @@ def register_mods(app):
 
 
 def create_app(env):
-    env = env.lower() if env else 'dev'
-    os.environ['ENV'] = env
-
     app = Flask(__name__)
+
+    from api import config
+    env = env or 'dev'
+    os.environ['ENV'] = env
+    conf.load(config, env=env)
+
     register_mods(app)
 
     return app

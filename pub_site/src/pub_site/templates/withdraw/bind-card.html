@@ -9,7 +9,7 @@
 {% endblock %}
 {% block content %}
     <div class="contRight payoffRight firstRight">
-        {% include 'withdraw/message.html' %}
+        {% include 'message.html' %}
         <form class="bind-card" method="post" action="{{ url_for('.bind_card') }}">
             {{ form.csrf_token }}
             <h2 class="first">请绑定提现银行卡</h2>

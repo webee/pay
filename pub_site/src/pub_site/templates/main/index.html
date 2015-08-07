@@ -3,6 +3,7 @@
 
 {% block content %}
     <div class="contRight payoffRight firstRight">
+        {% include 'message.html' %}
         <h2 class="first">账户信息</h2>
         <div class="line firstline margin48">
             <label class="widthauto">可用余额</label><span class="money">{{ res.balance }}</span>
@@ -32,7 +33,7 @@
                 <td width="135">来源</td>
                 <td width="296">交易名称</td>
             </tr>
-              {% for record in res.cash_records %}
+              {% for record in res.cash_records.records %}
                   {% set is_income = record.side == 'CREDIT' %}
                   <tr>
                       <td width="145" height="60">{{ record.created_on }}</td>

@@ -44,7 +44,7 @@ def withdraw():
             _update_preferred_card(form.bankcard.data)
             success_message = u"提现 %s元 申请成功！绿野将于3-5个工作日内审核并处理。" % actual_amount
             flash(success_message, category="success")
-            return redirect(url_for('.withdraw'))
+            return redirect(url_for('main.index'))
         flash(u"提现失败，请核实账户信息！", category="error")
         return redirect(url_for('.withdraw'))
     return render_template('withdraw/withdraw.html', balance=balance, bankcards=bankcards,

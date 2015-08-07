@@ -13,7 +13,7 @@
     <div class="line">
         <label>{{ field.label }}</label>
         {{ field(class="txk small" + (' orangetxk' if field.errors | length > 0 else '')) }}
-        <button class="hqyzm">获取验证码</button>
+        <input type="button" class="hqyzm" value="获取验证码">
         <em class="identifying-code warn"></em>
         {% for error in field.errors %}
             <em class="mistake">{{ error }}</em>

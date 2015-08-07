@@ -11,8 +11,7 @@ from pytoolbox.util.dbe import transactional
 
 
 class Order(object):
-    def __init__(self, activity_id, no, name, desc, created_on):
-        self.activity_id = activity_id
+    def __init__(self, no, name, desc, created_on):
         self.no = no
         self.name = name
         self.desc = desc

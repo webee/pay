@@ -12,10 +12,10 @@ def pay():
     channel_id = data['client_id']
     payer_id = data['payer']
     payee_id = data['payee']
-    order = Order(data['activity_id'], data['order_no'], data['order_name'], data['order_desc'], data['ordered_on'])
+    order = Order(data['order_no'], data['order_name'], data['order_desc'], data['ordered_on'])
     amount = data['amount']
-    client_callback_url = data['client_callback_url']
-    client_async_callback_url = data['client_async_callback_url']
+    client_callback_url = data.get('client_callback_url', '')
+    client_async_callback_url = data.get('client_async_callback_url', '')
 
     payment_id = find_or_create_pay_transaction(channel_id, payer_id, payee_id, order,
                                                    amount, client_callback_url, client_async_callback_url)

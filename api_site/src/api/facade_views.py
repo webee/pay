@@ -109,16 +109,17 @@ def withdraw_detail(withdraw_id):
     return response.ok(dict(withdraw_record))
 
 
-@mod.route('/accounts/<int:payer_account_id>/transfer', methods=['POST'])
-def transfer_to_lvye(payer_account_id):
+@mod.route('/accounts/<from_account_id>/transfer', methods=['POST'])
+def transfer_to_lvye(from_account_id):
     data = request.values
+    from_account_id = int(from_account_id)
     order_no = data['order_no']
     order_info = data['order_info']
-    payee_account_id = data['to_account_id']
-    amount = data['amount']
+    to_account_id = int(data['to_account_id'])
+    amount = Decimal(data['amount'])
 
     try:
-        _id = transfer(order_no, order_info, payer_account_id, payee_account_id, amount)
+        _id = transfer(order_no, order_info, from_account_id, to_account_id, amount)
         return response.ok(transfer_id=_id)
     except ZytCoreError, e:
         return response.bad_request(e.message)

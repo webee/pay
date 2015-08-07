@@ -5,15 +5,12 @@ from ._dba import find_payment_by_trade_id, create_refund, update_refund_result,
     transit_refund_state
 from .ipay import transaction
 from ._bookkeeping import bookkeep, Event, SourceType
-from pytoolbox import config
 from pytoolbox.util.dbe import transactional
 from pytoolbox.util.log import get_logger
+from api import config
 
 
 _logger = get_logger(__name__)
-
-_REFUND_STATUS_SUCCESS = config.get('lianlianpay', 'refund_status_success')
-_REFUND_STATUS_FAILED = config.get('lianlianpay', 'refund_status_failed')
 
 
 def refund(payment_trade_id, amount):
@@ -54,10 +51,10 @@ def _process_refund_result(refund_record, refund_serial_no, status):
         "Refund notify result: id={0}, refund_serial_no={1}, status={2}".format(refund_id, refund_serial_no, status))
 
     # process refund status.
-    if status == _REFUND_STATUS_FAILED:
+    if status == config.LianLianPay.Refund.Status.FAILED:
         transit_refund_state(refund_id, REFUND_STATE.CREATED, REFUND_STATE.FAILED)
         return True
-    if status == _REFUND_STATUS_SUCCESS:
+    if status == config.LianLianPay.Refund.Status.SUCCESS:
         transit_refund_state(refund_id, REFUND_STATE.CREATED, REFUND_STATE.SUCCESS)
         _bookkeep(refund_record)
         return True

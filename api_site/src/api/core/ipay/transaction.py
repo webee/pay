@@ -15,7 +15,8 @@ from .lianlian.refund import refund as _refund
 from .lianlian.validation import is_sending_to_me as _is_sending_to_me
 from . import zyt_url
 from api.util.uuid import encode_uuid, decode_uuid
-from pytoolbox import config as _config
+from api import config
+# from pytoolbox import config as _config
 
 
 notification = Notification()
@@ -84,5 +85,5 @@ def _generate_notification_url(relative_url, id, **kwargs):
     params = {'uuid': encode_uuid(id)}
     params.update(kwargs)
     relative_url = relative_url.format(**params)
-    root_url = _config.get('hosts', 'api_gateway')
+    root_url = config.Host.API_GATEWAY
     return urljoin(root_url, relative_url)

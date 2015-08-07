@@ -5,7 +5,7 @@ import json
 import requests
 from ..error import *
 from .sign import sign, verify
-from pytoolbox import config as global_config
+from api import config
 
 
 def sign_params(params):
@@ -62,5 +62,5 @@ def _parse_response_data(raw_data):
 
 
 def _should_validate_signature():
-    validate_signature = global_config.get('zyt', 'validate_signature')
+    validate_signature = config.ZiYouTong.VALIDATE_SIGNATURE
     return validate_signature is not None and validate_signature.upper() == 'TRUE'

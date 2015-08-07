@@ -3,15 +3,15 @@ from urlparse import urljoin
 from datetime import datetime
 
 from ._dba import create_payment, group_payment, find_payment_by_order_no
+from api import config
 from api.account import find_or_create_account, find_user_domain_id_by_channel
 from api.secured_transaction.util import oid
 from api.util.uuid import encode_uuid
-from pytoolbox import config
 from pytoolbox.util.dbe import transactional
 
 
-_API_GATEWAY = config.get('hosts', 'api_gateway')
-_ZYT_PAY_URL = config.get('zyt', 'url_pay')
+_API_GATEWAY = config.Host.API_GATEWAY
+_ZYT_PAY_URL = config.ZiYouTong.CallbackInterface.PAY_URL
 
 
 class Order(object):

@@ -9,15 +9,12 @@ from .ipay import transaction
 from .util.lock import require_user_account_lock
 from api.core import ZytCoreError, ConditionalError
 from api.util.parser import to_int
-from pytoolbox import config
+from api import config
 from pytoolbox.util.dbe import db_transactional
 from pytoolbox.util.log import get_logger
 
 
 _logger = get_logger(__name__)
-
-_PAY_TO_BANKCARD_RESULT_SUCCESS = config.get('lianlianpay', 'pay_to_bankcard_result_success')
-_PAY_TO_BANKCARD_RESULT_FAILURE = config.get('lianlianpay', 'pay_to_bankcard_result_failure')
 
 
 class BankcardNotFoundError(ConditionalError):
@@ -116,10 +113,10 @@ def _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
     update_withdraw_result(withdraw_id, paybill_id, result, failure_info)
     _logger.warn("Withdraw notify result: [{0}], id=[{1}]".format(result, withdraw_id))
 
-    if result == _PAY_TO_BANKCARD_RESULT_FAILURE:
+    if result == config.LianLianPay.PayToBankcard.Result.FAILURE:
         _fail_withdraw(withdraw_id)
         return True
-    elif result == _PAY_TO_BANKCARD_RESULT_SUCCESS:
+    elif result == config.LianLianPay.PayToBankcard.Result.SUCCESS:
         _succeed_withdraw(withdraw_id)
         return True
     else:

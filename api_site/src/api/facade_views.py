@@ -116,6 +116,9 @@ def transfer_to_lvye(payer_account_id):
     order_info = data['order_info']
     payee_account_id = data['to_account_id']
     amount = data['amount']
-    
-    _id = transfer(order_no, order_info, payer_account_id, payee_account_id, amount)
-    return response.ok(transfer_id=_id)
+
+    try:
+        _id = transfer(order_no, order_info, payer_account_id, payee_account_id, amount)
+        return response.ok(transfer_id=_id)
+    except ZytCoreError, e:
+        return response.bad_request(e.message)

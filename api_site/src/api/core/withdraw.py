@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .balance import get_cash_balance
+from .balance import get_cash_balance, InsufficientBalanceError
 from ._bookkeeping import bookkeep, Event, SourceType
 from ._dba import find_bankcard_by_id, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
     find_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result, list_all_unfailed_withdraw, \
@@ -21,12 +21,6 @@ class BankcardNotFoundError(ConditionalError):
     def __init__(self, bankcard_id):
         message = "Cannot find bankcard with [bankcard_id={0}].".format(bankcard_id)
         super(BankcardNotFoundError, self).__init__(message)
-
-
-class InsufficientBalanceError(ConditionalError):
-    def __init__(self):
-        message = "Insufficient balance error."
-        super(InsufficientBalanceError, self).__init__(message)
 
 
 class AmountValueError(ConditionalError):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import dba
+import _dba as dba
 
 
 def get_account_by_user_info(user_domain_id, user_id):

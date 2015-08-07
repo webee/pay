@@ -5,7 +5,8 @@ from __future__ import unicode_literals, print_function
 from flask.ext.script import Manager, Server
 import sys
 
-from api import create_app
+from api import create_app, config
+from pytoolbox.util import dbe
 
 
 manager = Manager(create_app)
@@ -24,6 +25,9 @@ def init_db():
 def main():
     reload(sys)
     sys.setdefaultencoding('utf-8')
+
+    dbe.create_db_engine(config.DataBase.HOST, config.DataBase.PORT, config.DataBase.INSTANCE,
+                         config.DataBase.USERNAME, config.DataBase.PASSWORD)
     manager.run()
 
 

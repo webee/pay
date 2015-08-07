@@ -34,4 +34,4 @@ def exec_sql_script(script_name):
 
 def inject_base_data():
     info('injecting base data ...')
-    exec_sql_script('migration/data_zyt_account.ddl')
+    exec_sql_script('migration/data_zyt_account.sql')

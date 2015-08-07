@@ -15,7 +15,7 @@ class App:
 class DataBase:
     HOST = 'localhost'
     PORT = 3306
-    INSTANCE = 'lvye_pay'
+    INSTANCE = 'lvye_pay_pub'
     USERNAME = 'lvye_pay'
     PASSWORD = 'p@55word'
 

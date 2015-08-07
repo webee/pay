@@ -36,7 +36,6 @@ class PayAPI:
 
 # #### data #######
 def load_provinces_and_cities(filepath):
-    from tools import pmc_config
     from os import path
     from collections import OrderedDict
     import codecs

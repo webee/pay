@@ -31,7 +31,7 @@ class UserCenter:
 HOST_URL = 'http://pay.lvye.com'
 
 # 绿野用户中心
-USER_DOMAIN_ID = 1
+USER_DOMAIN_ID = 2
 
 
 # # pay api

@@ -3,7 +3,6 @@ from flask.ext.login import current_user
 import requests, json, functools
 
 pay_server = config.PayAPI.ROOT_URL
-pay_client_id = 1
 
 
 def handle_response(func):
@@ -20,9 +19,9 @@ def handle_response(func):
 class PayClient:
     accounts = {}
 
-    def __init__(self, server=pay_server, client_id=pay_client_id):
+    def __init__(self, server=pay_server, user_domain_id=config.USER_DOMAIN_ID):
         self.server = server
-        self.client_id = client_id
+        self.user_domain_id = user_domain_id
 
     @handle_response
     def bind_bankcards(self, card_number, account_name, province_code, city_code, branch_bank_name):
@@ -68,7 +67,7 @@ class PayClient:
     def _get_account(self, uid):
         if uid in PayClient.accounts:
             return PayClient.accounts[uid]
-        url = '%s/user_domains/%s/users/%s/account' % (self.server, self.client_id, uid)
+        url = '%s/user_domains/%s/users/%s/account' % (self.server, self.user_domain_id, uid)
         resp = requests.get(url)
         if resp.status_code != 200:
             return {"account_id": 0}

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from functools import wraps
-from flask import request
 from urlparse import urljoin
 
+from flask import request
 from .error import *
 from .lianlian.api_access import parse_and_verify_request_data
 from .lianlian.bankcard import query_bin as _query_bin
@@ -13,11 +13,8 @@ from .lianlian.pay_to_bankcard import pay_to_bankcard as _pay_to_bankcard
 from .lianlian.query_order import query_order as _query_order
 from .lianlian.refund import refund as _refund
 from .lianlian.validation import is_sending_to_me as _is_sending_to_me
-from . import zyt_url
-from api.util.uuid import encode_uuid, decode_uuid
 from api import config
-# from pytoolbox import config as _config
-
+from api.util.uuid import encode_uuid, decode_uuid
 
 notification = Notification()
 
@@ -66,19 +63,19 @@ def is_valid_transaction(oid_partner, transaction_id, uuid):
 
 
 def generate_pay_return_url(id):
-    return _generate_notification_url(zyt_url.pay_return, id)
+    return _generate_notification_url(config.ZiYouTong.CallbackInterface.PAY_URL, id)
 
 
 def generate_pay_notification_url(id):
-    return _generate_notification_url(zyt_url.pay_notify, id)
+    return _generate_notification_url(config.ZiYouTong.CallbackInterface.PAY_NOTIFY_URL, id)
 
 
 def generate_withdraw_notification_url(account_id, id):
-    return _generate_notification_url(zyt_url.pay_to_bankcard_notify, id, account_id=account_id)
+    return _generate_notification_url(config.ZiYouTong.CallbackInterface.PAY_TO_BANKCARD_NOTIFY_URL, id, account_id=account_id)
 
 
 def generate_refund_notification_url(id):
-    return _generate_notification_url(zyt_url.refund_notify, id)
+    return _generate_notification_url(config.ZiYouTong.CallbackInterface.REFUND_NOTIFY_URL, id)
 
 
 def _generate_notification_url(relative_url, id, **kwargs):

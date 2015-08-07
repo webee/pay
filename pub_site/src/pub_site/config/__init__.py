@@ -12,6 +12,14 @@ class App:
     WTF_CSRF_SECRET_KEY = 'a random string'
 
 
+class DataBase:
+    HOST = 'localhost'
+    PORT = 3306
+    INSTANCE = 'lvye_pay'
+    USERNAME = 'lvye_pay'
+    PASSWORD = 'p@55word'
+
+
 class UserCenter:
     PASSPORT_LOGIN_URL = 'http://api.passport.lvye.com/oauth/toLogin/'
     AUTH_COOKIE = '4a7e7f902968e79c8b4e4975f316eb65'

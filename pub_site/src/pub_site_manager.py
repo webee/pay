@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
+import sys
 
 from flask.ext.script import Manager, Server, Shell
-from pub_site import create_app
+from pub_site import create_app, config
+from pytoolbox.util import dbe
 
 
 manager = Manager(create_app)
@@ -21,5 +23,14 @@ server = Server(host="0.0.0.0", port=5002)
 manager.add_command("runserver", server)
 
 
-if __name__ == '__main__':
+def main():
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+
+    dbe.create_db_engine(config.DataBase.HOST, config.DataBase.PORT, config.DataBase.INSTANCE,
+                         config.DataBase.USERNAME, config.DataBase.PASSWORD)
     manager.run()
+
+
+if __name__ == '__main__':
+    main()

@@ -13,6 +13,8 @@ class DataBase:
     USERNAME = 'lvye_pay'
     PASSWORD = os.environ['DATABASE_PASSWORD']
 
+class PayAPI:
+    ROOT_URL = os.environ['PAY_API_SITE']
 
 class Services:
     LEADER_SERVER = "http://leader.lvye.com"

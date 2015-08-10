@@ -3,10 +3,11 @@ from . import _dba
 from ._bookkeeping import SOURCE_TYPE_TABLE_MAP
 
 
-def get_user_cash_account_records(account_id, page_no, page_size):
+def get_user_cash_account_records(account_id, q, side, tp, page_no, page_size):
     offset = (page_no - 1) * page_size
     limit = page_size
-    records = _dba.get_user_cash_account_log(account_id, offset, limit)
+    count = _dba.get_user_cash_account_log_count(account_id, q, side, tp)
+    records = _dba.get_user_cash_account_log(account_id, q, side, tp, offset, limit)
 
     # get source_type and source_id
     source_type_ids = {}
@@ -23,4 +24,4 @@ def get_user_cash_account_records(account_id, page_no, page_size):
         for order in orders:
             orders_info[order.id] = order
 
-    return records, orders_info
+    return count, records, orders_info

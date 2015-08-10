@@ -74,10 +74,12 @@ def test_done_withdraw(withdraw_id, state):
 @manager.option('-f', '--from', type=long, dest="from_id", required=True)
 @manager.option('-t', '--to', type=long, dest="to_id", required=True)
 @manager.option('-a', '--amount', type=Decimal, dest="amount", required=True)
-def test_transfer(from_id, to_id, amount):
+@manager.option('-i', '--info', type=unicode, dest="info")
+def test_transfer(from_id, to_id, amount, info):
     from api.core.transfer import transfer
 
-    transfer('', '转账', from_id, to_id, amount)
+    info = info or '转账'
+    transfer('', info, from_id, to_id, amount)
 
 
 if __name__ == '__main__':

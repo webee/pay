@@ -16,13 +16,28 @@ _BANK_ACCOUNT = enum(IsPrivateAccount=0, IsCorporateAccount=1)
 
 
 @db_context
-def get_user_cash_account_log(db, account_id, offset, limit):
+def get_user_cash_account_log_count(db, account_id, q, side, tp):
+    q = '%{0}%'.format(q)
+    side = '{0}%'.format(side)
+    tp = '{0}%'.format(tp)
+    return db.get_scalar("""
+                SELECT count(1) FROM cash_account_transaction_log c LEFT JOIN event e ON c.event_id=e.id
+                  WHERE c.account_id=%(account_id)s and e.trade_info like %(q)s
+                  and c.side like %(side)s and e.source_type like %(tp)s
+    """, account_id=account_id, q=q, side=side, tp=tp)
+
+@db_context
+def get_user_cash_account_log(db, account_id, q, side, tp, offset, limit):
+    q = '%{0}%'.format(q)
+    side = '{0}%'.format(side)
+    tp = '{0}%'.format(tp)
     return db.list("""
-                SELECT e.id, e.source_type, e.source_id, c.account_id, c.side, c.amount, c.created_on FROM cash_account_transaction_log c LEFT JOIN event e ON c.event_id=e.id
-                  WHERE c.account_id=%(account_id)s
+                SELECT e.id, e.source_type, e.source_id, e.trade_info, c.account_id, c.side, c.amount, c.created_on FROM cash_account_transaction_log c LEFT JOIN event e ON c.event_id=e.id
+                  WHERE c.account_id=%(account_id)s and e.trade_info like %(q)s
+                  and c.side like %(side)s and e.source_type like %(tp)s
                   ORDER BY e.id DESC
                   LIMIT %(offset)s, %(limit)s
-    """, account_id=account_id, offset=offset, limit=limit)
+    """, account_id=account_id, offset=offset, limit=limit, q=q, side=side, tp=tp)
 
 
 def _str_vars(params):

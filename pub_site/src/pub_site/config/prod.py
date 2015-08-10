@@ -8,10 +8,10 @@ class App:
 HOST_URL = 'http://pay.lvye.com'
 
 class DataBase:
-    HOST = os.environ['DATABASE_HOST']
+    HOST = os.environ['PAY_PUB_SITE_DATABASE_HOST']
     INSTANCE = 'lvye_pay'
     USERNAME = 'lvye_pay'
-    PASSWORD = os.environ['DATABASE_PASSWORD']
+    PASSWORD = os.environ['PAY_PUB_SITE_DATABASE_PASSWORD']
 
 class PayAPI:
     ROOT_URL = os.environ['PAY_API_SITE']

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from ._dba import find_payment_by_order_no, create_payment, find_payment_by_id
+from ._dba import find_payment_by_order_no, create_payment, find_payment_by_id, update_payment_state, PAYMENT_STATE
 from .util import oid
 from api.account import find_or_create_account, find_user_domain_id_by_channel, get_account_by_id, \
     get_secured_account_id
@@ -61,6 +61,15 @@ def pay_by_id(payment_id):
         raise CorePayError(payment_id)
 
     return pay_form
+
+
+def update_payment_to_be_success(pay_record_id):
+    update_payment_state(pay_record_id, PAYMENT_STATE.SECURED)
+
+
+def get_sync_callback_url_of_payment(pay_record_id):
+    pay_record = find_payment_by_id(pay_record_id)
+    return pay_record['client_callback_url']
 
 
 def _new_payment(amount, client_callback_url, client_async_callback_url,

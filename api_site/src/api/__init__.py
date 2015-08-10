@@ -2,7 +2,11 @@
 from __future__ import unicode_literals, print_function, division
 from flask import Flask
 import os
-from pytoolbox import conf
+
+from api.callback_center import callbacks, event
+from api.direct_transaction import callback_interface as direct_callback
+from api.secured_transaction import callback_interface as secured_callback
+from pytoolbox.conf import config as conf
 from pytoolbox.util import dbe
 
 
@@ -20,6 +24,14 @@ def register_mods(app):
     app.register_blueprint(transaction_log_mod)
 
 
+def register_callbacks():
+    callbacks.bind_secured_handler(event.PAID, secured_callback.guarantee_payment)
+    callbacks.bind_secured_handler(event.PAID, direct_callback.update_payment_to_be_success)
+
+    callbacks.bind_secured_handler(event.REDIRECT_WEB_AFTER_PAID, secured_callback.get_sync_callback_url_of_payment)
+    callbacks.bind_secured_handler(event.REDIRECT_WEB_AFTER_PAID, direct_callback.get_sync_callback_url_of_payment)
+
+
 def create_app(env):
     app = Flask(__name__)
 
@@ -32,5 +44,6 @@ def create_app(env):
                          config.DataBase.USERNAME, config.DataBase.PASSWORD)
 
     register_mods(app)
+    register_callbacks()
 
     return app

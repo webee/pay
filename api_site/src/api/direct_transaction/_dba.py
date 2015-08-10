@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from api.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
@@ -37,3 +39,12 @@ def find_payment_by_id(db, id):
 def find_payment_by_order_no(db, channel_id, order_no):
     return db.get('SELECT * FROM direct_payment WHERE channel_id = %(channel_id)s AND order_id=%(order_id)s',
                   channel_id=channel_id, order_id=order_no)
+
+
+@db_context
+def update_payment_state(db, _id, state):
+    return db.execute(
+        """
+            UPDATE direct_payment SET state = %(state)s, updated_on = %(updated_on)s
+              WHERE id = %(id)s
+        """, id=_id, state=state, updated_on=datetime.now())

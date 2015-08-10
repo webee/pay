@@ -3,11 +3,10 @@
 from flask.ext.wtf import Form
 from wtforms import FloatField, RadioField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, NumberRange
+from .import PayType
 
 
-class PayType:
-    BY_BALANCE = 0
-    BY_BANKCARD = 1
+
 
 
 class PayForm(Form):

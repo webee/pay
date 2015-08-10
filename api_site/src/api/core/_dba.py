@@ -5,7 +5,7 @@ from datetime import datetime
 
 from ._bookkeeping import get_account_side_sign
 from .util.oid import pay_id, withdraw_id, refund_id, transfer_id, prepaid_id
-from api.util.enum import enum
+from pytoolbox.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
 

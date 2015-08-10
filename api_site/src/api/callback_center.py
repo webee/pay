@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import types
-from api.util.enum import enum, keyset_in_enum, value_in_enum
+from pytoolbox.util.enum import enum, keyset_in_enum, value_in_enum
 
 
 event = enum(PAID='0', REDIRECT_WEB_AFTER_PAID='1')

@@ -4,7 +4,7 @@ from ._dba import query_all_bankcards, create_bankcard
 from .ipay import transaction
 from .ipay.error import UnExpectedResponseError, TransactionApiError
 from api.core import ZytCoreError
-from api.util.enum import enum
+from pytoolbox.util.enum import enum
 from pytoolbox.util.log import get_logger
 
 

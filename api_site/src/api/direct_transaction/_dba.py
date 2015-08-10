@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from api.util.enum import enum
+from pytoolbox.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
 

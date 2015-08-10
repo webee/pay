@@ -24,7 +24,7 @@ def pay():
     return render_template('pay/pay.html', form=form)
 
 
-@mod.route('pay-success', methods=['POST'])
+@mod.route('/pay-success', methods=['POST'])
 @login_required
 def pay_succeed():
     flash(u"付款给绿野支付成功！", category="success")
@@ -60,11 +60,10 @@ def _pay(order):
         def succeed_handler():
             flash(u"付款给绿野支付成功！", category="success")
             return redirect(url_for('main.index'))
-
-        _handle_result(result, succeed_handler)
+        return _handle_result(result, succeed_handler)
     if order["pay_type"] == PayType.BY_BANKCARD:
         result = PayClient().pay_to_lvye(order["amount"], order_id=order["id"], order_name=order["name"],
-                                         order_description=order["description"], create_on=order["create_on"],
+                                         order_description=order["description"], create_on=order["created_on"],
                                          callback_url=url_for('.pay_succeed'))
         succeed_handler = lambda: redirect(result['data']['pay_url'])
-        _handle_result(result, succeed_handler)
+        return _handle_result(result, succeed_handler)

@@ -79,7 +79,7 @@ class PayClient:
 
     @handle_response
     def pay_to_lvye(self, amount, order_id, order_name, order_description, create_on, callback_url):
-        url = '%s/direct/pay' % self.server
+        url = '%s/direct/pre-pay' % self.server
         data = {
             "client_id": config.PayAPI.CHANNEL_ID,
             "payer": current_user.user_id,

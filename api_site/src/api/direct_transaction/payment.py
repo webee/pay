@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
+from urlparse import urljoin
 from datetime import datetime
 
 from ._dba import find_payment_by_order_no, create_payment, find_payment_by_id, update_payment_state, PAYMENT_STATE
 from .util import oid
 from api.account import find_or_create_account, find_user_domain_id_by_channel, get_account_by_id, \
     get_secured_account_id
+from api import config
 from api.core import pay as core_pay
 from api.util import req
+from api.util.uuid import encode_uuid
 from pytoolbox.util.dbe import transactional
+
+
+_API_GATEWAY = config.Host.API_GATEWAY
+_ZYT_PAY_URL = config.ZiYouTong.CallbackInterface.PAY_URL
 
 
 class Order(object):
@@ -70,6 +77,17 @@ def update_payment_to_be_success(pay_record_id):
 def get_sync_callback_url_of_payment(pay_record_id):
     pay_record = find_payment_by_id(pay_record_id)
     return pay_record['client_callback_url']
+
+
+def generate_pay_url(_id):
+    return _generate_notification_url(_ZYT_PAY_URL, _id)
+
+
+def _generate_notification_url(relative_url, id, **kwargs):
+    params = {'uuid': encode_uuid(id)}
+    params.update(kwargs)
+    relative_url = relative_url.format(**params)
+    return urljoin(_API_GATEWAY, relative_url)
 
 
 def _new_payment(amount, client_callback_url, client_async_callback_url,

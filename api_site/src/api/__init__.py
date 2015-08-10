@@ -25,11 +25,14 @@ def register_mods(app):
 
 
 def register_callbacks():
+    callbacks.bind_secured_handler(event.PAY, secured_callback.pay_by_id)
+    callbacks.bind_direct_handler(event.PAY, direct_callback.pay_by_id)
+
     callbacks.bind_secured_handler(event.PAID, secured_callback.guarantee_payment)
-    callbacks.bind_secured_handler(event.PAID, direct_callback.update_payment_to_be_success)
+    callbacks.bind_direct_handler(event.PAID, direct_callback.update_payment_to_be_success)
 
     callbacks.bind_secured_handler(event.REDIRECT_WEB_AFTER_PAID, secured_callback.get_sync_callback_url_of_payment)
-    callbacks.bind_secured_handler(event.REDIRECT_WEB_AFTER_PAID, direct_callback.get_sync_callback_url_of_payment)
+    callbacks.bind_direct_handler(event.REDIRECT_WEB_AFTER_PAID, direct_callback.get_sync_callback_url_of_payment)
 
 
 def create_app(env):

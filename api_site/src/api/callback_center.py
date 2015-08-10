@@ -3,7 +3,7 @@ import types
 from pytoolbox.util.enum import enum, keyset_in_enum, value_in_enum
 
 
-event = enum(PAID='0', REDIRECT_WEB_AFTER_PAID='1')
+event = enum(PAY='0', PAID='1', REDIRECT_WEB_AFTER_PAID='2')
 
 
 class CallbackCenter(object):

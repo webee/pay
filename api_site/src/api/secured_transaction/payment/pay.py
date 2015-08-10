@@ -7,7 +7,7 @@ from api.account import get_account_by_id, get_secured_account_id
 from api.util import req
 
 
-class PaymentNotFoundError(Exception):
+class PaymentNotFoundError(IOError):
     def __init__(self, payment_id):
         message = "Payment[secured_payment_id={0}] doesn't exist.".format(payment_id)
         super(PaymentNotFoundError, self).__init__(message)

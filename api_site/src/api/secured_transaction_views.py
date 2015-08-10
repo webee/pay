@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, request, Response
+from flask import Blueprint, request
 
 from api.secured_transaction.payment.prepay import *
 from api.secured_transaction.payment.postpay import get_secured_payment
 from api.secured_transaction.payment.confirm_pay import confirm_payment
 from api.secured_transaction.refund.refund import apply_to_refund
-from api.secured_transaction.payment.pay import pay_by_id, PaymentNotFoundError
 from api.util import response
-from api.util.uuid import decode_uuid
-
 
 secured_mod = Blueprint('secured_transaction', __name__)
 mod = secured_mod
@@ -30,16 +27,6 @@ def prepay():
     pay_url = generate_pay_url(payment_id)
 
     return response.ok(pay_url=pay_url)
-
-
-@mod.route('/pay/<uuid>', methods=['GET'])
-def pay(uuid):
-    try:
-        payment_id = decode_uuid(uuid)
-        form_submit = pay_by_id(payment_id)
-        return Response(form_submit, status=200, mimetype='text/html')
-    except PaymentNotFoundError:
-        return response.not_found({'uuid': uuid})
 
 
 @mod.route('/clients/<int:client_id>/orders/<order_id>/confirm-pay', methods=['PUT'])

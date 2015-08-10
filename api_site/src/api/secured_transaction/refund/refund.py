@@ -16,5 +16,6 @@ def apply_to_refund(pay_record, amount, async_callback_url):
         async_callback_url=async_callback_url
     )
     core_refund(payment_id, amount)
+    update_payment_state(payment_id, )
 
     return refund_id

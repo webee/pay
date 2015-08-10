@@ -1,18 +1,31 @@
 # -*- coding: utf-8 -*-
 from decimal import Decimal
+from flask import Blueprint, request, redirect, Response
 
-from flask import Blueprint, request, redirect
 from api.callback_center import callbacks
 from api.core.postpay import *
 from api.core.refund import get_refund_by_id, handle_refund_notification
 from api.core.withdraw import get_withdraw_by_id, handle_withdraw_notification
 from api.core.ipay.transaction import parse_and_verify, notification, is_sending_to_me, is_valid_transaction
+from api.util import response
+from api.util.uuid import decode_uuid
 from pytoolbox.util.enum import enum
+
 
 core_mod = Blueprint('core_callback_response', __name__)
 mod = core_mod
 
 PayResult = enum(Success=0, Failure=1, IsInvalidRequest=2)
+
+
+@mod.route('/pay/<uuid>', methods=['GET'])
+def pay(uuid):
+    try:
+        payment_id = decode_uuid(uuid)
+        form_submitted = callbacks.pay(payment_id)
+        return Response(form_submitted, status=200, mimetype='text/html')
+    except IOError:
+        return response.not_found({'uuid': uuid})
 
 
 @mod.route('/pay/<uuid>/result', methods=['POST'])

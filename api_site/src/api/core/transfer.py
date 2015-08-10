@@ -12,7 +12,7 @@ def transfer(trade_id, trade_info, payer_account_id, payee_account_id, amount):
         raise InsufficientBalanceError()
 
     transfer_id = create_transfer(trade_id, trade_info, payer_account_id, payee_account_id, amount)
-    bookkeep(Event(SourceType.TRANSFER, transfer_id, amount),
+    bookkeep(Event(SourceType.TRANSFER, transfer_id, amount, trade_info),
              (payer_account_id, '-cash'),
              (payee_account_id, '+cash'))
     return transfer_id

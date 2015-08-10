@@ -6,7 +6,7 @@ from pytoolbox.util.enum import enum, keyset_in_enum, value_in_enum
 event = enum(PAY='0', PAID='1', REDIRECT_WEB_AFTER_PAID='2')
 
 
-class DelegationCenter(object):
+class DelegationDispatcher(object):
     _CHANNEL_KEY_DIRECT = 'direct'
     _CHANNEL_KEY_SECURED = 'secured'
     _EVENT_KEYSET = keyset_in_enum(event)
@@ -19,12 +19,12 @@ class DelegationCenter(object):
     def bind_secured_handler(self, _event, callback):
         if not self._handlers.has_key(_event):
             self._handlers[_event] = dict()
-        self._handlers[_event][DelegationCenter._CHANNEL_KEY_SECURED] = callback
+        self._handlers[_event][DelegationDispatcher._CHANNEL_KEY_SECURED] = callback
 
     def bind_direct_handler(self, _event, callback):
         if not self._handlers.has_key(_event):
             self._handlers[_event] = dict()
-        self._handlers[_event][DelegationCenter._CHANNEL_KEY_DIRECT] = callback
+        self._handlers[_event][DelegationDispatcher._CHANNEL_KEY_DIRECT] = callback
 
     def trigger(self, _event, trade_id):
         if self.__class__._is_direct_payment(trade_id):
@@ -71,13 +71,13 @@ class DelegationCenter(object):
 
     @staticmethod
     def _is_supported_event(_event):
-        return _event in DelegationCenter._EVENT_KEYSET
+        return _event in DelegationDispatcher._EVENT_KEYSET
 
     def __getattribute__(self, item):
         item_in_upper_case = item.upper()
-        if DelegationCenter._is_supported_event(item_in_upper_case):
+        if DelegationDispatcher._is_supported_event(item_in_upper_case):
             self._latest_event = item_in_upper_case
-        return super(DelegationCenter, self).__getattribute__(item)
+        return super(DelegationDispatcher, self).__getattribute__(item)
 
 
-delegate = DelegationCenter()
+delegate = DelegationDispatcher()

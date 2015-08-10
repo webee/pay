@@ -19,12 +19,12 @@ class DelegationDispatcher(object):
     def bind_secured_handler(self, _event, callback):
         if not self._handlers.has_key(_event):
             self._handlers[_event] = dict()
-        self._handlers[_event][DelegationDispatcher._CHANNEL_KEY_SECURED] = callback
+        self._handlers[_event][self.__class__._CHANNEL_KEY_SECURED] = callback
 
     def bind_direct_handler(self, _event, callback):
         if not self._handlers.has_key(_event):
             self._handlers[_event] = dict()
-        self._handlers[_event][DelegationDispatcher._CHANNEL_KEY_DIRECT] = callback
+        self._handlers[_event][self.__class__._CHANNEL_KEY_DIRECT] = callback
 
     def trigger(self, _event, trade_id):
         if self.__class__._is_direct_payment(trade_id):

@@ -89,7 +89,7 @@ def _create_withdraw(account_id, bankcard_id, amount, callback_url):
 @db_transactional
 def _create_withdraw_to_be_frozen(db, account_id, bankcard_id, amount, callback_url):
     withdraw_id = create_withdraw(db, account_id, bankcard_id, amount, callback_url)
-    _freeze_withdraw(db, withdraw_id, account_id, amount)
+    _freeze_withdraw(db, withdraw_id, account_id, amount, bankcard_id)
     return withdraw_id
 
 
@@ -120,33 +120,46 @@ def _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
 @db_transactional
 def _fail_withdraw(db, withdraw_id):
     withdraw_record = get_withdraw_by_id(withdraw_id)
-    _unfreeze_withdraw_back_to_cash_account(db, withdraw_id, withdraw_record['account_id'], withdraw_record['amount'])
+    _unfreeze_withdraw_back_to_cash_account(db, withdraw_id, withdraw_record['account_id'], withdraw_record['amount'],
+                                            withdraw_record['bankcard_id'])
     transit_withdraw_state(db, withdraw_id, WITHDRAW_STATE.FROZEN, WITHDRAW_STATE.FAILED)
 
 
 @db_transactional
 def _succeed_withdraw(db, withdraw_id):
     withdraw_record = get_withdraw_by_id(withdraw_id)
-    _unfreeze_withdraw_to_bankcard(db, withdraw_id, withdraw_record['account_id'], withdraw_record['amount'])
+    _unfreeze_withdraw_to_bankcard(db, withdraw_id, withdraw_record['account_id'], withdraw_record['amount'],
+                                   withdraw_record['bankcard_id'])
     transit_withdraw_state(db, withdraw_id, WITHDRAW_STATE.FROZEN, WITHDRAW_STATE.SUCCESS)
 
 
-def _freeze_withdraw(db, withdraw_id, account_id, amount):
+def _freeze_withdraw(db, withdraw_id, account_id, amount, bankcard_id):
     bookkeep(db,
-             Event(SourceType.WITHDRAW_FROZEN, withdraw_id, amount),
+             Event(SourceType.WITHDRAW_FROZEN, withdraw_id, amount, _generate_withdraw_info(bankcard_id)),
              (account_id, '-cash'),
              (account_id, '+frozen'))
 
 
-def _unfreeze_withdraw_back_to_cash_account(db, withdraw_id, account_id, amount):
+def _unfreeze_withdraw_back_to_cash_account(db, withdraw_id, account_id, amount, bankcard_id):
     bookkeep(db,
-             Event(SourceType.WITHDRAW_FAILED, withdraw_id, amount),
+             Event(SourceType.WITHDRAW_FAILED, withdraw_id, amount, _generate_withdraw_info(bankcard_id)),
              (account_id, '-frozen'),
              (account_id, '+cash'))
 
 
-def _unfreeze_withdraw_to_bankcard(db, withdraw_id, account_id, amount):
+def _unfreeze_withdraw_to_bankcard(db, withdraw_id, account_id, amount, bankcard_id):
     bookkeep(db,
-             Event(SourceType.WITHDRAW_SUCCESS, withdraw_id, amount),
+             Event(SourceType.WITHDRAW_SUCCESS, withdraw_id, amount, _generate_withdraw_info(bankcard_id)),
              (account_id, '-frozen'),
              (account_id, '-asset'))
+
+
+def _generate_withdraw_info(bankcard_id):
+    bankcard = find_bankcard_by_id(bankcard_id)
+    bank_name = bankcard['bank_name']
+    secured_card_no = _mask_bankcard_no(bankcard['card_no'])
+    return '提现至 {0}[{1}]'.format(bank_name, secured_card_no)
+
+
+def _mask_bankcard_no(bankcard_no):
+    return '{0} **** **** {1}'.format(bankcard_no[:4], bankcard_no[-4:])

@@ -37,7 +37,8 @@ USER_DOMAIN_ID = 2
 # # pay api
 class PayAPI:
     ROOT_URL = "http://localhost:5000"
-    GET_ACCOUNT_INFO_URL = "user_domains/{user_domain_id}/users/{uid}/account"
+    GET_ACCOUNT_ID_URL = "user_domains/{user_domain_id}/users/{uid}/account"
+    GET_ACCOUNT_INFO_URL = "accounts/{account_id}"
     GET_USER_BALANCE_URL = "accounts/{account_id}/balance"
     GET_USER_CASH_RECORDS_URL = "accounts/{account_id}/cash_records"
 

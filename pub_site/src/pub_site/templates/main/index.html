@@ -25,28 +25,30 @@
         <div class="tablock margin48 tablockcur">
           <table width="952" cellspacing="0" cellpadding="0">
               <tr class="first">
-                <td width="145" height="40">发生时间</td>
-                <td width="74">交易类型</td>
-                <td width="127">交易单号</td>
-                <td width="99">交易金额(元)</td>
-                <td width="74">状态</td>
-                <td width="135">来源</td>
-                <td width="296">交易名称</td>
-            </tr>
-              {% for record in res.cash_records.records %}
+                  <td width="145" height="40">发生时间</td>
+                  <td width="127">交易单号</td>
+                  <td width="134">类型</td>
+                  <td width="87">收入(元)</td>
+                  <td width="87">支出(元)</td>
+                  <td width="100">对方</td>
+                  <td width="270">备注</td>
+              </tr>
+              {% for record in res.records %}
                   {% set is_income = record.side == 'CREDIT' %}
+                  {% set info = res.record_info[record.source_id] %}
                   <tr>
                       <td width="145" height="60">{{ record.created_on }}</td>
-                      <td>{% if is_income %}收入{% else %}支出{% endif %}</td>
                       <td>{{ record.source_id }}</td>
+                      <td>{{ record.type }}</td>
                       {% if is_income %}
                           <td class="red">+ {{ "%.2f"|format(record.amount) }}</td>
+                          <td></td>
                       {% else %}
+                          <td></td>
                           <td class="green">- {{ "%.2f"|format(record.amount) }}</td>
                       {% endif %}
-                      <td>{{ record.source_type }}</td>
-                      <td>{{ record.source_type }}</td>
-                      <td>{{ record.source_type }}</td>
+                      <td>{{ record.opposite }}</td>
+                      <td>{{ record.trade_info }}</td>
                   </tr>
               {% endfor %}
           </table>

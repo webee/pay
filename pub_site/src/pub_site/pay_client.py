@@ -2,9 +2,11 @@
 import os
 import requests
 from pub_site import config
+from decimal import Decimal
 
 
-_accounts = {}
+_uid_accounts = {}
+_id_accounts = {}
 
 
 def _generate_api_url(url, **kwargs):
@@ -12,13 +14,23 @@ def _generate_api_url(url, **kwargs):
 
 
 def get_account_id(uid):
-    if uid not in _accounts:
-        url = _generate_api_url(config.PayAPI.GET_ACCOUNT_INFO_URL, user_domain_id=config.USER_DOMAIN_ID, uid=uid)
+    if uid not in _uid_accounts:
+        url = _generate_api_url(config.PayAPI.GET_ACCOUNT_ID_URL, user_domain_id=config.USER_DOMAIN_ID, uid=uid)
         req = requests.get(url)
         if req.status_code == 200:
             res = req.json()
-            _accounts[uid] = res['account_id']
-    return _accounts.get(uid)
+            _uid_accounts[uid] = res['account_id']
+    return _uid_accounts.get(uid)
+
+
+def get_account_info(account_id):
+    if account_id not in _id_accounts:
+        url = _generate_api_url(config.PayAPI.GET_ACCOUNT_INFO_URL, account_id=account_id)
+        req = requests.get(url)
+        if req.status_code == 200:
+            res = req.json()
+            _uid_accounts[account_id] = res
+    return _uid_accounts.get(account_id)
 
 
 def get_user_balance(uid):
@@ -29,6 +41,7 @@ def get_user_balance(uid):
     if req.status_code == 200:
         data = req.json()
         return data['balance']
+    return Decimal(0)
 
 
 def get_user_cash_records(uid):
@@ -38,5 +51,6 @@ def get_user_cash_records(uid):
     req = requests.get(url)
 
     if req.status_code == 200:
-        return req.json()
-    return []
+        data = req.json()
+        return data['records'], data['record_info']
+    return [], {}

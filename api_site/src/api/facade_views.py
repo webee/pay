@@ -97,13 +97,12 @@ def withdraw_detail(withdraw_id):
     return response.ok(dict(withdraw_record))
 
 
-@mod.route('/accounts/<from_account_id>/transfer', methods=['POST'])
-def transfer_to_lvye(from_account_id):
+@mod.route('/accounts/<int:from_account_id>/transfer/to/<int:to_account_id>', methods=['POST'])
+def transfer(from_account_id, to_account_id):
     data = request.values
     from_account_id = int(from_account_id)
     order_no = data['order_no']
     order_info = data['order_info']
-    to_account_id = int(data['to_account_id'])
     amount = Decimal(data['amount'])
 
     try:

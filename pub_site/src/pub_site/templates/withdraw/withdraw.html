@@ -43,7 +43,7 @@
                     </p>
                 </div>
             </div>
-            {% from 'withdraw/forms.html' import input, identifying_code, submit %}
+            {% from 'forms.html' import input, identifying_code, submit %}
             {{ input(form.amount, "含手续费2元") }}
             {{ identifying_code(form.identifying_code) }}
             {{ submit(form.submit) }}

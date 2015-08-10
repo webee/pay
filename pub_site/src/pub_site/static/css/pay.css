@@ -1,0 +1,56 @@
+.line .txk.orangetxk {
+    border: 1px solid #f97700;
+}
+
+.line .wbk {
+    border-radius:5px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+}
+
+.line .wbk.orangetxk {
+    border: 1px solid #f97700;
+}
+
+.pay-type ul {
+    display: inline;
+}
+
+.pay-type li {
+    display: inline;
+}
+
+.line.pay-type li label {
+    font-size: 14px;
+    display: inline;
+    margin-left: 6px;
+}
+
+em.mistake {
+    display: block;
+    color: #f97700;
+    margin: 6px 0 0 185px;
+    background: url(../images/warn_bg.png) no-repeat left center;
+    padding-left: 20px;
+}
+
+.beizhu .mistake {
+    margin: 6px 0 0 0;
+}
+
+.tijiao {
+    display: block;
+    border: none;
+    width: 130px;
+    height: 44px;
+    font: 18px/44px "微软雅黑";
+    color: #fff;
+    background: #3cb43c;
+    text-align: center;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+    margin-left: 183px;
+}

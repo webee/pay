@@ -1,6 +1,7 @@
 {% extends 'layout.html' %}
 {% block title %}付款给绿野{% endblock %}
 {% block inline_css %}
+    <link href="{{ url_for('static', filename='css/pay.css') }}" rel="stylesheet">
 {% endblock %}
 {% block inline_scripts %}
     <script src="{{ url_for('static', filename='js/pay.js') }}"></script>
@@ -10,27 +11,23 @@
     <form class="pay-form" action="{{ url_for('.pay') }}" method="post">
         <div class="contRight payoffRight">
             {% include 'message.html' %}
-
+            {{ form.csrf_token }}
             <h2>付款给绿野</h2>
-
-            <div class="line">
-                <label>付款金额(元)</label>
-                <input type="text" value="" placeholder="180000" class="txk">
-            </div>
-            <div class="line">
-                <label>选择付款方式</label>
-                <input type="radio" name="choice" class="dx" checked="checked">
-                <span>账户余额支付</span>
-                <input type="radio" name="choice" class="dx"><span>银行卡支付</span>
+            {% from 'forms.html' import input, identifying_code, radio, submit %}
+            {{ input(form.amount, "") }}
+            <div class="line pay-type">
+                <label>{{ form.pay_type.label }}</label>
+                {{ form.pay_type() }}
             </div>
             <div class="line last">
-                <label>支付备注</label>
+                <label>{{ form.comment.label }}</label>
 
                 <div class="beizhu">
-                    <textarea class="wbk"
-                              placeholder="请输入付款备注，方便绿野客服人员确认您的支付信息。（不超过xx字）一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十"></textarea>
-                    <input type="submit" value="提交" class="tijiao tijiaoLayer">
+                    {{ form.comment(class="wbk", placeholder="请输入付款备注，方便绿野客服人员确认您的支付信息。（不超过140字）") }}
                 </div>
+            </div>
+            <div class="line">
+                <input type="button" value="提交" class="tijiao tijiaoLayer">
             </div>
         </div>
         <!--S遮罩层-->
@@ -40,13 +37,13 @@
             <h2>确认付款给绿野</h2>
 
             <div class="finaline">
-                <label>付款金额(元)</label><span>18,000.00 元</span>
+                <label>付款金额(元)</label>
+                <span class="amount"></span>
             </div>
             <div class="finaline clearfix">
                 <label>付款备注</label>
 
-                <p class="bz">
-                    2015年4月包车费用+广告费，共计18万元。2015年4月包车费用+广告费，共计18万元2015年4月包车费用+广告费，共计18万元2015年4月包车费用+广告费，共计18万元2015年4月包车费用+广告费，共计18万元2015年4月包车费用+广告费，共计18万元2015年4月包车费用+广告费，共计18万元</p>
+                <p class="bz"></p>
             </div>
             <div class="finaline">
                 <button>确认</button>

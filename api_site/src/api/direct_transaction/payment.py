@@ -26,6 +26,12 @@ class Order(object):
         self.category = '虚拟商品'
 
 
+class PaymentNotFoundError(IOError):
+    def __init__(self, payment_id):
+        message = "Payment[secured_payment_id={0}] doesn't exist.".format(payment_id)
+        super(PaymentNotFoundError, self).__init__(message)
+
+
 class CorePayError(Exception):
     def __init__(self, payment_id):
         message = "Cannot pay[secured_payment_id={0}] to guaranteed account.".format(payment_id)
@@ -48,6 +54,8 @@ def find_or_create_pay_transaction(channel_id, payer_user_id, payee_user_id, ord
 
 def pay_by_id(payment_id):
     pay_record = find_payment_by_id(payment_id)
+    if not pay_record:
+        raise PaymentNotFoundError(payment_id)
 
     payer_account_id = pay_record['payer_account_id']
     payer = get_account_by_id(payer_account_id)

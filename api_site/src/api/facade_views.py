@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from decimal import Decimal
 
-from flask import Blueprint, request, redirect, Response
+from flask import Blueprint, request, redirect
 from api.account import get_account_by_user_info, get_account_by_id
 from api.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
     ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance, transfer
-from api.secured_transaction.payment.pay import pay_by_id, PaymentNotFoundError
 from api.util import response
 from api.util.parser import to_bool
-from api.util.uuid import decode_uuid
 
 mod = Blueprint('common_transaction', __name__)
 
@@ -16,16 +14,6 @@ mod = Blueprint('common_transaction', __name__)
 @mod.route('/')
 def index():
     return redirect('http://huodong.lvye.com')
-
-
-@mod.route('/pay/<uuid>', methods=['GET'])
-def pay(uuid):
-    try:
-        payment_id = decode_uuid(uuid)
-        form_submit = pay_by_id(payment_id)
-        return Response(form_submit, status=200, mimetype='text/html')
-    except PaymentNotFoundError:
-        return response.not_found({'uuid': uuid})
 
 
 @mod.route('/user_domains/<int:user_domain_id>/users/<user_id>/account', methods=['GET'])

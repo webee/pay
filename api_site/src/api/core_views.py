@@ -18,6 +18,10 @@ mod = core_mod
 PayResult = enum(Success=0, Failure=1, IsInvalidRequest=2)
 
 
+@mod.route('/pay/heart-beat')
+def heart_beat_responser():
+    return 'ok'
+    
 @mod.route('/pay/<uuid>', methods=['GET'])
 def pay(uuid):
     try:

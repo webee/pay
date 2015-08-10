@@ -17,6 +17,7 @@ CREATE TABLE bankcard(
 CREATE TABLE payment(
   id CHAR(30) PRIMARY KEY, -- prefix with 'PAY'
   trade_id CHAR(30) NOT NULL,
+  trade_info VARCHAR(512),
   payer_account_id INT NOT NULL,
   payee_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
@@ -100,7 +101,7 @@ CREATE TABLE event(
   source_type ENUM('PAY', 'WITHDRAW:FROZEN', 'WITHDRAW:SUCCESS', 'WITHDRAW:FAILED', 'REFUND', 'TRANSFER', 'PREPAID') NOT NULL,
   source_id CHAR(30) NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
-  trade_info VARCHAR(128),
+  trade_info VARCHAR(512),
   created_on TIMESTAMP NOT NULL
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -50,12 +50,13 @@ def get_orders_info_by_ids(db, order_table, ids):
 
 
 @db_context
-def create_payment(db, trade_id, payer_account_id, payee_account_id, amount):
+def create_payment(db, trade_id, trade_info, payer_account_id, payee_account_id, amount):
     record_id = pay_id(payer_account_id)
     now = datetime.now()
     fields = {
         'id': record_id,
         'trade_id': trade_id,
+        'trade_info': trade_info,
         'payer_account_id': payer_account_id,
         'payee_account_id': payee_account_id,
         'amount': amount,

@@ -31,10 +31,11 @@ _ACCOUNTS_SIDES = {
 
 
 class Event(object):
-    def __init__(self, source_type, source_id, amount):
+    def __init__(self, source_type, source_id, amount, trade_info):
         self.source_type = source_type
         self.source_id = source_id
         self.amount = amount
+        self.trade_info = trade_info
         self.created_on = datetime.now()
 
 

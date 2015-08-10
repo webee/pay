@@ -2,7 +2,7 @@
 from decimal import Decimal
 from flask import Blueprint, request, redirect, Response
 
-from api.callback_center import callbacks
+from api.delegation_center import delegate
 from api.core.postpay import *
 from api.core.refund import get_refund_by_id, handle_refund_notification
 from api.core.withdraw import get_withdraw_by_id, handle_withdraw_notification
@@ -22,7 +22,7 @@ PayResult = enum(Success=0, Failure=1, IsInvalidRequest=2)
 def pay(uuid):
     try:
         payment_id = decode_uuid(uuid)
-        form_submitted = callbacks.pay(payment_id)
+        form_submitted = delegate.pay(payment_id)
         return Response(form_submitted, status=200, mimetype='text/html')
     except IOError:
         return response.not_found({'uuid': uuid})
@@ -114,10 +114,10 @@ def _notify_payment_result(uuid, data):
         return PayResult.Failure
 
     pay_record = succeed_payment(order_no, paybill_oid)
-    callbacks.paid(pay_record['trade_id'])
+    delegate.paid(pay_record['trade_id'])
     return PayResult.Success
 
 
 def _redirect_pay_result(pay_record):
-    return redirect(callbacks.redirect_web_after_paid(pay_record['trade_id']))
+    return redirect(delegate.redirect_web_after_paid(pay_record['trade_id']))
 

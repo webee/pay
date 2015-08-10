@@ -6,7 +6,7 @@ from pytoolbox.util.enum import enum, keyset_in_enum, value_in_enum
 event = enum(PAY='0', PAID='1', REDIRECT_WEB_AFTER_PAID='2')
 
 
-class CallbackCenter(object):
+class DelegationCenter(object):
     _CHANNEL_KEY_DIRECT = 'direct'
     _CHANNEL_KEY_SECURED = 'secured'
     _EVENT_KEYSET = keyset_in_enum(event)
@@ -14,23 +14,23 @@ class CallbackCenter(object):
     def __init__(self):
         self._handlers = dict()
         self._latest_event = ''
-        self._bind_default_event_handler(CallbackCenter._EVENT_KEYSET)
+        self._bind_default_event_handler(self.__class__._EVENT_KEYSET)
 
     def bind_secured_handler(self, _event, callback):
         if not self._handlers.has_key(_event):
             self._handlers[_event] = dict()
-        self._handlers[_event][CallbackCenter._CHANNEL_KEY_SECURED] = callback
+        self._handlers[_event][DelegationCenter._CHANNEL_KEY_SECURED] = callback
 
     def bind_direct_handler(self, _event, callback):
         if not self._handlers.has_key(_event):
             self._handlers[_event] = dict()
-        self._handlers[_event][CallbackCenter._CHANNEL_KEY_DIRECT] = callback
+        self._handlers[_event][DelegationCenter._CHANNEL_KEY_DIRECT] = callback
 
     def trigger(self, _event, trade_id):
-        if CallbackCenter._is_direct_payment(trade_id):
-            return self._trigger(_event, CallbackCenter._CHANNEL_KEY_DIRECT)
-        if CallbackCenter._is_secured_payment(trade_id):
-            return self._trigger(_event, CallbackCenter._CHANNEL_KEY_SECURED)
+        if self.__class__._is_direct_payment(trade_id):
+            return self._trigger(_event, self.__class__._CHANNEL_KEY_DIRECT)
+        if self.__class__._is_secured_payment(trade_id):
+            return self._trigger(_event, self.__class__._CHANNEL_KEY_SECURED)
         raise ValueError('Trade id [%s] is illegal value' % trade_id)
 
     def _trigger(self, _event, channel):
@@ -65,19 +65,19 @@ class CallbackCenter(object):
     def _default_event_handler(self, *args, **kwargs):
         if len(args) < 2:
             raise ValueError("There is no enough info to decide which handler should be called")
-        args = CallbackCenter._filter_out_class_parameter(args)
+        args = self.__class__._filter_out_class_parameter(args)
         trade_id = args[0]
         return self.trigger(value_in_enum(event, self._latest_event), trade_id)(*args, **kwargs)
 
     @staticmethod
     def _is_supported_event(_event):
-        return _event in CallbackCenter._EVENT_KEYSET
+        return _event in DelegationCenter._EVENT_KEYSET
 
     def __getattribute__(self, item):
         item_in_upper_case = item.upper()
-        if CallbackCenter._is_supported_event(item_in_upper_case):
+        if DelegationCenter._is_supported_event(item_in_upper_case):
             self._latest_event = item_in_upper_case
-        return super(CallbackCenter, self).__getattribute__(item)
+        return super(DelegationCenter, self).__getattribute__(item)
 
 
-callbacks = CallbackCenter()
+delegate = DelegationCenter()

@@ -26,3 +26,8 @@ def get_secured_payment(channel_id, order_id):
     if pay_record['state'] != PAYMENT_STATE.SECURED:
         return None
     return pay_record
+
+
+def mark_payment_as_refunding(pay_record_id):
+    update_payment_state(pay_record_id, PAYMENT_STATE.REFUNDING)
+

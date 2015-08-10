@@ -6,7 +6,8 @@ from pytoolbox.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
 
-PAYMENT_STATE = enum(CREATED='CREATED', SECURED='SECURED', FAILED='FAILED', CONFIRMED='CONFIRMED', REFUNDED='REFUNDED')
+PAYMENT_STATE = enum(CREATED='CREATED', SECURED='SECURED', FAILED='FAILED', CONFIRMED='CONFIRMED',
+                     REFUNDING='REFUNDING', REFUNDED='REFUNDED')
 
 
 @db_context

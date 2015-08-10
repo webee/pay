@@ -18,5 +18,9 @@ def transfer_id(account_id):
     return _generate(account_id, 'TFR')
 
 
+def prepaid_id(account_id):
+    return _generate(account_id, 'PRP')
+
+
 def _generate(account_id, prefix):
     return prefix + datetime.now().strftime("%Y%m%d%H%M%S%f") + '%0.7d' % account_id

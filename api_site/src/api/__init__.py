@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function, division
 from flask import Flask
 import os
-from pytoolbox.conf import config as conf
+from pytoolbox import conf
 from pytoolbox.util import dbe
 
 

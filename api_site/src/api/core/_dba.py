@@ -4,7 +4,7 @@ from decimal import Decimal
 from datetime import datetime
 
 from ._bookkeeping import get_account_side_sign
-from .util.oid import pay_id, withdraw_id, refund_id, transfer_id
+from .util.oid import pay_id, withdraw_id, refund_id, transfer_id, prepaid_id
 from api.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
@@ -18,7 +18,7 @@ _BANK_ACCOUNT = enum(IsPrivateAccount=0, IsCorporateAccount=1)
 @db_context
 def get_user_cash_account_log(db, account_id, offset, limit):
     return db.list("""
-                SELECT e.id, e.source_type, e.source_id, c.side, c.amount, c.created_on FROM cash_account_transaction_log c LEFT JOIN event e ON c.event_id=e.id
+                SELECT e.id, e.source_type, e.source_id, c.account_id, c.side, c.amount, c.created_on FROM cash_account_transaction_log c LEFT JOIN event e ON c.event_id=e.id
                   WHERE c.account_id=%(account_id)s
                   ORDER BY e.id DESC
                   LIMIT %(offset)s, %(limit)s
@@ -107,6 +107,19 @@ def create_transfer(db, trade_id, trade_info, payer_account_id, payee_account_id
         'created_on': datetime.now()
     }
     db.insert('transfer', **fields)
+    return _id
+
+
+@db_context
+def create_prepaid(db, account_id, amount):
+    _id = prepaid_id(account_id)
+    fields = {
+        'id': _id,
+        'account_id': account_id,
+        'amount': amount,
+        'created_on': datetime.now()
+    }
+    db.insert('prepaid', **fields)
     return _id
 
 

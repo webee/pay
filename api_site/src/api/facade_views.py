@@ -2,7 +2,7 @@
 from decimal import Decimal
 
 from flask import Blueprint, request, redirect
-from api.account import get_account_by_user_info, get_account_by_id
+from api.account import get_account_by_user_info, get_account_by_id, find_or_create_account
 from api.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
     ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance, transfer
 from api.util import response
@@ -17,13 +17,23 @@ def index():
 
 
 @mod.route('/user_domains/<int:user_domain_id>/users/<user_id>/account', methods=['GET'])
-def get_account_info(user_domain_id, user_id):
+def get_account_id(user_domain_id, user_id):
     account = get_account_by_user_info(user_domain_id, user_id)
-    if not account:
-        return response.not_found({'user_domain_id': user_domain_id, 'user_id': user_id})
+    if account:
+        account_id = account['id']
+    else:
+        account_id = find_or_create_account(user_domain_id, user_id)
 
-    account_id = account['id']
     return response.ok(account_id=account_id)
+
+
+@mod.route('/accounts/<int:account_id>', methods=['GET'])
+def get_account_info_by_id(account_id):
+    account = get_account_by_id(account_id)
+    if not account:
+        return response.not_found()
+
+    return response.ok(dict(account))
 
 
 @mod.route('/bankcards/<card_no>/bin', methods=['GET'])

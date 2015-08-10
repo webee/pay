@@ -11,6 +11,7 @@ class SourceType(object):
     WITHDRAW_FAILED = 'WITHDRAW:FAILED'
     REFUND = 'REFUND'
     TRANSFER = 'TRANSFER'
+    PREPAID = 'PREPAID'
 
 SOURCE_TYPE_TABLE_MAP = {SourceType.PAY: 'payment',
                          SourceType.WITHDRAW_FROZEN: 'withdraw',
@@ -18,6 +19,7 @@ SOURCE_TYPE_TABLE_MAP = {SourceType.PAY: 'payment',
                          SourceType.WITHDRAW_FAILED: 'withdraw',
                          SourceType.REFUND: 'refund',
                          SourceType.TRANSFER: 'transfer',
+                         SourceType.PREPAID: 'prepaid',
                          }
 
 
@@ -66,6 +68,13 @@ def bookkeep(db, event, account_a, account_b):
     event_id = _create_event(db, event)
     _credit(event_id, credit_account_id, credit_account, event.amount, event.created_on)
     _debit(event_id, debit_account_id, debit_account, event.amount, event.created_on)
+
+
+@db_context
+def transfer_bookkeep(db, event, from_id, to_id):
+    event_id = _create_event(db, event)
+    _credit(event_id, to_id, 'cash', event.amount, event.created_on)
+    _debit(event_id, from_id, 'cash', event.amount, event.created_on)
 
 
 def get_account_side_sign(account):

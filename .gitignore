@@ -1,7 +1,7 @@
 *.py[co]
 
 env.local.sh
-venv/
+*venv/
 null/
 .idea/
 logs/

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from decimal import Decimal
-from flask import Blueprint, request, redirect
 
-from api.callback_center import callbacks, event
+from flask import Blueprint, request, redirect
+from api.callback_center import callbacks
 from api.core.postpay import *
 from api.core.refund import get_refund_by_id, handle_refund_notification
 from api.core.withdraw import get_withdraw_by_id, handle_withdraw_notification
@@ -101,9 +101,10 @@ def _notify_payment_result(uuid, data):
         return PayResult.Failure
 
     pay_record = succeed_payment(order_no, paybill_oid)
-    callbacks.trigger(event.PAID, pay_record['trade_id'])(pay_record['trade_id'])
+    callbacks.paid(pay_record['trade_id'])
     return PayResult.Success
 
 
 def _redirect_pay_result(pay_record):
-    return redirect(callbacks.trigger(event.REDIRECT_WEB_AFTER_PAID, pay_record['trade_id'])(pay_record['trade_id']))
+    return redirect(callbacks.redirect_web_after_paid(pay_record['trade_id']))
+

@@ -17,7 +17,7 @@ CREATE TABLE bankcard(
 CREATE TABLE payment(
   id CHAR(30) PRIMARY KEY, -- prefix with 'PAY'
   trade_id CHAR(30) NOT NULL,
-  trade_info VARCHAR(512),
+  trade_info VARCHAR(256),
   payer_account_id INT NOT NULL,
   payee_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
@@ -77,6 +77,7 @@ CREATE TABLE refund(
   amount DECIMAL(12, 2) NOT NULL,
   created_on TIMESTAMP NOT NULL,
   state ENUM('CREATED', 'SUCCESS', 'FAILED') NOT NULL DEFAULT 'CREATED',
+  trade_info VARCHAR(256),
 
   refund_serial_no VARCHAR(16) COMMENT '退款流水号',
   updated_on TIMESTAMP,
@@ -101,7 +102,7 @@ CREATE TABLE event(
   source_type ENUM('PAY', 'WITHDRAW:FROZEN', 'WITHDRAW:SUCCESS', 'WITHDRAW:FAILED', 'REFUND', 'TRANSFER', 'PREPAID') NOT NULL,
   source_id CHAR(30) NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
-  trade_info VARCHAR(512),
+  trade_info VARCHAR(256),
   created_on TIMESTAMP NOT NULL
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

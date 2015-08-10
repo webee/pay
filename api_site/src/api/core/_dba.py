@@ -211,7 +211,7 @@ def find_withdraw_basic_info_by_id(db, _id):
 
 
 @db_context
-def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, created_on=datetime.now()):
+def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, trade_info, created_on=datetime.now()):
     _id = refund_id(payer_account_id)
     fields = {
         'id': _id,
@@ -220,7 +220,8 @@ def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, cr
         'payee_account_id': payee_account_id,
         'amount': amount,
         'created_on': created_on,
-        'state': REFUND_STATE.CREATED
+        'state': REFUND_STATE.CREATED,
+        'trade_info': trade_info
     }
     db.insert('refund', fields)
     return _id

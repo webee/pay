@@ -13,14 +13,14 @@ from api import config
 _logger = get_logger(__name__)
 
 
-def refund(payment_trade_id, amount):
+def refund(payment_trade_id, amount, trade_info):
     pay_record = find_payment_by_trade_id(payment_trade_id)
 
     payer_account_id = pay_record['payee_account_id']
     payee_account_id = pay_record['payer_account_id']
     paybill_id = pay_record['paybill_id']
     now = datetime.now()
-    refund_id = create_refund(pay_record['id'], payer_account_id, payee_account_id, amount, now)
+    refund_id = create_refund(pay_record['id'], payer_account_id, payee_account_id, amount, trade_info, now)
 
     _request_refund(refund_id, now, amount, paybill_id)
 

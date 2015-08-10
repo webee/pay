@@ -31,7 +31,7 @@ def main():
 @manager.option('-u', '--user_domain', type=long, dest="user_domain_id", required=True)
 @manager.option('-i', '--user_id', type=str, dest="user_id", required=True)
 def test_create_user(user_domain_id, user_id):
-    """充值"""
+    """新建用户"""
     from api.account._dba import _create_account
 
     account_id = _create_account(user_domain_id, user_id)
@@ -59,7 +59,7 @@ def test_withdraw(account_id, amount, bankcard_id):
     print('withdraw_id: %r' % withdraw_id)
 
 
-@manager.option('-i', '--id', type=long, dest="withdraw_id", required=True)
+@manager.option('-i', '--id', type=str, dest="withdraw_id", required=True)
 @manager.option('-s', '--state', type=int, dest="state", required=True)
 def test_done_withdraw(withdraw_id, state):
     """完成提现"""

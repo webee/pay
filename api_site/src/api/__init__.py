@@ -2,7 +2,6 @@
 from __future__ import unicode_literals, print_function, division
 from flask import Flask
 import os
-
 from api.delegation_center import delegate, event
 from api.direct_transaction import delegation_interface as direct_delegate
 from api.secured_transaction import delegation_interface as secured_delegate

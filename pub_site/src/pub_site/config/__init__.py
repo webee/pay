@@ -36,6 +36,8 @@ USER_DOMAIN_ID = 2
 
 # # pay api
 class PayAPI:
+    LVYE_USER_ID = 0
+    CHANNEL_ID = 2
     ROOT_URL = "http://localhost:5000"
     GET_ACCOUNT_ID_URL = "user_domains/{user_domain_id}/users/{uid}/account"
     GET_ACCOUNT_INFO_URL = "accounts/{account_id}"

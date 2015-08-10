@@ -3,6 +3,7 @@ from flask.ext.login import current_user
 import requests, json, functools
 
 pay_server = config.PayAPI.ROOT_URL
+lvye_user_id = config.PayAPI.LVYE_USER_ID
 
 
 def handle_response(func):
@@ -61,6 +62,34 @@ class PayClient:
             'bankcard_id': bankcard_id,
             'amount': amount,
             'callback_url': callback_url
+        }
+        return requests.post(url, data=data)
+
+    @handle_response
+    def transfer_to_lvye(self, amount, order_id, order_info):
+        from_id = self._get_account(current_user.user_id)['account_id']
+        to_id = self._get_account(lvye_user_id)['account_id']
+        url = '%s/accounts/%s/transfer/to/%s' % (self.server, from_id, to_id)
+        data = {
+            "order_no": order_id,
+            "order_info": order_info,
+            "amount": amount
+        }
+        return requests.post(url, data=data)
+
+    @handle_response
+    def pay_to_lvye(self, amount, order_id, order_name, order_description, create_on, callback_url):
+        url = '%s/direct/pre-pay' % self.server
+        data = {
+            "client_id": config.PayAPI.CHANNEL_ID,
+            "payer": current_user.user_id,
+            "payee": config.PayAPI.LVYE_USER_ID,
+            "order_no": order_id,
+            "order_name": order_name,
+            "order_desc": order_description,
+            "ordered_on": create_on,
+            "client_callback_url": callback_url,
+            "amount": amount
         }
         return requests.post(url, data=data)
 

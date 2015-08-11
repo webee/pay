@@ -2,6 +2,10 @@
     margin-left: 48px;
 }
 
+.mainCont .payoffRight h2.withdraw {
+    margin-left: 10px;
+}
+
 .line > .txk.city {
     margin-left: 16px;
 }

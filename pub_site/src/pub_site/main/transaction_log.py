@@ -7,6 +7,7 @@ TRADE_TYPE_MSG = {
     'WITHDRAW:FROZEN': '提现',
     'WITHDRAW:FAILED': '提现-退款',
     'PAY': '支付',
+    'REFUND': '退款',
     'PREPAID': '充值',
     'TRANSFER': '转账'
 }

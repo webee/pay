@@ -25,8 +25,8 @@ def deploy(env):
 
 
 def stop_python_server(name):
-    fab.run('/usr/local/bin/supervisorctl stop {}'.format(name))
+    fab.run('sudo /usr/local/bin/supervisorctl stop {}'.format(name))
 
 
 def start_python_server(name):
-    fab.run('/usr/local/bin/supervisorctl start {}'.format(name))
+    fab.run('sudo /usr/local/bin/supervisorctl start {}'.format(name))

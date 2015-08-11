@@ -3,7 +3,7 @@
 from flask.ext.wtf import Form
 from pub_site.withdraw.pay_client import PayClient
 from wtforms import FloatField, RadioField, TextAreaField, SubmitField
-from wtforms.validators import DataRequired, NumberRange, StopValidation
+from wtforms.validators import DataRequired, NumberRange, StopValidation, Length
 from ..constant import PayType
 
 
@@ -21,7 +21,7 @@ class PayForm(Form):
     pay_type = RadioField(u"选择付款方式", coerce=int,
                           choices=[(PayType.BY_BALANCE, u"账户余额支付"), (PayType.BY_BANKCARD, u"银行卡支付")],
                           default=PayType.BY_BALANCE)
-    comment = TextAreaField(u"支付备注", validators=[DataRequired(u"请提供备注信息")])
+    comment = TextAreaField(u"支付备注", validators=[DataRequired(u"请提供备注信息"), Length(max=140, message=u"备注不能超过140个字")])
     submit = SubmitField(u"确认")
 
 

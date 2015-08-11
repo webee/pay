@@ -18,7 +18,7 @@ class DataBase:
 
 
 class PayAPI:
-    ROOT_URL = os.environ['PAY_API_SITE']
+    ROOT_URL = 'http://' + os.environ['PAY_API_SITE']
 
 
 class Services:

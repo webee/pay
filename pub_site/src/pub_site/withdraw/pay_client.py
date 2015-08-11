@@ -28,7 +28,7 @@ class PayClient:
     def bind_bankcards(self, card_number, account_name, province_code, city_code, branch_bank_name):
         uid = current_user.user_id
         account_id = self._get_account(uid)['account_id']
-        url = 'http://%s/accounts/%s/bankcards' % (self.server, account_id)
+        url = '%s/accounts/%s/bankcards' % (self.server, account_id)
         data = {
             "card_no": card_number,
             "account_name": account_name,
@@ -43,21 +43,21 @@ class PayClient:
     def get_bankcards(self):
         uid = current_user.user_id
         account_id = self._get_account(uid)['account_id']
-        url = 'http://%s/accounts/%s/bankcards' % (self.server, account_id)
+        url = '%s/accounts/%s/bankcards' % (self.server, account_id)
         return requests.get(url)
 
     @handle_response
     def get_balance(self):
         uid = current_user.user_id
         account_id = self._get_account(uid)['account_id']
-        url = 'http://%s/accounts/%s/balance' % (self.server, account_id)
+        url = '%s/accounts/%s/balance' % (self.server, account_id)
         return requests.get(url)
 
     @handle_response
     def withdraw(self, amount, bankcard_id, callback_url):
         uid = current_user.user_id
         account_id = self._get_account(uid)['account_id']
-        url = 'http://%s/accounts/%s/withdraw' % (self.server, account_id)
+        url = '%s/accounts/%s/withdraw' % (self.server, account_id)
         data = {
             'bankcard_id': bankcard_id,
             'amount': amount,
@@ -69,7 +69,7 @@ class PayClient:
     def transfer_to_lvye(self, amount, order_id, order_info):
         from_id = self._get_account(current_user.user_id)['account_id']
         to_id = self._get_account(lvye_user_id)['account_id']
-        url = 'http://%s/accounts/%s/transfer/to/%s' % (self.server, from_id, to_id)
+        url = '%s/accounts/%s/transfer/to/%s' % (self.server, from_id, to_id)
         data = {
             "order_no": order_id,
             "order_info": order_info,
@@ -79,7 +79,7 @@ class PayClient:
 
     @handle_response
     def pay_to_lvye(self, amount, order_id, order_name, order_description, create_on, callback_url):
-        url = 'http://%s/direct/pre-pay' % self.server
+        url = '%s/direct/pre-pay' % self.server
         data = {
             "client_id": config.PayAPI.CHANNEL_ID,
             "payer": current_user.user_id,
@@ -96,7 +96,7 @@ class PayClient:
     def _get_account(self, uid):
         if uid in PayClient.accounts:
             return PayClient.accounts[uid]
-        url = 'http://%s/user_domains/%s/users/%s/account' % (self.server, self.user_domain_id, uid)
+        url = '%s/user_domains/%s/users/%s/account' % (self.server, self.user_domain_id, uid)
         resp = requests.get(url)
         if resp.status_code != 200:
             return {"account_id": 0}

@@ -7,6 +7,7 @@ from api.core.postpay import *
 from api.core.refund import get_refund_by_id, handle_refund_notification
 from api.core.withdraw import get_withdraw_by_id, handle_withdraw_notification
 from api.core.ipay.transaction import parse_and_verify, notification, is_sending_to_me, is_valid_transaction
+from api.util import response
 from pytoolbox.util.enum import enum
 
 core_mod = Blueprint('core_callback_response', __name__)
@@ -17,8 +18,8 @@ PayResult = enum(Success=0, Failure=1, IsInvalidRequest=2)
 
 
 @mod.route('/pay/heart-beat')
-def heart_beat_responser():
-    return 'ok'
+def heart_beat():
+    return response.ok()
 
 
 @mod.route('/pay/<uuid>/result', methods=['POST'])

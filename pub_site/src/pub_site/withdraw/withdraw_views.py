@@ -41,7 +41,7 @@ def set_current_channel():
 @mod.route('/withdraw', methods=['GET', 'POST'])
 @login_required
 def withdraw():
-    balance = PayClient().get_balance()['data']['balance']
+    balance = _get_balance()
     bankcards = PayClient().get_bankcards()['data']
     if len(bankcards) == 0:
         return redirect(url_for('.bind_card'))
@@ -87,6 +87,13 @@ def show_withdraw_result_page(transaction_id):
 def generate_identifying_code():
     resp = generate_and_send_identifying_code()
     return resp.content, resp.status_code
+
+
+def _get_balance():
+    result = PayClient().get_balance()
+    if result['status_code'] != 200:
+        return 0.0
+    return result['data']['balance']
 
 
 def _update_preferred_card(card_id):

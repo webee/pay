@@ -24,3 +24,16 @@ def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, as
     }
     db.insert('secured_refund', returns_id=True, **fields)
     return refund_id
+
+
+@db_context
+def find_refunded_payment_by_refund_id(db, refund_id):
+    return db.get(
+        """
+            SELECT secured_payment.*, secured_refund.async_callback_url as refund_callback_url,
+                   secured_refund.amount as refund_amount
+              FROM secured_payment
+                INNER JOIN secured_refund ON secured_payment.id = secured_refund.payee_account_id
+              WHERE secured_refund.id=%(refund_id)s
+        """,
+        refund_id=refund_id)

@@ -4,7 +4,7 @@ import os
 
 
 class DataBase:
-    HOST = os.environ['PAY_API_DATABASE_HOST']
+    HOST = os.environ['PAY_API_SITE_DATABASE_HOST']
     INSTANCE = 'lvye_pay'
     USERNAME = 'lvye_pay'
-    PASSWORD = os.environ['PAY_API_DATABASE_PASSWORD']
+    PASSWORD = os.environ['PAY_API_SITE_DATABASE_PASSWORD']

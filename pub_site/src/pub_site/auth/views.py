@@ -51,6 +51,7 @@ class User(UserMixin):
             return User.from_json(user_json, id)
 
         except Exception as _:
+            logger.exception(_)
             return None
 
 

@@ -2,7 +2,8 @@
 
 from flask import g, render_template, redirect, url_for, flash
 from flask.ext.login import login_required
-from . import pay_mod as mod, PayType
+from . import pay_mod as mod
+from ..constant import PayType
 from pub_site.pay.forms import PayForm
 from pub_site.withdraw.pay_client import PayClient
 from pytoolbox.util.dbe import from_db

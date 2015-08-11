@@ -4,7 +4,7 @@ from flask.ext.wtf import Form
 from pub_site.withdraw.pay_client import PayClient
 from wtforms import FloatField, RadioField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, NumberRange, StopValidation
-from . import PayType
+from ..constant import PayType
 
 
 def amount_less_than_balance(form, field):

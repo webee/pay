@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
-from flask.ext.login import login_required,current_user
+from flask.ext.login import login_required, current_user
 from flask import render_template, url_for, redirect, g, current_app
 from . import withdraw_mod as mod
 from pytoolbox.util.dbe import from_db
 from tools.mylog import get_logger
-from .import WITHDRAW_COMMISSION
+from . import WITHDRAW_COMMISSION
 from .forms import BindCardForm, WithdrawForm
 from identifying_code_manager import generate_and_send_identifying_code
 from pay_client import PayClient
 from flask import flash
+from datetime import datetime
+from ..constant import PayType
 
 
 logger = get_logger(__name__)
@@ -47,16 +49,17 @@ def withdraw():
     selected_card = _find_selected_card(bankcards, long(form.bankcard.data))
     if form.validate_on_submit():
         actual_amount = form.amount.data - WITHDRAW_COMMISSION
-        result = PayClient().withdraw(form.amount.data, form.bankcard.data, "callback_url")
-        if result['status_code'] == 202:
-            _update_preferred_card(form.bankcard.data)
-            success_message = u"提现 %s元 申请成功！绿野将于3-5个工作日内审核并处理。" % actual_amount
-            flash(success_message, category="success")
-            return redirect(url_for('main.index'))
-        flash(u"提现失败，请核实账户信息！", category="error")
-        return redirect(url_for('.withdraw'))
+        result = PayClient().withdraw(actual_amount, form.bankcard.data, "callback_url")
+        if result['status_code'] != 202:
+            flash(u"提现失败，请核实账户信息！", category="error")
+            return redirect(url_for('.withdraw'))
+        _charge_for_commission()
+        _update_preferred_card(form.bankcard.data)
+        success_message = u"提现 %s元 申请成功！绿野将于3-5个工作日内审核并处理。" % actual_amount
+        flash(success_message, category="success")
+        return redirect(url_for('main.index'))
     return render_template('withdraw/withdraw.html', balance=balance, bankcards=bankcards,
-                            selected_card=selected_card, form=form)
+                           selected_card=selected_card, form=form)
 
 
 @mod.route('/withdraw/bind-card', methods=['GET', 'POST'])
@@ -64,18 +67,7 @@ def withdraw():
 def bind_card():
     form = BindCardForm()
     if form.validate_on_submit():
-        card_number = form.card_number.data
-        account_name = form.name.data
-        province_code = form.province.data
-        city_code = form.city.data
-        branch_bank_name = form.subbranch_name.data
-        result = PayClient().bind_bankcards(
-            card_number=card_number,
-            account_name=account_name,
-            province_code=province_code,
-            city_code=city_code,
-            branch_bank_name=branch_bank_name
-        )
+        result = _do_bind_card(form)
         if result['status_code'] != 201:
             flash(u"银行卡绑定失败，请稍后再试。", category="error")
             return redirect(url_for('.bind_card'))
@@ -106,6 +98,33 @@ def _update_preferred_card(card_id):
     else:
         db.execute('update preferred_card set bankcard_id=%(card_id)s where user_id=%(user_id)s',
                    card_id=card_id, user_id=current_user_id)
+
+
+def _charge_for_commission():
+    order = {
+        "name": "pay_to_lvye",
+        "pay_type": PayType.BY_BALANCE,
+        "description": "commission for withdraw",
+        "amount": WITHDRAW_COMMISSION,
+        "created_on": datetime.now().isoformat()
+    }
+    order_id = from_db().insert('zyt_order', order, returns_id=True)
+    PayClient().transfer_to_lvye(WITHDRAW_COMMISSION, order_id, order["description"])
+
+
+def _do_bind_card(form):
+    card_number = form.card_number.data
+    account_name = form.name.data
+    province_code = form.province.data
+    city_code = form.city.data
+    branch_bank_name = form.subbranch_name.data
+    return PayClient().bind_bankcards(
+        card_number=card_number,
+        account_name=account_name,
+        province_code=province_code,
+        city_code=city_code,
+        branch_bank_name=branch_bank_name
+    )
 
 
 def _find_selected_card(bankcards, selected_card_id):

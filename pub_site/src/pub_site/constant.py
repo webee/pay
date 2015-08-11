@@ -10,3 +10,8 @@ SOURCE_MESSAGES = {
     'REFUND': '退款',
     'TRANSFER': '转账',
 }
+
+
+class PayType:
+    BY_BALANCE = 0
+    BY_BANKCARD = 1

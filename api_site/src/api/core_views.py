@@ -67,7 +67,10 @@ def notify_withdraw(uuid):
     elif withdraw_order.state != 'FROZEN':
         return notification.duplicate()
 
-    return handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info)
+    if handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info):
+        return notification.accepted()
+
+    return notification.is_invalid()
 
 
 @mod.route('/refund/<uuid>/notify', methods=['POST'])

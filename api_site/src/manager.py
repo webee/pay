@@ -45,7 +45,7 @@ def test_prepaid(account_id, amount):
     """充值"""
     from api.core.prepaid import prepaid
 
-    prepaid(account_id, amount)
+    prepaid(account_id, amount, '测试充值')
 
 
 @manager.option('-i', '--id', type=long, dest="account_id", required=True)
@@ -78,7 +78,7 @@ def test_done_withdraw(withdraw_id, state):
 def test_transfer(from_id, to_id, amount, info):
     from api.core.transfer import transfer
 
-    info = info or '转账'
+    info = info or '测试转账'
     transfer('', info, from_id, to_id, amount)
 
 

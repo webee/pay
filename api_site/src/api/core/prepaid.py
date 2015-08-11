@@ -5,8 +5,8 @@ from pytoolbox.util.dbe import transactional
 
 
 @transactional
-def prepaid(account_id, amount):
+def prepaid(account_id, amount, info):
     prepaid_id = create_prepaid(account_id, amount)
-    bookkeep(Event(SourceType.PREPAID, prepaid_id, amount),
+    bookkeep(Event(SourceType.PREPAID, prepaid_id, amount, info),
              (account_id, '+asset'),
              (account_id, '+cash'))

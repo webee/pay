@@ -1,5 +1,9 @@
 var requestRunning = false;
 
+function get_cur_balance() {
+    return Number($("#balance")[0].textContent);
+}
+
 function update_balance(callback) {
     if (requestRunning) {
         return;
@@ -27,6 +31,10 @@ $(document).ready(function () {
         }
     }
 
+    function get_cur_tab() {
+        return $("#tx_type_tabs")[0].dataset["cur"];
+    }
+
     function gen_activate_tab_cb(t) {
         return function() {
             var ts = []
@@ -35,6 +43,7 @@ $(document).ready(function () {
                     ts.push(tabs[i]);
                 }
             }
+            $("#tx_type_tabs")[0].dataset["cur"] = t;
             $(t).attr('class', 'cur');
             clear_class(ts)
 

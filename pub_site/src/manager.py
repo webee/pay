@@ -29,6 +29,12 @@ def init_db():
     init_db()
 
 
+@manager.option('-e', '--env', type=str, dest="environment", required=True)
+def deploy(environment):
+    environment = environment or 'dev'
+    from ops.deploy.deploy import deploy
+    deploy(environment)
+
 
 def main():
     reload(sys)

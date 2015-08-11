@@ -3,8 +3,8 @@ from __future__ import unicode_literals, print_function, division
 from flask import Flask
 import os
 from api.delegation_center import delegate, event
-from api.direct_transaction import delegation_interface as direct_delegate
-from api.secured_transaction import delegation_interface as secured_delegate
+from api.direct_transaction import callback_interface as direct_delegate
+from api.secured_transaction import callback_interface as secured_delegate
 from pytoolbox.conf import config as conf
 from pytoolbox.util import dbe
 

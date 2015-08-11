@@ -1,7 +1,19 @@
-function update_balance() {
+var requestRunning = false;
+
+function update_balance(callback) {
+    if (requestRunning) {
+        return;
+    }
+
+    requestRunning = true;
     $.getJSON('/balance')
         .done(function (res) {
             $("#balance").html(res.balance);
+        }).complete(function() {
+            requestRunning = false;
+            if (callback != null) {
+                callback();
+            }
         });
 }
 
@@ -46,6 +58,10 @@ $(document).ready(function () {
 
     function handle_pager(params, callback) {
         var pager = $("#tx_list_pager")[0];
+        if (pager == undefined) {
+            return;
+        }
+
         var page_no = Number(pager.dataset["pageNo"]);
         var page_count = Number(pager.dataset["pageCount"]);
         var prev_page_no = page_no - 1;
@@ -74,7 +90,21 @@ $(document).ready(function () {
             get_tx_list(params, callback)
         });
     }
+
+    function handle_search_bt(params, callback) {
+        $("#tx_search_bt").on("click", function() {
+            var q = $("#tx_search_q")[0].value;
+            $.extend(params, {q: q, page_no: 1})
+            get_tx_list(params, callback);
+        });
+    }
+
     function get_tx_list(params, callback) {
+        if (requestRunning) {
+            return;
+        }
+
+        requestRunning = true;
         $.get('/transaction_list', params)
             .done(function (data) {
                 $("#tx_list").html(data);
@@ -83,13 +113,19 @@ $(document).ready(function () {
                 }
 
                 handle_pager(params, callback);
+                handle_search_bt(params, callback);
+            })
+            .complete(function (){
+                requestRunning = false;
             });
     }
 
-    // update balance.
-    update_balance();
-    setInterval("update_balance()", 10000);
+    // every 10s, update balance.
+    setInterval("update_balance(null)", 10000);
 
-    // activate total.
-    get_tx_list({}, gen_activate_tab_cb('#total_tx'))
+    // update balance.
+    update_balance(function() {
+        // activate total.
+        get_tx_list({}, gen_activate_tab_cb('#total_tx'))
+    });
 });

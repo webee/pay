@@ -20,13 +20,14 @@ def transaction_list():
     uid = current_user.user_id
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 10))
-    q = request.args.get('q', '')
+    q = request.args.get('q', '').strip()
     side = request.args.get('side', '')
     tp = request.args.get('tp', '')
 
     count, records, record_infos = cash_records(uid, q, side, tp, page_no, page_size)
 
     res = {
+        'q': q,
         'count': count,
         'page_no': page_no,
         'page_size': page_size,

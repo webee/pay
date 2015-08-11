@@ -34,9 +34,9 @@ def pay_succeed():
 
 def _create_order(amount, pay_type, comment):
     order = {
-        "name": "pay_to_lvye",
+        "name": u"付款给绿野",
         "pay_type": pay_type,
-        "description": comment,
+        "description": (u"付款给绿野：%s" % comment),
         "amount": amount,
         "created_on": datetime.now().isoformat()
 
@@ -56,7 +56,7 @@ def _handle_result(result, process):
 
 def _pay(order):
     if order["pay_type"] == PayType.BY_BALANCE:
-        result = PayClient().transfer_to_lvye(order["amount"], order_id=order["id"], order_info=order["name"])
+        result = PayClient().transfer_to_lvye(order["amount"], order_id=order["id"], order_info=order["description"])
 
         def succeed_handler():
             flash(u"付款给绿野支付成功！", category="success")

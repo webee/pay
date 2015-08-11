@@ -102,9 +102,9 @@ def _update_preferred_card(card_id):
 
 def _charge_for_commission():
     order = {
-        "name": "pay_to_lvye",
+        "name": u"提现手续费",
         "pay_type": PayType.BY_BALANCE,
-        "description": "commission for withdraw",
+        "description": u"提现手续费",
         "amount": WITHDRAW_COMMISSION,
         "created_on": datetime.now().isoformat()
     }

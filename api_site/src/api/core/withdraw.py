@@ -3,13 +3,13 @@ from .balance import get_cash_balance, InsufficientBalanceError
 from ._bookkeeping import bookkeep, Event, SourceType
 from ._dba import find_bankcard_by_id, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
     find_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result, list_all_unfailed_withdraw, \
-    find_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id
-from ._notify import try_to_notify_withdraw_result_client
+    find_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id, find_withdraw_by_id
 from .ipay import transaction
 from .util.lock import require_user_account_lock
+from .util.handling_result import HandledResult
 from api.core import ZytCoreError, ConditionalError
+from api.util.notify import notify_client
 from api.util.parser import to_int
-from api import config
 from pytoolbox.util.dbe import db_transactional
 from pytoolbox.util.log import get_logger
 
@@ -66,10 +66,12 @@ def get_withdraw_basic_info_by_id(withdraw_id):
 
 
 def handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info=''):
-    if _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
-        try_to_notify_withdraw_result_client(withdraw_id)
-        return True
-    return False
+    withdraw_result = _process_withdraw_result(withdraw_id, paybill_id, result, failure_info)
+    if not withdraw_result.has_been_handled_by_3rd_party:
+        return False
+
+    _try_to_notify_withdraw_result_client(withdraw_id)
+    return True
 
 
 def list_unfailed_withdraw(account_id):
@@ -107,14 +109,14 @@ def _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
     update_withdraw_result(withdraw_id, paybill_id, result, failure_info)
     _logger.warn("Withdraw notify result: [{0}], id=[{1}]".format(result, withdraw_id))
 
-    if result == config.LianLianPay.PayToBankcard.Result.FAILURE:
+    if transaction.is_failed_withdraw(result):
         _fail_withdraw(withdraw_id)
-        return True
-    elif result == config.LianLianPay.PayToBankcard.Result.SUCCESS:
+        return HandledResult(True, False)
+    elif transaction.is_successful_withdraw(result):
         _succeed_withdraw(withdraw_id)
-        return True
-    else:
-        return False
+        return HandledResult(True, True)
+
+    return HandledResult(False)
 
 
 @db_transactional
@@ -163,3 +165,19 @@ def _generate_withdraw_info(bankcard_id):
 
 def _mask_bankcard_no(bankcard_no):
     return '{0} **** **** {1}'.format(bankcard_no[:4], bankcard_no[-4:])
+
+
+def _try_to_notify_withdraw_result_client(withdraw_id):
+    withdraw_order = find_withdraw_by_id(withdraw_id)
+    url = withdraw_order['async_callback_url']
+    amount = withdraw_order.amount
+    account_id = withdraw_order.account_id
+
+    if withdraw_order.state == WITHDRAW_STATE.SUCCESS:
+        params = {'code': 0, 'account_id': account_id, 'order_id': withdraw_id, 'amount': amount}
+    else:
+        params = {'code': 1, 'msg': 'failed', 'account_id': account_id, 'order_id': withdraw_id, 'amount': amount}
+
+    if not notify_client(url, params):
+        from api.task import tasks
+        tasks.withdraw_notify.delay(url, params)

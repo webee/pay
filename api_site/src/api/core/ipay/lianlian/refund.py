@@ -15,3 +15,7 @@ def refund(refund_id, refunded_on, amount, paybill_id, notify_url):
         'notify_url': notify_url
     }
     return request(config.LianLianPay.Refund.URL, params)
+
+
+def is_successful_refund(status):
+    return status == config.LianLianPay.Refund.Status.SUCCESS

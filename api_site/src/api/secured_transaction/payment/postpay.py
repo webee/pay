@@ -35,3 +35,6 @@ def mark_payment_as_refunding(pay_record_id):
 def mark_payment_as_refunded(pay_record_id):
     update_payment_state(pay_record_id, PAYMENT_STATE.REFUNDED)
 
+
+def mark_payment_as_refund_failed(pay_record_id):
+    update_payment_state(pay_record_id, PAYMENT_STATE.REFUND_FAILED)

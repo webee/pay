@@ -39,9 +39,6 @@ def deploy(environment):
 def main():
     reload(sys)
     sys.setdefaultencoding('utf-8')
-
-    dbe.create_db_engine(config.DataBase.HOST, config.DataBase.PORT, config.DataBase.INSTANCE,
-                         config.DataBase.USERNAME, config.DataBase.PASSWORD)
     manager.run()
 
 

@@ -7,7 +7,7 @@ from pytoolbox.util.dbe import db_context
 
 
 PAYMENT_STATE = enum(CREATED='CREATED', SECURED='SECURED', FAILED='FAILED', CONFIRMED='CONFIRMED',
-                     REFUNDING='REFUNDING', REFUNDED='REFUNDED')
+                     REFUNDING='REFUNDING', REFUNDED='REFUNDED', REFUND_FAILED='REFUND_FAILED')
 
 
 @db_context

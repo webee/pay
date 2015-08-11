@@ -7,6 +7,7 @@ import os
 from flask import Flask, render_template, current_app
 from flask.ext.login import LoginManager
 from tools.filters import register_filters, register_global_functions
+from pytoolbox.util import dbe
 
 
 def init_template(app):
@@ -69,6 +70,8 @@ def create_app(env):
 
     app.config.from_object(config.App)
 
+    dbe.create_db_engine(config.DataBase.HOST, config.DataBase.PORT, config.DataBase.INSTANCE,
+                         config.DataBase.USERNAME, config.DataBase.PASSWORD)
     register_mods(app)
     init_template(app)
     init_errors(app)

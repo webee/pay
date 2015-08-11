@@ -38,3 +38,11 @@ def pay_to_bankcard(no_order, money_order, info_order, bankcard, notify_url):
     # note: bankcode, 对公必须传
     # note: province_code, city_code, brabank_name, 工、农、中, 招,光大 浦发(对私打款),建行 (对公打款)可以不传, 其他银行必须传
     return request(config.LianLianPay.PayToBankcard.URL, params)
+
+
+def is_successful_withdraw(result):
+    return result == config.LianLianPay.PayToBankcard.Result.SUCCESS
+
+
+def is_failed_withdraw(result):
+    return result == config.LianLianPay.PayToBankcard.Result.FAILURE

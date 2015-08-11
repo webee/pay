@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import g, render_template, redirect, url_for, flash
-from flask.ext.login import login_required
+from flask.ext.login import login_required, current_user
 from . import pay_mod as mod
 from ..constant import PayType
 from pub_site.pay.forms import PayForm
@@ -35,6 +35,7 @@ def pay_succeed():
 def _create_order(amount, pay_type, comment):
     order = {
         "name": u"付款给绿野",
+        "user_id": current_user.user_id,
         "pay_type": pay_type,
         "description": (u"付款给绿野：%s" % comment),
         "amount": amount,

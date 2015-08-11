@@ -102,6 +102,7 @@ def _update_preferred_card(card_id):
 
 def _charge_for_commission():
     order = {
+        "user_id": current_user.user_id,
         "name": u"提现手续费",
         "pay_type": PayType.BY_BALANCE,
         "description": u"提现手续费",

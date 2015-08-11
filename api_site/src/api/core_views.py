@@ -31,7 +31,7 @@ def receive_pay_result(uuid):
     elif result == PayResult.Failure:
         return notification.fail()
     else:
-        pay_record = find_payment_by_uuid(uuid)
+        pay_record = get_payment_by_uuid(uuid)
         return _redirect_pay_result(pay_record)
 
 

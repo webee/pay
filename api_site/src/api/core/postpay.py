@@ -35,7 +35,7 @@ def get_payment_by_id(payment_id):
     return find_payment_by_id(payment_id)
 
 
-def find_payment_by_uuid(uuid):
+def get_payment_by_uuid(uuid):
     payment_id = decode_uuid(uuid)
     return get_payment_by_id(payment_id)
 

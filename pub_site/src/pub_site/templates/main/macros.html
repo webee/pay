@@ -20,7 +20,7 @@
                     {% else %}
                         <td class="green">- {{ "%.2f"|format(record.amount) }}</td>
                     {% endif %}
-                    <td class="{{ record.state_type }}">{{ record.state }}</td>
+                    <td>{{ record.state }}</td>
                     <td>{{ record.trade_info }}</td>
                     <td><a href="#">详情</a></td>
                 </tr>

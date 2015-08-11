@@ -20,3 +20,9 @@ class LianLianPay:
 
 class ZiYouTong:
     VALIDATE_SIGNATURE = False
+
+
+class Celery:
+    HOST = '127.0.0.1:5672'
+    PASSWORD = 'p@55word'
+    INSTANCE = ''

@@ -48,7 +48,7 @@ def _generate_submit_form(req_params):
 
 
 def _append_md5_sign(req_params):
-    digest = md5_sign(req_params, config.LianLianPay.Sign.MD5_TYPE)
+    digest = md5_sign(req_params, config.LianLianPay.Sign.MD5_KEY)
     req_params['sign'] = digest
     return req_params
 

@@ -3,7 +3,7 @@ import types
 from pytoolbox.util.enum import enum, keyset_in_enum, value_in_enum
 
 
-event = enum(PAY='0', PAID='1', REDIRECT_WEB_AFTER_PAID='2')
+event = enum(PAY='0', PAID='1', REDIRECT_WEB_AFTER_PAID='2', REFUNDED='3')
 
 
 class DelegationDispatcher(object):

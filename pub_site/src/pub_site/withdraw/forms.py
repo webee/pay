@@ -38,7 +38,7 @@ def identifying_code_should_match(form, field):
 
 
 def card_number_should_be_legal(form, field):
-    url = '%s/bankcards/%s/bin' % (config.PayAPI.ROOT_URL, field.data)
+    url = '%s/bankcards/%s/bin' % (config.PayAPI.ROOT_URL, field.data.replace(" ", ""))
     resp = requests.get(url)
     if resp.status_code != 200:
         raise ValidationError(u"无效的银行卡")

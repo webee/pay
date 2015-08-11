@@ -25,6 +25,10 @@ $(document).ready(function () {
                     ? '验证码已发送至注册领队时所留手机号'
                     : '验证码发送失败，请重试。';
                 $('.identifying-code.warn').html(message);
+            },
+            error: function() {
+                $('.hqyzm').removeAttr('disabled').attr('value', '重新获取');
+                $('.identifying-code.warn').html('验证码获取失败，请重新获取');
             }
         });
     });

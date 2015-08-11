@@ -26,6 +26,9 @@ $(function () {
         if(!comment) {
             errors['comment'] = '请提供备注信息';
         }
+        if(comment.length > 140) {
+            errors['comment'] = '备注不能超过140个字';
+        }
         return errors;
     }
 
@@ -62,5 +65,6 @@ $(function () {
     });
     $(".confirm a.close,.finaline button").click(function () {
         $(".bgLayer,.confirm").stop().fadeOut();
+        $("#main").showLoading();
     });
 });

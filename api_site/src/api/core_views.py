@@ -31,7 +31,7 @@ def receive_pay_result(uuid):
     elif result == PayResult.Failure:
         return notification.fail()
     else:
-        pay_record = find_payment_by_uuid(uuid)
+        pay_record = get_payment_by_uuid(uuid)
         return _redirect_pay_result(pay_record)
 
 
@@ -67,7 +67,10 @@ def notify_withdraw(uuid):
     elif withdraw_order.state != 'FROZEN':
         return notification.duplicate()
 
-    return handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info)
+    if handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info):
+        return notification.accepted()
+
+    return notification.is_invalid()
 
 
 @mod.route('/refund/<uuid>/notify', methods=['POST'])
@@ -89,7 +92,13 @@ def notify_refund(uuid):
     elif refund_order.state != 'CREATED':
         return notification.duplicate()
 
-    return handle_refund_notification(refund_order, oid_refundno, sta_refund)
+    result = handle_refund_notification(refund_order, oid_refundno, sta_refund)
+    if result:
+        pay_record = get_payment_by_id(refund_order['payment_id'])
+        delegate.refunded(pay_record['trade_id'])
+        return notification.accepted()
+
+    return notification.is_invalid()
 
 
 def _notify_payment_result(uuid, data):

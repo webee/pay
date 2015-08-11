@@ -1,4 +1,7 @@
 $(document).ready(function () {
+
+    $("#card_number").bankInput();
+
     var provinceToCitiesMap = {};
 
     function renderCitySelect(cities) {
@@ -22,5 +25,8 @@ $(document).ready(function () {
             renderCitySelect(provinceToCitiesMap[selectedProvinceCode]);
         }
 
+    });
+    $('#submit').click(function(){
+        $('#main').showLoading();
     });
 });

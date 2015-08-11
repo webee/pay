@@ -5,6 +5,7 @@ from flask.ext.login import login_required, current_user
 from . import main_mod as mod
 from pub_site import pay_client
 from .transaction_log import cash_records
+from ..constant import TradeType
 
 
 @mod.route('/', methods=['GET'])
@@ -23,7 +24,7 @@ def transaction_list():
     side = request.args.get('side', '')
     tp = request.args.get('tp', '')
 
-    count, records, record_info = cash_records(uid, q, side, tp, page_no, page_size)
+    count, records, record_infos = cash_records(uid, q, side, tp, page_no, page_size)
 
     res = {
         'count': count,
@@ -31,7 +32,7 @@ def transaction_list():
         'page_size': page_size,
         'page_count': (count - 1) / page_size + 1,
         'records': records,
-        'record_infos': record_info,
+        'record_infos': record_infos,
         }
     return render_template('main/tx_list.html', res=res)
 
@@ -43,3 +44,10 @@ def balance():
     balance = pay_client.get_user_balance(uid)
 
     return jsonify(balance=balance)
+
+
+@mod.route('/trade/<int:id>', methods=['GET'])
+@login_required
+def trade_detail(id):
+    trade = {"id": id, "type": TradeType.WITHDRAW}
+    return render_template('main/trade-detail.html', trade=trade)

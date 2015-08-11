@@ -30,10 +30,7 @@ def get_refund_by_id(refund_id):
 
 
 def handle_refund_notification(refund_record, refund_serial_no, status):
-    if _process_refund_result(refund_record, refund_serial_no, status):
-        # try_to_notify_refund_result_client(refund_id)
-        return True
-    return False
+    return _process_refund_result(refund_record, refund_serial_no, status)
 
 
 def _request_refund(refund_id, refunded_on, amount, paybill_id):

@@ -17,5 +17,5 @@ def pay_by_id(pay_record_id):
     return _pay_by_id(pay_record_id)
 
 
-def after_refunded(pay_record_id):
-    return _after_refunded(pay_record_id)
+def after_refunded(pay_record_id, is_successful_refund):
+    return _after_refunded(pay_record_id, is_successful_refund)

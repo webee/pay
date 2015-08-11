@@ -94,12 +94,9 @@ def notify_refund(uuid):
         return notification.duplicate()
 
     result = handle_refund_notification(refund_order, oid_refundno, sta_refund)
-    if result:
-        pay_record = get_payment_by_id(refund_order['payment_id'])
-        delegate.refunded(pay_record['trade_id'])
-        return notification.accepted()
-
-    return notification.is_invalid()
+    pay_record = get_payment_by_id(refund_order['payment_id'])
+    delegate.refunded(pay_record['trade_id'], result.is_successful)
+    return notification.accepted()
 
 
 def _notify_payment_result(uuid, data):

@@ -14,7 +14,7 @@ CREATE TABLE secured_payment(
   updated_on TIMESTAMP,
   client_callback_url VARCHAR(128),
   client_async_callback_url VARCHAR(128),
-  state ENUM('CREATED', 'SECURED', 'FAILED', 'CONFIRMED', 'REFUNDING', 'REFUNDED') NOT NULL DEFAULT 'CREATED',
+  state ENUM('CREATED', 'SECURED', 'FAILED', 'CONFIRMED', 'REFUNDING', 'REFUNDED', 'REFUND_FAILED') NOT NULL DEFAULT 'CREATED',
 
   UNIQUE KEY order_uiq_idx (channel_id, order_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;

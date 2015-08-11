@@ -12,13 +12,11 @@ def get_config(env):
     return config
 
 
-cfg = get_config('dev')
-
-fab.use_ssh_config = True
-fab.env.host_string = cfg.Deploy.HOST_STRING
-
-
-def deploy():
+def deploy(env):
+    env = env or 'dev'
+    cfg = get_config(env)
+    fab.use_ssh_config = True
+    fab.env.host_string = cfg.Deploy.HOST_STRING
     code_dir = cfg.Deploy.CODE_DIR
     with fab.cd(code_dir), fab.prefix('source api_venv/bin/activate'):
         fab.run('git pull --ff-only origin master')

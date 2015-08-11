@@ -4,10 +4,10 @@ from ._bookkeeping import bookkeep, Event, SourceType
 from ._dba import find_bankcard_by_id, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
     find_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result, list_all_unfailed_withdraw, \
     find_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id, find_withdraw_by_id
-from ._notify import notify_client
 from .ipay import transaction
 from .util.lock import require_user_account_lock
 from api.core import ZytCoreError, ConditionalError
+from api.util.notify import notify_client
 from api.util.parser import to_int
 from api import config
 from pytoolbox.util.dbe import db_transactional

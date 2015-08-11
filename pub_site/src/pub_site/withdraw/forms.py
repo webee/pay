@@ -14,7 +14,7 @@ from pytoolbox.util.dbe import from_db
 from pay_client import PayClient
 import re
 from wtforms.compat import string_types
-from .import WITHDRAW_COMMISSION
+from . import WITHDRAW_COMMISSION
 
 
 def name_and_id_card_should_match(form, field):
@@ -31,9 +31,9 @@ def name_and_id_card_should_match(form, field):
 
 def identifying_code_should_match(form, field):
     now = datetime.fromtimestamp(time.time()).isoformat()
-    sql = 'select count(1) from identifying_code where user_id=%(user_id)s and code=%(code)s and expire_at>=%(now)s'
-    count = from_db().get_scalar(sql, user_id=current_user.user_id, code=field.data, now=now)
-    if count == 0:
+    sql = 'select code from identifying_code where user_id=%(user_id)s and expire_at>=%(now)s order by expire_at desc limit 1'
+    code = from_db().get_scalar(sql, user_id=current_user.user_id, now=now)
+    if code != field.data:
         raise ValidationError(u"验证码错误")
 
 
@@ -117,7 +117,8 @@ class WithdrawForm(Form):
     bankcard = MyHiddenField()
     amount = FloatField(u"提现金额(元)",
                         validators=[DataRequired(u"请输入合法金额"), MyRegexp(r'^\d+(.\d{1,2})?$', message=u"请输入合法金额"),
-                                    amount_less_than_balance, NumberRange(min=WITHDRAW_COMMISSION, message=u"提现金额不能少于2元(含手续费2元)")])
+                                    amount_less_than_balance,
+                                    NumberRange(min=WITHDRAW_COMMISSION, message=u"提现金额不能少于2元(含手续费2元)")])
     identifying_code = StringField(u"验证码", validators=[DataRequired(u"验证码不能为空"), identifying_code_should_match])
     submit = SubmitField(u"提交")
 

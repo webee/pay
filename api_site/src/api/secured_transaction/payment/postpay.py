@@ -31,3 +31,7 @@ def get_secured_payment(channel_id, order_id):
 def mark_payment_as_refunding(pay_record_id):
     update_payment_state(pay_record_id, PAYMENT_STATE.REFUNDING)
 
+
+def mark_payment_as_refunded(pay_record_id):
+    update_payment_state(pay_record_id, PAYMENT_STATE.REFUNDED)
+

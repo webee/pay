@@ -9,7 +9,7 @@ def is_valid_payment(payment_id, uuid, paid_amount):
     if payment_id != decode_uuid(uuid):
         return False
 
-    pay_record = find_payment_by_id(payment_id)
+    pay_record = get_payment_by_id(payment_id)
     return pay_record['amount'] == paid_amount
 
 
@@ -25,15 +25,19 @@ def fail_payment(payment_id):
 @transactional
 def succeed_payment(payment_id, paybill_id):
     _succeed_payment(payment_id, paybill_id)
-    pay_record = find_payment_by_id(payment_id)
+    pay_record = get_payment_by_id(payment_id)
     _bookkeep(pay_record)
 
     return pay_record
 
 
+def get_payment_by_id(payment_id):
+    return find_payment_by_id(payment_id)
+
+
 def find_payment_by_uuid(uuid):
     payment_id = decode_uuid(uuid)
-    return find_payment_by_id(payment_id)
+    return get_payment_by_id(payment_id)
 
 
 def _bookkeep(pay_record):

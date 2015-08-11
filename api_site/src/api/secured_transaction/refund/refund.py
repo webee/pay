@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from api.core import refund as core_refund
 from ._dba import create_refund
-from api.secured_transaction.payment.postpay import mark_payment_as_refunding
+from api.secured_transaction.payment.postpay import mark_payment_as_refunding, mark_payment_as_refunded
 
 
 def apply_to_refund(pay_record, amount, async_callback_url):
@@ -22,3 +22,7 @@ def apply_to_refund(pay_record, amount, async_callback_url):
     mark_payment_as_refunding(payment_id)
 
     return refund_id
+
+
+def after_refunded(payment_id):
+    mark_payment_as_refunded(payment_id)

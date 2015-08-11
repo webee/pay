@@ -33,6 +33,8 @@ def register_callbacks():
     delegate.bind_secured_handler(event.REDIRECT_WEB_AFTER_PAID, secured_delegate.get_sync_callback_url_of_payment)
     delegate.bind_direct_handler(event.REDIRECT_WEB_AFTER_PAID, direct_delegate.get_sync_callback_url_of_payment)
 
+    delegate.bind_secured_handler(event.REFUNDED, secured_delegate.after_refunded)
+
 
 def create_app(env):
     app = Flask(__name__)

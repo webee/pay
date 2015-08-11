@@ -71,7 +71,7 @@ CREATE TABLE withdraw(
 
 CREATE TABLE refund(
   id CHAR(30) PRIMARY KEY,  -- prefix with 'RFD'
-  payment_id CHAR(30) NOT NULL,
+  payment_id CHAR(30) NOT NULL, -- id prefixed with 'PAY'
   payer_account_id INT UNSIGNED NOT NULL,
   payee_account_id INT UNSIGNED NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,

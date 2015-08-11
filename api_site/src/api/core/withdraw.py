@@ -9,7 +9,6 @@ from .util.lock import require_user_account_lock
 from api.core import ZytCoreError, ConditionalError
 from api.util.notify import notify_client
 from api.util.parser import to_int
-from api import config
 from pytoolbox.util.dbe import db_transactional
 from pytoolbox.util.log import get_logger
 
@@ -107,14 +106,14 @@ def _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
     update_withdraw_result(withdraw_id, paybill_id, result, failure_info)
     _logger.warn("Withdraw notify result: [{0}], id=[{1}]".format(result, withdraw_id))
 
-    if result == config.LianLianPay.PayToBankcard.Result.FAILURE:
+    if transaction.is_failed_withdraw(result):
         _fail_withdraw(withdraw_id)
         return True
-    elif result == config.LianLianPay.PayToBankcard.Result.SUCCESS:
+    elif transaction.is_successful_withdraw(result):
         _succeed_withdraw(withdraw_id)
         return True
-    else:
-        return False
+
+    return False
 
 
 @db_transactional

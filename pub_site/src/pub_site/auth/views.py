@@ -40,6 +40,7 @@ class User(UserMixin):
         import urllib2
         import json
         url = config.UserCenter.IS_PASSPORT_LOGIN_URL
+        logger.info(' url: {}'.format(url))
         request = urllib2.Request(
             url=url,
             headers={'Content-Type': 'text/xml', 'Cookie': config.UserCenter.AUTH_COOKIE + "=%s" % id},
@@ -51,6 +52,7 @@ class User(UserMixin):
             return User.from_json(user_json, id)
 
         except Exception as _:
+            logger.exception(_)
             return None
 
 

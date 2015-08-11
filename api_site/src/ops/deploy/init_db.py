@@ -5,7 +5,7 @@ from api import config
 
 
 def init_db():
-    recreate_db()
+    # recreate_db()
     create_schema()
     inject_base_data()
 

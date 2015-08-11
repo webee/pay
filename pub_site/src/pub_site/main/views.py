@@ -5,12 +5,14 @@ from flask.ext.login import login_required, current_user
 from . import main_mod as mod
 from pub_site import pay_client
 from .user import format_account_user
+from ..constant import TradeType
 
 
 @mod.route('/', methods=['GET'])
 @login_required
 def index():
     from pub_site.constant import SOURCE_MESSAGES
+
     uid = current_user.user_id
     balance = pay_client.get_user_balance(uid)
     records, record_info = pay_client.get_user_cash_records(uid)
@@ -48,3 +50,10 @@ def index():
         'record_info': record_info,
     }
     return render_template('main/index.html', res=res, source_messages=SOURCE_MESSAGES)
+
+
+@mod.route('/trade/<int:id>', methods=['GET'])
+@login_required
+def trade_detail(id):
+    trade = {"id": id, "type": TradeType.WITHDRAW}
+    return render_template('main/trade-detail.html', trade=trade)

@@ -1,3 +1,7 @@
+.mainCont .payoffRight h2.first {
+    margin-left: 0;
+}
+
 .line > .txk.city {
     margin-left: 16px;
 }

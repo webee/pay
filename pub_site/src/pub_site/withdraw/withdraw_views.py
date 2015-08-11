@@ -41,25 +41,19 @@ def set_current_channel():
 @mod.route('/withdraw', methods=['GET', 'POST'])
 @login_required
 def withdraw():
-    balance = _get_balance()
     bankcards = PayClient().get_bankcards()['data']
     if len(bankcards) == 0:
         return redirect(url_for('.bind_card'))
     form = WithdrawForm()
-    selected_card = _find_selected_card(bankcards, long(form.bankcard.data))
     if form.validate_on_submit():
         actual_amount = form.amount.data - WITHDRAW_COMMISSION
-        result = PayClient().withdraw(actual_amount, form.bankcard.data, "callback_url")
-        if result['status_code'] != 202:
-            flash(u"提现失败，请核实账户信息！", category="error")
-            return redirect(url_for('.withdraw'))
+        if not _do_withdraw(actual_amount, form.bankcard.data):
+            return _withdraw_failed()
         _charge_for_commission()
         _update_preferred_card(form.bankcard.data)
-        success_message = u"提现 %s元 申请成功！绿野将于3-5个工作日内审核并处理。" % actual_amount
-        flash(success_message, category="success")
-        return redirect(url_for('main.index'))
-    return render_template('withdraw/withdraw.html', balance=balance, bankcards=bankcards,
-                           selected_card=selected_card, form=form)
+        return _withdraw_succeed(actual_amount)
+    return render_template('withdraw/withdraw.html', balance=_get_balance(), bankcards=bankcards, form=form,
+                           selected_card=_find_selected_card(bankcards, long(form.bankcard.data)))
 
 
 @mod.route('/withdraw/bind-card', methods=['GET', 'POST'])
@@ -74,12 +68,6 @@ def bind_card():
         _update_preferred_card(result['data']['id'])
         return redirect(url_for('.withdraw'))
     return render_template('withdraw/bind-card.html', form=form)
-
-
-@mod.route('/withdraw/<transaction_id>/result')
-@login_required
-def show_withdraw_result_page(transaction_id):
-    return render_template('withdraw/show-withdraw-result.html')
 
 
 @mod.route('/withdraw/generate-identifying-code', methods=['POST'])
@@ -140,3 +128,19 @@ def _find_selected_card(bankcards, selected_card_id):
         if card['id'] == selected_card_id:
             return card
     return None
+
+
+def _do_withdraw(amount, card_number):
+    result = PayClient().withdraw(amount, card_number, "callback_url")
+    return result['status_code'] == 202
+
+
+def _withdraw_failed():
+    flash(u"提现失败，请核实账户信息！", category="error")
+    return redirect(url_for('.withdraw'))
+
+
+def _withdraw_succeed(amount):
+    success_message = u"提现 %s元 申请成功！绿野将于3-5个工作日内审核并处理。" % amount
+    flash(success_message, category="success")
+    return redirect(url_for('main.index'))

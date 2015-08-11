@@ -4,7 +4,7 @@ from __future__ import unicode_literals, print_function, division
 from datetime import timedelta
 
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, current_app
 from flask.ext.login import LoginManager
 from tools.filters import register_filters, register_global_functions
 
@@ -24,8 +24,14 @@ def init_errors(app):
     def page_not_found(e):
         return render_template('404.html', error=e), 404
 
+    @app.errorhandler(400)
+    def request_error(e):
+        current_app.error("internal server error.")
+        return render_template('500.html', error=e), 500
+
     @app.errorhandler(500)
     def internal_server_error(e):
+        current_app.error("internal server error.")
         return render_template('500.html', error=e), 500
 
 

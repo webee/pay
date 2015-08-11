@@ -114,7 +114,7 @@ def _charge_for_commission():
 
 
 def _do_bind_card(form):
-    card_number = form.card_number.data
+    card_number = form.card_number.data.replace(" ", "")
     account_name = form.name.data
     province_code = form.province.data
     city_code = form.city.data

@@ -1,4 +1,7 @@
 $(document).ready(function () {
+
+    $("#card_number").bankInput();
+
     var provinceToCitiesMap = {};
 
     function renderCitySelect(cities) {

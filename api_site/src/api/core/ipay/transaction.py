@@ -12,7 +12,7 @@ from .lianlian.pay import pay as _pay
 from .lianlian.pay_to_bankcard import pay_to_bankcard as _pay_to_bankcard, \
     is_successful_withdraw as _is_successful_withdraw, is_failed_withdraw as _is_failed_withdraw
 from .lianlian.query_order import query_order as _query_order
-from .lianlian.refund import refund as _refund
+from .lianlian.refund import refund as _refund, is_successful_refund as _is_successful_refund
 from .lianlian.validation import is_sending_to_me as _is_sending_to_me
 from api import config
 from api.util.uuid import encode_uuid, decode_uuid
@@ -69,6 +69,10 @@ def is_successful_withdraw(withdraw_result):
 
 def is_failed_withdraw(withdraw_result):
     return _is_failed_withdraw(withdraw_result)
+
+
+def is_successful_refund(refund_status):
+    return _is_successful_refund(refund_status)
 
 
 def generate_pay_return_url(id):

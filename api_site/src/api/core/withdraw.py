@@ -6,6 +6,7 @@ from ._dba import find_bankcard_by_id, create_withdraw, transit_withdraw_state, 
     find_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id, find_withdraw_by_id
 from .ipay import transaction
 from .util.lock import require_user_account_lock
+from .util.handling_result import HandledResult
 from api.core import ZytCoreError, ConditionalError
 from api.util.notify import notify_client
 from api.util.parser import to_int
@@ -65,10 +66,12 @@ def get_withdraw_basic_info_by_id(withdraw_id):
 
 
 def handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info=''):
-    if _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
-        _try_to_notify_withdraw_result_client(withdraw_id)
-        return True
-    return False
+    withdraw_result = _process_withdraw_result(withdraw_id, paybill_id, result, failure_info)
+    if not withdraw_result.has_been_handled_by_3rd_party:
+        return False
+
+    _try_to_notify_withdraw_result_client(withdraw_id)
+    return True
 
 
 def list_unfailed_withdraw(account_id):
@@ -108,12 +111,12 @@ def _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
 
     if transaction.is_failed_withdraw(result):
         _fail_withdraw(withdraw_id)
-        return True
+        return HandledResult(True, False)
     elif transaction.is_successful_withdraw(result):
         _succeed_withdraw(withdraw_id)
-        return True
+        return HandledResult(True, True)
 
-    return False
+    return HandledResult(False)
 
 
 @db_transactional

@@ -23,4 +23,7 @@ $(document).ready(function () {
         }
 
     });
+    $('#submit').click(function(){
+        $('#main').showLoading();
+    });
 });

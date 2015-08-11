@@ -62,5 +62,6 @@ $(function () {
     });
     $(".confirm a.close,.finaline button").click(function () {
         $(".bgLayer,.confirm").stop().fadeOut();
+        $("#main").showLoading();
     });
 });

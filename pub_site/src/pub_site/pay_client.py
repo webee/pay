@@ -52,5 +52,5 @@ def get_user_cash_records(uid):
 
     if req.status_code == 200:
         data = req.json()
-        return data['records'], data['record_info']
+        return data['records'], data['record_infos']
     return [], {}

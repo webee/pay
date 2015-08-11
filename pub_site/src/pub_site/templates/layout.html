@@ -7,6 +7,7 @@
 
 {% block css %}
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/showLoading.css') }}" rel="stylesheet">
     {% block inline_css %}
     {% endblock %}
 {% endblock %}
@@ -16,6 +17,7 @@
 <script src="{{ url_for('static',filename='js/html5.js') }}"></script>
 <![endif]-->
 <script src="{{ url_for('static', filename='js/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery/jquery.showLoading.js') }}"></script>
 {% block js %}{% endblock %}
 
 </head>
@@ -51,7 +53,7 @@
     </div>
 </header>
 
-<div class="main">
+<div class="main" id="main">
 	<div class="mainCont clearfix">
     	<div class="contLeft">
         	<h2 class="padding20">自游通</h2>

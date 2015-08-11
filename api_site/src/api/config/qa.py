@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+
+class App:
+    TESTING = False
+
+
 class Host:
     API_GATEWAY = 'http://pay.lvye.com'
 

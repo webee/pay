@@ -43,6 +43,7 @@ def create_app(env):
     env = env or 'dev'
     os.environ['ENV'] = env
     conf.load(config, env=env)
+    app.config.from_object(config.App)
 
     dbe.create_db_engine(config.DataBase.HOST, config.DataBase.PORT, config.DataBase.INSTANCE,
                          config.DataBase.USERNAME, config.DataBase.PASSWORD)

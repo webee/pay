@@ -3,6 +3,10 @@ from __future__ import unicode_literals, print_function, division
 import os
 
 
+class App:
+    TESTING = False
+    DEBUG = False
+
 class DataBase:
     HOST = os.environ['PAY_API_DATABASE_HOST']
     INSTANCE = 'lvye_pay'

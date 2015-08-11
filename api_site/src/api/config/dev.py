@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+
+class App:
+    DEBUG = True
+
+
 class Host:
     API_GATEWAY = 'http://127.0.0.1:5000'
 

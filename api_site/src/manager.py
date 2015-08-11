@@ -22,6 +22,12 @@ def init_db():
     init_db()
 
 
+@manager.command
+def deploy():
+    from ops.deploy.deploy import deploy
+    deploy('prod')
+
+
 def main():
     reload(sys)
     sys.setdefaultencoding('utf-8')

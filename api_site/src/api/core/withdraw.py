@@ -3,8 +3,8 @@ from .balance import get_cash_balance, InsufficientBalanceError
 from ._bookkeeping import bookkeep, Event, SourceType
 from ._dba import find_bankcard_by_id, create_withdraw, transit_withdraw_state, WITHDRAW_STATE, \
     find_withdraw_by_id as _get_withdraw_by_id, update_withdraw_result, list_all_unfailed_withdraw, \
-    find_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id
-from ._notify import try_to_notify_withdraw_result_client
+    find_withdraw_basic_info_by_id as _get_withdraw_basic_info_by_id, find_withdraw_by_id
+from ._notify import notify_client
 from .ipay import transaction
 from .util.lock import require_user_account_lock
 from api.core import ZytCoreError, ConditionalError
@@ -67,7 +67,7 @@ def get_withdraw_basic_info_by_id(withdraw_id):
 
 def handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info=''):
     if _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
-        try_to_notify_withdraw_result_client(withdraw_id)
+        _try_to_notify_withdraw_result_client(withdraw_id)
         return True
     return False
 
@@ -163,3 +163,19 @@ def _generate_withdraw_info(bankcard_id):
 
 def _mask_bankcard_no(bankcard_no):
     return '{0} **** **** {1}'.format(bankcard_no[:4], bankcard_no[-4:])
+
+
+def _try_to_notify_withdraw_result_client(withdraw_id):
+    withdraw_order = find_withdraw_by_id(withdraw_id)
+    url = withdraw_order['async_callback_url']
+    amount = withdraw_order.amount
+    account_id = withdraw_order.account_id
+
+    if withdraw_order.state == WITHDRAW_STATE.SUCCESS:
+        params = {'code': 0, 'account_id': account_id, 'order_id': withdraw_id, 'amount': amount}
+    else:
+        params = {'code': 1, 'msg': 'failed', 'account_id': account_id, 'order_id': withdraw_id, 'amount': amount}
+
+    if not notify_client(url, params):
+        from api.task import tasks
+        tasks.withdraw_notify.delay(url, params)

@@ -68,3 +68,10 @@ class ZiYouTong:
         PAY_NOTIFY_URL = '/core/pay/{uuid}/notify'
         PAY_TO_BANKCARD_NOTIFY_URL = '/core/withdraw/{uuid}/notify'
         REFUND_NOTIFY_URL = '/core/refund/{uuid}/notify'
+
+
+class Celery:
+    HOST = ''
+    USERNAME = 'lvye_pay'
+    PASSWORD = ''
+    INSTANCE = 'lvye_pay_api'

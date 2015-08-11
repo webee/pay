@@ -28,19 +28,8 @@ def get_refund_by_id(refund_id):
     return find_refund_by_id(refund_id)
 
 
-def handle_refund_notification(refund_record, refund_serial_no, status):
-    return _process_refund_result(refund_record, refund_serial_no, status)
-
-
-def _request_refund(refund_id, refunded_on, amount, paybill_id):
-    resp = transaction.refund(refund_id, refunded_on, amount, paybill_id)
-    if 'oid_refundno' in resp:
-        refund_serial_no = resp['oid_refundno']
-        update_refund_result(refund_id, refund_serial_no)
-
-
 @transactional
-def _process_refund_result(refund_record, refund_serial_no, status):
+def handle_refund_notification(refund_record, refund_serial_no, status):
     refund_id = refund_record['id']
     update_refund_result(refund_id, refund_serial_no)
     _logger.warn(
@@ -54,6 +43,13 @@ def _process_refund_result(refund_record, refund_serial_no, status):
     else:
         transit_refund_state(refund_id, REFUND_STATE.CREATED, REFUND_STATE.FAILED)
         return HandledResult(True, False)
+
+
+def _request_refund(refund_id, refunded_on, amount, paybill_id):
+    resp = transaction.refund(refund_id, refunded_on, amount, paybill_id)
+    if 'oid_refundno' in resp:
+        refund_serial_no = resp['oid_refundno']
+        update_refund_result(refund_id, refund_serial_no)
 
 
 def _bookkeep(refund_record):

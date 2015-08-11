@@ -12,3 +12,9 @@ class DataBase:
     INSTANCE = 'lvye_pay'
     USERNAME = 'lvye_pay'
     PASSWORD = os.environ['PAY_API_SITE_DATABASE_PASSWORD']
+
+
+class Celery:
+    HOST = '127.0.0.1:5672'
+    PASSWORD = 'p@55word'
+

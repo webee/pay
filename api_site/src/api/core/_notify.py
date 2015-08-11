@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from ._dba import find_withdraw_by_id, WITHDRAW_STATE
-from api.task import tasks
 from pytoolbox.util.log import get_logger
 
 _logger = get_logger(__name__)
@@ -18,7 +17,8 @@ def try_to_notify_withdraw_result_client(withdraw_id):
         params = {'code': 1, 'msg': 'failed', 'account_id': account_id, 'order_id': withdraw_id, 'amount': amount}
 
     if not _notify_client(url, params):
-        task.withdraw_notify.delay(url, params)
+        from api.task import tasks
+        tasks.withdraw_notify.delay(url, params)
 
 
 def try_to_notify_refund_result_client(refund_id):

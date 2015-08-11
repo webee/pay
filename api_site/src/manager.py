@@ -7,6 +7,7 @@ import sys
 
 from flask.ext.script import Manager, Server
 from api import create_app
+from api.task.app import make_celery
 
 
 manager = Manager(create_app)
@@ -27,6 +28,12 @@ def deploy(environment):
     environment = environment or 'dev'
     from ops.deploy.deploy import deploy
     deploy(environment)
+
+
+@manager.command
+def start_celery():
+    celery = make_celery(manager.app)
+    celery.start(argv=['celery', 'worker', '-l', 'info'])
 
 
 def main():

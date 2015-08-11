@@ -2,16 +2,21 @@
 from __future__ import unicode_literals
 from datetime import timedelta
 
-from .celery import app
-from pytoolbox.util.log import get_logger
+from .app import celery
 
 
-_logger = get_logger(__name__)
+if not celery:
+    raise ValueError("Celery isn't initialized yet")
 
 
-@app.task(ignore_result=True, queue='withdraw_notify', routing_key='withdraw_notify')
+@celery.task(ignore_result=True)
 def withdraw_notify(url, params, count=1):
     _notify_client(withdraw_notify, url, params, count)
+
+
+@celery.task
+def add(x, y):
+    return x + y
 
 
 def _notify_client(task, url, params, count):

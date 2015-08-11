@@ -21,4 +21,5 @@ def user_cash_records(account_id):
     cash_records = [dict(cash_record) for cash_record in cash_records]
     orders_info = {order_id: dict(order) for order_id, order in orders_info.items()}
 
-    return response.ok(count=count, page_no=page_no, page_size=page_size, records=cash_records, record_infos=orders_info)
+    return response.ok(count=count, page_no=page_no, page_size=page_size,
+                       records=cash_records, record_infos=orders_info)

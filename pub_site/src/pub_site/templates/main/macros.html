@@ -1,0 +1,52 @@
+{% macro tx_list(records, record_infos, count, page_no, page_size, page_count) -%}
+    <div class="tabtit margin48 clearfix">
+        <ul>
+            <li id="total_tx" class="cur">全部</li><li id="in_tx">收入</li><li id="out_tx">支出</li><li id="withdraw_tx">提现</li>
+        </ul>
+
+        <div class="search">
+            <input type="text" placeholder="交易单号, 活动id" class="txk" />
+            <button>查找</button>
+        </div>
+
+    </div>
+
+    <div class="tablock margin48 tablockcur">
+        <table width="952" cellspacing="0" cellpadding="0">
+            <tr class="first">
+                <td width="70" height="40">发生时间</td>
+                <td width="100">类型</td>
+                <td width="87">金额(元)</td>
+                <td width="80">状态</td>
+                <td width="270">交易名称</td>
+                <td width="80">操作</td>
+            </tr>
+            {% for record in records %}
+                {% set is_income = record.side == 'CREDIT' %}
+                {% set info = record_infos[record.source_id] %}
+                <tr>
+                    <td width="70" height="60">{{ record.created_on }}</td>
+                    <td>{{ record.type }}</td>
+                    {% if is_income %}
+                        <td class="red">+ {{ "%.2f"|format(record.amount) }}</td>
+                    {% else %}
+                        <td class="green">- {{ "%.2f"|format(record.amount) }}</td>
+                    {% endif %}
+                    <td class="{{ record.state_type }}">{{ record.state }}</td>
+                    <td>{{ record.trade_info }}</td>
+                    <td><a href="#">详情</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id="tx_list_pager" class="page" data-page-no="{{ page_no }}" data-page-count="{{ page_count }}">
+        <p class="suml">共 {{ count }} 条，每页 {{ page_size }} 条, 第 {{ page_no }}/{{ page_count }} 页</p>
+        <p class="pageNum">
+            <a id="tx_list_first" class="long" href="javascript:void(0)" title="">首页</a>
+            <a id="tx_list_prev" class="long" href="javascript:void(0)" title="">上一页</a>
+            <a id="tx_list_next" class="long" href="javascript:void(0)" title="">下一页</a>
+            <a id="tx_list_last" class="long" href="javascript:void(0)" title="">末页</a>
+        </p>
+    </div>
+{%- endmacro %}

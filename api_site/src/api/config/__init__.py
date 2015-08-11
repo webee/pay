@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+class Deploy:
+    HOST_STRING="192.168.0.165"
+    CODE_DIR="/home/lvye_pay/projects/pay2/api_site"
+
 class Host:
     API_GATEWAY = 'http://127.0.0.1:5000'
 

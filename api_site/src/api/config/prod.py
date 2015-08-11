@@ -7,6 +7,7 @@ class App:
     TESTING = False
     DEBUG = False
 
+
 class DataBase:
     HOST = os.environ['PAY_API_SITE_DATABASE_HOST']
     INSTANCE = 'lvye_pay'
@@ -15,6 +16,6 @@ class DataBase:
 
 
 class Celery:
-    HOST = '127.0.0.1:5672'
-    PASSWORD = 'p@55word'
+    HOST = os.environ['PAY_API_SITE_CELERY_HOST']
+    PASSWORD = os.environ['PAY_API_SITE_CELERY_PASSWORD']
 

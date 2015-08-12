@@ -35,7 +35,7 @@ def pay_by_id(payment_id):
         payee_account_id=secured_account_id,
         request_from_ip=req.ip(),
         product_name=pay_record['product_name'],
-        product_desc='担保支付申请：%s' % pay_record['product_name'],
+        product_desc=u'担保支付申请：%s' % pay_record['product_name'],
         traded_on=pay_record['ordered_on'],
         amount=amount
     )

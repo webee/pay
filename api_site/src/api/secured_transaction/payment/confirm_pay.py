@@ -14,7 +14,7 @@ def confirm_payment(pay_record):
     amount = pay_record['amount']
 
     confirm_to_pay_request_id = confirm_to_pay(payment_id, payee_account_id, amount)
-    trade_info = '担保支付确认：[{0}] {1}'.format(pay_record['order_id'], pay_record['product_name'])
+    trade_info = u'担保支付确认：[{0}] {1}'.format(pay_record['order_id'], pay_record['product_name'])
     core.transfer(confirm_to_pay_request_id, trade_info, secured_account_id, payee_account_id, amount)
 
     update_payment_state(payment_id, PAYMENT_STATE.CONFIRMED)

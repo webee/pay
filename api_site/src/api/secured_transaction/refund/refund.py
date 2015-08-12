@@ -18,7 +18,7 @@ def apply_to_refund(pay_record, amount, async_callback_url):
         amount=amount,
         async_callback_url=async_callback_url
     )
-    trade_info = '活动退款：%s' % pay_record['product_name']
+    trade_info = u'活动退款：%s' % pay_record['product_name']
     core_refund(payment_id, amount, trade_info)
 
     mark_payment_as_refunding(payment_id)

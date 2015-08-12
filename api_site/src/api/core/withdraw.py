@@ -160,7 +160,7 @@ def _generate_withdraw_info(bankcard_id):
     bankcard = find_bankcard_by_id(bankcard_id)
     bank_name = bankcard['bank_name']
     secured_card_no = _mask_bankcard_no(bankcard['card_no'])
-    return '提现至 {0}[{1}]'.format(bank_name, secured_card_no)
+    return u'提现至 {0}[{1}]'.format(bank_name, secured_card_no)
 
 
 def _mask_bankcard_no(bankcard_no):

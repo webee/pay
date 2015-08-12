@@ -21,7 +21,7 @@ class Order(object):
         self.name = name
         self.desc = desc
         self.created_on = created_on
-        self.category = '虚拟商品'
+        self.category = u'虚拟商品'
 
 
 @transactional

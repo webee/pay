@@ -74,7 +74,7 @@ def pay_by_id(payment_id):
 
 
 def update_payment_to_be_success(pay_record_id):
-    update_payment_state(pay_record_id, PAYMENT_STATE.SECURED)
+    update_payment_state(pay_record_id, PAYMENT_STATE.SUCCESS)
 
 
 def get_sync_callback_url_of_payment(pay_record_id):

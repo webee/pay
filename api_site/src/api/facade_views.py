@@ -6,6 +6,7 @@ from api.account import get_account_by_user_info, get_account_by_id, find_or_cre
 from api.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
     ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance, \
     transfer as core_transfer, list_cash_transaction_logs
+from api.charged_withdraw import apply_to_charged_withdraw
 from api import delegate
 from api.util import response
 from api.util.parser import to_bool
@@ -103,6 +104,21 @@ def withdraw(account_id):
         return response.accepted(order_id)
     except ZytCoreError, e:
         return response.bad_request(e.message)
+
+
+@mod.route('/accounts/<int:account_id>/charged-withdraw', methods=['POST'])
+def withdraw(account_id):
+    data = request.values
+    bankcard_id = data['bankcard_id']
+    amount = Decimal(data['amount'])
+    charged_fee = Decimal(data['fee'])
+    callback_url = data.get('callback_url', '')
+
+    if charged_fee >= amount:
+        response.bad_request('Charged fee of withdraw should be less than total amount', amount=amount, fee=charged_fee)
+
+    charged_withdraw_id = apply_to_charged_withdraw(account_id, bankcard_id, amount, charged_fee, callback_url)
+    return response.accepted(charged_withdraw_id)
 
 
 @mod.route('/accounts/<int:account_id>/withdraw', methods=['GET'])

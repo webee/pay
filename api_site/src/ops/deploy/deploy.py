@@ -24,7 +24,12 @@ def deploy(env):
     with fab.cd(code_dir), fab.prefix('source api_venv/bin/activate'):
         fab.run('git pull --ff-only origin master')
         stop_python_server('pay_api_site')
+        do_migration()
         start_python_server('pay_api_site')
+
+
+def do_migration():
+    fab.run('python src/manager.py migrate')
 
 
 def stop_python_server(name):

@@ -17,7 +17,6 @@ def recreate_db():
 
 def create_schema():
     info('creating schema ...')
-    exec_sql_script('migration/schema_zyt.ddl')
     exec_sql_script('migration/schema_zyt_account.ddl')
     exec_sql_script('migration/schema_zyt_core.ddl')
     exec_sql_script('migration/schema_zyt_secured_transaction.ddl')

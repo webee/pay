@@ -10,7 +10,7 @@ from .util.handling_result import HandledResult
 from api.core import ZytCoreError, ConditionalError
 from api.util.notify import notify_client
 from api.util.parser import to_int
-from pytoolbox.util.dbe import db_transactional
+from pytoolbox.util.dbe import db_transactional, transactional
 from pytoolbox.util.log import get_logger
 
 
@@ -65,13 +65,19 @@ def get_withdraw_basic_info_by_id(withdraw_id):
     return _get_withdraw_basic_info_by_id(withdraw_id)
 
 
+@transactional
 def handle_withdraw_notification(withdraw_id, paybill_id, result, failure_info=''):
-    withdraw_result = _process_withdraw_result(withdraw_id, paybill_id, result, failure_info)
-    if not withdraw_result.has_been_handled_by_3rd_party:
-        return False
+    update_withdraw_result(withdraw_id, paybill_id, result, failure_info)
+    _logger.warn("Withdraw notify result: [{0}], id=[{1}]".format(result, withdraw_id))
 
-    _try_to_notify_withdraw_result_client(withdraw_id)
-    return True
+    if transaction.is_failed_withdraw(result):
+        _fail_withdraw(withdraw_id)
+        return HandledResult(True, False)
+    elif transaction.is_successful_withdraw(result):
+        _succeed_withdraw(withdraw_id)
+        return HandledResult(True, True)
+
+    return HandledResult(False)
 
 
 def list_unfailed_withdraw(account_id):
@@ -102,21 +108,6 @@ def _request_withdraw(withdraw_id, amount, bankcard, notify_url):
     except Exception, e:
         _fail_withdraw(withdraw_id)
         raise WithdrawRequestFailedError(withdraw_id, e.message)
-
-
-@db_transactional
-def _process_withdraw_result(withdraw_id, paybill_id, result, failure_info):
-    update_withdraw_result(withdraw_id, paybill_id, result, failure_info)
-    _logger.warn("Withdraw notify result: [{0}], id=[{1}]".format(result, withdraw_id))
-
-    if transaction.is_failed_withdraw(result):
-        _fail_withdraw(withdraw_id)
-        return HandledResult(True, False)
-    elif transaction.is_successful_withdraw(result):
-        _succeed_withdraw(withdraw_id)
-        return HandledResult(True, True)
-
-    return HandledResult(False)
 
 
 @db_transactional
@@ -167,8 +158,8 @@ def _mask_bankcard_no(bankcard_no):
     return '{0} **** **** {1}'.format(bankcard_no[:4], bankcard_no[-4:])
 
 
-def _try_to_notify_withdraw_result_client(withdraw_id):
-    withdraw_order = find_withdraw_by_id(withdraw_id)
+def try_to_notify_withdraw_result_client(withdraw_order):
+    withdraw_id = withdraw_order['id']
     url = withdraw_order['async_callback_url']
     amount = withdraw_order.amount
     account_id = withdraw_order.account_id

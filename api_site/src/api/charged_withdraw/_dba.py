@@ -5,9 +5,8 @@ from .util.oid import charged_withdraw_id
 from pytoolbox.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
-
 CHARGED_WITHDRAW_STATE = enum(CREATED='CREATED', CHARGED_FEE='CHARGED_FEE', SUCCESS='SUCCESS',
-                               REFUNDED_FEE='REFUNDED_FEE')
+                              REFUNDED_FEE='REFUNDED_FEE')
 
 
 @db_context

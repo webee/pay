@@ -3,7 +3,7 @@
     $.fn.bankInput = function (options) {
         var defaults = {
             min: 10, // 最少输入字数
-            max: 25, // 最多输入字数
+            max: 23, // 最多输入字数
             deimiter: ' ', // 账号分隔符
             onlyNumber: true, // 只能输入数字
             copy: true // 允许复制

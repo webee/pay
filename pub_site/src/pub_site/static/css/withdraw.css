@@ -1,5 +1,9 @@
 .mainCont .payoffRight h2.first {
-    margin-left: 0;
+    margin-left: 48px;
+}
+
+.mainCont .payoffRight h2.withdraw {
+    margin-left: 10px;
 }
 
 .line > .txk.city {

@@ -16,29 +16,30 @@ $(function () {
     }
 
     var amountPattern = /^\d+(.\d{1,2})?$/ig;
+
     function validate() {
         var errors = {};
         var amount = $('#amount').val();
-        if(!amount || !amount.match(amountPattern) || amount<=0) {
+        if (!amount || !amount.match(amountPattern) || amount <= 0) {
             errors['amount'] = '请输入合法金额';
         }
         var comment = $('#comment').val();
-        if(!comment) {
+        if (!comment) {
             errors['comment'] = '请提供备注信息';
         }
-        if(comment.length > 140) {
+        if (comment.length > 140) {
             errors['comment'] = '备注不能超过140个字';
         }
         return errors;
     }
 
     function showErrorMessages(errors) {
-        if(!!errors['amount']) {
+        if (!!errors['amount']) {
             $('#amount').addClass('orangetxk');
             var error = $('<em class="mistake"></em>').text(errors['amount']);
             $('#amount').parent().append(error);
         }
-        if(!!errors['comment']) {
+        if (!!errors['comment']) {
             $('#comment').addClass('orangetxk');
             var error = $('<em class="mistake"></em>').text(errors['comment']);
             $('#comment').parent().append(error);
@@ -56,14 +57,17 @@ $(function () {
     $(".payoffRight .line .tijiaoLayer").click(function () {
         clearErrors();
         var errors = validate();
-        if(!$.isEmptyObject(errors)) {
+        if (!$.isEmptyObject(errors)) {
             showErrorMessages(errors);
             return;
         }
         updateConfirmInfomation();
         $(".bgLayer,.confirm").stop().fadeIn();
     });
-    $(".confirm a.close,.finaline button").click(function () {
+    $(".confirm a.close").click(function () {
+        $(".bgLayer,.confirm").stop().fadeOut();
+    });
+    $(".finaline button").click(function () {
         $(".bgLayer,.confirm").stop().fadeOut();
         $("#main").showLoading();
     });

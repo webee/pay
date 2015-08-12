@@ -52,7 +52,7 @@ footer{background:#333;height:60px;}
 /*提现申请成功页*/
 .main{min-height:860px;overflow-y:auto;}
 .mainCont{width:1170px;overflow:hidden;margin:0 auto;max-width:1200px;}
-.contLeft a {color: inherit;}
+.contLeft a {color: inherit; display: block;}
 .mainCont .contLeft,.mainCont .contRight{float:left;color:#595757;}
 .mainCont .contLeft{width:170px;background:#fafafa;padding-bottom:274px;}
 .mainCont .contRight{width:1000px;background:#fff;text-align:center;padding:106px 0 82px;}
@@ -110,7 +110,7 @@ footer{background:#333;height:60px;}
 .firstRight .line .orangetxk{border:1px solid #f97700;}/*填写错误*/
 .firstRight .line em.warn{margin-left:30px;}.firstRight .line em.mistake{display:block;color:#f97700;margin:6px 0 0 145px;background:url(../images/warn_bg.png) no-repeat left center;padding-left:20px;}/*填写错误*/
 .firstRight .line .small{width:110px;}
-.firstRight .line .hqyzm{display:inline-block;width:109px;height:38px;border:1px solid #dcdcdc;background:#fafafa;line-height:36px;text-align:center;font-size:14px;border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;position: relative;top: -2px;margin-left:16px;color:#595757;}
+.firstRight .line .hqyzm{display:inline-block;width:109px;height:38px;border:1px solid #dcdcdc;background:#fafafa;line-height:36px;text-align:center;font-size:14px;border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;position: relative;top: -2px;margin-left:16px;color:#595757;cursor: pointer;}
 .firstRight .line .tijiao{margin-left:145px;}
 
 

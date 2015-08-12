@@ -71,7 +71,7 @@ def _pay(order):
     if order["pay_type"] == PayType.BY_BANKCARD:
         result = PayClient().pay_to_lvye(order["amount"], order_id=order["id"], order_name=order["name"],
                                          order_description=order["description"], create_on=order["created_on"],
-                                         callback_url=url_for('.pay_succeed', _external=True))
+                                         callback_url=url_for('pay.pay_succeed', _external=True))
         _logger.info("pay result: %s" % result['data']['pay_url'])
         succeed_handler = lambda: redirect(result['data']['pay_url'])
         return _handle_result(result, succeed_handler)

@@ -8,6 +8,7 @@ from flask import Flask, render_template, current_app
 from flask.ext.login import LoginManager
 from tools.filters import register_filters, register_global_functions
 from pytoolbox.util import dbe
+from tools import log
 
 
 def init_template(app):
@@ -57,7 +58,10 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message = None
 
 
-def create_app(env):
+def create_app(env, deploy):
+    if deploy:
+        return Flask(__name__)
+
     from pytoolbox.conf import config as conf
     from pub_site import config
 

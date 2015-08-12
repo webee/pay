@@ -4,12 +4,12 @@ from __future__ import unicode_literals, print_function
 import sys
 
 from flask.ext.script import Manager, Server, Shell
-from pub_site import create_app, config
-from pytoolbox.util import dbe
+from pub_site import create_app
 
 
 manager = Manager(create_app)
-manager.add_option('-e', '--env', dest='env', required=False)
+manager.add_option('-e', '--env', dest='env', required=False, default='dev')
+manager.add_option('-d', '--deploy', action='store_true', dest='deploy', required=False, default=False)
 
 
 def make_shell_context():

@@ -3,11 +3,6 @@ import os
 from pytoolbox import conf
 
 
-class Deploy:
-    HOST_STRING = "lvye_pay@192.168.0.165"
-    CODE_DIR = "/home/lvye_pay/projects/pay2/pub_site"
-
-
 class App:
     ADMINS = ['liufan@lvye.com', 'yiwang@lvye.com', 'mengyu@lvye.com', 'zhoushiwei@lvye.com']
     SECRET_KEY = os.environ.get('SECRET_KEY') or '.yek eyvl'

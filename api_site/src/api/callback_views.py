@@ -9,12 +9,16 @@ from api.core.withdraw import get_withdraw_by_id, handle_withdraw_notification, 
 from api.core.ipay.transaction import parse_and_verify, notification, is_sending_to_me, is_valid_transaction
 from api.charged_withdraw.callback_interface import notify_result_to_charged_withdraw
 from api.util import response
+import os
 from pytoolbox.util.enum import enum
+from pytoolbox.util.log import get_logger
 
 callback_mod = Blueprint('core_callback_response', __name__)
 mod = callback_mod
 
 PayResult = enum(Success=0, Failure=1, IsInvalidRequest=2)
+
+_logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 
 
 @mod.route('/pay/heart-beat')
@@ -120,6 +124,8 @@ def _notify_payment_result(uuid, data):
         return PayResult.Failure
 
     pay_record = succeed_payment(order_no, paybill_oid)
+
+    _logger.info('****PAY RECORD: id={0}, trade_id={1}'.format(pay_record['id'], pay_record['trade_id']))
     delegate.paid(pay_record['trade_id'])
     return PayResult.Success
 

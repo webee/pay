@@ -11,8 +11,8 @@ from api.charged_withdraw.callback_interface import notify_result_to_charged_wit
 from api.util import response
 from pytoolbox.util.enum import enum
 
-core_mod = Blueprint('core_callback_response', __name__)
-mod = core_mod
+callback_mod = Blueprint('core_callback_response', __name__)
+mod = callback_mod
 
 PayResult = enum(Success=0, Failure=1, IsInvalidRequest=2)
 

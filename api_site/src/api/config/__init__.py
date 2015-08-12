@@ -77,10 +77,10 @@ class ZiYouTong:
 
     class CallbackInterface:
         PAY_URL = '/pay/{uuid}'
-        PAY_RETURN_URL = '/core/pay/{uuid}/result'
-        PAY_NOTIFY_URL = '/core/pay/{uuid}/notify'
-        PAY_TO_BANKCARD_NOTIFY_URL = '/core/withdraw/{uuid}/notify'
-        REFUND_NOTIFY_URL = '/core/refund/{uuid}/notify'
+        PAY_RETURN_URL = '/callback/pay/{uuid}/result'
+        PAY_NOTIFY_URL = '/callback/pay/{uuid}/notify'
+        PAY_TO_BANKCARD_NOTIFY_URL = '/callback/withdraw/{uuid}/notify'
+        REFUND_NOTIFY_URL = '/callback/refund/{uuid}/notify'
 
 
 class Celery:

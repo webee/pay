@@ -11,14 +11,14 @@ from pytoolbox.util import dbe
 
 def register_mods(app):
     from api.facade_views import mod
-    from api.core_views import core_mod
+    from api.callback_views import callback_mod
     from api.secured_transaction_views import secured_mod
     from api.direct_transaction_views import direct_mod
 
     app.register_blueprint(mod)
     app.register_blueprint(secured_mod, url_prefix='/secured')
     app.register_blueprint(direct_mod, url_prefix='/direct')
-    app.register_blueprint(core_mod, url_prefix='/core')
+    app.register_blueprint(callback_mod, url_prefix='/callback')
 
 
 def register_callbacks():

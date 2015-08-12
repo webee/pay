@@ -18,6 +18,9 @@ def deploy(env):
     fab.use_ssh_config = True
     fab.env.host_string = cfg.Deploy.HOST_STRING
     code_dir = cfg.Deploy.CODE_DIR
+    toolbox_dir = "{}/../libraries/pytoolbox".format(code_dir)
+    with fab.cd(toolbox_dir):
+        fab.run('git pull --ff-only origin master')
     with fab.cd(code_dir), fab.prefix('source pub_venv/bin/activate'):
         fab.run('git pull --ff-only origin master')
         stop_python_server('pay_pub_site')

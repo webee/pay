@@ -10,9 +10,6 @@ from .forms import BindCardForm, WithdrawForm
 from identifying_code_manager import generate_and_send_identifying_code
 from pay_client import PayClient
 from flask import flash
-from datetime import datetime
-from ..constant import PayType
-
 
 logger = get_logger(__name__)
 

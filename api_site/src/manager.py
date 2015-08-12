@@ -19,6 +19,11 @@ manager.add_command("runserver", server)
 
 
 @manager.command
+def migrate():
+    from ops.deploy.migration import do_migration
+    do_migration()
+
+@manager.command
 def init_db():
     from ops.deploy.init_db import init_db
     init_db()

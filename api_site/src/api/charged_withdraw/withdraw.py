@@ -9,7 +9,7 @@ def charged_withdraw(account_id, bankcard_id, amount, charged_fee, callback_url)
     charged_withdraw_id = create_charged_withdraw(account_id, bankcard_id, actual_withdraw_amount, charged_fee,
                                                   callback_url)
 
-    if apply_to_withdraw(charged_withdraw_id, account_id, bankcard_id, actual_withdraw_amount, callback_url):
+    if apply_to_withdraw(charged_withdraw_id, account_id, bankcard_id, actual_withdraw_amount, ''):
         _charge_fee(charged_withdraw_id, account_id, charged_fee)
 
     return charged_withdraw_id

@@ -8,6 +8,10 @@ from pub_site.pay.forms import PayForm
 from pub_site.withdraw.pay_client import PayClient
 from pytoolbox.util.dbe import from_db
 from datetime import datetime
+from pytoolbox.util.log import get_logger
+import os
+
+_logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 
 
 @mod.before_request
@@ -67,5 +71,6 @@ def _pay(order):
         result = PayClient().pay_to_lvye(order["amount"], order_id=order["id"], order_name=order["name"],
                                          order_description=order["description"], create_on=order["created_on"],
                                          callback_url=url_for('.pay_succeed'))
+        _logger.info("pay result: %s" % result['data']['pay_url'])
         succeed_handler = lambda: redirect(result['data']['pay_url'])
         return _handle_result(result, succeed_handler)

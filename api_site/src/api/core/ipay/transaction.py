@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from functools import wraps
-from urlparse import urljoin
 
 from flask import request
 from .error import *
@@ -76,7 +75,7 @@ def is_successful_refund(refund_status):
 
 
 def generate_pay_return_url(id):
-    return _generate_notification_url(config.ZiYouTong.CallbackInterface.PAY_URL, id)
+    return _generate_notification_url(config.ZiYouTong.CallbackInterface.PAY_RETURN_URL, id)
 
 
 def generate_pay_notification_url(id):
@@ -96,4 +95,4 @@ def _generate_notification_url(relative_url, id, **kwargs):
     params.update(kwargs)
     relative_url = relative_url.format(**params)
     root_url = config.Host.API_GATEWAY
-    return urljoin(root_url, relative_url)
+    return root_url + relative_url

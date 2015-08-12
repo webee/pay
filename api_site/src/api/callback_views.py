@@ -125,7 +125,6 @@ def _notify_payment_result(uuid, data):
 
     pay_record = succeed_payment(order_no, paybill_oid)
 
-    _logger.info('****PAY RECORD: id={0}, trade_id={1}'.format(pay_record['id'], pay_record['trade_id']))
     delegate.paid(pay_record['trade_id'])
     return PayResult.Success
 

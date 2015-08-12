@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from urlparse import urljoin
 from datetime import datetime
 
 from ._dba import find_payment_by_order_no, create_payment, find_payment_by_id, update_payment_state, PAYMENT_STATE
@@ -91,7 +90,7 @@ def _generate_notification_url(relative_url, id, **kwargs):
     params = {'uuid': encode_uuid(id)}
     params.update(kwargs)
     relative_url = relative_url.format(**params)
-    return urljoin(config.Host.API_GATEWAY, relative_url)
+    return config.Host.API_GATEWAY + relative_url
 
 
 def _new_payment(amount, client_callback_url, client_async_callback_url,

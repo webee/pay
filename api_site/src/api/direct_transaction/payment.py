@@ -13,10 +13,6 @@ from api.util.uuid import encode_uuid
 from pytoolbox.util.dbe import transactional
 
 
-_API_GATEWAY = config.Host.API_GATEWAY
-_ZYT_PAY_URL = config.ZiYouTong.CallbackInterface.PAY_URL
-
-
 class Order(object):
     def __init__(self, no, name, desc, created_on):
         self.no = no
@@ -88,14 +84,14 @@ def get_sync_callback_url_of_payment(pay_record_id):
 
 
 def generate_pay_url(_id):
-    return _generate_notification_url(_ZYT_PAY_URL, _id)
+    return _generate_notification_url(config.ZiYouTong.CallbackInterface.PAY_URL, _id)
 
 
 def _generate_notification_url(relative_url, id, **kwargs):
     params = {'uuid': encode_uuid(id)}
     params.update(kwargs)
     relative_url = relative_url.format(**params)
-    return urljoin(_API_GATEWAY, relative_url)
+    return urljoin(config.Host.API_GATEWAY, relative_url)
 
 
 def _new_payment(amount, client_callback_url, client_async_callback_url,

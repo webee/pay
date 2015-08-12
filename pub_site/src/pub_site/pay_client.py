@@ -4,14 +4,20 @@ import requests
 from pub_site import config
 from decimal import Decimal
 from tools.urls import build_url
+from pytoolbox.util.log import get_logger
+
 
 
 _uid_accounts = {}
 _id_accounts = {}
 
+_logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
+
 
 def _generate_api_url(url, **kwargs):
-    return os.path.join(config.PayAPI.ROOT_URL, url.format(**kwargs))
+    url = os.path.join(config.PayAPI.ROOT_URL, url.format(**kwargs))
+    _logger.info("request url %s" % url)
+    return url
 
 
 def get_account_id(uid):

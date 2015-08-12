@@ -1,6 +1,10 @@
 from pub_site import config
 from flask.ext.login import current_user
 import requests, json, functools
+from pytoolbox.util.log import get_logger
+import os
+
+_logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 
 pay_server = config.PayAPI.ROOT_URL
 lvye_user_id = config.PayAPI.LVYE_USER_ID
@@ -97,6 +101,7 @@ class PayClient:
         if uid in PayClient.accounts:
             return PayClient.accounts[uid]
         url = '%s/user_domains/%s/users/%s/account' % (self.server, self.user_domain_id, uid)
+        _logger.info("get account url: %s" % url)
         resp = requests.get(url)
         if resp.status_code != 200:
             return {"account_id": 0}

@@ -2,10 +2,6 @@
 import _dba as dba
 
 
-def get_account_by_user_info(user_domain_id, user_id):
-    return dba.find_account_by_user_info(user_domain_id, user_id)
-
-
 def get_account_by_id(account_id):
     return dba.find_account_by_id(account_id)
 

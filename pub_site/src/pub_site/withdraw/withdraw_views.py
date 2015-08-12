@@ -46,11 +46,11 @@ def withdraw():
         return redirect(url_for('.bind_card'))
     form = WithdrawForm()
     if form.validate_on_submit():
-        actual_amount = form.amount.data - WITHDRAW_COMMISSION
-        if not _do_withdraw(actual_amount, form.bankcard.data):
+        if not _do_withdraw(form.amount.data, WITHDRAW_COMMISSION, form.bankcard.data):
             return _withdraw_failed()
-        _charge_for_commission()
         _update_preferred_card(form.bankcard.data)
+
+        actual_amount = form.amount.data - WITHDRAW_COMMISSION
         return _withdraw_succeed(actual_amount)
     return render_template('withdraw/withdraw.html', balance=_get_balance(), bankcards=bankcards, form=form,
                            selected_card=_find_selected_card(bankcards, long(form.bankcard.data)))
@@ -95,18 +95,6 @@ def _update_preferred_card(card_id):
                    card_id=card_id, user_id=current_user_id)
 
 
-def _charge_for_commission():
-    order = {
-        "user_id": current_user.user_id,
-        "name": u"提现手续费",
-        "pay_type": PayType.BY_BALANCE,
-        "description": u"提现手续费",
-        "amount": WITHDRAW_COMMISSION,
-        "created_on": datetime.now().isoformat()
-    }
-    order_id = from_db().insert('zyt_order', order, returns_id=True)
-    PayClient().transfer_to_lvye(WITHDRAW_COMMISSION, order_id, order["description"])
-
 
 def _do_bind_card(form):
     card_number = form.card_number.data.replace(" ", "")
@@ -130,8 +118,8 @@ def _find_selected_card(bankcards, selected_card_id):
     return None
 
 
-def _do_withdraw(amount, card_number):
-    result = PayClient().withdraw(amount, card_number, "callback_url")
+def _do_withdraw(amount, fee, card_number):
+    result = PayClient().withdraw(amount, fee, card_number)
     return result['status_code'] == 202
 
 

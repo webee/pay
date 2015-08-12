@@ -58,13 +58,14 @@ class PayClient:
         return requests.get(url)
 
     @handle_response
-    def withdraw(self, amount, bankcard_id, callback_url):
+    def withdraw(self, amount, fee, bankcard_id, callback_url=''):
         uid = current_user.user_id
         account_id = self._get_account(uid)['account_id']
-        url = '%s/accounts/%s/withdraw' % (self.server, account_id)
+        url = '%s/accounts/%s/charged-withdraw' % (self.server, account_id)
         data = {
             'bankcard_id': bankcard_id,
             'amount': amount,
+            'fee': fee,
             'callback_url': callback_url
         }
         return requests.post(url, data=data)

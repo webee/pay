@@ -2,9 +2,9 @@
 from decimal import Decimal
 
 from flask import Blueprint, request, redirect, Response
-from api.account import get_account_by_user_info, get_account_by_id, find_or_create_account
+from api.account import get_account_by_id, find_or_create_account
 from api.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
-    ZytCoreError, apply_to_withdraw, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance, \
+    ZytCoreError, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance, \
     transfer as core_transfer, list_cash_transaction_logs
 from api.charged_withdraw import apply_to_charged_withdraw
 from api import delegate
@@ -19,6 +19,7 @@ mod = Blueprint('common_transaction', __name__)
 def index():
     return redirect('http://huodong.lvye.com')
 
+
 @mod.route('/pay/<uuid>', methods=['GET'])
 def pay(uuid):
     try:
@@ -31,12 +32,7 @@ def pay(uuid):
 
 @mod.route('/user_domains/<int:user_domain_id>/users/<user_id>/account', methods=['GET'])
 def get_account_id(user_domain_id, user_id):
-    account = get_account_by_user_info(user_domain_id, user_id)
-    if account:
-        account_id = account['id']
-    else:
-        account_id = find_or_create_account(user_domain_id, user_id)
-
+    account_id = find_or_create_account(user_domain_id, user_id)
     return response.ok(account_id=account_id)
 
 

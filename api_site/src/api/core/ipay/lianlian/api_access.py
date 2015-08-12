@@ -62,5 +62,4 @@ def _parse_response_data(raw_data):
 
 
 def _should_validate_signature():
-    validate_signature = config.ZiYouTong.VALIDATE_SIGNATURE
-    return validate_signature is not None and validate_signature.upper() == 'TRUE'
+    return config.ZiYouTong.VALIDATE_SIGNATURE

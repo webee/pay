@@ -34,7 +34,10 @@ def register_callbacks():
     delegate.bind_secured_handler(event.REFUNDED, secured_delegate.after_refunded)
 
 
-def create_app(env):
+def create_app(env, deploy):
+    if deploy:
+        return Flask(__name__)
+
     app = Flask(__name__)
 
     from api import config

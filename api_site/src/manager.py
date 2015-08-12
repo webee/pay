@@ -11,7 +11,8 @@ from api.task.app import make_celery
 
 
 manager = Manager(create_app)
-manager.add_option('-e', '--env', dest='env', required=False)
+manager.add_option('-e', '--env', dest='env', required=False, default='dev')
+manager.add_option('-d', '--deploy', action='store_true', dest='deploy', required=False, default=False)
 
 server = Server(host="0.0.0.0", port=5000)
 manager.add_command("runserver", server)

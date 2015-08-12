@@ -9,6 +9,9 @@ class App:
     DEBUG = False
 
 
+class Host:
+    API_GATEWAY = 'http://pay.lvye.com/api'
+
 class DataBase:
     HOST = os.environ['PAY_API_SITE_DATABASE_HOST']
     INSTANCE = 'lvye_pay'

@@ -18,7 +18,7 @@ class DataBase:
 
 
 class PayAPI:
-    ROOT_URL = "http://pay.lvye.com/api"
+    ROOT_URL = os.environ['PAY_API_SITE']
 
 
 class Services:

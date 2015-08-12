@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import base64
 from hashlib import md5
-from . import public_key
+from pytoolbox.util import public_key
 from api import config
 
 

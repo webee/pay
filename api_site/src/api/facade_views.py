@@ -100,7 +100,7 @@ def withdraw(account_id):
     amount = Decimal(data['amount'])
 
     try:
-        order_id = apply_to_withdraw(account_id, bankcard_id, amount, callback_url)
+        order_id = apply_to_withdraw('', account_id, bankcard_id, amount, callback_url)
         return response.accepted(order_id)
     except ZytCoreError, e:
         return response.bad_request(e.message)

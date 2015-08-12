@@ -42,7 +42,7 @@ class WithdrawRequestFailedError(ZytCoreError):
         self.withdraw_id = withdraw_id
 
 
-def apply_to_withdraw(account_id, bankcard_id, amount, callback_url):
+def apply_to_withdraw(trade_id, account_id, bankcard_id, amount, callback_url):
     bankcard = find_bankcard_by_id(to_int(bankcard_id))
     if bankcard is None:
         raise BankcardNotFoundError(bankcard_id)
@@ -50,7 +50,7 @@ def apply_to_withdraw(account_id, bankcard_id, amount, callback_url):
     if amount <= 0:
         raise NegativeAmountError(amount)
 
-    withdraw_id = _create_withdraw(account_id, bankcard.id, amount, callback_url)
+    withdraw_id = _create_withdraw(trade_id, account_id, bankcard.id, amount, callback_url)
     notify_url = transaction.generate_withdraw_notification_url(account_id, withdraw_id)
     _request_withdraw(withdraw_id, amount, bankcard, notify_url)
 
@@ -79,18 +79,18 @@ def list_unfailed_withdraw(account_id):
     return [dict(record) for record in records]
 
 
-def _create_withdraw(account_id, bankcard_id, amount, callback_url):
+def _create_withdraw(trade_id, account_id, bankcard_id, amount, callback_url):
     with require_user_account_lock(account_id, 'cash'):
         balance = get_cash_balance(account_id)
         if amount > balance:
             raise InsufficientBalanceError()
 
-        return _create_withdraw_to_be_frozen(account_id, bankcard_id, amount, callback_url)
+        return _create_withdraw_to_be_frozen(trade_id, account_id, bankcard_id, amount, callback_url)
 
 
 @db_transactional
-def _create_withdraw_to_be_frozen(db, account_id, bankcard_id, amount, callback_url):
-    withdraw_id = create_withdraw(db, account_id, bankcard_id, amount, callback_url)
+def _create_withdraw_to_be_frozen(db, trade_id, account_id, bankcard_id, amount, callback_url):
+    withdraw_id = create_withdraw(db, trade_id, account_id, bankcard_id, amount, callback_url)
     _freeze_withdraw(db, withdraw_id, account_id, amount, bankcard_id)
     return withdraw_id
 

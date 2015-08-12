@@ -168,10 +168,11 @@ def find_bankcard_by_id(db, bankcard_id):
 
 
 @db_context
-def create_withdraw(db, account_id, bankcard_id, amount, callback_url):
+def create_withdraw(db, trade_id, account_id, bankcard_id, amount, callback_url):
     _id = withdraw_id(account_id)
     fields = {
         'id': _id,
+        'trade_id': trade_id,
         'account_id': account_id,
         'bankcard_id': bankcard_id,
         'amount': amount,

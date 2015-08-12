@@ -39,9 +39,9 @@ def add_bankcard(account_id, card_no, account_name, is_corporate_account, provin
                          branch_bank_name)
 
 
-def apply_to_withdraw(account_id, bankcard_id, amount, callback_url):
+def apply_to_withdraw(trade_id, account_id, bankcard_id, amount, callback_url):
     from .withdraw import apply_to_withdraw as _apply_to_withdraw
-    return _apply_to_withdraw(account_id, bankcard_id, amount, callback_url)
+    return _apply_to_withdraw(trade_id, account_id, bankcard_id, amount, callback_url)
 
 
 def list_unfailed_withdraw(account_id):

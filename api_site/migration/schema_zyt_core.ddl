@@ -42,7 +42,7 @@ CREATE TABLE prepaid(
 
 CREATE TABLE transfer(
   id CHAR(30) PRIMARY KEY, -- prefix with 'TFR'
-  trade_id CHAR(30) NOT NULL,
+  trade_id VARCHAR(30) NOT NULL,
   payer_account_id INT NOT NULL,
   payee_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
@@ -53,6 +53,7 @@ CREATE TABLE transfer(
 
 CREATE TABLE withdraw(
   id CHAR(30) PRIMARY KEY, -- prefix with 'WDR'
+  trade_id VARCHAR(30),
   account_id INT UNSIGNED NOT NULL COMMENT '提现账号',
   bankcard_id INT UNSIGNED NOT NULL COMMENT '提现到银行号id',
   amount DECIMAL(12, 2) NOT NULL,

@@ -36,3 +36,8 @@ def update_withdraw_state(db, _id, state):
               WHERE id = %(id)s
         """,
         id=_id, new_state=state)
+
+
+@db_context
+def find_charged_withdraw_by_id(db, _id):
+    return db.get("SELECT * FROM charged_withdraw WHERE id = %(id)s", id=_id)

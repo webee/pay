@@ -7,6 +7,7 @@ from api.core.postpay import *
 from api.core.refund import get_refund_by_id, handle_refund_notification
 from api.core.withdraw import get_withdraw_by_id, handle_withdraw_notification, try_to_notify_withdraw_result_client
 from api.core.ipay.transaction import parse_and_verify, notification, is_sending_to_me, is_valid_transaction
+from api.charged_withdraw.callback_interface import notify_result_to_charged_withdraw
 from api.util import response
 from pytoolbox.util.enum import enum
 
@@ -74,7 +75,7 @@ def notify_withdraw(uuid):
     if withdraw_order['async_callback_url']:
         try_to_notify_withdraw_result_client(withdraw_order)
     elif withdraw_order['trade_id']:
-        pass
+        notify_result_to_charged_withdraw(withdraw_order['trade_id'], withdraw_result.is_successful)
 
     return notification.accepted()
 

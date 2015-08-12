@@ -7,7 +7,6 @@
                 <td width="87">金额(元)</td>
                 <td width="80">状态</td>
                 <td width="270">交易名称</td>
-                <td width="80">操作</td>
             </tr>
             {% for record in records %}
                 {% set is_income = record.side == 'CREDIT' %}
@@ -22,7 +21,6 @@
                     {% endif %}
                     <td>{{ record.state }}</td>
                     <td>{{ record.trade_info }}</td>
-                    <td><a href="#">详情</a></td>
                 </tr>
             {% endfor %}
         </table>

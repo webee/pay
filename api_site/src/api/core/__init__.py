@@ -66,4 +66,4 @@ def get_cash_balance(account_id):
 
 def list_cash_transaction_logs(account_id, q, side, tp, page_no, page_size):
     from api.core import transaction_log
-    transaction_log.get_user_cash_account_records(account_id, q, side, tp, page_no, page_size)
+    return transaction_log.get_user_cash_account_records(account_id, q, side, tp, page_no, page_size)

@@ -92,20 +92,6 @@ def account_balance(account_id):
     return response.ok(balance=balance)
 
 
-@mod.route('/accounts/<int:account_id>/withdraw', methods=['POST'])
-def withdraw(account_id):
-    data = request.values
-    bankcard_id = data['bankcard_id']
-    callback_url = data['callback_url']
-    amount = Decimal(data['amount'])
-
-    try:
-        order_id = apply_to_withdraw('', account_id, bankcard_id, amount, callback_url)
-        return response.accepted(order_id)
-    except ZytCoreError, e:
-        return response.bad_request(e.message)
-
-
 @mod.route('/accounts/<int:account_id>/charged-withdraw', methods=['POST'])
 def withdraw(account_id):
     data = request.values

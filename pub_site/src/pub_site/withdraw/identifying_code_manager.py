@@ -26,9 +26,9 @@ def _clear_expired_identifying_code():
 
 
 def _send_message(mobile, messages):
-    return requests.post(config.SMS.URL, data={
-        'cdkey': config.SMS.CD_KEY,
-        'password': config.SMS.PASSWORD,
+    return requests.post(config.SMSConfig.URL, data={
+        'cdkey': config.SMSConfig.CD_KEY,
+        'password': config.SMSConfig.PASSWORD,
         'phone': mobile,
         'message': messages
     })

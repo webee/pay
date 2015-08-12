@@ -78,7 +78,7 @@ class Services:
     LEADER_SERVER = "http://tleader.lvye.com"
 
 
-class SMS:
+class SMSConfig:
     URL = 'http://sdk999ws.eucp.b2m.cn:8080/sdkproxy/sendsms.action'
     CD_KEY = '9SDK-EMY-0999-JBQOO'
     PASSWORD = '506260'

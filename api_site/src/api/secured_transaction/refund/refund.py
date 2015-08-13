@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from api.core import refund as core_refund, generate_refund_order
 from ._dba import create_refund, find_refunded_payment_by_refund_id
+from api.core import refund as core_refund, generate_refund_order, update_order_state
 from api.secured_transaction.payment.postpay import mark_payment_as_refunding, mark_payment_as_refunded, \
     mark_payment_as_refund_failed
 from api.util.notify import notify_client
@@ -30,11 +30,21 @@ def apply_to_refund(pay_record, amount, async_callback_url):
 
 def after_refunded(payment_id, refund_id, is_successful_refund):
     if is_successful_refund:
-        mark_payment_as_refunded(payment_id)
+        _succeed_refund(refund_id, payment_id)
     else:
-        mark_payment_as_refund_failed(payment_id)
+        _fail_refund(refund_id, payment_id)
 
     _try_notify_client(refund_id, is_successful_refund)
+
+
+def _succeed_refund(refund_id, payment_id):
+    mark_payment_as_refunded(payment_id)
+    update_order_state(refund_id, u'已退款')
+
+
+def _fail_refund(refund_id, payment_id):
+    mark_payment_as_refund_failed(payment_id)
+    update_order_state(refund_id, u'退款失败')
 
 
 def _try_notify_client(refund_id, is_successful_refund):

@@ -4,7 +4,7 @@ from decimal import Decimal
 from datetime import datetime
 
 from ._bookkeeping import get_account_side_sign
-from .util.oid import pay_id, withdraw_id, refund_id, transfer_id, prepaid_id
+from .util.oid import pay_id, withdraw_id, refund_id, transfer_id, prepaid_id, order_id
 from pytoolbox.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
@@ -65,12 +65,12 @@ def get_orders_info_by_ids(db, order_table, ids):
 
 
 @db_context
-def create_payment(db, trade_id, trade_info, payer_account_id, payee_account_id, amount):
+def create_payment(db, trade_order_id, trade_info, payer_account_id, payee_account_id, amount):
     record_id = pay_id(payer_account_id)
     now = datetime.now()
     fields = {
         'id': record_id,
-        'trade_id': trade_id,
+        'trade_order_id': trade_order_id,
         'trade_info': trade_info,
         'payer_account_id': payer_account_id,
         'payee_account_id': payee_account_id,
@@ -329,6 +329,26 @@ def get_unsettled_balance(db, account_id, account, side, low_id, high_id=None):
                 account_id=account_id, side=side, low_id=low_id, high_id=high_id)
 
     return Decimal(0) if balance is None else balance
+
+
+@db_context
+def create_trade_order(db, type, source_id, from_account_id, to_account_id, amount, state, info):
+    _id = order_id(from_account_id)
+    now = datetime.now()
+    fields = {
+        'id': _id,
+        'type': type,
+        'source_id': source_id,
+        'from_account_id': from_account_id,
+        'to_account_id': to_account_id,
+        'amount': amount,
+        'state': state,
+        'info': info,
+        'created_on': now,
+        'updated_on': now
+    }
+    db.insert('trade_order', **fields)
+    return _id
 
 
 def _sql_to_query_withdraw():

@@ -4,7 +4,7 @@ CREATE TABLE secured_payment(
   order_id VARCHAR(64) NOT NULL,
   product_name VARCHAR(50) NOT NULL,
   product_category VARCHAR(50) NOT NULL,
-  product_desc VARCHAR(50) NOT NULL,
+  product_desc VARCHAR(256) NOT NULL,
   payer_account_id INT NOT NULL,
   payee_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,

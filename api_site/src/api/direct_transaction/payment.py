@@ -6,7 +6,7 @@ from .util import oid
 from api.account import find_or_create_account, find_user_domain_id_by_channel, get_account_by_id, \
     get_secured_account_id
 from api import config
-from api.core import pay as core_pay
+from api.core import generate_pay_order, pay as core_pay
 from api.util import req
 from api.util.uuid import encode_uuid
 from pytoolbox.util.dbe import transactional
@@ -52,12 +52,24 @@ def pay_by_id(payment_id):
     if not pay_record:
         raise PaymentNotFoundError(payment_id)
 
+    pay_form = _pay_with_core(pay_record)
+    if not pay_form:
+        raise CorePayError(payment_id)
+
+    return pay_form
+
+
+def _pay_with_core(pay_record):
     payer_account_id = pay_record['payer_account_id']
-    payer = get_account_by_id(payer_account_id)
     secured_account_id = get_secured_account_id()
     amount = pay_record['amount']
+    desc = u"付款给绿野：{0}".format(pay_record['product_desc'])
+
+    order_id = generate_pay_order(pay_record['id'], payer_account_id, secured_account_id, amount, u'未支付', desc)
+
+    payer = get_account_by_id(payer_account_id)
     pay_form = core_pay(
-        trade_id=payment_id,
+        order_id=order_id,
         payer_account_id=payer_account_id,
         payer_created_on=payer['created_on'],
         payee_account_id=secured_account_id,
@@ -67,9 +79,6 @@ def pay_by_id(payment_id):
         traded_on=pay_record['ordered_on'],
         amount=amount
     )
-    if not pay_form:
-        raise CorePayError(payment_id)
-
     return pay_form
 
 

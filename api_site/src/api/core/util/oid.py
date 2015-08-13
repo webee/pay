@@ -2,6 +2,10 @@
 from datetime import datetime
 
 
+def order_id(account_id):
+    return _generate(account_id, 'ODX')
+
+
 def pay_id(account_id):
     return _generate(account_id, 'PAY')
 

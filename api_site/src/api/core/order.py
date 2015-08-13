@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+from ._dba import create_trade_order
+from pytoolbox.util.enum import enum
+
+_ORDER_TYPE = enum(PAY='PAY', REFUND='REFUND', WITHDRAW='WITHDRAW', TRANSFER='TRANSFER')
+
+
+def generate_pay_order(source_id, from_account_id, to_account_id, amount, state, info):
+    return _generate_order(_ORDER_TYPE.PAY, source_id, from_account_id, to_account_id, amount, state, info)
+
+
+def _generate_order(type, source_id, from_account_id, to_account_id, amount, state, info):
+    return create_trade_order(type, source_id, from_account_id, to_account_id, amount, state, info)

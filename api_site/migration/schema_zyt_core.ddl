@@ -14,9 +14,23 @@ CREATE TABLE bankcard(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+CREATE TABLE trade_order(
+  id CHAR(30) PRIMARY KEY, -- prefix with 'ODX'
+  type ENUM('PAY', 'REFUND', 'WITHDRAW', 'TRANSFER') NOT NULL,
+  source_id CHAR(30) NOT NULL,
+  from_account_id INT NOT NULL,
+  to_account_id INT NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  state VARCHAR(16) NOT NULL,
+  info VARCHAR(256) NOT NULL,
+  created_on TIMESTAMP NOT NULL,
+  updated_on TIMESTAMP NOT NULL
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 CREATE TABLE payment(
   id CHAR(30) PRIMARY KEY, -- prefix with 'PAY'
-  trade_id CHAR(30) NOT NULL,
+  trade_order_id CHAR(30) NOT NULL,
   trade_info VARCHAR(256),
   payer_account_id INT NOT NULL,
   payee_account_id INT NOT NULL,
@@ -28,7 +42,7 @@ CREATE TABLE payment(
   transaction_ended_on TIMESTAMP,
   confirmed_on TIMESTAMP,
 
-  UNIQUE KEY trade_id (trade_id)
+  FOREIGN KEY trade_order_id(trade_order_id) REFERENCES trade_order(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

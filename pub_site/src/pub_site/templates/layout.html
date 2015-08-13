@@ -32,21 +32,15 @@
 				<img src="http://www.lvye.cn/header/images/logo.png" class="pngfix" height="47" width="103" title="首页" alt="首页">
 			</a>
 		</h1>
+        <ul class="newaLine clearfix">
+        	<li><a href="http://leader.lvye.com/manage/list.jhtml" target="_blank">活动管理</a></li>
+            <li><a href="http://leader.lvye.com/enter/entList.jhtml" target="_blank">报名管理</a></li>
+            <li><a href="http://leader.lvye.com/lrfd/list.jhtml" target="_blank">退款管理</a></li>
+            <li><a href="http://pay.lvye.com/" target="_blank">自游通</a></li>
+        </ul>
         <div class="loginBtn clearfix">
-        	<div class="sx">
-                <span class="emailBtn"></span>
-                <ul class="sEmail" style="display:none">
-                    <li><a href="###" target="_blank" title="">我的消息</a></li>
-                    <li><a class="warn" href="###" target="_blank" title="">我的提醒(10)</a></li>
-                    <em></em>
-                </ul>
-            </div>
             <div class="yh">
-                <a class="userName" href="/">{{ current_user.user_name }}<em></em></a>
-                <ul class="userexit" style="display:none">
-                    <li><a href="{{ url_for('auth.logout') }}" title="">退出</a></li>
-                    <em></em>
-                </ul>
+                <span class="userName">当前用户：{{ current_user.user_name }}</span>
             </div>
 
         </div>
@@ -78,11 +72,10 @@
 <footer>
 	<div class="ftCont clearfix">
     	<ul class="cL">
-        	<li><a href="###" target="_blank">关于我们</a></li>
-            <li><a href="###" target="_blank">帮助中心</a></li>
-            <li><a href="###" target="_blank">实用工具</a></li>
+        	<li><a href="http://www.lvye.cn/about/" target="_blank">关于我们</a></li>
+            <li><a href="http://www.lvye.cn/about/contactUs.html" target="_blank">联系我们</a></li>
         </ul>
-        <p class="cR">Copyright  1999-2014  www.lvye.cn  绿野户外网版权所有</p>
+        <p class="cR">Copyright  1999-2015  <a href="www.lvye.com">www.lvye.com</a>  绿野户外网版权所有</p>
     </div>
 </footer>
 

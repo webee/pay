@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from ._dba import find_payment_by_id, update_payment_state, PAYMENT_STATE, find_payment_by_order_no, request_secured_payment
 from api.account import get_account_by_id
+from api.core import update_order_state
 
 
 def guarantee_payment(pay_record_id):
     pay_record = find_payment_by_id(pay_record_id)
     request_secured_payment(pay_record_id, pay_record['payer_account_id'], pay_record['amount'])
     update_payment_state(pay_record_id, PAYMENT_STATE.SECURED)
+    update_order_state(pay_record_id, u'已支付')
 
 
 def get_sync_callback_url_of_payment(pay_record_id):

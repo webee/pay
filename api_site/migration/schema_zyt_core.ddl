@@ -24,7 +24,9 @@ CREATE TABLE trade_order(
   state VARCHAR(16) NOT NULL,
   info VARCHAR(256) NOT NULL,
   created_on TIMESTAMP NOT NULL,
-  updated_on TIMESTAMP NOT NULL
+  updated_on TIMESTAMP NOT NULL,
+
+  UNIQUE KEY source_id (source_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

@@ -351,6 +351,16 @@ def create_trade_order(db, type, source_id, from_account_id, to_account_id, amou
     return _id
 
 
+@db_context
+def update_trade_order_state(db, source_id, state):
+    return db.execute(
+        """
+          UPDATE trade_order SET state = %(state)s, updated_on=%(updated_on)s
+            WHERE source_id = %(source_id)s
+        """,
+        source_id=source_id, state=state, updated_on=datetime.now())
+
+
 def _sql_to_query_withdraw():
     return """
         SELECT withdraw.id,

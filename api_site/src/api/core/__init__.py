@@ -72,3 +72,8 @@ def list_cash_transaction_logs(account_id, q, side, tp, page_no, page_size):
 def generate_pay_order(source_id, from_account_id, to_account_id, amount, state, info):
     from .order import generate_pay_order as _generate_pay_order
     return _generate_pay_order(source_id, from_account_id, to_account_id, amount, state, info)
+
+
+def update_order_state(order_id, state):
+    from .order import update_order_state as _update_order_state
+    return _update_order_state(order_id, state)

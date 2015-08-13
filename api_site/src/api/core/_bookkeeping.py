@@ -13,15 +13,6 @@ class SourceType(object):
     TRANSFER = 'TRANSFER'
     PREPAID = 'PREPAID'
 
-SOURCE_TYPE_TABLE_MAP = {SourceType.PAY: 'payment',
-                         SourceType.WITHDRAW_FROZEN: 'withdraw',
-                         SourceType.WITHDRAW_SUCCESS: 'withdraw',
-                         SourceType.WITHDRAW_FAILED: 'withdraw',
-                         SourceType.REFUND: 'refund',
-                         SourceType.TRANSFER: 'transfer',
-                         SourceType.PREPAID: 'prepaid',
-                         }
-
 
 _ACCOUNTS_SIDES = {
     'asset': {'+': 'd', '-': 'c'},

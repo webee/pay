@@ -43,7 +43,6 @@ class PayAPI:
     GET_ACCOUNT_ID_URL = "user_domains/{user_domain_id}/users/{uid}/account"
     GET_ACCOUNT_INFO_URL = "accounts/{account_id}"
     GET_USER_BALANCE_URL = "accounts/{account_id}/balance"
-    GET_USER_CASH_RECORDS_URL = "accounts/{account_id}/cash_records"
     GET_USER_ORDERS_URL = "accounts/{account_id}/orders"
 
 

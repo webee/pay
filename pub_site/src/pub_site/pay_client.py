@@ -51,18 +51,6 @@ def get_user_balance(uid):
     return Decimal(0)
 
 
-def get_user_cash_records(uid, q, side, tp, page_no=1, page_size=20):
-    account_id = get_account_id(uid)
-    url = _generate_api_url(config.PayAPI.GET_USER_CASH_RECORDS_URL, account_id=account_id)
-    url = build_url(url, q=q, side=side, tp=tp, page_no=page_no, page_size=page_size)
-
-    req = requests.get(url)
-
-    if req.status_code == 200:
-        data = req.json()
-        return data
-
-
 def list_trade_orders(uid, category, page_no, page_size, keyword):
     account_id = get_account_id(uid)
     url = _generate_api_url(config.PayAPI.GET_USER_ORDERS_URL, account_id=account_id)

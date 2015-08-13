@@ -5,7 +5,7 @@ from flask import Blueprint, request, redirect, Response
 from api.account import get_account_by_id, find_or_create_account
 from api.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
     ZytCoreError, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance, \
-    transfer as core_transfer, list_cash_transaction_logs, generate_transfer_order, update_order_state, \
+    transfer as core_transfer, generate_transfer_order, update_order_state, \
     list_trade_orders
 from api.charged_withdraw import apply_to_charged_withdraw
 from api import delegate
@@ -138,22 +138,6 @@ def transfer(from_account_id, to_account_id):
         return response.ok(transfer_id=_id)
     except ZytCoreError, e:
         return response.bad_request(e.message)
-
-
-@mod.route('/accounts/<int:account_id>/cash_records', methods=['GET'])
-def user_cash_records(account_id):
-    q = request.args.get('q', '')
-    side = request.args.get('side', '')
-    tp = request.args.get('tp', '')
-    page_no = int(request.args.get('page_no', 1))
-    page_size = int(request.args.get('page_size', 20))
-    count, cash_records, orders_info = list_cash_transaction_logs(account_id, q, side, tp, page_no, page_size)
-
-    cash_records = [dict(cash_record) for cash_record in cash_records]
-    orders_info = {order_id: dict(order) for order_id, order in orders_info.items()}
-
-    return response.ok(count=count, page_no=page_no, page_size=page_size,
-                       records=cash_records, record_infos=orders_info)
 
 
 @mod.route('/accounts/<int:account_id>/orders')

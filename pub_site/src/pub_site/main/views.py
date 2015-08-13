@@ -4,7 +4,7 @@ from flask import request, render_template, jsonify
 from flask.ext.login import login_required, current_user
 from . import main_mod as mod
 from pub_site import pay_client
-from .transaction_log import cash_records, list_trade_orders
+from .transaction_log import list_trade_orders
 from ..constant import TradeType
 
 
@@ -12,30 +12,6 @@ from ..constant import TradeType
 @login_required
 def index():
     return render_template('main/index.html')
-
-
-@mod.route('/transaction_list', methods=['GET'])
-@login_required
-def transaction_list():
-    uid = current_user.user_id
-    page_no = int(request.args.get('page_no', 1))
-    page_size = int(request.args.get('page_size', 10))
-    q = request.args.get('q', '').strip()
-    side = request.args.get('side', '')
-    tp = request.args.get('tp', '')
-
-    count, records, record_infos = cash_records(uid, q, side, tp, page_no, page_size)
-
-    res = {
-        'q': q,
-        'count': count,
-        'page_no': page_no,
-        'page_size': page_size,
-        'page_count': (count - 1) / page_size + 1,
-        'records': records,
-        'record_infos': record_infos,
-        }
-    return render_template('main/tx_list.html', res=res)
 
 
 @mod.route('/orders', methods=['GET'])

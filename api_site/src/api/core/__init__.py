@@ -69,11 +69,6 @@ def get_cash_balance(account_id):
     return _get_cash_balance(account_id)
 
 
-def list_cash_transaction_logs(account_id, q, side, tp, page_no, page_size):
-    from api.core import transaction_log
-    return transaction_log.get_user_cash_account_records(account_id, q, side, tp, page_no, page_size)
-
-
 def generate_pay_order(source_id, from_account_id, to_account_id, amount, state, info):
     from .order import generate_pay_order as _generate_pay_order
     return _generate_pay_order(source_id, from_account_id, to_account_id, amount, state, info)

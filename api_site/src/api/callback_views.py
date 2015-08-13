@@ -100,7 +100,7 @@ def notify_refund(uuid):
 
     result = handle_refund_notification(refund_order, oid_refundno, sta_refund)
     pay_record = get_payment_by_id(refund_order['payment_id'])
-    delegate.refunded(pay_record['trade_id'], refund_id, result.is_successful)
+    delegate.refunded(pay_record['source_id'], refund_id, result.is_successful)
     return notification.accepted()
 
 
@@ -120,10 +120,10 @@ def _notify_payment_result(uuid, data):
 
     pay_record = succeed_payment(order_no, paybill_oid)
 
-    delegate.paid(pay_record['trade_id'])
+    delegate.paid(pay_record['source_id'])
     return PayResult.Success
 
 
 def _redirect_pay_result(pay_record):
-    return redirect(delegate.redirect_web_after_paid(pay_record['trade_id']))
+    return redirect(delegate.redirect_web_after_paid(pay_record['source_id']))
 

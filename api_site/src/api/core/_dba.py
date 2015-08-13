@@ -83,8 +83,14 @@ def create_payment(db, trade_order_id, trade_info, payer_account_id, payee_accou
 
 
 @db_context
-def find_payment_by_id(db, id):
-    return db.get('SELECT * FROM payment WHERE id = %(id)s', id=id)
+def find_payment_by_id(db, _id):
+    return db.get(
+        """
+            SELECT payment.*, trade_order.source_id FROM payment
+              INNER JOIN trade_order ON payment.trade_order_id = trade_order.id
+              WHERE payment.id=%(id)s
+        """,
+        id=_id)
 
 
 @db_context

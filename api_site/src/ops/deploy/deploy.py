@@ -23,6 +23,9 @@ def deploy(env):
         fab.run('git pull --ff-only origin master')
     with fab.cd(code_dir), fab.prefix('source api_venv/bin/activate'):
         fab.run('git pull --ff-only origin master')
+
+        reread_config_file()
+
         stop_python_server('pay_api_site')
         # do_migration()
         start_python_server('pay_api_site')
@@ -30,6 +33,11 @@ def deploy(env):
 
 def do_migration():
     fab.run('python src/manager.py migrate')
+
+
+def reread_config_file():
+    fab.run('sudo cp deploy/pay_api_site.conf /etc/supervisord.d/')
+    fab.run('sudo /usr/local/bin/supervisorctl reread')
 
 
 def stop_python_server(name):

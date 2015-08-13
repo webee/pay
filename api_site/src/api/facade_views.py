@@ -162,6 +162,7 @@ def list_orders(account_id):
     category = data['category']
     page_no = int(data.get('page_no', 1))
     page_size = int(data.get('page_size', 20))
+    keyword = data.get('keyword', None)
 
-    total_num, orders = list_trade_orders(account_id, category, page_no, page_size)
+    total_num, orders = list_trade_orders(account_id, category, page_no, page_size, keyword)
     return response.ok(total=total_num, records=orders)

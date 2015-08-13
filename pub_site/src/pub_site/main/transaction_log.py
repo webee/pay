@@ -28,8 +28,8 @@ def cash_records(uid, q, side, tp, page_no=1, page_size=20):
     return count, records, record_infos
 
 
-def list_trade_orders(uid, category, page_no, page_size):
-    data = pay_client.list_trade_orders(uid, category, page_no, page_size)
+def list_trade_orders(uid, category, page_no, page_size, keyword):
+    data = pay_client.list_trade_orders(uid, category, page_no, page_size, keyword)
     records = data['records']
     for record in records:
         record['type'] = TRADE_TYPE_MSG[record['type']]

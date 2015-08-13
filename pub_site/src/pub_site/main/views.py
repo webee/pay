@@ -45,9 +45,11 @@ def list_orders():
     data = request.args
     category = data['category']
     page_no = int(data.get('page_no', 1))
+    keyword = data.get('keyword', '').strip()
+    keyword = None if not keyword else keyword
 
     page_size = 10
-    count, records = list_trade_orders(uid, category, page_no, page_size)
+    count, records = list_trade_orders(uid, category, page_no, page_size, keyword)
     res = {
         'count': count,
         'page_no': page_no,

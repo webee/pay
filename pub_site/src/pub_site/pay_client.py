@@ -63,10 +63,19 @@ def get_user_cash_records(uid, q, side, tp, page_no=1, page_size=20):
         return data
 
 
-def list_trade_orders(uid, category, page_no, page_size):
+def list_trade_orders(uid, category, page_no, page_size, keyword):
     account_id = get_account_id(uid)
     url = _generate_api_url(config.PayAPI.GET_USER_ORDERS_URL, account_id=account_id)
-    url = build_url(url, category=category, page_no=page_no, page_size=page_size)
+
+    params = {
+        'category': category,
+        'page_no': page_no,
+        'page_size': page_size
+    }
+    if keyword:
+        params['keyword'] = keyword
+
+    url = build_url(url, **params)
 
     req = requests.get(url)
 

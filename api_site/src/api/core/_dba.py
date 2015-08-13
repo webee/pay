@@ -382,21 +382,31 @@ def find_trade_order_by_source_id(db, source_id):
 
 
 @db_context
-def list_trade_orders(db, account_id, category, offset, page_size):
+def list_trade_orders(db, account_id, category, offset, page_size, keyword):
     query_statement = "SELECT id, type, amount, state, info, created_on, from_account_id, to_account_id " \
                       "FROM trade_order"
     query_statement += _sql_to_scope_trade_orders(category)
+    if keyword:
+        query_statement += " AND info like %(keyword)s"
     query_statement += " ORDER BY created_on DESC"
     query_statement += " LIMIT %(offset)s, %(limit)s"
 
-    return db.list(query_statement, account_id=account_id, offset=offset, limit=page_size)
+    if keyword:
+        return db.list(query_statement, account_id=account_id, offset=offset, limit=page_size,
+                       keyword='%{0}%'.format(keyword))
+    else:
+        return db.list(query_statement, account_id=account_id, offset=offset, limit=page_size)
 
 
 @db_context
-def count_all_trade_orders(db, account_id, category):
+def count_all_trade_orders(db, account_id, category, keyword):
     query_statement = "SELECT COUNT(1) FROM trade_order"
     query_statement += _sql_to_scope_trade_orders(category)
-    return db.get_scalar(query_statement, account_id=account_id)
+    if keyword:
+        query_statement += " AND info like %(keyword)s"
+        return db.get_scalar(query_statement, account_id=account_id, keyword='%{0}%'.format(keyword))
+    else:
+        return db.get_scalar(query_statement, account_id=account_id)
 
 
 def _sql_to_query_withdraw():
@@ -418,5 +428,5 @@ def _sql_to_scope_trade_orders(category):
     elif category == _ORDER_CATEGORY.EXPENSE:
         statement += " WHERE from_account_id=%(account_id)s"
     else:
-        statement += " WHERE from_account_id=%(account_id)s OR to_account_id=%(account_id)s"
+        statement += " WHERE (from_account_id=%(account_id)s OR to_account_id=%(account_id)s)"
     return statement

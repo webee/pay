@@ -33,11 +33,11 @@ def _find_or_create_order(type, source_id, from_account_id, to_account_id, amoun
     return create_trade_order(type, source_id, from_account_id, to_account_id, amount, state, info)
 
 
-def list_orders(account_id, category, page_no, page_size):
-    count = count_all_trade_orders(account_id, category)
+def list_orders(account_id, category, page_no, page_size, keyword):
+    count = count_all_trade_orders(account_id, category, keyword)
 
     offset = (page_no - 1) * page_size
-    raw_orders = list_trade_orders(account_id, category, offset, page_size)
+    raw_orders = list_trade_orders(account_id, category, offset, page_size, keyword)
 
     formatted_orders = []
     for order in raw_orders:

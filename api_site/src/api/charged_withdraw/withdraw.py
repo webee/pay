@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from ._dba import create_charged_withdraw, update_withdraw_state, CHARGED_WITHDRAW_STATE, find_charged_withdraw_by_id
 from api.account import get_secured_account_id
-from api.core import apply_to_withdraw, transfer as core_transfer, generate_withdraw_order, get_bankcard_by_id
+from api.core import apply_to_withdraw, transfer as core_transfer, generate_withdraw_order, get_bankcard_by_id, \
+    update_order_state
 
 
 def charged_withdraw(account_id, bankcard_id, amount, charged_fee, callback_url):
@@ -20,6 +21,7 @@ def charged_withdraw(account_id, bankcard_id, amount, charged_fee, callback_url)
 
 def succeed_withdraw(charged_withdraw_id):
     update_withdraw_state(charged_withdraw_id, CHARGED_WITHDRAW_STATE.SUCCESS)
+    update_order_state(charged_withdraw_id, u'已完成')
 
 
 def fail_withdraw(charged_withdraw_id):
@@ -30,6 +32,7 @@ def fail_withdraw(charged_withdraw_id):
     core_transfer(charged_withdraw_id, u'提现失败，手续费退回', secured_account_id, to_account_id, fee)
 
     update_withdraw_state(charged_withdraw_id, CHARGED_WITHDRAW_STATE.REFUNDED_FEE)
+    update_order_state(charged_withdraw_id, u'失败')
 
 
 def _charge_fee(charged_withdraw_id, order_id, account_id, fee):

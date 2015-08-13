@@ -61,15 +61,6 @@ def test_create_user(user_domain_id, user_id):
 
 @manager.option('-i', '--id', type=long, dest="account_id", required=True)
 @manager.option('-a', '--amount', type=Decimal, dest="amount", required=True)
-def test_prepaid(account_id, amount):
-    """充值"""
-    from api.core.prepaid import prepaid
-
-    prepaid(account_id, amount, '测试充值')
-
-
-@manager.option('-i', '--id', type=long, dest="account_id", required=True)
-@manager.option('-a', '--amount', type=Decimal, dest="amount", required=True)
 @manager.option('-b', '--bankcard', type=int, dest="bankcard_id", required=True)
 def test_withdraw(account_id, amount, bankcard_id):
     """申请提现"""

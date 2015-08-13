@@ -8,11 +8,11 @@ from .util.oid import pay_id, withdraw_id, refund_id, transfer_id, prepaid_id, o
 from pytoolbox.util.enum import enum
 from pytoolbox.util.dbe import db_context
 
-
 WITHDRAW_STATE = enum(FROZEN='FROZEN', SUCCESS='SUCCESS', FAILED='FAILED')
 REFUND_STATE = enum(CREATED='CREATED', SUCCESS='SUCCESS', FAILED='FAILED')
 BOOKKEEPING_SIDE = enum(CREDIT='CREDIT', DEBIT='DEBIT', BOTH='BOTH')
 _BANK_ACCOUNT = enum(IsPrivateAccount=0, IsCorporateAccount=1)
+_ORDER_CATEGORY = enum(ALL='ALL', INCOME='INCOME', EXPENSE='EXPENSE')
 
 
 @db_context
@@ -25,6 +25,7 @@ def get_user_cash_account_log_count(db, account_id, q, side, tp):
                   WHERE c.account_id=%(account_id)s and e.trade_info like %(q)s
                   and c.side like %(side)s and e.source_type like %(tp)s
     """, account_id=account_id, q=q, side=side, tp=tp)
+
 
 @db_context
 def get_user_cash_account_log(db, account_id, q, side, tp, offset, limit):
@@ -380,6 +381,24 @@ def find_trade_order_by_source_id(db, source_id):
     return db.get("SELECT * FROM trade_order WHERE source_id=%(source_id)s", source_id=source_id)
 
 
+@db_context
+def list_trade_orders(db, account_id, category, offset, page_size):
+    query_statement = "SELECT id, type, amount, state, info, created_on, from_account_id, to_account_id " \
+                      "FROM trade_order"
+    query_statement += _sql_to_scope_trade_orders(category)
+    query_statement += " ORDER BY created_on DESC"
+    query_statement += " LIMIT %(offset)s, %(limit)s"
+
+    return db.list(query_statement, account_id=account_id, offset=offset, limit=page_size)
+
+
+@db_context
+def count_all_trade_orders(db, account_id, category):
+    query_statement = "SELECT COUNT(1) FROM trade_order"
+    query_statement += _sql_to_scope_trade_orders(category)
+    return db.get_scalar(query_statement, account_id=account_id)
+
+
 def _sql_to_query_withdraw():
     return """
         SELECT withdraw.id,
@@ -390,3 +409,14 @@ def _sql_to_query_withdraw():
         FROM withdraw
           INNER JOIN bankcard ON withdraw.bankcard_id = bankcard.id
     """
+
+
+def _sql_to_scope_trade_orders(category):
+    statement = ""
+    if category == _ORDER_CATEGORY.INCOME:
+        statement += " WHERE to_account_id=%(account_id)s"
+    elif category == _ORDER_CATEGORY.EXPENSE:
+        statement += " WHERE from_account_id=%(account_id)s"
+    else:
+        statement += " WHERE from_account_id=%(account_id)s OR to_account_id=%(account_id)s"
+    return statement

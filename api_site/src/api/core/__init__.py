@@ -94,6 +94,11 @@ def generate_withdraw_order(source_id, account_id, amount, state, info):
     return _generate_withdraw_order(source_id, account_id, amount, state, info)
 
 
+def list_trade_orders(account_id, category, page_no, page_size):
+    from .order import list_orders as _list_orders
+    return _list_orders(account_id, category, page_no, page_size)
+
+
 def update_order_state(source_id, state):
     from .order import update_order_state as _update_order_state
     return _update_order_state(source_id, state)

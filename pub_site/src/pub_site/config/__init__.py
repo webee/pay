@@ -6,6 +6,7 @@ from pytoolbox import conf
 class App:
     ADMINS = ['liufan@lvye.com', 'yiwang@lvye.com', 'mengyu@lvye.com', 'zhoushiwei@lvye.com']
     SECRET_KEY = os.environ.get('SECRET_KEY') or '.yek eyvl'
+    PROPAGATE_EXCEPTIONS = True
     TESTING = False
     DEBUG = True
     LOGIN_DISABLED = False
@@ -43,6 +44,7 @@ class PayAPI:
     GET_ACCOUNT_INFO_URL = "accounts/{account_id}"
     GET_USER_BALANCE_URL = "accounts/{account_id}/balance"
     GET_USER_CASH_RECORDS_URL = "accounts/{account_id}/cash_records"
+    GET_USER_ORDERS_URL = "accounts/{account_id}/orders"
 
 
 # #### data #######

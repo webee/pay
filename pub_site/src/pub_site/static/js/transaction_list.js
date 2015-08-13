@@ -37,7 +37,7 @@ $(document).ready(function () {
 
     function gen_activate_tab_cb(t) {
         return function() {
-            var ts = []
+            var ts = [];
             for (var i = 0; i < tabs.length; i++) {
                 if (tabs[i] != t) {
                     ts.push(tabs[i]);
@@ -45,22 +45,18 @@ $(document).ready(function () {
             }
             $("#tx_type_tabs")[0].dataset["cur"] = t;
             $(t).attr('class', 'cur');
-            clear_class(ts)
+            clear_class(ts);
 
             $("#total_tx").click(function() {
-                get_tx_list({}, gen_activate_tab_cb('#total_tx'))
+                get_tx_list({category: 'ALL'}, gen_activate_tab_cb('#total_tx'))
             });
 
             $("#in_tx").click(function() {
-                get_tx_list({side: 'CREDIT'}, gen_activate_tab_cb('#in_tx'))
+                get_tx_list({category: 'INCOME'}, gen_activate_tab_cb('#in_tx'))
             });
 
             $("#out_tx").click(function() {
-                get_tx_list({side: 'DEBIT'}, gen_activate_tab_cb('#out_tx'))
-            });
-
-            $("#withdraw_tx").click(function() {
-                get_tx_list({tp: 'WITHDRAW'}, gen_activate_tab_cb('#withdraw_tx'))
+                get_tx_list({category: 'EXPENSE'}, gen_activate_tab_cb('#out_tx'))
             });
         }
     }
@@ -83,19 +79,19 @@ $(document).ready(function () {
         }
 
         $("#tx_list_first").on("click", function() {
-            $.extend(params, {page_no: 1})
+            $.extend(params, {page_no: 1});
             get_tx_list(params, callback)
         });
         $("#tx_list_last").on("click", function() {
-            $.extend(params, {page_no: page_count})
+            $.extend(params, {page_no: page_count});
             get_tx_list(params, callback)
         });
         $("#tx_list_prev").on("click", function() {
-            $.extend(params, {page_no: prev_page_no})
+            $.extend(params, {page_no: prev_page_no});
             get_tx_list(params, callback)
         });
         $("#tx_list_next").on("click", function() {
-            $.extend(params, {page_no: next_page_no})
+            $.extend(params, {page_no: next_page_no});
             get_tx_list(params, callback)
         });
     }
@@ -103,7 +99,7 @@ $(document).ready(function () {
     function handle_search_bt(params, callback) {
         $("#tx_search_bt").on("click", function() {
             var q = $("#tx_search_q")[0].value;
-            $.extend(params, {q: q, page_no: 1})
+            $.extend(params, {q: q, page_no: 1});
             get_tx_list(params, callback);
         });
     }
@@ -114,7 +110,7 @@ $(document).ready(function () {
         }
 
         requestRunning = true;
-        $.get('/transaction_list', params)
+        $.get('/orders', params)
             .done(function (data) {
                 $("#tx_list").html(data);
                 if (callback != null) {
@@ -135,6 +131,6 @@ $(document).ready(function () {
     // update balance.
     update_balance(function() {
         // activate total.
-        get_tx_list({}, gen_activate_tab_cb('#total_tx'))
+        get_tx_list({category: 'ALL', page_no: 1}, gen_activate_tab_cb('#total_tx'))
     });
 });

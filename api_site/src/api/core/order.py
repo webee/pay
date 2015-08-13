@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from ._dba import create_trade_order, update_trade_order_state, find_trade_order_by_source_id
+from ._dba import create_trade_order, update_trade_order_state, find_trade_order_by_source_id, list_trade_orders, \
+    count_all_trade_orders
 from pytoolbox.util.enum import enum
 
 _ORDER_TYPE = enum(PAY='PAY', REFUND='REFUND', WITHDRAW='WITHDRAW', TRANSFER='TRANSFER')
@@ -30,3 +31,22 @@ def _find_or_create_order(type, source_id, from_account_id, to_account_id, amoun
     if order:
         return order.id
     return create_trade_order(type, source_id, from_account_id, to_account_id, amount, state, info)
+
+
+def list_orders(account_id, category, page_no, page_size):
+    count = count_all_trade_orders(account_id, category)
+
+    offset = (page_no - 1) * page_size
+    raw_orders = list_trade_orders(account_id, category, offset, page_size)
+
+    formatted_orders = []
+    for order in raw_orders:
+        income_ratio = 1 if order['to_account_id'] == account_id else -1
+        formatted_orders.append({
+            'id': order.id,
+            'type': order.type,
+            'amount': float(order.amount) * income_ratio,
+            'info': order.info,
+            'created_on': order.created_on
+        })
+    return count, formatted_orders

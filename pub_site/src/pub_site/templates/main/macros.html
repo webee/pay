@@ -1,4 +1,4 @@
-{% macro tx_list(records, record_infos, count, page_no, page_size, page_count) -%}
+{% macro tx_list(records, count, page_no, page_size, page_count) -%}
     <div class="tablock margin48 tablockcur">
         <table width="952" cellspacing="0" cellpadding="0">
             <tr class="first">
@@ -9,18 +9,16 @@
                 <td width="270">交易名称</td>
             </tr>
             {% for record in records %}
-                {% set is_income = record.side == 'CREDIT' %}
-                {% set info = record_infos[record.source_id] %}
                 <tr>
                     <td width="70" height="60">{{ record.created_on }}</td>
                     <td>{{ record.type }}</td>
-                    {% if is_income %}
-                        <td class="red">+ {{ "%.2f"|format(record.amount) }}</td>
+                    {% if record.amount >= 0 %}
+                        <td class="red">{{ "%.2f"|format(record.amount) }}</td>
                     {% else %}
-                        <td class="green">- {{ "%.2f"|format(record.amount) }}</td>
+                        <td class="green">{{ "%.2f"|format(record.amount) }}</td>
                     {% endif %}
                     <td>{{ record.state }}</td>
-                    <td>{{ record.trade_info }}</td>
+                    <td>{{ record.info }}</td>
                 </tr>
             {% endfor %}
         </table>

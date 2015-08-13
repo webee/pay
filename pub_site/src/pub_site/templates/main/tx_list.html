@@ -1,6 +1,6 @@
 <div class="tabtit margin48 clearfix">
     <ul id="tx_type_tabs" data-cur="#total_tx">
-        <li id="total_tx" class="cur">全部</li><li id="in_tx">收入</li><li id="out_tx">支出</li><li id="withdraw_tx">提现</li>
+        <li id="total_tx" class="cur">全部</li><li id="in_tx">收入</li><li id="out_tx">支出</li>
     </ul>
 
     <div class="search">
@@ -12,7 +12,7 @@
 
 {% if res.count > 0 %}
     {% from 'main/macros.html' import tx_list %}
-    {{ tx_list(res.records, res.record_infos, res.count, res.page_no, res.page_size, res.page_count) }}
+    {{ tx_list(res.records, res.count, res.page_no, res.page_size, res.page_count) }}
 {% else %}
     <p><h2>暂无任何记录!!</h2></p
 {% endif %}

@@ -4,7 +4,7 @@ from flask import request, render_template, jsonify
 from flask.ext.login import login_required, current_user
 from . import main_mod as mod
 from pub_site import pay_client
-from .transaction_log import cash_records
+from .transaction_log import cash_records, list_trade_orders
 from ..constant import TradeType
 
 
@@ -36,6 +36,27 @@ def transaction_list():
         'record_infos': record_infos,
         }
     return render_template('main/tx_list.html', res=res)
+
+
+@mod.route('/orders', methods=['GET'])
+@login_required
+def list_orders():
+    uid = current_user.user_id
+    data = request.args
+    category = data['category']
+    page_no = int(data.get('page_no', 1))
+
+    page_size = 10
+    count, records = list_trade_orders(uid, category, page_no, page_size)
+    res = {
+        'count': count,
+        'page_no': page_no,
+        'page_size': page_size,
+        'page_count': (count - 1) / page_size + 1,
+        'records': records,
+    }
+    return render_template('main/tx_list.html', res=res)
+
 
 
 @mod.route('/balance', methods=['GET'])

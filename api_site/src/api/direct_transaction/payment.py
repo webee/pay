@@ -63,9 +63,9 @@ def _pay_with_core(pay_record):
     payer_account_id = pay_record['payer_account_id']
     secured_account_id = get_secured_account_id()
     amount = pay_record['amount']
-    desc = u"付款给绿野：{0}".format(pay_record['product_desc'])
 
-    order_id = generate_pay_order(pay_record['id'], payer_account_id, secured_account_id, amount, u'未支付', desc)
+    order_id = generate_pay_order(pay_record['id'], payer_account_id, secured_account_id, amount, u'未支付',
+                                  pay_record['product_desc'])
 
     payer = get_account_by_id(payer_account_id)
     pay_form = core_pay(

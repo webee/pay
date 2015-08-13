@@ -19,6 +19,10 @@ export PYTHONPATH=$FLASK_DIR:$PYTHONPATH
 
 # Start your unicorn
 export ENV=${env}
+if [ -f ${HOME}/pay-env.sh ]; then
+    source ${HOME}/.pay-env.sh
+fi
+
 exec gunicorn main:app -b ${host}:${port} \
   --name $NAME \
   -k gevent \

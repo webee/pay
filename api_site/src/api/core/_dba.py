@@ -375,6 +375,11 @@ def update_trade_order_state(db, source_id, state):
         source_id=source_id, state=state, updated_on=datetime.now())
 
 
+@db_context
+def find_trade_order_by_source_id(db, source_id):
+    return db.get("SELECT * FROM trade_order WHERE source_id=%(source_id)s", source_id=source_id)
+
+
 def _sql_to_query_withdraw():
     return """
         SELECT withdraw.id,

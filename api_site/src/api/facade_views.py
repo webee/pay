@@ -20,6 +20,11 @@ def index():
     return redirect('http://huodong.lvye.com')
 
 
+@mod.route('/heart-beat')
+def heart_beat():
+    return "OK"
+
+
 @mod.route('/pay/<uuid>', methods=['GET'])
 def pay(uuid):
     try:

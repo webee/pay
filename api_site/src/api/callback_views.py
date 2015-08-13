@@ -21,11 +21,6 @@ PayResult = enum(Success=0, Failure=1, IsInvalidRequest=2)
 _logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 
 
-@mod.route('/pay/heart-beat')
-def heart_beat():
-    return response.ok()
-
-
 @mod.route('/pay/<uuid>/result', methods=['POST'])
 @parse_and_verify
 def receive_pay_result(uuid):

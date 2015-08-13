@@ -37,10 +37,6 @@ def bookkeep(db, event, account_a, account_b):
 
     sa, account_name_a = account_name_a[0], account_name_a[1:]
     sb, account_name_b = account_name_b[0], account_name_b[1:]
-    # account_id_map = {
-    #     account_name_a: account_id_a,
-    #     account_name_b: account_id_b,
-    # }
 
     if sa == '+' and sb == '-':
         debit_account, debit_account_id, credit_account, credit_account_id = \

@@ -125,9 +125,6 @@ $(document).ready(function () {
             });
     }
 
-    // every 10s, update balance.
-    //setInterval("update_balance(null)", 10000);
-
     // update balance.
     update_balance(function() {
         // activate total.

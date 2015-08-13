@@ -11,10 +11,10 @@ class ConditionalError(ZytCoreError):
 
 
 
-def pay(order_id, payer_account_id, payer_created_on, payee_account_id, request_from_ip, product_name, product_desc,
+def pay(order_id, payer_account_id, payee_account_id, request_from_ip, product_name, product_desc,
         traded_on, amount):
     from .pay import pay as _pay
-    return _pay(order_id, payer_account_id, payer_created_on, payee_account_id, request_from_ip, product_name,
+    return _pay(order_id, payer_account_id, payee_account_id, request_from_ip, product_name,
                 product_desc, traded_on, amount)
 
 

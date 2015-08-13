@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from ._dba import create_payment
+from api.account import get_account_by_id
 from .ipay import transaction
 from .util.attr_dict import AttrDict
 
@@ -11,12 +12,13 @@ class PaymentCreationFailedError(Exception):
 
 
 
-def pay(order_id, payer_account_id, payer_created_on, payee_account_id, request_from_ip, product_name, product_desc,
+def pay(order_id, payer_account_id, payee_account_id, request_from_ip, product_name, product_desc,
         traded_on, amount):
     payment_id = create_payment(order_id, product_desc, payer_account_id, payee_account_id, amount)
     if not payment_id:
         raise PaymentCreationFailedError()
 
+    payer_created_on = get_account_by_id(payer_account_id).created_on
     payer = AttrDict(id=payer_account_id, created_on=payer_created_on)
     return transaction.pay(
         payer=payer,

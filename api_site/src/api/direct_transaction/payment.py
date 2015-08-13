@@ -67,11 +67,9 @@ def _pay_with_core(pay_record):
     order_id = generate_pay_order(pay_record['id'], payer_account_id, secured_account_id, amount, u'未支付',
                                   pay_record['product_desc'])
 
-    payer = get_account_by_id(payer_account_id)
     pay_form = core_pay(
         order_id=order_id,
         payer_account_id=payer_account_id,
-        payer_created_on=payer['created_on'],
         payee_account_id=secured_account_id,
         request_from_ip=req.ip(),
         product_name=pay_record['product_name'],

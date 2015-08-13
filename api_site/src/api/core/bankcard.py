@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .util.attr_dict import AttrDict
-from ._dba import query_all_bankcards, create_bankcard
+from ._dba import query_all_bankcards, create_bankcard, find_bankcard_by_id
 from .ipay import transaction
 from .ipay.error import UnExpectedResponseError, TransactionApiError
 from api.core import ZytCoreError
@@ -55,6 +55,10 @@ def add_bankcard(account_id, card_no, account_name, is_corporate_account, provin
 
     bankcard_id = create_bankcard(account_id, card)
     return bankcard_id
+
+
+def get_bankcard_by_id(bankcard_id):
+    return find_bankcard_by_id(bankcard_id)
 
 
 def _parse_card_type(card_type):

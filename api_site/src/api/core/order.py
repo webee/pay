@@ -17,6 +17,10 @@ def generate_transfer_order(source_id, from_account_id, to_account_id, amount, s
     return _generate_order(_ORDER_TYPE.TRANSFER, source_id, from_account_id, to_account_id, amount, state, info)
 
 
+def generate_withdraw_order(source_id, account_id, amount, state, info):
+    return _generate_order(_ORDER_TYPE.WITHDRAW, source_id, account_id, None, amount, state, info)
+
+
 def update_order_state(source_id, state):
     update_trade_order_state(source_id, state)
 

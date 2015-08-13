@@ -39,9 +39,14 @@ def add_bankcard(account_id, card_no, account_name, is_corporate_account, provin
                          branch_bank_name)
 
 
-def apply_to_withdraw(trade_id, account_id, bankcard_id, amount, callback_url):
+def get_bankcard_by_id(bankcard_id):
+    from .bankcard import get_bankcard_by_id as _get_bankcard_by_id
+    return _get_bankcard_by_id(bankcard_id)
+
+
+def apply_to_withdraw(order_id, account_id, bankcard_id, amount, callback_url):
     from .withdraw import apply_to_withdraw as _apply_to_withdraw
-    return _apply_to_withdraw(trade_id, account_id, bankcard_id, amount, callback_url)
+    return _apply_to_withdraw(order_id, account_id, bankcard_id, amount, callback_url)
 
 
 def list_unfailed_withdraw(account_id):
@@ -82,6 +87,11 @@ def generate_refund_order(source_id, from_account_id, to_account_id, amount, sta
 def generate_transfer_order(source_id, from_account_id, to_account_id, amount, state, info):
     from .order import generate_transfer_order as _generate_transfer_order
     return _generate_transfer_order(source_id, from_account_id, to_account_id, amount, state, info)
+
+
+def generate_withdraw_order(source_id, account_id, amount, state, info):
+    from .order import generate_withdraw_order as _generate_withdraw_order
+    return _generate_withdraw_order(source_id, account_id, amount, state, info)
 
 
 def update_order_state(source_id, state):

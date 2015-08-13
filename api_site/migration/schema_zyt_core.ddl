@@ -19,7 +19,7 @@ CREATE TABLE trade_order(
   type ENUM('PAY', 'REFUND', 'WITHDRAW', 'TRANSFER') NOT NULL,
   source_id VARCHAR(30) NOT NULL,
   from_account_id INT NOT NULL,
-  to_account_id INT NOT NULL,
+  to_account_id INT,
   amount DECIMAL(12, 2) NOT NULL,
   state VARCHAR(16) NOT NULL,
   info VARCHAR(256) NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE transfer(
 
 CREATE TABLE withdraw(
   id CHAR(30) PRIMARY KEY, -- prefix with 'WDR'
-  trade_id VARCHAR(30),
+  trade_order_id CHAR(30) NOT NULL,
   account_id INT UNSIGNED NOT NULL COMMENT '提现账号',
   bankcard_id INT UNSIGNED NOT NULL COMMENT '提现到银行号id',
   amount DECIMAL(12, 2) NOT NULL,

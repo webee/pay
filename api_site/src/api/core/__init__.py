@@ -18,9 +18,9 @@ def pay(order_id, payer_account_id, payer_created_on, payee_account_id, request_
                 product_desc, traded_on, amount)
 
 
-def transfer(trade_id, trade_info, payer_account_id, payee_account_id, amount):
+def transfer(order_id, trade_info, payer_account_id, payee_account_id, amount):
     from .transfer import transfer as _transfer
-    return _transfer(trade_id, trade_info, payer_account_id, payee_account_id, amount)
+    return _transfer(order_id, trade_info, payer_account_id, payee_account_id, amount)
 
 
 def query_bankcard_bin(card_no):
@@ -79,6 +79,11 @@ def generate_refund_order(source_id, from_account_id, to_account_id, amount, sta
     return _generate_refund_order(source_id, from_account_id, to_account_id, amount, state, info)
 
 
-def update_order_state(order_id, state):
+def generate_transfer_order(source_id, from_account_id, to_account_id, amount, state, info):
+    from .order import generate_transfer_order as _generate_transfer_order
+    return _generate_transfer_order(source_id, from_account_id, to_account_id, amount, state, info)
+
+
+def update_order_state(source_id, state):
     from .order import update_order_state as _update_order_state
-    return _update_order_state(order_id, state)
+    return _update_order_state(source_id, state)

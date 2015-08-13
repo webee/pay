@@ -17,7 +17,7 @@ CREATE TABLE bankcard(
 CREATE TABLE trade_order(
   id CHAR(30) PRIMARY KEY, -- prefix with 'ODX'
   type ENUM('PAY', 'REFUND', 'WITHDRAW', 'TRANSFER') NOT NULL,
-  source_id CHAR(30) NOT NULL,
+  source_id VARCHAR(30) NOT NULL,
   from_account_id INT NOT NULL,
   to_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
@@ -58,12 +58,14 @@ CREATE TABLE prepaid(
 
 CREATE TABLE transfer(
   id CHAR(30) PRIMARY KEY, -- prefix with 'TFR'
-  trade_id VARCHAR(30) NOT NULL,
+  trade_order_id CHAR(30) NOT NULL,
   payer_account_id INT NOT NULL,
   payee_account_id INT NOT NULL,
   amount DECIMAL(12, 2) NOT NULL,
   trade_info VARCHAR(128) DEFAULT '',
-  created_on TIMESTAMP NOT NULL
+  created_on TIMESTAMP NOT NULL,
+
+  FOREIGN KEY trade_order_id(trade_order_id) REFERENCES trade_order(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

@@ -5,7 +5,7 @@ from flask import Blueprint, request, redirect, Response
 from api.account import get_account_by_id, find_or_create_account
 from api.core import query_bankcard_bin, list_all_bankcards as _list_all_bankcards, add_bankcard as _add_bankcard, \
     ZytCoreError, list_unfailed_withdraw, get_withdraw_basic_info_by_id, get_cash_balance, \
-    transfer as core_transfer, list_cash_transaction_logs
+    transfer as core_transfer, list_cash_transaction_logs, generate_transfer_order, update_order_state
 from api.charged_withdraw import apply_to_charged_withdraw
 from api import delegate
 from api.util import response
@@ -131,7 +131,9 @@ def transfer(from_account_id, to_account_id):
     amount = Decimal(data['amount'])
 
     try:
-        _id = core_transfer(order_no, order_info, from_account_id, to_account_id, amount)
+        order_id = generate_transfer_order(order_no, from_account_id, to_account_id, amount, u'转账中', order_info)
+        _id = core_transfer(order_id, order_info, from_account_id, to_account_id, amount)
+        update_order_state(order_no, u'已转账')
         return response.ok(transfer_id=_id)
     except ZytCoreError, e:
         return response.bad_request(e.message)

@@ -25,8 +25,8 @@ test -d $RUN_DIR || mkdir -p $RUN_DIR
 # Start your unicorn
 export ENV=${env}
 exec gunicorn main:app -b 127.0.0.1:5000 \
-  --name $NAME                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            \
-  -k gevent
+  --name $NAME \
+  -k gevent \
   --workers $NUM_WORKERS \
   --user=$USER --group=$GROUP \
   --log-level=info \

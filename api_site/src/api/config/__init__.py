@@ -2,7 +2,6 @@
 
 
 class App:
-    PROPAGATE_EXCEPTIONS = True
     TESTING = False
     DEBUG = True
 

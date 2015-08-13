@@ -6,7 +6,6 @@ from pytoolbox import conf
 class App:
     ADMINS = ['liufan@lvye.com', 'yiwang@lvye.com', 'mengyu@lvye.com', 'zhoushiwei@lvye.com']
     SECRET_KEY = os.environ.get('SECRET_KEY') or '.yek eyvl'
-    PROPAGATE_EXCEPTIONS = True
     TESTING = False
     DEBUG = True
     LOGIN_DISABLED = False

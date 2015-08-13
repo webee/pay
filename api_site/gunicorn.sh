@@ -9,7 +9,7 @@ VENV_DIR=${PROJ_ROOT}/venv
 SOCK_FILE=${PROJ_ROOT}/run/pay_api.sock
 USER=${USER:-lvye_pay}
 GROUP=${GROUP:-lvye_pay}
-NUM_WORKERS=8
+NUM_WORKERS=${NUM_WORKERS:-8}
 
 echo "Starting $NAME"
 

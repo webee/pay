@@ -31,7 +31,9 @@ def _init_errors(app):
 
 
 def _register_mods(app):
-    pass
+    from admin_site.reconciliation import recon_mod
+
+    app.register_blueprint(recon_mod, url_prefix='/recon')
 
 
 def _init_csrf_protect(app):

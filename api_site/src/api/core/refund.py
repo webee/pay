@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from ._dba import find_payment_by_order_source_id, create_refund, update_refund_result, find_refund_by_id, REFUND_STATE, \
+from ._dba import only_find_successful_payment_by_order_source_id, create_refund, update_refund_result, find_refund_by_id, REFUND_STATE, \
     transit_refund_state
 from .ipay import transaction
 from .util.handling_result import HandledResult
@@ -13,7 +13,7 @@ _logger = get_logger(__name__)
 
 
 def refund(order_id, payment_order_source_id, amount, trade_info):
-    pay_record = find_payment_by_order_source_id(payment_order_source_id)
+    pay_record = only_find_successful_payment_by_order_source_id(payment_order_source_id)
 
     payer_account_id = pay_record['payee_account_id']
     payee_account_id = pay_record['payer_account_id']

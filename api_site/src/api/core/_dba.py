@@ -45,12 +45,13 @@ def find_payment_by_id(db, _id):
 
 
 @db_context
-def find_payment_by_order_source_id(db, order_source_id):
+def only_find_successful_payment_by_order_source_id(db, order_source_id):
     return db.get(
         """
             SELECT payment.* FROM payment
               INNER JOIN trade_order ON payment.trade_order_id = trade_order.id
               WHERE trade_order.source_id = %(source_id)s
+                AND payment.state = 'SUCCESS'
         """,
         source_id=order_source_id)
 

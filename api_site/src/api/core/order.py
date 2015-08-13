@@ -26,6 +26,7 @@ def update_order_state(source_id, state):
 
 
 def _find_or_create_order(type, source_id, from_account_id, to_account_id, amount, state, info):
-    if find_trade_order_by_source_id(source_id):
-        return source_id
+    order = find_trade_order_by_source_id(source_id)
+    if order:
+        return order.id
     return create_trade_order(type, source_id, from_account_id, to_account_id, amount, state, info)

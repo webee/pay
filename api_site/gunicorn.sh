@@ -9,6 +9,7 @@ NAME="pay-api-site"
 FLASK_DIR=${PROJ_ROOT}/src
 VENV_DIR=${PROJ_ROOT}/api_venv
 NUM_WORKERS=${NUM_WORKERS:-8}
+ENV_FILE=${HOME}/.pay_env.sh
 
 echo "Starting $NAME"
 
@@ -19,8 +20,8 @@ export PYTHONPATH=$FLASK_DIR:$PYTHONPATH
 
 # Start your unicorn
 export ENV=${env}
-if [ -f ${HOME}/pay-env.sh ]; then
-    source ${HOME}/.pay-env.sh
+if [ -f ${ENV_FILE} ]; then
+    source ${ENV_FILE}
 fi
 
 exec gunicorn main:app -b ${host}:${port} \

@@ -6,7 +6,6 @@ PROJ_ROOT=$(dirname $0)
 NAME="pay-api-site"
 FLASK_DIR=${PROJ_ROOT}/src
 VENV_DIR=${PROJ_ROOT}/api_venv
-SOCK_FILE=${PROJ_ROOT}/run/pay_api.sock
 USER=${USER:-lvye_pay}
 GROUP=${GROUP:-lvye_pay}
 NUM_WORKERS=${NUM_WORKERS:-8}
@@ -30,4 +29,3 @@ exec gunicorn main:app -b 127.0.0.1:5000 \
   --workers $NUM_WORKERS \
   --user=$USER --group=$GROUP \
   --log-level=info \
-  --bind=unix:$SOCK_FILE

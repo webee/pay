@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from api.core import refund as core_refund
+from api.core import refund as core_refund, generate_refund_order
 from ._dba import create_refund, find_refunded_payment_by_refund_id
 from api.secured_transaction.payment.postpay import mark_payment_as_refunding, mark_payment_as_refunded, \
     mark_payment_as_refund_failed
@@ -8,18 +8,20 @@ from api.util.notify import notify_client
 
 def apply_to_refund(pay_record, amount, async_callback_url):
     payment_id = pay_record.id
-    refund_payee_account_id = pay_record.payer_account_id
-    refund_payer_account_id = pay_record.payee_account_id
+    from_account_id = pay_record.payee_account_id
+    to_account_id = pay_record.payer_account_id
 
     refund_id = create_refund(
         payment_id=payment_id,
-        payer_account_id=refund_payer_account_id,
-        payee_account_id=refund_payee_account_id,
+        payer_account_id=from_account_id,
+        payee_account_id=to_account_id,
         amount=amount,
         async_callback_url=async_callback_url
     )
+
     trade_info = u'活动退款：%s' % pay_record['product_name']
-    core_refund(payment_id, amount, trade_info)
+    order_id = generate_refund_order(refund_id, from_account_id, to_account_id, amount, u'退款中', trade_info)
+    core_refund(order_id, payment_id, amount, trade_info)
 
     mark_payment_as_refunding(payment_id)
 

@@ -88,6 +88,7 @@ CREATE TABLE withdraw(
 
 CREATE TABLE refund(
   id CHAR(30) PRIMARY KEY,  -- prefix with 'RFD'
+  trade_order_id CHAR(30) NOT NULL,
   payment_id CHAR(30) NOT NULL, -- id prefixed with 'PAY'
   payer_account_id INT UNSIGNED NOT NULL,
   payee_account_id INT UNSIGNED NOT NULL,
@@ -99,6 +100,7 @@ CREATE TABLE refund(
   refund_serial_no VARCHAR(16) COMMENT '退款流水号',
   updated_on TIMESTAMP,
 
+  FOREIGN KEY trade_order_id(trade_order_id) REFERENCES trade_order(id),
   FOREIGN KEY payment_id(payment_id) REFERENCES payment(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

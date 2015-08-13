@@ -54,9 +54,9 @@ def get_withdraw_basic_info_by_id(withdraw_id):
     return _get_withdraw_basic_info_by_id(withdraw_id)
 
 
-def refund(payment_trade_id, amount, trade_info):
+def refund(order_id, payment_order_source_id, amount, trade_info):
     from .refund import refund as _refund
-    return _refund(payment_trade_id, amount, trade_info)
+    return _refund(order_id, payment_order_source_id, amount, trade_info)
 
 
 def get_cash_balance(account_id):
@@ -72,6 +72,11 @@ def list_cash_transaction_logs(account_id, q, side, tp, page_no, page_size):
 def generate_pay_order(source_id, from_account_id, to_account_id, amount, state, info):
     from .order import generate_pay_order as _generate_pay_order
     return _generate_pay_order(source_id, from_account_id, to_account_id, amount, state, info)
+
+
+def generate_refund_order(source_id, from_account_id, to_account_id, amount, state, info):
+    from .order import generate_refund_order as _generate_refund_order
+    return _generate_refund_order(source_id, from_account_id, to_account_id, amount, state, info)
 
 
 def update_order_state(order_id, state):

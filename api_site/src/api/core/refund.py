@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from ._dba import find_payment_by_trade_id, create_refund, update_refund_result, find_refund_by_id, REFUND_STATE, \
+from ._dba import find_payment_by_order_source_id, create_refund, update_refund_result, find_refund_by_id, REFUND_STATE, \
     transit_refund_state
 from .ipay import transaction
 from .util.handling_result import HandledResult
@@ -12,14 +12,14 @@ from pytoolbox.util.log import get_logger
 _logger = get_logger(__name__)
 
 
-def refund(payment_trade_id, amount, trade_info):
-    pay_record = find_payment_by_trade_id(payment_trade_id)
+def refund(order_id, payment_order_source_id, amount, trade_info):
+    pay_record = find_payment_by_order_source_id(payment_order_source_id)
 
     payer_account_id = pay_record['payee_account_id']
     payee_account_id = pay_record['payer_account_id']
     paybill_id = pay_record['paybill_id']
     now = datetime.now()
-    refund_id = create_refund(pay_record['id'], payer_account_id, payee_account_id, amount, trade_info, now)
+    refund_id = create_refund(order_id, pay_record['id'], payer_account_id, payee_account_id, amount, trade_info, now)
 
     _request_refund(refund_id, now, amount, paybill_id)
 

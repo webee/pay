@@ -88,8 +88,14 @@ def find_payment_by_id(db, id):
 
 
 @db_context
-def find_payment_by_trade_id(db, trade_id):
-    return db.get('SELECT * FROM payment WHERE trade_id = %(trade_id)s', trade_id=trade_id)
+def find_payment_by_order_source_id(db, order_source_id):
+    return db.get(
+        """
+            SELECT payment.* FROM payment
+              INNER JOIN trade_order ON payment.trade_order_id = trade_order.id
+              WHERE trade_order.source_id = %(source_id)s
+        """,
+        source_id=order_source_id)
 
 
 @db_context
@@ -227,10 +233,12 @@ def find_withdraw_basic_info_by_id(db, _id):
 
 
 @db_context
-def create_refund(db, payment_id, payer_account_id, payee_account_id, amount, trade_info, created_on=datetime.now()):
+def create_refund(db, order_id, payment_id, payer_account_id, payee_account_id, amount, trade_info,
+                  created_on=datetime.now()):
     _id = refund_id(payer_account_id)
     fields = {
         'id': _id,
+        'trade_order_id': order_id,
         'payment_id': payment_id,
         'payer_account_id': payer_account_id,
         'payee_account_id': payee_account_id,

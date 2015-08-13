@@ -17,10 +17,6 @@ source ${VENV_DIR}/bin/activate
 
 export PYTHONPATH=$FLASK_DIR:$PYTHONPATH
 
-# Create the run directory if it doesn't exist
-RUN_DIR=$(dirname $SOCK_FILE)
-test -d $RUN_DIR || mkdir -p $RUN_DIR
-
 # Start your unicorn
 export ENV=${env}
 exec gunicorn main:app -b 127.0.0.1:5000 \

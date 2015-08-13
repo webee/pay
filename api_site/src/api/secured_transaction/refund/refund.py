@@ -39,12 +39,12 @@ def after_refunded(payment_id, refund_id, is_successful_refund):
 
 def _succeed_refund(refund_id, payment_id):
     mark_payment_as_refunded(payment_id)
-    update_order_state(refund_id, u'已退款')
+    update_order_state(refund_id, u'已完成')
 
 
 def _fail_refund(refund_id, payment_id):
     mark_payment_as_refund_failed(payment_id)
-    update_order_state(refund_id, u'退款失败')
+    update_order_state(refund_id, u'失败')
 
 
 def _try_notify_client(refund_id, is_successful_refund):

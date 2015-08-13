@@ -33,12 +33,13 @@ def pay_by_id(payment_id):
 
 def _pay_with_core(pay_record):
     payer_account_id = pay_record['payer_account_id']
-    secured_account_id = get_secured_account_id()
+    payee_account_id = pay_record['payee_account_id']
     amount = pay_record['amount']
     desc = pay_record['product_desc']
 
-    order_id = generate_pay_order(pay_record['id'], payer_account_id, secured_account_id, amount, u'未支付', desc)
+    order_id = generate_pay_order(pay_record['id'], payer_account_id, payee_account_id, amount, u'未支付', desc)
 
+    secured_account_id = get_secured_account_id()
     payer = get_account_by_id(payer_account_id)
     pay_form = core_pay(
         order_id=order_id,

@@ -32,6 +32,8 @@ em.mistake {
     margin: 6px 0 0 185px;
     background: url(../images/warn_bg.png) no-repeat left center;
     padding-left: 20px;
+    height: 17px;
+    line-height: 18px;
 }
 
 .beizhu .mistake {

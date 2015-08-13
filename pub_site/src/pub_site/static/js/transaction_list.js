@@ -12,7 +12,7 @@ function update_balance(callback) {
     requestRunning = true;
     $.getJSON('/balance')
         .done(function (res) {
-            $("#balance").html(res.balance);
+            $("#balance").html(res.balance+ ' 元');
         }).complete(function() {
             requestRunning = false;
             if (callback != null) {

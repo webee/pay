@@ -116,7 +116,7 @@ class MyRegexp(object):
 class WithdrawForm(Form):
     bankcard = MyHiddenField()
     amount = FloatField(u"提现金额(元)",
-                        validators=[DataRequired(u"请输入合法金额"), MyRegexp(r'^\d+(.\d{1,2})?$', message=u"请输入合法金额"),
+                        validators=[DataRequired(u'请输入数字，小数点后最多2位， 例如"8.88"'), MyRegexp(r'^\d+(.\d{1,2})?$', message=u'请输入数字，小数点后最多2位， 例如"8.88"'),
                                     amount_less_than_balance,
                                     NumberRange(min=WITHDRAW_COMMISSION, message=u"提现金额不能少于2元(含手续费2元)")])
     identifying_code = StringField(u"验证码", validators=[DataRequired(u"验证码不能为空"), identifying_code_should_match])

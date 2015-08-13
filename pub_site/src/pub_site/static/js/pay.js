@@ -21,7 +21,7 @@ $(function () {
         var errors = {};
         var amount = $('#amount').val();
         if (!amount || !amount.match(amountPattern) || amount <= 0) {
-            errors['amount'] = '请输入合法金额';
+            errors['amount'] = '请输入数字，小数点后最多2位， 例如"8.88"';
         }
         var comment = $('#comment').val();
         if (!comment) {

@@ -61,11 +61,11 @@ def _try_notify_client(refund_id, is_successful_refund):
     url = refunded_payment.refund_callback_url
     _logger.info('notify client url: {}'.format(url))
     if is_successful_refund:
-        params = {'code': 0, 'client_id': refunded_payment.client_id, 'order_id': refunded_payment.order_id,
-                  'amount': refunded_payment.refund_amount}
+        params = {'code': 0, 'client_id': refunded_payment.channel_id, 'order_id': refunded_payment.order_id,
+                  'amount': refunded_payment.refunded_amount}
     else:
-        params = {'code': 1, 'client_id': refunded_payment.client_id, 'order_id': refunded_payment.order_id,
-                  'amount': refunded_payment.refund_amount}
+        params = {'code': 1, 'client_id': refunded_payment.channel_id, 'order_id': refunded_payment.order_id,
+                  'amount': refunded_payment.refunded_amount}
 
     if not notify_client(url, params):
         # other notify process.

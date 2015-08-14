@@ -38,6 +38,7 @@ def do_migration():
 def reread_config_file():
     fab.run('sudo cp deploy/pay_api_site.conf /etc/supervisord.d/')
     fab.run('sudo /usr/local/bin/supervisorctl reread')
+    fab.run('sudo /usr/local/bin/supervisorctl update')
 
 
 def stop_python_server(name):

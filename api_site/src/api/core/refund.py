@@ -41,6 +41,7 @@ def handle_refund_notification(refund_record, refund_serial_no, status):
         transit_refund_state(refund_id, REFUND_STATE.CREATED, REFUND_STATE.SUCCESS)
         _logger.info("book keeping {0}".format(refund_id))
         _bookkeep(refund_record)
+        _logger.info("book keeping succeed.")
         return HandledResult(True, True)
     else:
         _logger.info("refund failed. status: {0}".format(status))
@@ -58,6 +59,7 @@ def _request_refund(refund_id, refunded_on, amount, paybill_id):
 def _bookkeep(refund_record):
     pay_record = find_refund_by_id(refund_record['payment_id'])
     payer_account_id = pay_record['payer_account_id']
+    _logger.info("find payer account id: [{}]".format(payer_account_id))
     bookkeep(Event(SourceType.REFUND, refund_record['id'], refund_record['amount']),
              (payer_account_id, '-cash'),
              (payer_account_id, '-asset'))

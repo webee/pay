@@ -33,7 +33,7 @@ def find_refunded_payment_by_refund_id(db, refund_id):
             SELECT secured_payment.*, secured_refund.async_callback_url as refund_callback_url,
                    secured_refund.amount as refund_amount
               FROM secured_payment
-                INNER JOIN secured_refund ON secured_payment.id = secured_refund.payee_account_id
+                INNER JOIN secured_refund ON secured_payment.id = secured_refund.secured_payment_id
               WHERE secured_refund.id=%(refund_id)s
         """,
         refund_id=refund_id)

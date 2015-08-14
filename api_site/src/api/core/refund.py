@@ -2,7 +2,7 @@
 from datetime import datetime
 
 from ._dba import only_find_successful_payment_by_order_source_id, create_refund, update_refund_result, find_refund_by_id, REFUND_STATE, \
-    transit_refund_state
+    transit_refund_state, find_payment_by_id
 from .ipay import transaction
 from .util.handling_result import HandledResult
 from ._bookkeeping import bookkeep, Event, SourceType
@@ -57,7 +57,7 @@ def _request_refund(refund_id, refunded_on, amount, paybill_id):
 
 
 def _bookkeep(refund_record):
-    pay_record = find_refund_by_id(refund_record['payment_id'])
+    pay_record = find_payment_by_id(refund_record['payment_id'])
     payer_account_id = pay_record['payer_account_id']
     _logger.info("find payer account id: [{}]".format(payer_account_id))
     bookkeep(Event(SourceType.REFUND, refund_record['id'], refund_record['amount']),

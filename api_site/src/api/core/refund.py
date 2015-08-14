@@ -58,8 +58,8 @@ def _request_refund(refund_id, refunded_on, amount, paybill_id):
 
 def _bookkeep(refund_record):
     pay_record = find_payment_by_id(refund_record['payment_id'])
-    payer_account_id = pay_record['payer_account_id']
-    _logger.info("find payer account id: [{}]".format(payer_account_id))
+    payee_account_id = pay_record['payee_account_id']
+    _logger.info("find payee account id: [{}]".format(payee_account_id))
     bookkeep(Event(SourceType.REFUND, refund_record['id'], refund_record['amount'], trade_info=refund_record['trade_info']),
-             (payer_account_id, '-cash'),
-             (payer_account_id, '-asset'))
+             (payee_account_id, '-cash'),
+             (payee_account_id, '-asset'))

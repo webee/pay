@@ -359,6 +359,12 @@ def count_all_trade_orders(db, account_id, category, keyword):
     else:
         return db.get_scalar(query_statement, account_id=account_id)
 
+@db_context
+def find_trade_order_by_refund_id(db, refund_id):
+    query_statement = "select * from trade_order where id=(select trade_order_id from refund where id= %(refund_id)s)"
+    return db.get(query_statement, refund_id=refund_id)
+
+
 
 def _sql_to_query_withdraw():
     return """

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from ._dba import create_refund, find_refunded_payment_by_refund_id
 from api.core import refund as core_refund, generate_refund_order, update_order_state
+from api.core._dba import find_trade_order_by_refund_id
 from api.secured_transaction.payment.postpay import mark_payment_as_refunding, mark_payment_as_refunded, \
     mark_payment_as_refund_failed
 from api.util.notify import notify_client
@@ -39,8 +40,9 @@ def after_refunded(payment_id, refund_id, is_successful_refund):
     else:
         _logger.info('refund failed with refund id [{0}] and payment_id: [{1}]'.format(refund_id, payment_id))
         _fail_refund(refund_id, payment_id)
-
-    _try_notify_client(refund_id, is_successful_refund)
+    trade_order = find_trade_order_by_refund_id(refund_id)
+    secured_refund_id = trade_order.source_id
+    _try_notify_client(secured_refund_id, is_successful_refund)
 
 
 def _succeed_refund(refund_id, payment_id):

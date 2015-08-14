@@ -23,6 +23,7 @@ def deploy(env):
         fab.run('git pull --ff-only origin master')
     with fab.cd(code_dir), fab.prefix('source pub_venv/bin/activate'):
         fab.run('git pull --ff-only origin master')
+        renew_config_file()
         stop_python_server('pay_pub_site')
         start_python_server('pay_pub_site')
 
@@ -33,3 +34,8 @@ def stop_python_server(name):
 
 def start_python_server(name):
     fab.run('sudo /usr/local/bin/supervisorctl start {}'.format(name))
+
+def renew_config_file():
+    fab.run('sudo cp deploy/pay_pub_site.conf /etc/supervisord.d/')
+    fab.run('sudo /usr/local/bin/supervisorctl reread')
+    fab.run('sudo /usr/local/bin/supervisorctl update')

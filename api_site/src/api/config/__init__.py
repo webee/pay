@@ -57,10 +57,10 @@ class LianLianPay:
         URL = 'https://yintong.com.cn/traderapi/refund.htm'
 
         class Status:
-            APPLIED = 0
-            PROCESSING = 1
-            SUCCESS = 2
-            FAILED = 3
+            APPLIED = '0'
+            PROCESSING = '1'
+            SUCCESS = '2'
+            FAILED = '3'
 
     class BankcardBinQuery:
         URL = 'https://yintong.com.cn/traderapi/bankcardquery.htm'

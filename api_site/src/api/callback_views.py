@@ -100,6 +100,7 @@ def notify_refund(uuid):
 
     result = handle_refund_notification(refund_order, oid_refundno, sta_refund)
     pay_record = get_payment_by_id(refund_order['payment_id'])
+    _logger.info("get pay_record {0}".format(pay_record.id))
     delegate.refunded(pay_record['source_id'], refund_id, result.is_successful)
     return notification.accepted()
 

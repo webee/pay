@@ -37,10 +37,13 @@ def handle_refund_notification(refund_record, refund_serial_no, status):
 
     # process refund status.
     if transaction.is_successful_refund(status):
+        _logger.info("refund success. status: {0}".format(status))
         transit_refund_state(refund_id, REFUND_STATE.CREATED, REFUND_STATE.SUCCESS)
+        _logger.info("book keeping {0}".format(refund_id))
         _bookkeep(refund_record)
         return HandledResult(True, True)
     else:
+        _logger.info("refund failed. status: {0}".format(status))
         transit_refund_state(refund_id, REFUND_STATE.CREATED, REFUND_STATE.FAILED)
         return HandledResult(True, False)
 

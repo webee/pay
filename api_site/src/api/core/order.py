@@ -46,6 +46,7 @@ def list_orders(account_id, category, page_no, page_size, keyword):
             'id': order.id,
             'type': order.type,
             'amount': float(order.amount) * income_ratio,
+            'state': order.state,
             'info': order.info,
             'created_on': order.created_on
         })

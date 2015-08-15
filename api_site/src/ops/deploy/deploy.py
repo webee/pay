@@ -3,7 +3,7 @@ import fabric.api as fab
 
 def get_config(env):
     import os
-    from ops import config
+    from ops.config import deploy as config
     import pytoolbox.conf.config as conf
 
     env = env or 'dev'

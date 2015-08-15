@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 from fabric.api import local
 from tools.log import *
-from ops import config
+from ops.config import db as config
+import pytoolbox.conf.config as conf
 
 
-def init_db(recreate=False):
+def init_db(env, recreate=False):
+    env = env or 'dev'
+    conf.load(config, env=env)
+
     if recreate:
         recreate_db()
     create_schema()

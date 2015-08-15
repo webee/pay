@@ -3,7 +3,7 @@ from datetime import datetime
 
 from ..util import oid
 from pytoolbox.util.enum import enum
-from pytoolbox.util.dbe import db_context
+from pytoolbox.util.dbs import db_context
 
 
 PAYMENT_STATE = enum(CREATED='CREATED', SECURED='SECURED', FAILED='FAILED', CONFIRMED='CONFIRMED',

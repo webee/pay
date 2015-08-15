@@ -9,11 +9,6 @@ class Host:
     API_GATEWAY = 'http://127.0.0.1:5000'
 
 
-class DataBase:
-    HOST = 'localhost'
-    PASSWORD = 'p@55word'
-
-
 class LianLianPay:
     OID_PARTNER = '201408071000001546'
 

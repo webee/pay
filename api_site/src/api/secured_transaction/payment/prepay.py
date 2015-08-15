@@ -6,7 +6,7 @@ from api import config
 from api.account import find_or_create_account, find_user_domain_id_by_channel
 from api.secured_transaction.util import oid
 from api.util.uuid import encode_uuid
-from pytoolbox.util.dbe import transactional
+from pytoolbox.util.dbs import transactional
 
 
 class Order(object):

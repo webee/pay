@@ -23,10 +23,10 @@ def migrate():
     from ops.deploy.migration import do_migration
     do_migration()
 
-@manager.command
-def init_db():
+@manager.option('-r', '--recreate', action="store_true", dest="recreate", required=True, default=False)
+def init_db(recreate):
     from ops.deploy.init_db import init_db
-    init_db()
+    init_db(recreate)
 
 
 @manager.option('-e', '--env', type=str, dest="environment", required=True)

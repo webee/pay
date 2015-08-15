@@ -9,7 +9,7 @@ from api import config
 from api.core import generate_pay_order, pay as core_pay
 from api.util import req
 from api.util.uuid import encode_uuid
-from pytoolbox.util.dbe import transactional
+from pytoolbox.util.dbs import transactional
 
 
 class Order(object):

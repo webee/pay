@@ -2,7 +2,7 @@
 from ._bookkeeping import Event, SourceType, bookkeep
 from ._dba import create_transfer
 from .balance import get_cash_balance, InsufficientBalanceError
-from pytoolbox.util.dbe import transactional
+from pytoolbox.util.dbs import transactional
 
 
 @transactional

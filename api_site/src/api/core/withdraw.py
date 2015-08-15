@@ -10,7 +10,7 @@ from .util.handling_result import HandledResult
 from api.core import ZytCoreError, ConditionalError
 from api.util.notify import notify_client
 from api.util.parser import to_int
-from pytoolbox.util.dbe import db_transactional, transactional
+from pytoolbox.util.dbs import db_transactional, transactional
 from pytoolbox.util.log import get_logger
 
 

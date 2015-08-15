@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from fabric.api import local
 from tools.log import *
-from api import config
+from ops import config
 
 
-def init_db():
-    # recreate_db()
+def init_db(recreate=False):
+    if recreate:
+        recreate_db()
     create_schema()
     inject_base_data()
 

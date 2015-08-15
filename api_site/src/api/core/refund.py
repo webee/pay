@@ -6,7 +6,7 @@ from ._dba import only_find_successful_payment_by_order_source_id, create_refund
 from .ipay import transaction
 from .util.handling_result import HandledResult
 from ._bookkeeping import bookkeep, Event, SourceType
-from pytoolbox.util.dbe import transactional
+from pytoolbox.util.dbs import transactional
 from pytoolbox.util.log import get_logger
 
 _logger = get_logger(__name__)

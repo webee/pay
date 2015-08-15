@@ -9,11 +9,6 @@ class Host:
     API_GATEWAY = 'http://pay.lvye.com'
 
 
-class DataBase:
-    HOST = 'localhost'
-    PASSWORD = 'p@55word'
-
-
 class LianLianPay:
     OID_PARTNER = '201507021000395502'
 

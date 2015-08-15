@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from ._dba import confirm_to_pay, update_payment_state, PAYMENT_STATE
 from api.core import transfer as core_transfer, update_order_state
 from api.account import get_secured_account_id
-from pytoolbox.util.dbe import transactional
+from pytoolbox.util.dbs import transactional
 
 
 @transactional

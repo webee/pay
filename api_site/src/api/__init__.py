@@ -6,7 +6,7 @@ from api.delegation_center import delegate, event
 from api.direct_transaction import callback_interface as direct_delegate
 from api.secured_transaction import callback_interface as secured_delegate
 from pytoolbox.conf import config as conf
-from pytoolbox.util import dbe
+from pytoolbox.util import dbs
 
 
 def register_mods(app):
@@ -46,8 +46,7 @@ def create_app(env='dev', deploy=False):
     conf.load(config, env=env)
     app.config.from_object(config.App)
 
-    dbe.create_db_engine(config.DataBase.HOST, config.DataBase.PORT, config.DataBase.INSTANCE,
-                         config.DataBase.USERNAME, config.DataBase.PASSWORD)
+    dbs.init_db(app)
 
     register_mods(app)
     register_callbacks()

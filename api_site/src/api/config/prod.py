@@ -7,16 +7,14 @@ from pytoolbox.conf.config import read_file
 class App:
     TESTING = False
     DEBUG = False
+    # database
+    SQLALCHEMY_DATABASE_URI = 'mysql://lvye_pay:{0}@{1}:3306/lvye_pay'.format(
+        os.environ['PAY_API_SITE_DATABASE_PASSWORD'], os.environ['PAY_API_SITE_DATABASE_HOST'])
+    SQLALCHEMY_ECHO = False
 
 
 class Host:
     API_GATEWAY = 'http://pay.lvye.com/api'
-
-class DataBase:
-    HOST = os.environ['PAY_API_SITE_DATABASE_HOST']
-    INSTANCE = 'lvye_pay'
-    USERNAME = 'lvye_pay'
-    PASSWORD = os.environ['PAY_API_SITE_DATABASE_PASSWORD']
 
 
 class Celery:

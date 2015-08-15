@@ -4,18 +4,16 @@
 class App:
     TESTING = False
     DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'mysql://lvye_pay:p@55word@localhost:3306/lvye_pay'
+    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_POOL_SIZE = 30
+    SQLALCHEMY_POOL_TIMEOUT = 60
+    SQLALCHEMY_MAX_OVERFLOW = 60
+    SQLALCHEMY_POOL_RECYCLE = 3600
 
 
 class Host:
     API_GATEWAY = 'http://127.0.0.1:5000'
-
-
-class DataBase:
-    HOST = ''
-    PORT = 3306
-    INSTANCE = 'lvye_pay'
-    USERNAME = 'lvye_pay'
-    PASSWORD = ''
 
 
 class LianLianPay:

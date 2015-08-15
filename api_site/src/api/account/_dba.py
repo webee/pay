@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pytoolbox.util.dbe import db_context
+from pytoolbox.util.dbs import db_context
 
 
 @db_context

@@ -11,4 +11,4 @@ class App:
         os.environ['PAY_API_SITE_DATABASE_PASSWORD'], os.environ['PAY_API_SITE_DATABASE_HOST'])
     SQLALCHEMY_ECHO = False
 
-HOST_URL = 'http://pay.lvye.com'
+HOST_URL = 'http://pay.lvye.com/api'

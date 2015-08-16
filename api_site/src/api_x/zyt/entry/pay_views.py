@@ -48,7 +48,7 @@ def cashier_desk(sn):
         abort(404)
     if transaction.state == TransactionState.SUCCESS:
         return render_template("info.html", msg="该订单已支付完成")
-    return render_template("cashier_desk.html", tx=transaction, vas=VirtualAccountSystemType)
+    return render_template("cashier_desk.html", root_url=config.HOST_URL, tx=transaction, vas=VirtualAccountSystemType)
 
 
 @mod.route("/pay/<sn>/<vas_name>", methods=["GET"])

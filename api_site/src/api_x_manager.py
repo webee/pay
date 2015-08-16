@@ -23,8 +23,8 @@ server = Server(host="0.0.0.0", port=5000)
 manager.add_command("runserver", server)
 
 
-@manager.command
-def init_db():
+@manager.option('-r', '--recreate', action="store_true", dest="recreate", required=True, default=False)
+def init_db(recreate):
     from fabric.api import local
     from api_x import db
     from api_x.data import init_data
@@ -34,7 +34,9 @@ def init_db():
         info('recreating database ...')
         local('mysql -u root -p < migration/init_db.ddl')
 
-    recreate_db()
+    if recreate:
+        recreate_db()
+    db.drop_all()
     db.create_all()
     init_data()
 

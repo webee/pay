@@ -63,7 +63,7 @@ def test_get_user_balance(user_id):
 @manager.option('-a', '--amount', type=Decimal, dest="amount", required=True)
 @manager.option('-f', '--fail', action="store_true", dest="failed", default=False)
 def test_prepaid(user_id, amount, failed):
-    from api_x.zyt import get_vas_by_name
+    from api_x.zyt.biz.vas import get_vas_by_name
     from api_x.zyt.biz import prepaid
 
     vas = get_vas_by_name('test_pay')
@@ -96,7 +96,7 @@ def test_withdraw(user_id, amount, bankcard_id):
 @manager.option('-i', '--id', type=long, dest="withdraw_id", required=True)
 @manager.option('-s', '--success', type=int, dest="success", default=1)
 def test_done_withdraw(withdraw_id, success):
-    from api_x.zyt import get_vas_by_name
+    from api_x.zyt.biz.vas import get_vas_by_name
     from api_x.dbs import require_transaction_context
     from datetime import datetime
     from api_x.zyt.biz import withdraw
@@ -121,7 +121,7 @@ def test_done_withdraw(withdraw_id, success):
 @manager.option('-a', '--amount', type=Decimal, dest="amount", required=True)
 def test_transfer(from_id, to_id, amount):
     from api_x import zyt
-    from api_x.zyt import get_vas_by_name
+    from api_x.zyt.biz.vas import get_vas_by_name
     from api_x.zyt.biz import transfer
 
     zyt = get_vas_by_name(zyt.NAME)

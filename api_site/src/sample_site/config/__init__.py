@@ -1,7 +1,7 @@
 # coding=utf-8
 
 
-HOST_URL = "http://dev_pay.lvye.com:8089"
+HOST_URL = "http://localhost:8089"
 
 
 class App:
@@ -13,6 +13,6 @@ class App:
 
 
 class PayAPI:
-    PREPAID_URL = 'http://dev_pay.lvye.com:8088/prepaid'
-    PRE_PAY_URL = 'http://dev_pay.lvye.com:8088/pre_pay'
-    CONFIRM_GUARANTEE_PAYMENT_URL = 'http://dev_pay.lvye.com:8088/pay/guarantee_payment/confirm'
+    PREPAID_URL = 'http://pay.lvye.com/api/prepaid'
+    PRE_PAY_URL = 'http://pay.lvye.com/api/pre_pay'
+    CONFIRM_GUARANTEE_PAYMENT_URL = 'http://pay.lvye.com/api/pay/guarantee_payment/confirm'

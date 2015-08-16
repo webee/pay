@@ -15,7 +15,7 @@ from . import notification
 @parse_and_verify
 def pay_result(pay_source):
     """支付页面回调, 更多操作可由notify完成，这里只是返回callback"""
-    data = request.values
+    data = request.verified_data
     partner_oid = data['oid_partner']
     order_no = data['no_order']
     pay_result = data['result_pay']
@@ -37,7 +37,7 @@ def pay_result(pay_source):
 @mod.route("/pay/notify/<pay_source>", methods=["POST"])
 @parse_and_verify
 def pay_notify(pay_source):
-    data = request.values
+    data = request.verified_data
     partner_oid = data['oid_partner']
     order_no = data['no_order']
     pay_result = data['result_pay']

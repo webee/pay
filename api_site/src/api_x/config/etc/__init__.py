@@ -16,4 +16,4 @@ class App:
     SQLALCHEMY_POOL_RECYCLE = 3600
 
 
-HOST_URL = 'http://pay.lvye.com'
+HOST_URL = 'http://pay.lvye.com/api'

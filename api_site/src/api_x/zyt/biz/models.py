@@ -80,8 +80,8 @@ class PaymentRecord(db.Model):
     amount = db.Column(db.Numeric(12, 2), nullable=False)
     refunded_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
-    es_name = db.Column(db.VARCHAR(32))
-    es_sn = db.Column(db.VARCHAR(128))
+    vas_name = db.Column(db.VARCHAR(32))
+    vas_sn = db.Column(db.VARCHAR(128))
 
     client_callback_url = db.Column(db.VARCHAR(128))
     client_notify_url = db.Column(db.VARCHAR(128))

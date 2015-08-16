@@ -142,7 +142,7 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
     :return:
     """
     trx, payment_record = get_tx_payment_by_sn(sn)
-    update_payment_info(payment_record.id, vas_name, vas_sn)
+    payment_record = update_payment_info(payment_record.id, vas_name, vas_sn)
 
     if is_success:
         # 直付和担保付的不同操作

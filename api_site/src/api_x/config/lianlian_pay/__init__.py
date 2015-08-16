@@ -3,7 +3,7 @@ from tools.pmc_config import read_string
 PLATFORM = 'lvye.com'
 OID_PARTNER = '201507021000395502'
 
-ROOT_URL = "http://pay.lvye.com"
+ROOT_URL = "http://pay.lvye.com/api"
 
 
 class SignType:

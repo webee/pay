@@ -43,12 +43,12 @@ def pre_pay():
 @mod.route('/cashier_desk/<sn>', methods=['GET'])
 def cashier_desk(sn):
     """支付收银台入口"""
-    transaction = get_tx_by_sn(sn)
-    if transaction is None:
+    tx = get_tx_by_sn(sn)
+    if tx is None:
         abort(404)
-    if transaction.state == TransactionState.SUCCESS:
+    if tx.state != TransactionState.SUCCESS:
         return render_template("info.html", msg="该订单已支付完成")
-    return render_template("cashier_desk.html", root_url=config.HOST_URL, tx=transaction, vas=VirtualAccountSystemType)
+    return render_template("cashier_desk.html", root_url=config.HOST_URL, tx=tx, vas=VirtualAccountSystemType)
 
 
 @mod.route("/pay/<sn>/<vas_name>", methods=["GET"])
@@ -59,6 +59,8 @@ def pay(sn, vas_name):
     tx = get_tx_by_sn(sn)
     if tx is None:
         abort(404)
+    if tx.state != TransactionState.SUCCESS:
+        return render_template("info.html", msg="该订单已支付完成")
 
     return payment.pay(vas_name, tx)
 

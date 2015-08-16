@@ -11,6 +11,7 @@ from api_x.zyt.vas import NAME as ZYT_NAME
 from ..vas.models import EventType
 from .transaction import create_transaction, transit_transaction_state, get_tx_by_sn
 from .models import TransactionType, PaymentRecord, PaymentType
+from api_x.dbs import require_transaction_context
 
 
 @transactional
@@ -19,7 +20,11 @@ def create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
                    client_callback_url, client_notify_url):
     channel = get_channel_info(channel_id)
     comments = "在线支付-{0}:{1}|{2}".format(channel.name, product_name, order_id)
-    tx_record = create_transaction(TransactionType.PAYMENT, amount, comments, [payer_id, payee_id])
+    user_ids = [payer_id, payee_id]
+    if payment_type == PaymentType.GUARANTEE:
+        secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
+        user_ids.append(secure_user_id)
+    tx_record = create_transaction(TransactionType.PAYMENT, amount, comments, user_ids)
 
     fields = {
         'tx_id': tx_record.id,
@@ -53,7 +58,12 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_i
                                         client_callback_url, client_notify_url)
     else:
         # update payment info, if not paid.
-        pass
+        with require_transaction_context():
+            PaymentRecord.query.filter_by(id=payment_record.id, state=TransactionState.CREATED)\
+                .update({'amount': amount})
+            db.session.commit()
+
+            payment_record = PaymentRecord.query.get(payment_record.id)
     return payment_record
 
 
@@ -67,6 +77,10 @@ def get_payment_by_tx_id(tx_id):
 
 def get_payment_by_sn(sn):
     return PaymentRecord.query.filter_by(sn=sn).first()
+
+
+def get_payment_by_id(id):
+    return PaymentRecord.query.get(id)
 
 
 def get_tx_payment_by_sn(sn):

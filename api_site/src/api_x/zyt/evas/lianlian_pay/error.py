@@ -4,30 +4,30 @@ from __future__ import unicode_literals
 from ..error import EvasError
 
 
-class TransactionApiError(EvasError):
+class ApiError(EvasError):
     def __init__(self, message):
-        super(TransactionApiError, self).__init__(message)
+        super(ApiError, self).__init__(message)
 
 
-class InvalidSignError(TransactionApiError):
+class InvalidSignError(ApiError):
     def __init__(self, sign_type, signed_data):
         message = "Sign verification failed [SignType={0}, SignedData={1}].".format(sign_type, signed_data)
         super(InvalidSignError, self).__init__(message)
 
 
-class UnExpectedResponseError(TransactionApiError):
+class UnExpectedResponseError(ApiError):
     def __init__(self, status_code, content):
         message = "Api didn't response as expected [StatusCode={0}, Content={1}].".format(status_code, content)
         super(UnExpectedResponseError, self).__init__(message)
 
 
-class RequestFailedError(TransactionApiError):
+class RequestFailedError(ApiError):
     def __init__(self, return_code, return_msg):
         message = "Request failed, because ReturnCode is {0} and Message is {1}.".format(return_code, return_msg)
-        super(TransactionApiError, self).__init__(message)
+        super(ApiError, self).__init__(message)
 
 
-class DictParsingError(TransactionApiError):
+class DictParsingError(ApiError):
     def __init__(self, raw_data):
         message = "Data [{0}] must be a dict.".format(raw_data)
-        super(TransactionApiError, self).__init__(message)
+        super(ApiError, self).__init__(message)

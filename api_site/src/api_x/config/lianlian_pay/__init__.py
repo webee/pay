@@ -31,8 +31,14 @@ class Payment:
     RETURN_URL = '/pay/{uuid}/result'
 
 
-class Bankcard:
-    BIN_QUERY_URL = 'https://yintong.com.cn/traderapi/bankcardquery.htm'
+class Refund:
+    URL = 'https://yintong.com.cn/traderapi/refund.htm'
+
+    class Status:
+        APPLY = '0'
+        PROCESSING = '1'
+        SUCCESS = '2'
+        FAILED = '3'
 
 
 class PayToBankcard:
@@ -48,6 +54,10 @@ class PayToBankcard:
         PROCESSING = 'PROCESSING'
 
 
+class Bankcard:
+    BIN_QUERY_URL = 'https://yintong.com.cn/traderapi/bankcardquery.htm'
+
+
 class OrderQuery:
     VERSION = "1.1"
     URL = "https://yintong.com.cn/traderapi/orderquery.htm"
@@ -55,14 +65,3 @@ class OrderQuery:
     class TypeDC:
         PAY = "0"
         WITHDRAW = "1"
-
-
-class Refund:
-    URL = 'https://yintong.com.cn/traderapi/refund.htm'
-    NOTIFY_URL = '/refund/{uuid}/notify'
-
-    class Status:
-        APPLY = '0'
-        PROCESSING = '1'
-        SUCCESS = '2'
-        FAILED = '3'

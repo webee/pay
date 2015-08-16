@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from flask import url_for, Response
-from api_x.config import lianlian_pay
 from .commons import generate_absolute_url
 from .pay import pay as _pay
 
@@ -28,7 +27,3 @@ def pay_to_bankcard():
 
 def query_bin():
     pass
-
-
-def is_sending_to_me(partner_id):
-    return partner_id == lianlian_pay.OID_PARTNER

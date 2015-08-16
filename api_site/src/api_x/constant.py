@@ -23,10 +23,23 @@ class TransactionType:
 
 class TransactionState:
     CREATED = 'CREATED'
-    SUCCESS = 'SUCCESS'
     FAILED = 'FAILED'
+    SUCCESS = 'SUCCESS'
     SECURED = 'SECURED'
-    CONFIRMED= 'CONFIRMED'
+
+
+class PaymentTransactionState:
+    CREATED = 'CREATED'
+    FAILED = 'FAILED'
+    SUCCESS = 'SUCCESS'
+    SECURED = 'SECURED'
+    REFUNDING = 'REFUNDING'
+
+
+class RefundTransactionState:
+    CREATED = 'CREATED'
+    FAILED = 'FAILED'
+    SUCCESS = 'SUCCESS'
 
 
 class BankcardType:

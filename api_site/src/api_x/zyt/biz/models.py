@@ -35,7 +35,16 @@ class TransactionRecord(db.Model):
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
-        return '<Transaction %r, %r>' % (self.type, self.amount, self.state)
+        return '<Transaction %r, %r, %r>' % (self.type, self.amount, self.state)
+
+
+class UserTransaction(db.Model):
+    __tablename__ = 'user_transaction'
+
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('account_user.id'), nullable=False)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False)
+    tx_record = db.relationship('TransactionRecord', backref=db.backref('users', lazy='dynamic'))
 
 
 class TransactionStateLog(db.Model):
@@ -49,15 +58,6 @@ class TransactionStateLog(db.Model):
     event_id = db.Column(db.BigInteger, nullable=True, default=0L)
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-
-class UserTransaction(db.Model):
-    __tablename__ = 'user_transaction'
-
-    id = db.Column(db.BigInteger, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('account_user.id'), nullable=False)
-    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False)
-    tx_record = db.relationship('TransactionRecord', backref=db.backref('users', lazy='dynamic'))
 
 
 class PaymentRecord(db.Model):
@@ -79,14 +79,15 @@ class PaymentRecord(db.Model):
     product_desc = db.Column(db.VARCHAR(50), nullable=False)
     amount = db.Column(db.Numeric(12, 2), nullable=False)
     refunded_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    client_callback_url = db.Column(db.VARCHAR(128))
+    client_notify_url = db.Column(db.VARCHAR(128))
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+    # need update on notify.
     vas_name = db.Column(db.VARCHAR(32))
     vas_sn = db.Column(db.VARCHAR(128))
 
-    client_callback_url = db.Column(db.VARCHAR(128))
-    client_notify_url = db.Column(db.VARCHAR(128))
-
-    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # index
     __table_args__ = (db.UniqueConstraint('channel_id', 'order_id', name='channel_order_id_uniq_idx'),)
@@ -111,11 +112,18 @@ class RefundRecord(db.Model):
     sn = db.Column(db.CHAR(32), nullable=False)
 
     payment_sn = db.Column(db.CHAR(32), nullable=False)
+    payment_state = db.Column(db.VARCHAR(32), nullable=False)
+    payer_id = db.Column(db.Integer, nullable=False)
+    payee_id = db.Column(db.Integer, nullable=False)
+
     amount = db.Column(db.Numeric(12, 2), nullable=False)
-
     client_notify_url = db.Column(db.VARCHAR(128))
-
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    vas_name = db.Column(db.VARCHAR(32))
+    vas_sn = db.Column(db.VARCHAR(128))
+
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class PrepaidRecord(db.Model):

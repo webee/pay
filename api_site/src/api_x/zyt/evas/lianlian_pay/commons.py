@@ -6,3 +6,7 @@ from api_x.config import lianlian_pay
 
 def generate_absolute_url(path):
     return lianlian_pay.ROOT_URL + path
+
+
+def is_sending_to_me(partner_id):
+    return partner_id == lianlian_pay.OID_PARTNER

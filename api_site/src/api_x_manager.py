@@ -32,7 +32,7 @@ def init_db():
     def recreate_db():
         from tools.log import info
         info('recreating database ...')
-        local('mysql -u root -p < db/init_db.ddl')
+        local('mysql -u root -p < migration/init_db.ddl')
 
     recreate_db()
     db.create_all()

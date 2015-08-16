@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<h1>Pay sample</h1>
+
+<form action="{{ url_for('sample.pay') }}" method="POST">
+    <select name="payment_type">
+        <option value="DIRECT">直接到账</option>
+        <option value="GUARANTEE">担保支付</option>
+    </select>
+    <input type="submit" value="支付1分"/>
+</form>
+<form action="{{ url_for('sample.confirm_guarantee_payment') }}" method="POST">
+    <input type="text" name='order_id' value="" placeholder="order id."/>
+    <input type="submit" value="担保支付确认"/>
+</form>
+</body>
+</html>

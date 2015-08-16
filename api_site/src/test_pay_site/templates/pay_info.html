@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<h1>支付信息</h1>
+<p>
+<ul>
+    <li>交易流水号: {{ res.sn }}</li>
+    <li>商户: {{ res.merchant }}</li>
+    <li>用户: {{ res.user_id }}</li>
+    <li>商品订单号: {{ res.order_no }}</li>
+    <li>商品名: {{ res.product_name }}</li>
+    <li>金额: {{ res.amount }}</li>
+    <form action="{{ url_for('main.do_pay') }}" method="POST">
+        <input type="hidden" name="sn" value="{{ res.sn }}"/>
+        <select name="result">
+            <option value="SUCCESS">成功</option>
+            <option value="FAILED">失败</option>
+        </select>
+        <input type="submit" value="确认支付"/>
+    </form>
+</ul>
+</p>
+</body>
+</html>

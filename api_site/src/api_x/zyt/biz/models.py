@@ -92,6 +92,17 @@ class PaymentRecord(db.Model):
     __table_args__ = (db.UniqueConstraint('channel_id', 'order_id', name='channel_order_id_uniq_idx'),)
 
 
+class PaymentRecordLianlianPayExtra(db.Model):
+    __tablename__ = 'payment_record_lianlian_pay_extra'
+
+    id = db.Column(db.BigInteger, primary_key=True)
+    payment_record_id = db.Column(db.BigInteger, db.ForeignKey('payment_record.id'), nullable=False, unique=True)
+
+    pay_type = db.Column(db.CHAR(1))
+
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
 class RefundRecord(db.Model):
     __tablename__ = 'refund_record'
 

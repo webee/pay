@@ -9,9 +9,11 @@ from flask.ext.sqlalchemy import SQLAlchemy
 def register_mods(app):
     from api_x.zyt.entry import entry_mod
     from api_x.zyt.evas.test_pay.entry import test_pay_entry_mod
+    from api_x.zyt.evas.lianlian_pay.entry import lianlian_pay_entry_mod
 
     app.register_blueprint(entry_mod)
     app.register_blueprint(test_pay_entry_mod, url_prefix="/vas/test_pay")
+    app.register_blueprint(lianlian_pay_entry_mod, url_prefix="/vas/lianlian_pay")
 
 
 def init_config(app, env):

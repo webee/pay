@@ -3,6 +3,6 @@
 
 class App:
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'mysql://pay_system:p@55word@127.0.0.1:3306/pay_system'
+    SQLALCHEMY_DATABASE_URI = 'mysql://lvye_pay:p@55word@127.0.0.1:3306/lvye_pay'
 
 HOST_URL = 'http://beta_pay.webee.com:8088'

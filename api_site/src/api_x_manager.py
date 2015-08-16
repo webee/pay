@@ -23,7 +23,7 @@ server = Server(host="0.0.0.0", port=5000)
 manager.add_command("runserver", server)
 
 
-@manager.option('-r', '--recreate', action="store_true", dest="recreate", required=True, default=False)
+@manager.option('-r', '--recreate', action="store_true", dest="recreate", required=False, default=False)
 def init_db(recreate):
     from fabric.api import local
     from api_x import db

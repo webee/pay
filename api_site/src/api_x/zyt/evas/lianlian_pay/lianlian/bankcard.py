@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from .api_access import request
+from .api_x.zyt.evas.lianlian_pay.api_access import request
 from api_x import config
 
 

@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 
 from functools import wraps
+
 from flask import request
-from ..lianlian.api_access import parse_and_verify_request_data
+from ..api_x.zyt.evas.lianlian_pay.api_access import parse_and_verify_request_data
 from ..error import *
 from . import notification
 

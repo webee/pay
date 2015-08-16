@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from api_x.core import ZytCoreError
+
+from ..error import EvasError
 
 
-class TransactionApiError(ZytCoreError):
+class TransactionApiError(EvasError):
     def __init__(self, message):
         super(TransactionApiError, self).__init__(message)
 

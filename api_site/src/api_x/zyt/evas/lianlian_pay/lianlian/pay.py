@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import json
-from .sign import md5_sign
+
+from .api_x.zyt.evas.lianlian_pay.sign import md5_sign
 from .util import datetime_to_str, now_to_str
 from api_x.config import lianlian_pay
 

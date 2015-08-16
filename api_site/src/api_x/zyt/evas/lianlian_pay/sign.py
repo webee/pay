@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import base64
 from hashlib import md5
 from pytoolbox.util import public_key
-from api_x import config
+from api_x.config import lianlian_pay
 
 
 class UnknownSignTypeError(Exception):
@@ -86,16 +86,16 @@ def rsa_sign(data, key):
 
 
 def sign(data, sign_type):
-    if sign_type == config.LianLianPay.Sign.MD5_TYPE:
-        return _sign_md5_data(data, config.LianLianPay.Sign.MD5_KEY)
-    elif sign_type == config.LianLianPay.Sign.RSA_TYPE:
-        return _sign_rsa_data(data, config.LianLianPay.Sign.RSA_LVYE_PRI_KEY)
+    if sign_type == lianlian_pay.SignType.MD5:
+        return _sign_md5_data(data, lianlian_pay.MD5_KEY)
+    elif sign_type == lianlian_pay.SignType.RSA:
+        return _sign_rsa_data(data, lianlian_pay.LVYE_PRI_KEY)
     raise UnknownSignTypeError(sign_type)
 
 
 def verify(data, sign_type):
-    if sign_type == config.LianLianPay.Sign.MD5_TYPE:
-        return _verify_md5_data(data, config.LianLianPay.Sign.MD5_KEY)
-    elif sign_type == config.LianLianPay.Sign.RSA_TYPE:
-        return _verify_rsa_data(data, config.LianLianPay.Sign.RSA_YT_PUB_KEY)
+    if sign_type == lianlian_pay.SignType.MD5:
+        return _verify_md5_data(data, lianlian_pay.MD5_KEY)
+    elif sign_type == lianlian_pay.SignType.RSA:
+        return _verify_rsa_data(data, lianlian_pay.YT_PUB_KEY)
     raise UnknownSignTypeError(sign_type)

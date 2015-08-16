@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from api_x.zyt.evas.lianlian_pay import pay as _pay
 
 from flask import url_for, Response
 from api_x.config import lianlian_pay
+from .pay import pay as _pay
 
 
 NAME = 'LIANLIAN_PAY'

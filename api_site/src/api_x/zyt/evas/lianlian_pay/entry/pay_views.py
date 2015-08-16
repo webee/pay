@@ -9,6 +9,10 @@ from api_x.zyt.evas.test_pay import NAME
 from .commons import parse_and_verify
 from .. import is_sending_to_me
 from . import notification
+from tools.mylog import get_logger
+
+
+logger = get_logger(__name__)
 
 
 @mod.route("/pay/result/<pay_source>", methods=["POST"])
@@ -43,6 +47,7 @@ def pay_notify(pay_source):
     pay_result = data['result_pay']
     paybill_oid = data['oid_paybill']
 
+    logger.info('pay notify {0}: {1}'.format(pay_source, data))
     if not is_sending_to_me(partner_oid):
         return notification.is_invalid()
 

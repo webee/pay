@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 import json
 
-from .api_x.zyt.evas.lianlian_pay.sign import md5_sign
-from .util import datetime_to_str, now_to_str
 from api_x.config import lianlian_pay
+from .sign import md5_sign
+from .util import datetime_to_str, now_to_str
 
 
 def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url):

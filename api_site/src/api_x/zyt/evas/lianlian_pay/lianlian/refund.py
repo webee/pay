@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .api_x.zyt.evas.lianlian_pay.api_access import request
-from .util import datetime_to_str
+from .api_x.zyt.evas.lianlian_pay.util import datetime_to_str
 from api_x import config
 
 

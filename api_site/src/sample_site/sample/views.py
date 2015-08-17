@@ -25,18 +25,19 @@ def pay():
                                payee_account_user_id=payee_account_user_id, balance=balance)
 
     amount = Decimal(request.values['amount'])
+    payment_type = request.values['payment_type']
     params = {
         'channel_id': channel_id,
         'payer_user_id': payer,
         'payee_user_id': payee,
         'order_id': request.values.get('order_id') or generate_order_id(),
-        'product_name': '测试支付{0}元'.format(amount),
+        'product_name': '测试{1}支付{0}元'.format(amount, '担保' if payment_type == 'GUARANTEE' else ''),
         'product_category': '测试',
         'product_desc': '[{0}]用于测试的商品'.format(channel_name),
         'amount': amount,
         'client_callback_url': config.HOST_URL + url_for('.pay'),
         'client_notify_url': '',
-        'payment_type': request.values['payment_type']
+        'payment_type': payment_type
     }
 
     print("order_id: {0}".format(params['order_id']))

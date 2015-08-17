@@ -52,11 +52,15 @@ def create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
 def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
                            product_name, product_category, product_desc, amount,
                            client_callback_url, client_notify_url):
-    if amount <= 0:
-        raise NonPositiveAmountError(amount)
-
+    """
+    如果金额为0, 新建订单则直接失败
+    如果已经有对应订单，则直接支付成功
+    """
     payment_record = PaymentRecord.query.filter_by(channel_id=channel_id, order_id=order_id).first()
     if payment_record is None:
+        if amount <= 0:
+            raise NonPositiveAmountError(amount)
+
         payment_record = create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
                                         product_name, product_category, product_desc, amount,
                                         client_callback_url, client_notify_url)

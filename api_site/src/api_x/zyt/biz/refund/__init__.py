@@ -187,5 +187,5 @@ def succeed_refund_secured(vas_name, payment_record, refund_record):
 
 @transactional
 def fail_refund(payment_record, refund_record):
-    transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDED, refund_record.payment_state)
+    transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING, refund_record.payment_state)
     transit_transaction_state(refund_record.tx_id, RefundTransactionState.CREATED, RefundTransactionState.FAILED)

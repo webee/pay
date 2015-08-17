@@ -33,6 +33,7 @@ class PaymentTransactionState:
     FAILED = 'FAILED'
     SUCCESS = 'SUCCESS'
     SECURED = 'SECURED'
+    REFUNDED = 'REFUNDED'
     REFUNDING = 'REFUNDING'
 
 

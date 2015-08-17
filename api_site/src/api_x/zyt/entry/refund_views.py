@@ -10,10 +10,10 @@ from api_x.zyt.biz import refund
 @mod.route('/refund', methods=['POST'])
 def apply_to_refund():
     data = request.values
-    channel_id = data['client_id']
+    channel_id = data['channel_id']
     order_id = data['order_no']
     amount = data['amount']
-    client_notify_url = data['callback_url']
+    client_notify_url = data['notify_url']
 
     refund_record = refund.apply_to_refund(channel_id, order_id, amount, client_notify_url)
     return response.accepted(refund_record.sn)

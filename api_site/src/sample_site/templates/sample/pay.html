@@ -11,11 +11,12 @@ payer: {{ payer }}<br/>
 payee: {{ payee }}
 <hr>
 <form action="{{ url_for('sample.pay') }}" method="POST">
+    <input type="text" name='amount' value="0.01"/>
     <select name="payment_type">
         <option value="DIRECT">直接到账</option>
         <option value="GUARANTEE">担保支付</option>
     </select>
-    <input type="submit" value="支付1分"/>
+    <input type="submit" value="去支付"/>
 </form>
 <hr>
 <form action="{{ url_for('sample.confirm_guarantee_payment') }}" method="POST">
@@ -24,6 +25,7 @@ payee: {{ payee }}
 </form>
 <hr>
 <form action="{{ url_for('sample.refund') }}" method="POST">
+    <input type="text" name='amount' value="0.01"/>
     <input type="text" name='order_id' value="" placeholder="order id."/>
     <input type="submit" value="退款"/>
 </form>

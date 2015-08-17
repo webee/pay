@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals, print_function
 
+from decimal import Decimal
 from flask import request, render_template, redirect, url_for
 from . import sample_mod as mod
 import requests
@@ -26,7 +27,7 @@ def pay():
         'product_name': '支付1分钱',
         'product_category': '测试',
         'product_desc': '用于测试的商品',
-        'amount': 0.01,
+        'amount': Decimal(request.values['amount']),
         'client_callback_url': config.HOST_URL + url_for('.pay'),
         'client_notify_url': '',
         'payment_type': request.values['payment_type']
@@ -56,11 +57,13 @@ def confirm_guarantee_payment():
 def refund():
     params = {
         'channel_id': 1,
-        'order_id': request.values['order_id']
+        'order_id': request.values['order_id'],
+        'amount': Decimal(request.values['amount']),
+        'notify_url': ''
     }
 
     req = requests.post(config.PayAPI.REFUND_URL, params)
-    return render_template('info.html', title='退款结果', msg=req.content)
+    return render_template('sample/info.html', title='退款结果', msg=req.content)
 
 
 @mod.route('/prepaid', methods=['GET'])

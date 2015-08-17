@@ -12,9 +12,7 @@ def success(**kwargs):
 
 
 def fail(code, msg, **kwargs):
-    if data is not None:
-        return jsonify(ret=False, code=code, msg=msg, **kwargs)
-    return jsonify(ret=False, code=msg, msg=msg)
+    return jsonify(ret=False, code=code, msg=msg, **kwargs)
 
 
 def updated(ids):

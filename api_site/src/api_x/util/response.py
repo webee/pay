@@ -2,9 +2,19 @@
 from __future__ import unicode_literals
 
 import json
-from flask import Response
+from flask import Response, jsonify
 import decimal
 import datetime
+
+
+def success(**kwargs):
+    return jsonify(ret=True, **kwargs)
+
+
+def fail(code, msg, **kwargs):
+    if data is not None:
+        return jsonify(ret=False, code=code, msg=msg, **kwargs)
+    return jsonify(ret=False, code=msg, msg=msg)
 
 
 def updated(ids):

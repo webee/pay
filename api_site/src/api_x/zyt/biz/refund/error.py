@@ -32,6 +32,12 @@ class PaymentNotRefundableError(RefundError):
         super(PaymentNotRefundableError, self).__init__(message)
 
 
+class PaymentIsRefundingError(RefundError):
+    def __init__(self, message=None):
+        message = message or "payment is refunding."
+        super(PaymentNotRefundableError, self).__init__(message)
+
+
 class RefundStateMissMatchError(RefundError):
     def __init__(self, message=None):
         message = message or "refund state miss match."

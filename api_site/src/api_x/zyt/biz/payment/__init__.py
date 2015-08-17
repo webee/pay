@@ -8,9 +8,9 @@ from api_x.zyt.user_mapping import get_channel_info, get_system_account_user_id
 from api_x.constant import TransactionState, SECURE_USER_NAME
 from api_x.dbs import transactional
 from api_x.zyt.vas import NAME as ZYT_NAME
-from ..vas.models import EventType
-from .transaction import create_transaction, transit_transaction_state, get_tx_by_sn
-from .models import TransactionType, PaymentRecord, PaymentType
+from api_x.zyt.vas.models import EventType
+from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, get_tx_by_sn
+from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
 from api_x.dbs import require_transaction_context
 
 
@@ -59,7 +59,7 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_i
     else:
         # update payment info, if not paid.
         with require_transaction_context():
-            PaymentRecord.query.filter_by(id=payment_record.id, state=TransactionState.CREATED)\
+            PaymentRecord.query.filter_by(id=payment_record.id, state=TransactionState.CREATED) \
                 .update({'amount': amount})
             db.session.commit()
 

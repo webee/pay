@@ -6,7 +6,7 @@ from flask import request, render_template
 from . import lianlian_pay_entry_mod as mod
 from api_x.zyt.evas.lianlian_pay.constant import BizType, NotifyType
 from api_x.zyt.evas.lianlian_pay.notify import get_notify_handle
-from api_x.zyt.evas.test_pay import NAME
+from api_x.zyt.evas.lianlian_pay import NAME
 from .commons import parse_and_verify
 from . import notification
 from tools.mylog import get_logger

@@ -35,6 +35,18 @@ def init_extensions(app):
     db.init_app(app)
 
 
+def custom_flask(app):
+    from flask.json import JSONEncoder
+    from datetime import datetime
+
+    class CustomJSONEncoder(JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime):
+                return obj.isoformat(sep=str(' '))
+            return super(CustomJSONEncoder, self).default(obj)
+    app.json_encoder = CustomJSONEncoder
+
+
 # extensions.
 db = SQLAlchemy(session_options={'autocommit': True})
 
@@ -45,6 +57,7 @@ def create_app(env):
     init_config(app, env)
     register_mods(app)
     init_extensions(app)
+    custom_flask(app)
 
     from api_x.zyt.biz import init_register_notify_handles
     init_register_notify_handles()

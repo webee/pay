@@ -27,9 +27,7 @@ def apply_to_refund(channel_id, order_id, amount, client_notify_url):
     if amount_value <= 0:
         raise NegativeAmountError(amount_value)
 
-    payment_record, refund_record = _create_refund(tx, payment_record, amount_value, client_notify_url)
-
-    _request_refund(payment_record, refund_record)
+    refund_record = _create_and_request_refund(tx, payment_record, amount_value, client_notify_url)
 
     return refund_record
 
@@ -73,6 +71,8 @@ def _get_tx_payment_to_refund(channel_id, order_id):
         raise NoPaymentFoundError(channel_id, order_id)
 
     tx = get_tx_by_sn(payment_record.sn)
+    if tx.state == PaymentTransactionState.REFUNDING:
+        raise PaymentIsRefundingError()
     if not _is_refundable(tx, payment_record):
         raise PaymentNotRefundableError()
     return tx, payment_record
@@ -85,9 +85,19 @@ def _is_refundable(tx, payment_record):
     if pay_type == PaymentType.GUARANTEE:
         return tx.state in [PaymentTransactionState.SECURED, PaymentTransactionState.REFUNDED]
 
+@transactional
+def _create_and_request_refund(tx, payment_record, amount, client_notify_url):
+    payment_record, refund_record = _create_refund(tx, payment_record, amount, client_notify_url)
+
+    _request_refund(payment_record, refund_record)
+
+    return refund_record
+
 
 @transactional
 def _create_refund(tx, payment_record, amount, client_notify_url):
+    cur_payment_state = tx.state
+
     # start refunding.
     transit_transaction_state(tx.id, tx.state, PaymentTransactionState.REFUNDING)
 
@@ -111,7 +121,7 @@ def _create_refund(tx, payment_record, amount, client_notify_url):
         'tx_id': tx_record.id,
         'sn': tx_record.sn,
         'payment_sn': payment_record.sn,
-        'payment_state': tx.state,
+        'payment_state': cur_payment_state,
         'payer_id': payment_record.payer_id,
         'payee_id': payment_record.payee_id,
         'amount': amount,

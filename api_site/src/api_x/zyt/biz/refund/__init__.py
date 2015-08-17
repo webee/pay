@@ -46,6 +46,9 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
     :return:
     """
     tx, refund_record = get_tx_refund_by_sn(sn)
+    if tx is None:
+        return True
+
     refund_record = update_refund_info(refund_record.id, vas_sn)
     payment_tx, payment_record = get_tx_payment_by_sn(refund_record.payment_sn)
 

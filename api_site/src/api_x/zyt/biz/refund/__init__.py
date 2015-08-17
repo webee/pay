@@ -183,7 +183,7 @@ def succeed_refund(vas_name, payment_record, refund_record):
     event_id = bookkeeping(EventType.TRANSFER_OUT, refund_record.sn, refund_record.payee_id, vas_name, refund_amount)
 
     # 全部金额都退款，则状态为已退款
-    is_refunded = payment_amount == refunded_amount + refund_record
+    is_refunded = payment_amount == refunded_amount + refunded_amount
 
     if is_refunded:
         transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
@@ -207,7 +207,7 @@ def succeed_refund_secured(vas_name, payment_record, refund_record):
     event_id = bookkeeping(EventType.TRANSFER_OUT_FROZEN, payment_record.sn, secure_user_id, vas_name, refund_amount)
 
     # 全部金额都退款，则状态为已退款
-    is_refunded = payment_amount == refunded_amount + refund_record
+    is_refunded = payment_amount == refunded_amount + refunded_amount
 
     if is_refunded:
         transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,

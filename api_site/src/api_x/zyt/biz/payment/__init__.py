@@ -78,7 +78,6 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_i
                              'product_name': product_name,
                              'product_category': product_category,
                              'product_desc': product_desc})
-                db.session.commit()
 
             payment_record = PaymentRecord.query.get(payment_record.id)
     if payment_record.amount <= 0:

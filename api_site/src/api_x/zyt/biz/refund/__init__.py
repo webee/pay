@@ -158,7 +158,7 @@ def _refund_by_lianlian_pay(payment_record, refund_record):
     created_on = refund_record.created_on
     amount = refund_record.amount
     try:
-        res = refund(sn, created_on, amount, vas_sn, refund_record.client_notify_url)
+        res = refund(TransactionType.REFUND, sn, created_on, amount, vas_sn)
 
         if 'oid_refundno' in res:
             oid_refundno = res['oid_refundno']

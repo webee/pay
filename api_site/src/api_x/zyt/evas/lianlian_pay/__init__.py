@@ -18,7 +18,8 @@ def pay(source, user_id, user_created_on, ip, order_no, ordered_on, order_name, 
                          return_url, notify_url))
 
 
-def refund(refund_no, refunded_on, amount, paybill_id, notify_url):
+def refund(source, refund_no, refunded_on, amount, paybill_id):
+    notify_url = generate_absolute_url(url_for('lianlian_pay_entry.refund_notify', refund_source=source))
     return _refund(refund_no, refunded_on, amount, paybill_id, notify_url)
 
 

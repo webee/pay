@@ -52,10 +52,11 @@ def create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
 def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
                            product_name, product_category, product_desc, amount,
                            client_callback_url, client_notify_url):
+    if amount <= 0:
+        raise NonPositiveAmountError(amount)
+
     payment_record = PaymentRecord.query.filter_by(channel_id=channel_id, order_id=order_id).first()
     if payment_record is None:
-        if amount <= 0:
-            raise NonPositiveAmountError(amount)
         payment_record = create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
                                         product_name, product_category, product_desc, amount,
                                         client_callback_url, client_notify_url)
@@ -70,6 +71,10 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_i
             db.session.commit()
 
             payment_record = PaymentRecord.query.get(payment_record.id)
+    if payment_record.amount <= 0:
+        from api_x.zyt import vas as zyt
+        payment_record = update_payment_info(payment_record.id, zyt.NAME, '')
+        succeed_payment(zyt.NAME, payment_record)
     return payment_record
 
 

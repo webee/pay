@@ -27,7 +27,7 @@ def pay():
         'order_id': request.values.get('order_id') or generate_order_id(),
         'product_name': '测试支付{0}元'.format(amount),
         'product_category': '测试',
-        'product_desc': '用于测试的商品',
+        'product_desc': '[{0}]用于测试的商品'.format(channel_name),
         'amount': amount,
         'client_callback_url': config.HOST_URL + url_for('.pay'),
         'client_notify_url': '',

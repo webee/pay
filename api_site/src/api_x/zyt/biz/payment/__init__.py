@@ -5,7 +5,7 @@ from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_channel_info, get_system_account_user_id
-from api_x.constant import TransactionState, SECURE_USER_NAME
+from api_x.constant import TransactionState, SECURE_USER_NAME, PaymentTransactionState
 from api_x.dbs import transactional
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.vas.models import EventType
@@ -13,6 +13,10 @@ from api_x.zyt.biz.transaction import create_transaction, transit_transaction_st
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
 from api_x.dbs import require_transaction_context
 from api_x.zyt.biz.error import NonPositiveAmountError
+from tools.mylog import get_logger
+
+
+logger = get_logger(__name__)
 
 
 @transactional
@@ -67,12 +71,14 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_i
     else:
         # update payment info, if not paid.
         with require_transaction_context():
-            PaymentRecord.query.filter_by(id=payment_record.id, state=TransactionState.CREATED) \
-                .update({'amount': amount,
-                         'product_name': product_name,
-                         'product_category': product_category,
-                         'product_desc': product_desc})
-            db.session.commit()
+            tx = get_tx_by_sn(payment_record.sn)
+            if tx.state == PaymentTransactionState.CREATED:
+                PaymentRecord.query.filter_by(id=payment_record.id) \
+                    .update({'amount': amount,
+                             'product_name': product_name,
+                             'product_category': product_category,
+                             'product_desc': product_desc})
+                db.session.commit()
 
             payment_record = PaymentRecord.query.get(payment_record.id)
     if payment_record.amount <= 0:
@@ -170,18 +176,29 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
-    trx, payment_record = get_tx_payment_by_sn(sn)
-    payment_record = update_payment_info(payment_record.id, vas_name, vas_sn)
+    from ..transaction import TransactionStateError
 
-    if is_success:
-        # 直付和担保付的不同操作
-        if payment_record.type == PaymentType.DIRECT:
-            succeed_payment(vas_name, payment_record)
-        elif payment_record.type == PaymentType.GUARANTEE:
-            secure_payment(vas_name, payment_record)
-    else:
-        fail_payment(payment_record)
+    tx, payment_record = get_tx_payment_by_sn(sn)
 
+    try:
+        with require_transaction_context():
+            if is_success:
+                # 直付和担保付的不同操作
+                if payment_record.type == PaymentType.DIRECT:
+                    succeed_payment(vas_name, payment_record)
+                elif payment_record.type == PaymentType.GUARANTEE:
+                    secure_payment(vas_name, payment_record)
+            else:
+                fail_payment(payment_record)
+            payment_record = update_payment_info(payment_record.id, vas_name, vas_sn)
+    except TransactionStateError as e:
+        logger.exception(e)
+        # 重复通知，或者不同支付方式重复支付
+        if tx.state in [PaymentTransactionState.SUCCESS, PaymentTransactionState.SECURED]:
+            if payment_record.vas_name != vas_name:
+                # 重复支付
+                # TODO, 退款到余额(短信通知)或者原路返回
+                logger.warning('duplicated payment: [{0}], [{1}]'.format(payment_record.vas_name, vas_name))
     # TODO
     # notify
 

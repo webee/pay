@@ -20,7 +20,7 @@ def init_lianlian_pay_notify_handles():
 
     # payment
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC, handle_payment_result)
-    register_refund_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.ASYNC, handle_payment_notify)
+    register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.ASYNC, handle_payment_notify)
 
     # refund
     register_refund_notify_handle(TransactionType.REFUND, handle_refund_notify)

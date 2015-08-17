@@ -37,7 +37,7 @@ def refund_notify(refund_source):
                 return notification.succeed()
             return notification.is_invalid()
         except Exception as e:
-            logger.warning('refund notify error: {0}'.format(e.message))
+            logger.exception(e)
             return notification.is_invalid()
 
     return notification.succeed()

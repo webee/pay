@@ -12,7 +12,7 @@ from ...vas.models import EventType
 from ..transaction import create_transaction, transit_transaction_state, get_tx_by_sn, get_tx_by_id
 from ..models import TransactionType, RefundRecord, PaymentType
 from .error import *
-from ..payment import get_payment_by_id, get_payment_by_sn
+from ..payment import get_payment_by_id, get_tx_payment_by_sn
 from api_x.utils.error import *
 from .dba import get_tx_refund_by_sn
 from tools.mylog import get_logger
@@ -47,10 +47,11 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
     """
     tx, refund_record = get_tx_refund_by_sn(sn)
     refund_record = update_refund_info(refund_record.id, vas_sn)
-    payment_record = get_payment_by_sn(refund_record.payment_sn)
+    payment_tx, payment_record = get_tx_payment_by_sn(refund_record.payment_sn)
 
-    if payment_record.state != PaymentTransactionState.REFUNDING:
-        raise Exception('payment state error.')
+    if payment_tx.state != PaymentTransactionState.REFUNDING and tx.state != RefundTransactionState.CREATED:
+        logger.warning('bad refund notify: [sn: {0}]'.format(sn))
+        return True
 
     if is_success:
         # 直付和担保付的不同操作

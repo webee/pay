@@ -18,7 +18,7 @@ class PayAPI:
     # sample
     CHANNEL_ID = 1
 
-    ROOT_URL = "http://pay.lvye.vom/api"
+    ROOT_URL = "http://pay.lvye.com/api"
     PREPAID_URL = '/prepaid'
     PRE_PAY_URL = '/pre_pay'
     CONFIRM_GUARANTEE_PAYMENT_URL = '/pay/guarantee_payment/confirm'

@@ -43,7 +43,7 @@ def pre_pay():
                                                         client_callback_url, client_notify_url)
         pay_url = config.HOST_URL + url_for('entry.cashier_desk', sn=payment_record.sn)
 
-        return response.ok(sn=payment_record.sn, pay_url=pay_url)
+        return response.success(sn=payment_record.sn, pay_url=pay_url)
     except Exception as e:
         logger.exception(e)
         return response.fail(code=1, msg=e.message)

@@ -89,9 +89,9 @@ def _get_tx_payment_to_refund(channel_id, order_id):
 def _is_refundable(tx, payment_record):
     pay_type = payment_record.type
     if pay_type == PaymentType.DIRECT:
-        return tx.state in [PaymentTransactionState.SUCCESS, PaymentTransactionState.REFUNDED]
+        return tx.state == PaymentTransactionState.SUCCESS
     if pay_type == PaymentType.GUARANTEE:
-        return tx.state in [PaymentTransactionState.SECURED, PaymentTransactionState.REFUNDED]
+        return tx.state in PaymentTransactionState.SECURED
 
 @transactional
 def _create_and_request_refund(tx, payment_record, amount, client_notify_url):

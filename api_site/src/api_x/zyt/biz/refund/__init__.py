@@ -56,9 +56,9 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
     if is_success:
         # 直付和担保付的不同操作
         if payment_record.type == PaymentType.DIRECT:
-            succeed_refund(vas_name, payment_record)
+            succeed_refund(vas_name, payment_record, refund_record)
         elif payment_record.type == PaymentType.GUARANTEE:
-            succeed_refund_secured(vas_name, payment_record)
+            succeed_refund_secured(vas_name, payment_record, refund_record)
     else:
         fail_refund(payment_record, refund_record)
 

@@ -12,7 +12,7 @@ class AmountValueError(AmountError):
         super(AmountValueError, self).__init__(message)
 
 
-class NegativeAmountError(AmountError):
+class NonPositiveAmountError(AmountError):
     def __init__(self, amount):
         message = "amount must be positive: [{0}]".format(amount)
-        super(NegativeAmountError, self).__init__(message)
+        super(NonPositiveAmountError, self).__init__(message)

@@ -8,7 +8,12 @@ from api_x.zyt.user_mapping import find_or_create_account_user_by_channel_info
 from api_x.zyt.biz.transaction import get_tx_by_sn
 from api_x.config import etc as config
 from api_x.constant import VirtualAccountSystemType
+from api_x.util import response
 from . import entry_mod as mod
+from tools.mylog import get_logger
+
+
+logger = get_logger(__name__)
 
 
 @mod.route('/pre_pay', methods=['POST'])
@@ -32,12 +37,16 @@ def pre_pay():
     payer_id = find_or_create_account_user_by_channel_info(channel_id, payer_user_id)
     payee_id = find_or_create_account_user_by_channel_info(channel_id, payee_user_id)
 
-    payment_record = payment.find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
-                                                    product_name, product_category, product_desc, amount,
-                                                    client_callback_url, client_notify_url)
-    pay_url = config.HOST_URL + url_for('entry.cashier_desk', sn=payment_record.sn)
+    try:
+        payment_record = payment.find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
+                                                        product_name, product_category, product_desc, amount,
+                                                        client_callback_url, client_notify_url)
+        pay_url = config.HOST_URL + url_for('entry.cashier_desk', sn=payment_record.sn)
 
-    return jsonify({'sn': payment_record.sn, 'pay_url': pay_url})
+        return response.ok(sn=payment_record.sn, pay_url=pay_url)
+    except Exception as e:
+        logger.exception(e)
+        return response.fail(code=1, msg=e.message)
 
 
 @mod.route('/cashier_desk/<sn>', methods=['GET'])

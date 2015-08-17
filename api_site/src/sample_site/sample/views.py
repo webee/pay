@@ -19,15 +19,16 @@ def pay():
     if request.method == 'GET':
         return render_template('sample/pay.html', channel=channel_name, payer=payer, payee=payee)
 
+    amount = Decimal(request.values['amount'])
     params = {
         'channel_id': channel_id,
         'payer_user_id': payer,
         'payee_user_id': payee,
         'order_id': request.values.get('order_id') or generate_order_id(),
-        'product_name': '支付1分钱',
+        'product_name': '测试支付{0}元'.format(amount),
         'product_category': '测试',
         'product_desc': '用于测试的商品',
-        'amount': Decimal(request.values['amount']),
+        'amount': amount,
         'client_callback_url': config.HOST_URL + url_for('.pay'),
         'client_notify_url': '',
         'payment_type': request.values['payment_type']

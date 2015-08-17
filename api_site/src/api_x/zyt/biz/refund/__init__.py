@@ -13,7 +13,7 @@ from ..transaction import create_transaction, transit_transaction_state, get_tx_
 from ..models import TransactionType, RefundRecord, PaymentType
 from .error import *
 from ..payment import get_payment_by_id, get_tx_payment_by_sn
-from api_x.utils.error import *
+from api_x.zyt.biz.error import *
 from .dba import get_tx_refund_by_sn
 from tools.mylog import get_logger
 
@@ -29,7 +29,7 @@ def apply_to_refund(channel_id, order_id, amount, client_notify_url):
     except InvalidOperation:
         raise AmountValueError(amount)
     if amount_value <= 0:
-        raise NegativeAmountError(amount_value)
+        raise NonPositiveAmountError(amount_value)
 
     refund_record = _create_and_request_refund(tx, payment_record, amount_value, client_notify_url)
 

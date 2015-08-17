@@ -12,6 +12,7 @@ from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, get_tx_by_sn
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
 from api_x.dbs import require_transaction_context
+from api_x.zyt.biz.error import NonPositiveAmountError
 
 
 @transactional
@@ -53,6 +54,8 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_i
                            client_callback_url, client_notify_url):
     payment_record = PaymentRecord.query.filter_by(channel_id=channel_id, order_id=order_id).first()
     if payment_record is None:
+        if amount <= 0:
+            raise NonPositiveAmountError(amount)
         payment_record = create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
                                         product_name, product_category, product_desc, amount,
                                         client_callback_url, client_notify_url)
@@ -60,7 +63,10 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_i
         # update payment info, if not paid.
         with require_transaction_context():
             PaymentRecord.query.filter_by(id=payment_record.id, state=TransactionState.CREATED) \
-                .update({'amount': amount})
+                .update({'amount': amount,
+                         'product_name': product_name,
+                         'product_category': product_category,
+                         'product_desc': product_desc})
             db.session.commit()
 
             payment_record = PaymentRecord.query.get(payment_record.id)

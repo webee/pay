@@ -111,7 +111,7 @@ def _create_refund(tx, payment_record, amount, client_notify_url):
         'tx_id': tx_record.id,
         'sn': tx_record.sn,
         'payment_sn': payment_record.sn,
-        'payment_state': payment_record.state,
+        'payment_state': tx.state,
         'payer_id': payment_record.payer_id,
         'payee_id': payment_record.payee_id,
         'amount': amount,

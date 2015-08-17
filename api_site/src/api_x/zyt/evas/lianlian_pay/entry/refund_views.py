@@ -5,7 +5,7 @@ from api_x.zyt.evas.lianlian_pay.commons import is_sending_to_me
 from flask import request, render_template
 from . import lianlian_pay_entry_mod as mod
 from api_x.zyt.evas.lianlian_pay.constant import BizType, NotifyType
-from api_x.zyt.evas.lianlian_pay.notify import get_notify_handle
+from api_x.zyt.evas.lianlian_pay.notify import get_refund_notify_handle
 from api_x.zyt.evas.test_pay import NAME
 from .commons import parse_and_verify
 from . import notification
@@ -29,7 +29,7 @@ def refund_notify(refund_source):
     if not is_sending_to_me(partner_oid):
         return notification.is_invalid()
 
-    handle = get_notify_handle(refund_source, BizType.PAY, NotifyType.ASYNC)
+    handle = get_refund_notify_handle(refund_source)
     if handle:
         try:
             # 是否成功，订单号，来源系统，来源系统订单号，数据

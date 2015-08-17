@@ -11,7 +11,7 @@ from api_x.zyt.biz import refund
 def apply_to_refund():
     data = request.values
     channel_id = data['channel_id']
-    order_id = data['order_no']
+    order_id = data['order_id']
     amount = data['amount']
     client_notify_url = data['notify_url']
 

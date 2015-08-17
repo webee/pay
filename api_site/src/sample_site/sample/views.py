@@ -23,7 +23,7 @@ def pay():
         'channel_id': channel_id,
         'payer_user_id': payer,
         'payee_user_id': payee,
-        'order_id': generate_order_id(),
+        'order_id': request.values.get('order_id') or generate_order_id(),
         'product_name': '支付1分钱',
         'product_category': '测试',
         'product_desc': '用于测试的商品',

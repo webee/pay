@@ -15,6 +15,10 @@ from .error import *
 from ..payment import get_payment_by_id, get_payment_by_sn
 from api_x.utils.error import *
 from .dba import get_tx_refund_by_sn
+from tools.mylog import get_logger
+
+
+logger = get_logger(__name__)
 
 
 def apply_to_refund(channel_id, order_id, amount, client_notify_url):
@@ -89,7 +93,11 @@ def _is_refundable(tx, payment_record):
 def _create_and_request_refund(tx, payment_record, amount, client_notify_url):
     payment_record, refund_record = _create_refund(tx, payment_record, amount, client_notify_url)
 
-    _request_refund(payment_record, refund_record)
+    try:
+        _request_refund(payment_record, refund_record)
+    except Exception as e:
+        logger.exception(e)
+        fail_refund(payment_record, refund_record)
 
     return refund_record
 
@@ -149,7 +157,6 @@ def _request_refund(payment_record, refund_record):
 
 def _refund_by_lianlian_pay(payment_record, refund_record):
     """连连退款"""
-    from api_x.zyt.evas.lianlian_pay.error import ApiError
     from api_x.zyt.evas.lianlian_pay import refund
 
     vas_sn = payment_record.vas_sn
@@ -157,17 +164,14 @@ def _refund_by_lianlian_pay(payment_record, refund_record):
     sn = refund_record.sn
     created_on = refund_record.created_on
     amount = refund_record.amount
-    try:
-        res = refund(TransactionType.REFUND, sn, created_on, amount, vas_sn)
 
-        if 'oid_refundno' in res:
-            oid_refundno = res['oid_refundno']
+    res = refund(TransactionType.REFUND, sn, created_on, amount, vas_sn)
 
-            update_refund_info(refund_record.id, oid_refundno)
-        return res
-    except (ApiError, Exception) as e:
-        fail_refund(payment_record, refund_record)
-        raise RefundFailedError(e.message)
+    if 'oid_refundno' in res:
+        oid_refundno = res['oid_refundno']
+
+        update_refund_info(refund_record.id, oid_refundno)
+    return res
 
 
 @transactional

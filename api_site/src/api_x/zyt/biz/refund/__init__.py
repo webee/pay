@@ -177,27 +177,48 @@ def _refund_by_lianlian_pay(payment_record, refund_record):
 
 @transactional
 def succeed_refund(vas_name, payment_record, refund_record):
-    event_id = bookkeeping(EventType.TRANSFER_OUT, refund_record.sn, refund_record.payee_id, vas_name,
-                           refund_record.amount)
-    transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
-                              refund_record.payment_state, event_id)
+    payment_amount = payment_record.amount
+    refunded_amount = payment_record.refunded_amount
+    refund_amount = refund_record.amount
+    event_id = bookkeeping(EventType.TRANSFER_OUT, refund_record.sn, refund_record.payee_id, vas_name, refund_amount)
+
+    # 全部金额都退款，则状态为已退款
+    is_refunded = payment_amount == refunded_amount + refund_record
+
+    if is_refunded:
+        transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
+                                  PaymentTransactionState.REFUNDED, event_id)
+    else:
+        transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
+                                  refund_record.payment_state, event_id)
+
     transit_transaction_state(refund_record.tx_id, RefundTransactionState.CREATED,
                               RefundTransactionState.SUCCESS, event_id)
 
-    update_payment_refunded_amount(payment_record.id, refund_record.amount)
+    update_payment_refunded_amount(payment_record.id, refund_amount)
 
 
 @transactional
 def succeed_refund_secured(vas_name, payment_record, refund_record):
+    payment_amount = payment_record.amount
+    refunded_amount = payment_record.refunded_amount
+    refund_amount = refund_record.amount
     secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-    event_id = bookkeeping(EventType.TRANSFER_OUT_FROZEN, payment_record.sn, secure_user_id, vas_name,
-                           payment_record.amount)
-    transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
-                              refund_record.payment_state, event_id)
+    event_id = bookkeeping(EventType.TRANSFER_OUT_FROZEN, payment_record.sn, secure_user_id, vas_name, refund_amount)
+
+    # 全部金额都退款，则状态为已退款
+    is_refunded = payment_amount == refunded_amount + refund_record
+
+    if is_refunded:
+        transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
+                                  PaymentTransactionState.REFUNDED, event_id)
+    else:
+        transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
+                                  refund_record.payment_state, event_id)
     transit_transaction_state(refund_record.tx_id, RefundTransactionState.CREATED,
                               RefundTransactionState.SUCCESS, event_id)
 
-    update_payment_refunded_amount(payment_record.id, refund_record.amount)
+    update_payment_refunded_amount(payment_record.id, refund_amount)
 
 
 @transactional

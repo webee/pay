@@ -25,10 +25,10 @@ def get_tx_refund_by_sn(sn):
 
 
 @transactional
-def update_payment_refunded_amount(payment_id, amount):
+def update_payment_refunded_amount(payment_id, refund_amount):
     payment_record = get_payment_by_id(payment_id)
 
-    payment_record.refunded_amount += amount
+    payment_record.refunded_amount += refund_amount
 
     db.session.add(payment_record)
 

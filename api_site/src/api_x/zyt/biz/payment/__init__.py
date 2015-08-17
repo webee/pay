@@ -116,10 +116,10 @@ def secure_payment(vas_name, payment_record):
 @transactional
 def _confirm_payment(payment_record):
     secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-    event_id1 = bookkeeping(EventType.TRANSFER_OUT_FROZEN, payment_record.sn, secure_user_id, ZYT_NAME,
-                            payment_record.amount)
-    event_id2 = bookkeeping(EventType.TRANSFER_IN, payment_record.sn, payment_record.payee_id, ZYT_NAME,
-                            payment_record.amount)
+    # 确认金额为订单金额 - 已退款金额
+    amount = payment_record.amount - payment_record.refunded_amount
+    event_id1 = bookkeeping(EventType.TRANSFER_OUT_FROZEN, payment_record.sn, secure_user_id, ZYT_NAME, amount)
+    event_id2 = bookkeeping(EventType.TRANSFER_IN, payment_record.sn, payment_record.payee_id, ZYT_NAME, amount)
 
     transit_transaction_state(payment_record.tx_id, TransactionState.SECURED, TransactionState.SUCCESS,
                               [event_id1, event_id2])

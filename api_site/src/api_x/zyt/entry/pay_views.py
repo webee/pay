@@ -46,7 +46,7 @@ def cashier_desk(sn):
     tx = get_tx_by_sn(sn)
     if tx is None:
         abort(404)
-    if tx.state != TransactionState.SUCCESS:
+    if tx.state != TransactionState.CREATED:
         return render_template("info.html", msg="该订单已支付完成")
     return render_template("cashier_desk.html", root_url=config.HOST_URL, tx=tx, vas=VirtualAccountSystemType)
 
@@ -59,7 +59,7 @@ def pay(sn, vas_name):
     tx = get_tx_by_sn(sn)
     if tx is None:
         abort(404)
-    if tx.state != TransactionState.SUCCESS:
+    if tx.state != TransactionState.CREATED:
         return render_template("info.html", msg="该订单已支付完成")
 
     return payment.pay(vas_name, tx)

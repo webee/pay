@@ -44,3 +44,14 @@ def request_prepay(params):
     url = _generate_api_url(config.PayAPI.PRE_PAY_URL)
     req = requests.post(url, params)
     return req.json()
+
+
+def request_refund(params):
+    url = _generate_api_url(config.PayAPI.REFUND_URL)
+    return requests.post(url, params)
+
+
+def request_confirm_guarantee_payment(params):
+    url = _generate_api_url(config.PayAPI.CONFIRM_GUARANTEE_PAYMENT_URL)
+    req = requests.post(url, params)
+    return req.json()

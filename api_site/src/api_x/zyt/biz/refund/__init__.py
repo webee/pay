@@ -119,7 +119,7 @@ def _create_refund(tx, payment_record, amount, client_notify_url):
         raise PaymentNotRefundableError()
 
     if amount + payment_record.refunded_amount > payment_record.amount:
-        raise RefundAmountError(amount)
+        raise RefundAmountError(payment_record.amount, payment_record.refunded_amount, amount)
 
     comments = "退款-交易流水号: [{0}]".format(payment_record.sn)
 

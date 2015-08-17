@@ -53,8 +53,7 @@ def confirm_guarantee_payment():
         'order_id': request.values['order_id']
     }
 
-    req = requests.post(config.PayAPI.CONFIRM_GUARANTEE_PAYMENT_URL, params)
-    data = req.json()
+    data = pay_client.request_confirm_guarantee_payment(params)
     print('ret: {0}'.format(data))
     return redirect(url_for('sample.pay'))
 
@@ -68,7 +67,7 @@ def refund():
         'notify_url': ''
     }
 
-    req = requests.post(config.PayAPI.REFUND_URL, params)
+    req = pay_client.request_refund(params)
     return render_template('sample/info.html', title='退款结果', msg=req.content)
 
 

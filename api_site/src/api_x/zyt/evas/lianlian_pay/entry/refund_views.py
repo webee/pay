@@ -18,14 +18,14 @@ logger = get_logger(__name__)
 
 @mod.route("/refund/notify/<refund_source>", methods=["POST"])
 @parse_and_verify
-def pay_notify(refund_source):
+def refund_notify(refund_source):
     data = request.verified_data
     partner_oid = data['oid_partner']
     refund_no = data['no_refund']
     status = data['sta_refund']
     refundno_oid = data['oid_refundno']
 
-    logger.info('pay notify {0}: {1}'.format(refund_source, data))
+    logger.info('refund notify {0}: {1}'.format(refund_source, data))
     if not is_sending_to_me(partner_oid):
         return notification.is_invalid()
 
@@ -37,7 +37,7 @@ def pay_notify(refund_source):
                 return notification.succeed()
             return notification.is_invalid()
         except Exception as e:
-            logger.warning('pay notify error: {0}'.format(e.message))
+            logger.warning('refund notify error: {0}'.format(e.message))
             return notification.is_invalid()
 
     return notification.succeed()

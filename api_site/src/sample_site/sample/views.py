@@ -11,13 +11,17 @@ from sample_site.utils import generate_order_id
 @mod.route('/pay', methods=['GET', 'POST'])
 def pay():
     """支付一分钱"""
+    channel_id = 1
+    channel_name = 'sample'
+    payer = 'webee'
+    payee = 'test001'
     if request.method == 'GET':
-        return render_template('sample/pay.html')
+        return render_template('sample/pay.html', channel=channel_name, payer=payer, payee=payee)
 
     params = {
-        'channel_id': 1,
-        'payer_user_id': 'webee',
-        'payee_user_id': 'test001',
+        'channel_id': channel_id,
+        'payer_user_id': payer,
+        'payee_user_id': payee,
         'order_id': generate_order_id(),
         'product_name': '支付1分钱',
         'product_category': '测试',
@@ -46,6 +50,17 @@ def confirm_guarantee_payment():
     data = req.json()
     print('ret: {0}'.format(data))
     return redirect(url_for('sample.pay'))
+
+
+@mod.route('/refund', methods=['POST'])
+def refund():
+    params = {
+        'channel_id': 1,
+        'order_id': request.values['order_id']
+    }
+
+    req = requests.post(config.PayAPI.REFUND_URL, params)
+    return render_template('info.html', title='退款结果', msg=req.content)
 
 
 @mod.route('/prepaid', methods=['GET'])

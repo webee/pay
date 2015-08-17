@@ -138,8 +138,9 @@ def _request_refund(payment_record, refund_record):
 
 
 def _refund_by_lianlian_pay(payment_record, refund_record):
+    """连连退款"""
     from api_x.zyt.evas.lianlian_pay.error import ApiError
-    from api_x.zyt.evas.lianlian_pay.refund import refund
+    from api_x.zyt.evas.lianlian_pay import refund
 
     vas_sn = payment_record.vas_sn
 

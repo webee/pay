@@ -16,3 +16,4 @@ class PayAPI:
     PREPAID_URL = 'http://pay.lvye.com/api/prepaid'
     PRE_PAY_URL = 'http://pay.lvye.com/api/pre_pay'
     CONFIRM_GUARANTEE_PAYMENT_URL = 'http://pay.lvye.com/api/pay/guarantee_payment/confirm'
+    REFUND_URL = 'http://pay.lvye.com/api/refund'

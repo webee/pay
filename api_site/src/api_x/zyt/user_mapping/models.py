@@ -19,7 +19,7 @@ class Channel(db.Model):
     user_domain_id = db.Column(db.Integer, db.ForeignKey('user_domain.id'), nullable=False)
     user_domain = db.relationship('UserDomain', backref=db.backref('channels', lazy='dynamic'))
 
-    name = db.Column(db.VARCHAR(32))
+    name = db.Column(db.VARCHAR(32), nullable=False, unique=True)
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 

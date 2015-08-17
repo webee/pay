@@ -11,14 +11,14 @@
     <h1>请选择支付方式：</h1>
     <ul>
         <li>
-            <form action="{{ url_for('entry.prepaid_by', vas_name=vas.TEST_PAY) }}" method="POST">
+            <form action="{{ url_for('biz_entry.prepaid_by', vas_name=vas.TEST_PAY) }}" method="POST">
                 <input type="hidden" name="user_id" value="{{ user_id }}">
                 <input type="hidden" name="amount" value="{{ amount }}">
                 <input type="submit" value="test_pay">
             </form>
         </li>
         <li>
-            <form action="{{ url_for('entry.prepaid_by', vas_name=vas.WEIXIN_PAY) }}" method="POST">
+            <form action="{{ url_for('biz_entry.prepaid_by', vas_name=vas.WEIXIN_PAY) }}" method="POST">
                 <input type="hidden" name="user_id" value="{{ user_id }}">
                 <input type="hidden" name="amount" value="{{ amount }}">
                 <input type="submit" value="微信支付">

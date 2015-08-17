@@ -23,8 +23,8 @@ class Channel(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
-class UserMap(db.Model):
-    __tablename__ = 'user_map'
+class UserMapping(db.Model):
+    __tablename__ = 'user_mapping'
 
     id = db.Column(db.BigInteger, primary_key=True)
     user_domain_id = db.Column(db.Integer, db.ForeignKey('user_domain.id'), nullable=False)

@@ -5,7 +5,7 @@ from api_x import db
 from api_x.dbs import require_transaction_context
 from api_x.zyt.biz.models import Bankcard
 from api_x.zyt.user_mapping import create_user_domain, create_channel, find_or_create_account_user_by_channel_info
-from api_x.zyt.user_mapping import find_or_create_account_user
+from api_x.zyt.user_mapping import get_or_create_account_user
 
 
 def init_data():
@@ -21,7 +21,7 @@ def add_system_users():
     from api_x.constant import SYSTEM_USER_DOMAIN_NAME, SECURE_USER_NAME
     system_user_domain = create_user_domain(SYSTEM_USER_DOMAIN_NAME)
     # 担保用户(secure)#1
-    _ = find_or_create_account_user(system_user_domain.id, SECURE_USER_NAME)
+    _ = get_or_create_account_user(system_user_domain.id, SECURE_USER_NAME)
 
 
 def add_vases():

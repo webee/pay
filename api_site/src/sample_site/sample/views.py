@@ -7,17 +7,22 @@ from . import sample_mod as mod
 import requests
 from sample_site import config
 from sample_site.utils import generate_order_id
+from sample_site import pay_client
 
 
 @mod.route('/pay', methods=['GET', 'POST'])
 def pay():
     """支付一分钱"""
-    channel_id = 1
+    channel_id = config.PayAPI.CHANNEL_ID
     channel_name = 'sample'
     payer = 'webee'
     payee = 'test001'
+
+    payee_account_user_id = pay_client.get_account_user_id(payer)
+    balance = pay_client.get_user_balance(payee)
     if request.method == 'GET':
-        return render_template('sample/pay.html', channel=channel_name, payer=payer, payee=payee)
+        return render_template('sample/pay.html', channel=channel_name, payer=payer, payee=payee,
+                               payee_account_user_id=payee_account_user_id, balance=balance)
 
     amount = Decimal(request.values['amount'])
     params = {
@@ -36,8 +41,7 @@ def pay():
 
     print("order_id: {0}".format(params['order_id']))
 
-    req = requests.post(config.PayAPI.PRE_PAY_URL, params)
-    data = req.json()
+    data = pay_client.request_prepay(params)
     return redirect(data['pay_url'])
 
 

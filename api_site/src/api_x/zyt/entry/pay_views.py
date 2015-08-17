@@ -9,7 +9,7 @@ from api_x.zyt.biz.transaction import get_tx_by_sn
 from api_x.config import etc as config
 from api_x.constant import VirtualAccountSystemType
 from api_x.util import response
-from . import entry_mod as mod
+from . import biz_entry_mod as mod
 from tools.mylog import get_logger
 
 
@@ -41,7 +41,7 @@ def pre_pay():
         payment_record = payment.find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
                                                         product_name, product_category, product_desc, amount,
                                                         client_callback_url, client_notify_url)
-        pay_url = config.HOST_URL + url_for('entry.cashier_desk', sn=payment_record.sn)
+        pay_url = config.HOST_URL + url_for('biz_entry.cashier_desk', sn=payment_record.sn)
 
         return response.success(sn=payment_record.sn, pay_url=pay_url)
     except Exception as e:

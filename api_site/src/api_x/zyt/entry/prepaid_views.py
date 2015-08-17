@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from flask import request, render_template
-from . import entry_mod as mod
+from . import biz_entry_mod as mod
 from api_x.constant import VirtualAccountSystemType, TransactionType
 
 

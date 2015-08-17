@@ -30,16 +30,6 @@ def get_account_id(uid):
     return _uid_accounts.get(uid)
 
 
-def get_account_info(account_id):
-    if account_id not in _id_accounts:
-        url = _generate_api_url(config.PayAPI.GET_ACCOUNT_INFO_URL, account_id=account_id)
-        req = requests.get(url)
-        if req.status_code == 200:
-            res = req.json()
-            _uid_accounts[account_id] = res
-    return _uid_accounts.get(account_id)
-
-
 def get_user_balance(uid):
     account_id = get_account_id(uid)
     url = _generate_api_url(config.PayAPI.GET_USER_BALANCE_URL, account_id=account_id)

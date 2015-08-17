@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from flask import request
-from . import entry_mod as mod
+from . import biz_entry_mod as mod
 from api_x.util import response
 from api_x.zyt.biz import refund
 from tools.mylog import get_logger

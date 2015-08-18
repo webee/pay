@@ -24,3 +24,8 @@ def bad():
 def miss():
     """没有处理, 期待下次发送处理"""
     return failed()
+
+
+def wrong():
+    """返回数据有问题"""
+    return failed()

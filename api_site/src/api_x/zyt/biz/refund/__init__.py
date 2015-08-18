@@ -197,6 +197,7 @@ def _refund_by_test_pay(payment_record, refund_record, data):
     res = refund(TransactionType.REFUND, sn, amount, vas_sn, result or 'SUCCESS')
 
     if not is_success_request(res):
+        logger.error('request refund failed: {0}'.format(res))
         raise RefundFailedError(res['reg_msg'])
     return res
 
@@ -215,6 +216,7 @@ def _refund_by_lianlian_pay(payment_record, refund_record):
     res = refund(TransactionType.REFUND, sn, created_on, amount, vas_sn)
 
     if not is_success_request(res):
+        logger.error('request refund failed: {0}'.format(res))
         raise RefundFailedError(res['reg_msg'])
     return res
 

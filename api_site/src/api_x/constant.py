@@ -1,8 +1,17 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
-SYSTEM_USER_DOMAIN_NAME = '系统用户'
+
+class DefaultUserDomain:
+    SYSTEM_USER_DOMAIN_NAME = '系统用户'
+    TEST_DOMAIN_NAME = '测试用户'
+    LVYE_CORP_DOMAIN_NAME = '绿野公司用户'
+    LVYE_ACCOUNT_DOMAIN_NAME = '绿野用户中心'
+
+# 系统用户
 SECURE_USER_NAME = 'secure'
+# 绿野公司
+LVYE_CORP_USER_NAME = 'lvye'
 
 
 class VirtualAccountSystemType:
@@ -21,13 +30,6 @@ class TransactionType:
     WITHDRAW = 'WITHDRAW'
 
 
-class TransactionState:
-    CREATED = 'CREATED'
-    FAILED = 'FAILED'
-    SUCCESS = 'SUCCESS'
-    SECURED = 'SECURED'
-
-
 class PaymentTransactionState:
     CREATED = 'CREATED'
     FAILED = 'FAILED'
@@ -41,6 +43,21 @@ class RefundTransactionState:
     CREATED = 'CREATED'
     FAILED = 'FAILED'
     SUCCESS = 'SUCCESS'
+
+
+class WithdrawTransactionState:
+    CREATED = 'CREATED'
+    FAILED = 'FAILED'
+    SUCCESS = 'SUCCESS'
+    FROZEN = 'FROZEN'
+    PROCESSING = 'PROCESSING'
+
+
+class TransactionState:
+    CREATED = 'CREATED'
+    FAILED = 'FAILED'
+    SUCCESS = 'SUCCESS'
+    SECURED = 'SECURED'
 
 
 class BankcardType:

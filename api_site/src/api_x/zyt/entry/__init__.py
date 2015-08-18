@@ -5,7 +5,7 @@ from flask import Blueprint, render_template
 
 biz_entry_mod = Blueprint('biz_entry', __name__, template_folder='./templates')
 
-from . import views, pay_views, refund_views
+from . import views, pay_views, refund_views, withdraw_views
 
 
 @biz_entry_mod.errorhandler(404)

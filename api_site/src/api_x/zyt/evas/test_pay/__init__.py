@@ -47,3 +47,17 @@ def refund(source, refund_no, amount, pay_sn, result='SUCCESS'):
     req = requests.post(test_pay.Refund.URL, params)
 
     return req.json()
+
+
+def pay_to_bankcard(source, order_no, amount, result='SUCCESS'):
+    notify_url = generate_absolute_url(url_for('test_pay_entry.pay_to_bankcard_notify', refund_source=source))
+    params = {
+        'merchant_id': test_pay.MERCHANT_ID,
+        'order_no': order_no,
+        'amount': amount,
+        'notify_url': notify_url,
+        'result': result
+    }
+    req = requests.post(test_pay.PayToBankcard.URL, params)
+
+    return req.json()

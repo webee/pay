@@ -85,4 +85,4 @@ def confirm_guarantee_payment():
         payment.confirm_payment(channel_id, order_id)
         return response.ok()
     except Exception as e:
-        return response.bad_request(e.message)
+        return response.bad_request(msg=e.message)

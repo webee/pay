@@ -32,8 +32,8 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_i
             raise NonPositiveAmountError(amount)
 
         payment_record = _create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
-                                        product_name, product_category, product_desc, amount,
-                                        client_callback_url, client_notify_url)
+                                         product_name, product_category, product_desc, amount,
+                                         client_callback_url, client_notify_url)
     else:
         # update payment info, if not paid.
         with require_transaction_context():
@@ -48,7 +48,9 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_i
             payment_record = PaymentRecord.query.get(payment_record.id)
     if payment_record.amount <= 0:
         from api_x.zyt import vas as zyt
-        tx, payment_record = update_payment_info(tx, payment_record.id, zyt.NAME, '', PaymentTransactionState.CREATED)
+
+        tx, payment_record = update_payment_info(tx, payment_record.id, zyt.NAME, payment_record.sn,
+                                                 PaymentTransactionState.CREATED)
         succeed_payment(zyt.NAME, payment_record)
     return payment_record
 
@@ -85,8 +87,6 @@ def _create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
     db.session.add(payment_record)
 
     return payment_record
-
-
 
 
 def get_payment_by_channel_order_id(channel_id, order_id):
@@ -202,8 +202,8 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
         else:
             fail_payment(payment_record)
 
-    # TODO
-    # notify client
+            # TODO
+            # notify client
 
 
 def _is_duplicated_notify(tx, payment_record, vas_name, vas_sn):

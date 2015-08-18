@@ -6,7 +6,7 @@ from api_x import db
 from api_x.zyt.vas.models import Event, SystemAssetAccountItem, UserLiabilityAccountItem, LiabilityType, EventType
 from api_x.zyt.vas.models import UserCashBalanceLog, UserCashBalance
 from api_x.dbs import transactional
-from .error import InsufficientAvailableBalanceError, InsufficientFrozenBalanceError
+from .error import InsufficientAvailableBalanceError, InsufficientFrozenBalanceError, AmountValueError
 
 
 DEBIT = 'DEBIT'
@@ -24,6 +24,9 @@ def _register_event_action(event_type):
 
 @transactional
 def bookkeeping(event_type, transaction_sn, user_id, vas_name, amount):
+    if amount <= 0:
+        raise AmountValueError()
+
     event = _create_event(transaction_sn, user_id, vas_name, event_type, amount)
     _event_actions[event_type](event)
     _update_balance(event)

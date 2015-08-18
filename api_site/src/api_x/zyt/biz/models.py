@@ -27,6 +27,8 @@ class TransactionRecord(db.Model):
     sn = db.Column(db.CHAR(32))
     type = db.Column(db.Enum(TransactionType.PAYMENT, TransactionType.REFUND, TransactionType.WITHDRAW,
                              TransactionType.TRANSFER, TransactionType.PREPAID), nullable=False)
+    # 涉及到的总金额
+    # 支付金额，退款金额，提现金额(+手续费)
     amount = db.Column(db.Numeric(12, 2), nullable=False)
     comments = db.Column(db.VARCHAR(128), default='')
     state = db.Column(db.VARCHAR(32), nullable=False)

@@ -73,3 +73,16 @@ def _log_state_transit(tx_id, prev_state, state, event_id=None):
         for event_id in event_ids:
             tx_state_log = TransactionStateLog(tx_id=tx_id, prev_state=prev_state, state=state, event_id=event_id)
             db.session.add(tx_state_log)
+
+
+@transactional
+def update_transaction_info(tx_id, vas_name, vas_sn):
+    tx = TransactionRecord.query.get(tx_id)
+    if tx is None:
+        raise TransactionNotFoundError(tx_id)
+
+    tx.vas_name = vas_name
+    tx.vas_sn = vas_sn
+    db.session.add(tx)
+
+    return tx

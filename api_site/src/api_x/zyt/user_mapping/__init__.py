@@ -26,8 +26,15 @@ def create_channel(user_domain_id, name):
 
 
 def get_system_account_user_id(user_id):
-    from api_x.constant import SYSTEM_USER_DOMAIN_NAME
-    user_domain = UserDomain.query.filter_by(name=SYSTEM_USER_DOMAIN_NAME).first()
+    from api_x.constant import DefaultUserDomain
+    user_domain = UserDomain.query.filter_by(name=DefaultUserDomain.SYSTEM_USER_DOMAIN_NAME).first()
+    user_map = UserMapping.query.filter_by(user_domain_id=user_domain.id, user_id=user_id).one()
+    return user_map.account_user_id
+
+
+def get_lvye_corp_account_user_id(user_id):
+    from api_x.constant import DefaultUserDomain
+    user_domain = UserDomain.query.filter_by(name=DefaultUserDomain.LVYE_CORP_DOMAIN_NAME).first()
     user_map = UserMapping.query.filter_by(user_domain_id=user_domain.id, user_id=user_id).one()
     return user_map.account_user_id
 

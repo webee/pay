@@ -13,8 +13,8 @@ from tools.mylog import get_logger
 logger = get_logger(__name__)
 
 
-@mod.route('/pay', methods=['GET', 'POST'])
-def pay():
+@mod.route('/', methods=['GET'])
+def index():
     """支付一分钱"""
     channel_id = config.PayAPI.CHANNEL_ID
     channel_name = 'sample'
@@ -23,9 +23,17 @@ def pay():
 
     payee_account_user_id = pay_client.get_account_user_id(payee)
     balance = pay_client.get_user_balance(payee)
-    if request.method == 'GET':
-        return render_template('sample/pay.html', channel=channel_name, payer=payer, payee=payee,
-                               payee_account_user_id=payee_account_user_id, balance=balance)
+    return render_template('sample/pay.html', channel=channel_name, payer=payer, payee=payee,
+                           payee_account_user_id=payee_account_user_id, balance=balance)
+
+
+@mod.route('/pay', methods=['POST'])
+def pay():
+    """支付一分钱"""
+    channel_id = config.PayAPI.CHANNEL_ID
+    channel_name = 'sample'
+    payer = 'webee'
+    payee = 'test001'
 
     amount = Decimal(request.values['amount'])
     payment_type = request.values['payment_type']

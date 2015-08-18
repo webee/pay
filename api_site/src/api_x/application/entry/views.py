@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import time
 from flask import jsonify
-from . import business_mod as mod
+from . import application_mod as mod
 
 
 @mod.route('/', methods=['GET', 'POST'])

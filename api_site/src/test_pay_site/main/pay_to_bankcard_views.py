@@ -13,24 +13,21 @@ import thread
 logger = get_logger(__name__)
 
 
-@mod.route('/refund', methods=['POST'])
-def refund():
+@mod.route('/pay_to_bankcard', methods=['POST'])
+def pay_to_bankcard():
     data = request.values
     merchant_id = data['merchant_id']
-    refund_no = data['refund_no']
-    pay_sn = data['pay_sn']
+    order_no = data['order_no']
     amount = data['amount']
     notify_url = data['notify_url']
     result = data['result']
 
-    # find payment by pay_sn
-    # do refund
-    # notify.
+    # pay to bankcard amount.
     # ...
     params = {
-        'sn': generate_sn(merchant_id, refund_no),
+        'sn': generate_sn(merchant_id, order_no),
         'result': result,
-        'refund_no': refund_no,
+        'order_no': order_no
     }
 
     # async notify
@@ -41,7 +38,7 @@ def refund():
 
 def notify_client(notify_url, params):
     logger.info('before notify: {0}'.format(notify_url))
-    time.sleep(2)
+    time.sleep(10)
 
     logger.info('start notify: {0}'.format(notify_url))
     try:

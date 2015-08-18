@@ -10,3 +10,7 @@ class Pay:
 
 class Refund:
     URL = "http://dev_pay.lvye.com:8090/refund"
+
+
+class PayToBankcard:
+    URL = "http://dev_pay.lvye.com:8090/pay_to_bankcard"

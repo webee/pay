@@ -9,7 +9,7 @@ from tools import pmc_config
 def register_mods(app):
     from sample_site.sample import sample_mod
 
-    app.register_blueprint(sample_mod, url_prefix='/sample')
+    app.register_blueprint(sample_mod)
 
 
 def create_app(env='dev'):

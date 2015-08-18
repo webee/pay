@@ -46,10 +46,6 @@ def not_found(params=None):
     return _response(404, {'error': 'not found', 'params': params})
 
 
-def bad_request(message, **request_params):
-    return _response(400, {'error': message, 'params': str(request_params)})
-
-
 def _response(status_code, obj=None):
     js = _dumps(obj if obj else {})
     return Response(js, status=status_code, mimetype='application/json')

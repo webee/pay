@@ -27,7 +27,7 @@ def refund_notify(refund_source):
 
     logger.info('refund notify {0}: {1}'.format(refund_source, data))
     if not is_sending_to_me(partner_oid):
-        return notification.is_invalid()
+        return notification.bad()
 
     handle = get_refund_notify_handle(refund_source)
     if handle is None:
@@ -36,6 +36,7 @@ def refund_notify(refund_source):
     try:
         # 是否成功，订单号，来源系统，来源系统订单号，数据
         handle(is_success_status(status), refund_no, NAME, refundno_oid, data)
+        logger.info('refund notify success: {0}, {1}'.format(refund_source, refund_no))
         return notification.succeed()
     except Exception as e:
         logger.exception(e)

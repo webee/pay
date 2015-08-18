@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from flask import url_for, Response
 from api_x.config import test_pay
+import requests
+from .commons import generate_absolute_url
 
 NAME = 'TEST_PAY'
 
@@ -30,3 +32,18 @@ def generate_submit_form(url, req_params):
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'
     submit_page += '<script>document.forms["returnForm"].submit();</script>'
     return submit_page
+
+
+def refund(source, refund_no, amount, pay_sn, result='SUCCESS'):
+    notify_url = generate_absolute_url(url_for('test_pay_entry.refund_notify', refund_source=source))
+    params = {
+        'merchant_id': test_pay.MERCHANT_ID,
+        'refund_no': refund_no,
+        'amount': amount,
+        'pay_sn': pay_sn,
+        'notify_url': notify_url,
+        'result': result
+    }
+    req = requests.post(test_pay.Refund.URL, params)
+
+    return req.json()

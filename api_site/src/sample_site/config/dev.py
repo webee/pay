@@ -6,4 +6,4 @@ class App:
 
 
 class PayAPI:
-    ROOT_URL = "http://dev_pay.lvye.com:5000"
+    ROOT_URL = "http://localhost:5000"

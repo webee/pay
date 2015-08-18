@@ -13,4 +13,4 @@ def is_sending_to_me(partner_id):
 
 
 def is_success_request(data):
-    return 'ret_code' in data or data['ret_code'] == '0000'
+    return 'ret_code' in data and data['ret_code'] == '0000'

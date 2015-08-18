@@ -4,10 +4,13 @@ from __future__ import unicode_literals, print_function
 from decimal import Decimal
 from flask import request, render_template, redirect, url_for
 from . import sample_mod as mod
-import requests
 from sample_site import config
 from sample_site.utils import generate_order_id
 from sample_site import pay_client
+from tools.mylog import get_logger
+
+
+logger = get_logger(__name__)
 
 
 @mod.route('/pay', methods=['GET', 'POST'])
@@ -18,7 +21,7 @@ def pay():
     payer = 'webee'
     payee = 'test001'
 
-    payee_account_user_id = pay_client.get_account_user_id(payer)
+    payee_account_user_id = pay_client.get_account_user_id(payee)
     balance = pay_client.get_user_balance(payee)
     if request.method == 'GET':
         return render_template('sample/pay.html', channel=channel_name, payer=payer, payee=payee,
@@ -48,8 +51,9 @@ def pay():
 
 @mod.route('/pay/guarantee_payment/confirm', methods=['POST'])
 def confirm_guarantee_payment():
+    channel_id = config.PayAPI.CHANNEL_ID
     params = {
-        'channel_id': 1,
+        'channel_id': channel_id,
         'order_id': request.values['order_id']
     }
 
@@ -60,13 +64,19 @@ def confirm_guarantee_payment():
 
 @mod.route('/refund', methods=['POST'])
 def refund():
+    suggest_result = request.values['suggest_result']
+    channel_id = config.PayAPI.CHANNEL_ID
     params = {
-        'channel_id': 1,
+        'channel_id': channel_id,
         'order_id': request.values['order_id'],
         'amount': Decimal(request.values['amount']),
         'notify_url': ''
     }
+    if suggest_result:
+        # for test.
+        params['result'] = suggest_result
 
+    logger.info('refund: {0}'.format(params))
     req = pay_client.request_refund(params)
     return render_template('sample/info.html', title='退款结果', msg=req.content)
 

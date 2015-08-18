@@ -17,6 +17,10 @@ def duplicate():
     return succeed()
 
 
+def bad():
+    return succeed()
+
+
 def miss():
     """没有处理, 期待下次发送处理"""
     return failed()

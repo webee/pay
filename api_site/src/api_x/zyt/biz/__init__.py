@@ -13,6 +13,9 @@ def init_test_pay_notify_handles():
     register_notify_handle(TransactionType.PAYMENT, BizType.PAY, NotifyType.SYNC, handle_payment_result)
     register_notify_handle(TransactionType.PAYMENT, BizType.PAY, NotifyType.ASYNC, handle_payment_notify)
 
+    # refund
+    register_notify_handle(TransactionType.REFUND, BizType.REFUND, NotifyType.ASYNC, handle_refund_notify)
+
 
 def init_lianlian_pay_notify_handles():
     from api_x.zyt.evas.lianlian_pay.constant import NotifyType

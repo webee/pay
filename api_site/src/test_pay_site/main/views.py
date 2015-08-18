@@ -5,6 +5,11 @@ from flask import request, render_template, redirect, url_for, session, Response
 from test_pay_site import config
 from . import main_mod as mod
 import requests
+from test_pay_site.main.commons import generate_sn
+from tools.mylog import get_logger
+
+
+logger = get_logger(__name__)
 
 
 @mod.route('/pay', methods=['POST'])
@@ -65,16 +70,13 @@ def do_pay():
 
     # TODO: async notify
     try:
+        logger.info('notify {0}: {1}'.format(notify_url, params))
         req = requests.post(notify_url, params)
         print(req.json())
     except Exception as e:
         print(e.message)
 
     return Response(generate_submit_form(return_url, params), status=200, mimetype='text/html')
-
-
-def generate_sn(merchant_id, order_no):
-    return '{0}.{1}'.format(merchant_id, order_no)
 
 
 def generate_submit_form(url, req_params):

@@ -180,9 +180,9 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
     tx, payment_record = get_tx_payment_by_sn(sn)
 
     if _is_duplicated_notify(tx, payment_record, vas_name, vas_sn):
-        # 重复通知
         return
-    elif _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
+
+    if _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
         # 重复支付
         # TODO, 退款到余额(短信通知)或者原路返回
         logger.warning('duplicated payment: [{0}], [{1}], [{2}, {3}]'.format(

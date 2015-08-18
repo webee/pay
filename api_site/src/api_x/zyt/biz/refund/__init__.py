@@ -16,6 +16,7 @@ from ..payment import get_payment_by_id, get_tx_payment_by_sn
 from api_x.zyt.biz.error import *
 from .dba import get_tx_refund_by_sn
 from tools.mylog import get_logger
+from api_x.dbs import require_transaction_context
 
 
 logger = get_logger(__name__)
@@ -46,29 +47,36 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
     :return:
     """
     tx, refund_record = get_tx_refund_by_sn(sn)
-    if tx is None:
-        return True
-
-    refund_record = update_refund_info(refund_record.id, vas_sn)
     payment_tx, payment_record = get_tx_payment_by_sn(refund_record.payment_sn)
+
+    if tx is None or refund_record is None or refund_record.vas_name != vas_name:
+        # 不存在
+        return
+
+    if _is_duplicated_notify(tx, refund_record, vas_name, vas_sn):
+        return
 
     if payment_tx.state != PaymentTransactionState.REFUNDING and tx.state != RefundTransactionState.CREATED:
         logger.warning('bad refund notify: [sn: {0}]'.format(sn))
-        return True
+        return
 
-    if is_success:
-        # 直付和担保付的不同操作
-        if payment_record.type == PaymentType.DIRECT:
-            succeed_refund(vas_name, payment_record, refund_record)
-        elif payment_record.type == PaymentType.GUARANTEE:
-            succeed_refund_secured(vas_name, payment_record, refund_record)
-    else:
-        fail_refund(payment_record, refund_record)
+    with require_transaction_context():
+        refund_record = update_refund_info(refund_record.id, vas_sn)
+        if is_success:
+            # 直付和担保付的不同操作
+            if payment_record.type == PaymentType.DIRECT:
+                succeed_refund(vas_name, payment_record, refund_record)
+            elif payment_record.type == PaymentType.GUARANTEE:
+                succeed_refund_secured(vas_name, payment_record, refund_record)
+        else:
+            fail_refund(payment_record, refund_record)
 
     # TODO
     # notify
 
-    return True
+
+def _is_duplicated_notify(tx, refund_record, vas_name, vas_sn):
+    return vas_name == refund_record.vas_name and vas_sn == refund_record.vas_sn
 
 
 def _get_tx_payment_to_refund(channel_id, order_id):
@@ -102,6 +110,7 @@ def _create_and_request_refund(tx, payment_record, amount, client_notify_url):
     except Exception as e:
         logger.exception(e)
         fail_refund(payment_record, refund_record)
+        raise RefundFailedError(e.message)
 
     return refund_record
 
@@ -162,6 +171,7 @@ def _request_refund(payment_record, refund_record):
 def _refund_by_lianlian_pay(payment_record, refund_record):
     """连连退款"""
     from api_x.zyt.evas.lianlian_pay import refund
+    from api_x.zyt.evas.lianlian_pay.commons import is_success_request
 
     vas_sn = payment_record.vas_sn
 
@@ -175,6 +185,9 @@ def _refund_by_lianlian_pay(payment_record, refund_record):
         oid_refundno = res['oid_refundno']
 
         update_refund_info(refund_record.id, oid_refundno)
+
+    if not is_success_request(res):
+        raise RefundFailedError(res['reg_msg'])
     return res
 
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from .api_x.zyt.evas.lianlian_pay.api_access import request
-from .api_x.zyt.evas.lianlian_pay.util import now_to_str
-from api_x import config
+from .api_access import request
+from .util import now_to_str
+from api_x.config import lianlian_pay
 
 
 def pay_to_bankcard(no_order, money_order, info_order, bankcard, notify_url):
@@ -16,9 +16,9 @@ def pay_to_bankcard(no_order, money_order, info_order, bankcard, notify_url):
     :return:
     """
     params = {
-        'platform': config.LianLianPay.PLATFORM,
-        'oid_partner': config.LianLianPay.OID_PARTNER,
-        'sign_type': config.LianLianPay.Sign.RSA_TYPE,
+        'platform': lianlian_pay.PLATFORM,
+        'oid_partner': lianlian_pay.OID_PARTNER,
+        'sign_type': lianlian_pay.SignType.RSA,
         'no_order': no_order,
         'dt_order': now_to_str(),
         'money_order': money_order,
@@ -31,18 +31,18 @@ def pay_to_bankcard(no_order, money_order, info_order, bankcard, notify_url):
         'city_code': bankcard.city_code,
         'brabank_name': bankcard.branch_bank_name,
         'notify_url': notify_url,
-        'api_version': config.LianLianPay.PayToBankcard.VERSION,
+        'api_version': lianlian_pay.PayToBankcard.VERSION,
         'prcptcd': ''
     }
     # TODO:
     # note: bankcode, 对公必须传
     # note: province_code, city_code, brabank_name, 工、农、中, 招,光大 浦发(对私打款),建行 (对公打款)可以不传, 其他银行必须传
-    return request(config.LianLianPay.PayToBankcard.URL, params)
+    return request(lianlian_pay.PayToBankcard.URL, params)
 
 
 def is_successful_withdraw(result):
-    return result == config.LianLianPay.PayToBankcard.Result.SUCCESS
+    return result == lianlian_pay.PayToBankcard.Result.SUCCESS
 
 
 def is_failed_withdraw(result):
-    return result == config.LianLianPay.PayToBankcard.Result.FAILURE
+    return result == lianlian_pay.PayToBankcard.Result.FAILURE

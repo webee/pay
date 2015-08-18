@@ -62,6 +62,7 @@ def pay_notify(pay_source):
         handle(is_success_result(pay_result), order_no, NAME, paybill_oid, data)
         return notification.succeed()
     except Exception as e:
+        logger.exception(e)
         logger.warning('pay notify error: {0}'.format(e.message))
         return notification.failed()
 

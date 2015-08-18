@@ -10,3 +10,7 @@ def generate_absolute_url(path):
 
 def is_sending_to_me(partner_id):
     return partner_id == lianlian_pay.OID_PARTNER
+
+
+def is_success_request(data):
+    return 'ret_code' in data or data['ret_code'] == '0000'

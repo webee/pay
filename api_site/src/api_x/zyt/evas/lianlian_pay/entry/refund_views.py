@@ -30,17 +30,17 @@ def refund_notify(refund_source):
         return notification.is_invalid()
 
     handle = get_refund_notify_handle(refund_source)
-    if handle:
-        try:
-            # 是否成功，订单号，来源系统，来源系统订单号，数据
-            if handle(is_success_status(status), refund_no, NAME, refundno_oid, data):
-                return notification.succeed()
-            return notification.is_invalid()
-        except Exception as e:
-            logger.exception(e)
-            return notification.is_invalid()
+    if handle is None:
+        return notification.miss()
 
-    return notification.succeed()
+    try:
+        # 是否成功，订单号，来源系统，来源系统订单号，数据
+        handle(is_success_status(status), refund_no, NAME, refundno_oid, data)
+        return notification.succeed()
+    except Exception as e:
+        logger.exception(e)
+        logger.warning('refund notify error: {0}'.format(e.message))
+        return notification.failed()
 
 
 def is_success_status(status):

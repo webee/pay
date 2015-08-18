@@ -52,17 +52,18 @@ def pay_notify(pay_source):
         return notification.is_invalid()
 
     handle = get_pay_notify_handle(pay_source, NotifyType.Pay.ASYNC)
-    if handle:
-        try:
-            # 是否成功，订单号，来源系统，来源系统订单号，数据
-            if handle(is_success_result(pay_result), order_no, NAME, paybill_oid, data):
-                return notification.succeed()
-            return notification.is_invalid()
-        except Exception as e:
-            logger.warning('pay notify error: {0}'.format(e.message))
-            return notification.is_invalid()
+    if handle is None:
+        return notification.miss()
 
-    return notification.succeed()
+    try:
+        # 此通知的调用协议
+        # 是否成功，订单号，来源系统，来源系统订单号，数据
+        # TODO: 提出接口
+        handle(is_success_result(pay_result), order_no, NAME, paybill_oid, data)
+        return notification.succeed()
+    except Exception as e:
+        logger.warning('pay notify error: {0}'.format(e.message))
+        return notification.failed()
 
 
 def is_success_result(result):

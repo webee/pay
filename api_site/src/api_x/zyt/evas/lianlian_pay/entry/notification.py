@@ -4,25 +4,19 @@ from __future__ import unicode_literals
 from flask import jsonify
 
 
-def is_invalid():
+def succeed():
+    return jsonify({'ret_code': '0000', 'ret_msg': 'success'})
+
+
+def failed():
     return jsonify({'ret_code': '9999'})
 
 
 def duplicate():
-    return jsonify({'ret_code': '0000', 'ret_msg': '重复通知'})
+    """重复通知, 不再通知"""
+    return succeed()
 
 
-def succeed():
-    return jsonify({'ret_code': '0000', 'ret_msg': '交易成功'})
-
-
-def fail():
-    return jsonify({'ret_code': '0000', 'ret_msg': '交易失败'})
-
-
-def accepted():
-    return jsonify({'ret_code': '0000', 'ret_msg': 'accepted'})
-
-
-def refused():
-    return jsonify({'ret_code': '9999', 'ret_msg': 'refused'})
+def miss():
+    """没有处理, 期待下次发送处理"""
+    return failed()

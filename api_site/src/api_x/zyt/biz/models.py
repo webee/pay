@@ -31,6 +31,10 @@ class TransactionRecord(db.Model):
     comments = db.Column(db.VARCHAR(128), default='')
     state = db.Column(db.VARCHAR(32), nullable=False)
 
+    # need update on notify.
+    # vas_name = db.Column(db.VARCHAR(32), nullable=False, default='')
+    # vas_sn = db.Column(db.VARCHAR(128), nullable=False, default='')
+
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -91,17 +95,6 @@ class PaymentRecord(db.Model):
 
     # index
     __table_args__ = (db.UniqueConstraint('channel_id', 'order_id', name='channel_order_id_uniq_idx'),)
-
-
-class PaymentRecordLianlianPayExtra(db.Model):
-    __tablename__ = 'payment_record_lianlian_pay_extra'
-
-    id = db.Column(db.BigInteger, primary_key=True)
-    payment_record_id = db.Column(db.BigInteger, db.ForeignKey('payment_record.id'), nullable=False, unique=True)
-
-    pay_type = db.Column(db.CHAR(1))
-
-    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
 class RefundRecord(db.Model):
@@ -199,3 +192,16 @@ class WithdrawRecord(db.Model):
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# third party payments specific infos related to corresponding biz record.
+# use it or not.
+class PaymentRecordLianlianPayExtra(db.Model):
+    __tablename__ = 'payment_record_lianlian_pay_extra'
+
+    id = db.Column(db.BigInteger, primary_key=True)
+    payment_record_id = db.Column(db.BigInteger, db.ForeignKey('payment_record.id'), nullable=False, unique=True)
+
+    pay_type = db.Column(db.CHAR(1))
+
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

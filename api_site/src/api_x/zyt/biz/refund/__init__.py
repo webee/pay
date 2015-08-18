@@ -8,6 +8,7 @@ from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id
 from api_x.constant import SECURE_USER_NAME, PaymentTransactionState, RefundTransactionState
 from api_x.dbs import transactional
+from api_x.zyt.vas.user import get_user_cash_balance
 from ...vas.models import EventType
 from ..transaction import create_transaction, transit_transaction_state, get_tx_by_sn, get_tx_by_id
 from ..models import TransactionType, RefundRecord, PaymentType
@@ -139,6 +140,12 @@ def _create_refund(tx, payment_record, amount, client_notify_url):
     if payment_record.type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
         user_ids.append(secure_user_id)
+    elif payment_record.type == PaymentType.DIRECT:
+        # check balance.
+        # 直付退款时收款方余额必须足够
+        balance = get_user_cash_balance(payment_record.payee_id)
+        if amount > balance.available:
+            raise RefundBalanceError(amount, balance.available)
     tx_record = create_transaction(TransactionType.REFUND, amount, comments, user_ids)
 
     fields = {

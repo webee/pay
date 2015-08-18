@@ -49,3 +49,9 @@ class RefundAmountError(RefundError):
         message = "refund amount error: [payment_amount: {0}, refunded_amount: {1}, refund_amount: {2}]."\
             .format(payment_amount, refunded_amount, refund_amount)
         super(RefundAmountError, self).__init__(message)
+
+
+class RefundBalanceError(RefundError):
+    def __init__(self, amount, balance):
+        message = "refund balance error: [amount: {0}, balance: {1}.".format(amount, balance)
+        super(RefundBalanceError, self).__init__(message)

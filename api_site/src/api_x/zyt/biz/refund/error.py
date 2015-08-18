@@ -55,3 +55,9 @@ class RefundBalanceError(RefundError):
     def __init__(self, amount, balance):
         message = "refund balance error: [amount: {0}, balance: {1}.".format(amount, balance)
         super(RefundBalanceError, self).__init__(message)
+
+
+class RefundDirectPayError(RefundError):
+    def __init__(self, sn):
+        message = "direct pay is not allowed refund. [{0}]".format(sn)
+        super(RefundDirectPayError, self).__init__(message)

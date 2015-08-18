@@ -26,6 +26,10 @@ logger = get_logger(__name__)
 def apply_to_refund(channel_id, order_id, amount, client_notify_url, data):
     tx, payment_record = _get_tx_payment_to_refund(channel_id, order_id)
 
+    if payment_record.type == PaymentType.DIRECT:
+        # disable direct pay refund.
+        raise RefundDirectPayError(tx.sn)
+
     try:
         amount_value = Decimal(amount)
     except InvalidOperation:
@@ -69,6 +73,8 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         if is_success:
             # 直付和担保付的不同操作
             if payment_record.type == PaymentType.DIRECT:
+                # !!impossible.
+                # direct pay is not allowed to refund.
                 succeed_refund(vas_name, payment_record, refund_record)
             elif payment_record.type == PaymentType.GUARANTEE:
                 succeed_refund_secured(vas_name, payment_record, refund_record)

@@ -32,8 +32,8 @@ class TransactionRecord(db.Model):
     state = db.Column(db.VARCHAR(32), nullable=False)
 
     # need update on notify.
-    # vas_name = db.Column(db.VARCHAR(32), nullable=False, default='')
-    # vas_sn = db.Column(db.VARCHAR(128), nullable=False, default='')
+    vas_name = db.Column(db.VARCHAR(32), nullable=False, default='')
+    vas_sn = db.Column(db.VARCHAR(128), nullable=False, default='')
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -149,29 +149,6 @@ class TransferRecord(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
-class Bankcard(db.Model):
-    __tablename__ = 'bankcard'
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    user_id = db.Column(db.Integer, db.ForeignKey('account_user.id'), nullable=False)
-    user = db.relationship('AccountUser', backref=db.backref('bankcards', lazy='dynamic'))
-
-    # 0-对私, 1-对公
-    flag = db.Column(db.SmallInteger, nullable=False)
-    # 银行账号，对私必须是借记卡
-    card_no = db.Column(db.VARCHAR(21), nullable=False)
-    card_type = db.Column(db.Enum('DEBIT', 'CREDIT'), nullable=False)
-    account_name = db.Column(db.VARCHAR(12), nullable=False)
-    bank_code = db.Column(db.VARCHAR(12), nullable=False)
-    province_code = db.Column(db.VARCHAR(12), nullable=False)
-    city_code = db.Column(db.VARCHAR(12), nullable=False)
-    bank_name = db.Column(db.VARCHAR(12), nullable=False)
-    branch_bank_name = db.Column(db.VARCHAR(50), nullable=False)
-
-    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-
 class WithdrawRecord(db.Model):
     __tablename__ = 'withdraw_record'
 
@@ -180,15 +157,22 @@ class WithdrawRecord(db.Model):
     sn = db.Column(db.CHAR(32), nullable=False)
 
     from_user_id = db.Column(db.Integer, nullable=False)
-    bankcard_id = db.Column(db.Integer, db.ForeignKey('bankcard.id'), nullable=False)
+    flag_card = db.Column(db.CHAR(1), nullable=False)
+    card_type = db.Column(db.Enum('DEBIT', 'CREDIT'), nullable=False)
+    card_no = db.Column(db.VARCHAR(21), nullable=False)
+    acct_name = db.Column(db.VARCHAR(12), nullable=False)
+    bank_code = db.Column(db.VARCHAR(12))
+    province_code = db.Column(db.VARCHAR(12))
+    city_code = db.Column(db.VARCHAR(12))
+    bank_name = db.Column(db.VARCHAR(24), nullable=False)
+    brabank_name = db.Column(db.VARCHAR(50))
+    prcptcd = db.Column(db.VARCHAR(12))
 
     amount = db.Column(db.Numeric(12, 2), nullable=False)
+    actual_amount = db.Column(db.Numeric(12, 2), nullable=False)
+    fee = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
     client_notify_url = db.Column(db.VARCHAR(128))
-
-    paybill_id = db.Column(db.VARCHAR(18))
-    result = db.Column(db.VARCHAR(32))
-    failure_info = db.Column(db.VARCHAR(255))
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -203,5 +187,18 @@ class PaymentRecordLianlianPayExtra(db.Model):
     payment_record_id = db.Column(db.BigInteger, db.ForeignKey('payment_record.id'), nullable=False, unique=True)
 
     pay_type = db.Column(db.CHAR(1))
+
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class WithdrawRecordLianlianPayExtra(db.Model):
+    __tablename__ = 'withdraw_record_lianlian_pay_extra'
+
+    id = db.Column(db.BigInteger, primary_key=True)
+    withdraw_record_id = db.Column(db.BigInteger, db.ForeignKey('withdraw_record.id'), nullable=False, unique=True)
+
+    info_order = db.Column(db.VARCHAR(255))
+    result_pay = db.Column(db.VARCHAR(12))
+    settle_date = db.Column(db.VARCHAR(8))
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

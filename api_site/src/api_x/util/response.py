@@ -15,6 +15,10 @@ def fail(code, msg, **kwargs):
     return jsonify(ret=False, code=code, msg=msg, **kwargs)
 
 
+def bad_request(code=1, msg='bad request', **kwargs):
+    return fail(code, msg, **kwargs), 400
+
+
 def updated(ids):
     return ok(ids=ids)
 

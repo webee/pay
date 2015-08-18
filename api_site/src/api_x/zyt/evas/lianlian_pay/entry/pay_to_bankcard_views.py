@@ -15,16 +15,16 @@ from tools.mylog import get_logger
 logger = get_logger(__name__)
 
 
-@mod.route("/refund/notify/<refund_source>", methods=["POST"])
+@mod.route("/pay_to_bankcard/notify/<source>", methods=["POST"])
 @parse_and_verify
-def refund_notify(refund_source):
+def pay_to_bankcard_notify(source):
     data = request.verified_data
     partner_oid = data['oid_partner']
     refund_no = data['no_refund']
     status = data['sta_refund']
     refundno_oid = data['oid_refundno']
 
-    logger.info('refund notify {0}: {1}'.format(refund_source, data))
+    logger.info('refund notify {0}: {1}'.format(source, data))
     if not is_sending_to_me(partner_oid):
         return notification.bad()
 

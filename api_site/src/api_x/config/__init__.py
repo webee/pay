@@ -8,3 +8,6 @@ def load_config(env):
     register_config(__name__, 'etc', env=env)
     register_config(__name__, 'lianlian_pay', env=env)
     register_config(__name__, 'test_pay', env=env)
+
+    # business
+    register_config(__name__, 'business', env=env)

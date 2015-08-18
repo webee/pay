@@ -19,10 +19,44 @@ from tools.mylog import get_logger
 logger = get_logger(__name__)
 
 
+def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
+                           product_name, product_category, product_desc, amount,
+                           client_callback_url, client_notify_url):
+    """
+    如果金额为0, 新建订单则直接失败
+    如果已经有对应订单，则直接支付成功
+    """
+    payment_record = PaymentRecord.query.filter_by(channel_id=channel_id, order_id=order_id).first()
+    if payment_record is None:
+        if amount <= 0:
+            raise NonPositiveAmountError(amount)
+
+        payment_record = _create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
+                                        product_name, product_category, product_desc, amount,
+                                        client_callback_url, client_notify_url)
+    else:
+        # update payment info, if not paid.
+        with require_transaction_context():
+            tx = get_tx_by_sn(payment_record.sn)
+            if tx.state == PaymentTransactionState.CREATED:
+                PaymentRecord.query.filter_by(id=payment_record.id) \
+                    .update({'amount': amount,
+                             'product_name': product_name,
+                             'product_category': product_category,
+                             'product_desc': product_desc})
+
+            payment_record = PaymentRecord.query.get(payment_record.id)
+    if payment_record.amount <= 0:
+        from api_x.zyt import vas as zyt
+        tx, payment_record = update_payment_info(tx, payment_record.id, zyt.NAME, '', PaymentTransactionState.CREATED)
+        succeed_payment(zyt.NAME, payment_record)
+    return payment_record
+
+
 @transactional
-def create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
-                   product_name, product_category, product_desc, amount,
-                   client_callback_url, client_notify_url):
+def _create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
+                    product_name, product_category, product_desc, amount,
+                    client_callback_url, client_notify_url):
     channel = get_channel_info(channel_id)
     comments = "在线支付-{0}:{1}|{2}".format(channel.name, product_name, order_id)
     user_ids = [payer_id, payee_id]
@@ -53,38 +87,6 @@ def create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
     return payment_record
 
 
-def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
-                           product_name, product_category, product_desc, amount,
-                           client_callback_url, client_notify_url):
-    """
-    如果金额为0, 新建订单则直接失败
-    如果已经有对应订单，则直接支付成功
-    """
-    payment_record = PaymentRecord.query.filter_by(channel_id=channel_id, order_id=order_id).first()
-    if payment_record is None:
-        if amount <= 0:
-            raise NonPositiveAmountError(amount)
-
-        payment_record = create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
-                                        product_name, product_category, product_desc, amount,
-                                        client_callback_url, client_notify_url)
-    else:
-        # update payment info, if not paid.
-        with require_transaction_context():
-            tx = get_tx_by_sn(payment_record.sn)
-            if tx.state == PaymentTransactionState.CREATED:
-                PaymentRecord.query.filter_by(id=payment_record.id) \
-                    .update({'amount': amount,
-                             'product_name': product_name,
-                             'product_category': product_category,
-                             'product_desc': product_desc})
-
-            payment_record = PaymentRecord.query.get(payment_record.id)
-    if payment_record.amount <= 0:
-        from api_x.zyt import vas as zyt
-        tx, payment_record = update_payment_info(tx, payment_record.id, zyt.NAME, '', PaymentTransactionState.CREATED)
-        succeed_payment(zyt.NAME, payment_record)
-    return payment_record
 
 
 def get_payment_by_channel_order_id(channel_id, order_id):

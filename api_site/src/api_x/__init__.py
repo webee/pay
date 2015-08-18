@@ -19,6 +19,9 @@ def register_mods(app):
     app.register_blueprint(test_pay_entry_mod, url_prefix="/vas/test_pay")
     app.register_blueprint(lianlian_pay_entry_mod, url_prefix="/vas/lianlian_pay")
 
+    from api_x.business.entry import business_mod
+    app.register_blueprint(business_mod, url_prefix="/business")
+
 
 def init_config(app, env):
     from api_x import config

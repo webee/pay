@@ -36,6 +36,12 @@ def refund():
     # async notify
     thread.start_new(notify_client, (notify_url, params))
 
+    # 返回成功，通知错误
+    params = {
+        'sn': params['sn'],
+        'result': 'SUCCESS',
+        'refund_no': refund_no
+    }
     return jsonify(params)
 
 

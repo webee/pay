@@ -33,6 +33,12 @@ def pay_to_bankcard():
     # async notify
     thread.start_new(notify_client, (notify_url, params))
 
+    # 返回成功，通知错误
+    params = {
+        'sn': generate_sn(merchant_id, order_no),
+        'result': 'SUCCESS',
+        'order_no': order_no
+    }
     return jsonify(params)
 
 

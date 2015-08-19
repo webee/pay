@@ -82,8 +82,9 @@ def auth():
     user_cookie = request.cookies.get(config.UserCenter.AUTH_COOKIE)
     user = User.get(user_cookie)
     logger.info('user cookie: {}, user: {}'.format(user_cookie, user))
-    login_user(user)
-    session['current_user'] = user.to_dict()
+    if user is not None:
+        login_user(user)
+        session['current_user'] = user.to_dict()
 
     next_url = request.args.get('next') or '/'
     return redirect(next_url)

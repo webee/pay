@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 
 class DefaultUserDomain:
-    SYSTEM_USER_DOMAIN_NAME = '系统用户'
-    TEST_DOMAIN_NAME = '测试用户'
-    LVYE_CORP_DOMAIN_NAME = '绿野公司用户'
-    LVYE_ACCOUNT_DOMAIN_NAME = '绿野用户中心'
+    SYSTEM_USER_DOMAIN_NAME = 'system'
+    TEST_DOMAIN_NAME = 'testing'
+    LVYE_CORP_DOMAIN_NAME = 'lvye_corp'
+    LVYE_ACCOUNT_DOMAIN_NAME = 'lvye_account'
 
 # 系统用户
 SECURE_USER_NAME = 'secure'

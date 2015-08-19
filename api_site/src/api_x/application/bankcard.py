@@ -25,8 +25,8 @@ def add_bankcard(user_id, card_no, acct_name, is_corporate_account, province_cod
     if bankcard_info.is_not_using_debit_card_as_private_account:
         raise TryToBindCreditCardToPrivateAccountError(card_no)
 
-    bankcard_id = dba.add_bankcard(user_id, bankcard_info)
-    return bankcard_id
+    bankcard = dba.add_bankcard(user_id, bankcard_info)
+    return bankcard.id
 
 
 class BankCardInfo(object):

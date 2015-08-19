@@ -33,7 +33,7 @@ def add_bankcard(user_id, bankcard_info):
     bankcard = Bankcard(**fields)
     db.session.add(bankcard)
 
-    return bankcard.id
+    return bankcard
 
 
 @transactional

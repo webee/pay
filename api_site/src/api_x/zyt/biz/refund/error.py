@@ -61,3 +61,9 @@ class RefundDirectPayError(RefundError):
     def __init__(self, sn):
         message = "direct pay is not allowed refund. [{0}]".format(sn)
         super(RefundDirectPayError, self).__init__(message)
+
+
+class RefundSuccessPayError(RefundError):
+    def __init__(self, sn):
+        message = "success finished payment is not allowed refund. [{0}]".format(sn)
+        super(RefundDirectPayError, self).__init__(message)

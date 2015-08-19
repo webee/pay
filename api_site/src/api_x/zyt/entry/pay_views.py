@@ -3,12 +3,13 @@ from __future__ import unicode_literals
 from api_x.zyt.biz import payment
 from api_x.constant import TransactionState
 
-from flask import request, render_template, jsonify, url_for, abort
-from api_x.zyt.user_mapping import find_or_create_account_user_by_channel_info
+from flask import request, render_template, url_for, abort
+from api_x.zyt.user_mapping import get_or_create_account_user
 from api_x.zyt.biz.transaction import get_tx_by_sn
 from api_x.config import etc as config
 from api_x.constant import VirtualAccountSystemType
 from api_x.util import response
+from api_x.zyt.user_mapping import get_channel_by_name
 from . import biz_entry_mod as mod
 from tools.mylog import get_logger
 
@@ -19,7 +20,7 @@ logger = get_logger(__name__)
 @mod.route('/pre_pay', methods=['POST'])
 def pre_pay():
     data = request.values
-    channel_id = data['channel_id']
+    channel_name = data['channel_name']
     payer_user_id = data['payer_user_id']
     payee_user_id = data['payee_user_id']
     order_id = data['order_id']
@@ -33,12 +34,15 @@ def pre_pay():
 
     # TODO: check parameters
     # payment_type in PaymentTypes.
+    channel = get_channel_by_name(channel_name)
+    if channel is None:
+        return response.fail(msg='channel not exits: [{0}]'.format(channel_name))
 
-    payer_id = find_or_create_account_user_by_channel_info(channel_id, payer_user_id)
-    payee_id = find_or_create_account_user_by_channel_info(channel_id, payee_user_id)
+    payer_id = get_or_create_account_user(channel.user_domain_id, payer_user_id)
+    payee_id = get_or_create_account_user(channel.user_domain_id, payee_user_id)
 
     try:
-        payment_record = payment.find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
+        payment_record = payment.find_or_create_payment(payment_type, payer_id, payee_id, channel, order_id,
                                                         product_name, product_category, product_desc, amount,
                                                         client_callback_url, client_notify_url)
         pay_url = config.HOST_URL + url_for('biz_entry.cashier_desk', sn=payment_record.sn)
@@ -78,11 +82,15 @@ def pay(sn, vas_name):
 def confirm_guarantee_payment():
     from api_x.util import response
     data = request.values
-    channel_id = data['channel_id']
+    channel_name = data['channel_name']
     order_id = data['order_id']
 
+    channel = get_channel_by_name(channel_name)
+    if channel is None:
+        return response.fail(msg='channel not exits: [{0}]'.format(channel_name))
+
     try:
-        payment.confirm_payment(channel_id, order_id)
-        return response.ok()
+        payment.confirm_payment(channel, order_id)
+        return response.success()
     except Exception as e:
         return response.bad_request(msg=e.message)

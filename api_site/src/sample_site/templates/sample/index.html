@@ -37,13 +37,14 @@ payee: {{ payee }}[{{ payee_account_user_id }}], 全部: {{ balance.total }}, �
 </form>
 <hr/>
 <form action="{{ url_for('sample.withdraw') }}" method="POST">
+    bankcard_id: <input type="text" name='bankcard_id' value="1"/>
     <input type="text" name='amount' value="0.01"/>
     <select name="suggest_result" title="suggest result for test.">
         <option value="">_</option>
         <option value="SUCCESS">成功</option>
         <option value="FAILED">失败</option>
     </select>
-    <input type="checkbox" name="use_test_pay" value="1"/>use_test_pay
+    use_test_pay: <input type="checkbox" name="use_test_pay" value="1"/>
     <input type="submit" value="提现"/>
 </form>
 </body>

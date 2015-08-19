@@ -21,7 +21,7 @@ def _generate_api_url(url, **kwargs):
 def get_account_user_id(user_id):
     if user_id not in _uid_accounts:
         url = _generate_api_url(config.PayAPI.GET_CREATE_ACCOUNT_ID_URL,
-                                user_domain_id=config.PayAPI.USER_DOMAIN_ID, user_id=user_id)
+                                user_domain_name=config.PayAPI.USER_DOMAIN_NAME, user_id=user_id)
         req = requests.post(url)
         if req.status_code == 200:
             res = req.json()
@@ -51,8 +51,9 @@ def request_refund(params):
     return requests.post(url, params)
 
 
-def request_withdraw(params):
-    url = _generate_api_url(config.PayAPI)
+def request_withdraw(user_id, params):
+    account_user_id = get_account_user_id(user_id)
+    url = _generate_api_url(config.PayAPI.WITHDRAW_URL, account_user_id=account_user_id)
     return requests.post(url, params)
 
 

@@ -80,7 +80,7 @@ class UserWithdrawLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tx_sn = db.Column(db.CHAR(32), nullable=False)
     user_id = db.Column(db.Integer, nullable=False)
-    bankcard_id = db.Column(db.Integer, db.Fo)
+    bankcard_id = db.Column(db.Integer, db.ForeignKey('bankcard.id'), nullable=False)
 
     amount = db.Column(db.Numeric(12, 2), nullable=False)
     actual_amount = db.Column(db.Numeric(12, 2))

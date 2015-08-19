@@ -23,8 +23,16 @@ from api_x.dbs import require_transaction_context
 logger = get_logger(__name__)
 
 
-def apply_to_refund(channel_id, order_id, amount, client_notify_url, data):
-    tx, payment_record = _get_tx_payment_to_refund(channel_id, order_id)
+def apply_to_refund(channel, order_id, amount, client_notify_url, data):
+    tx, payment_record = _get_tx_payment_to_refund(channel.id, order_id)
+
+    # FIXME:
+    # 以下事实上是拒绝所有成功的交易进行退款
+    # 因为金额可能被提现出去。
+    # 下面的逻辑是冗余的
+    if tx.state == PaymentTransactionState.SUCCESS:
+        # disable success finished pay refund.
+        raise RefundSuccessPayError(tx.sn)
 
     if payment_record.type == PaymentType.DIRECT:
         # disable direct pay refund.

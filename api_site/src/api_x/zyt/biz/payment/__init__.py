@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
-from api_x.zyt.user_mapping import get_channel_info, get_system_account_user_id
+from api_x.zyt.user_mapping import get_system_account_user_id
 from api_x.constant import TransactionState, SECURE_USER_NAME, PaymentTransactionState
 from api_x.dbs import transactional
 from api_x.zyt.vas import NAME as ZYT_NAME
@@ -19,19 +19,19 @@ from tools.mylog import get_logger
 logger = get_logger(__name__)
 
 
-def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
+def find_or_create_payment(payment_type, payer_id, payee_id, channel, order_id,
                            product_name, product_category, product_desc, amount,
                            client_callback_url, client_notify_url):
     """
     如果金额为0, 新建订单则直接失败
     如果已经有对应订单，则直接支付成功
     """
-    payment_record = PaymentRecord.query.filter_by(channel_id=channel_id, order_id=order_id).first()
+    payment_record = PaymentRecord.query.filter_by(channel_id=channel.id, order_id=order_id).first()
     if payment_record is None:
         if amount <= 0:
             raise NonPositiveAmountError(amount)
 
-        payment_record = _create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
+        payment_record = _create_payment(payment_type, payer_id, payee_id, channel, order_id,
                                          product_name, product_category, product_desc, amount,
                                          client_callback_url, client_notify_url)
     else:
@@ -56,10 +56,9 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel_id, order_i
 
 
 @transactional
-def _create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
+def _create_payment(payment_type, payer_id, payee_id, channel, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url):
-    channel = get_channel_info(channel_id)
     comments = "在线支付-{0}:{1}|{2}".format(channel.name, product_name, order_id)
     user_ids = [payer_id, payee_id]
     if payment_type == PaymentType.GUARANTEE:
@@ -72,7 +71,7 @@ def _create_payment(payment_type, payer_id, payee_id, channel_id, order_id,
         'sn': tx_record.sn,
         'payer_id': payer_id,
         'payee_id': payee_id,
-        'channel_id': channel_id,
+        'channel_id': channel.id,
         'order_id': order_id,
         'product_name': product_name,
         'product_category': product_category,
@@ -217,7 +216,7 @@ def _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
     return vas_name != payment_record.vas_name or vas_sn != payment_record.vas_sn
 
 
-def confirm_payment(channel_id, order_id):
-    payment_record = get_payment_by_channel_order_id(channel_id, order_id)
+def confirm_payment(channel, order_id):
+    payment_record = get_payment_by_channel_order_id(channel.id, order_id)
     if payment_record is not None and payment_record.type == PaymentType.GUARANTEE:
         _confirm_payment(payment_record)

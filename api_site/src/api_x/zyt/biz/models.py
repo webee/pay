@@ -110,6 +110,8 @@ class RefundRecord(db.Model):
     payment_state = db.Column(db.VARCHAR(32), nullable=False)
     payer_id = db.Column(db.Integer, nullable=False)
     payee_id = db.Column(db.Integer, nullable=False)
+    channel_id = db.Column(db.Integer, nullable=False)
+    order_id = db.Column(db.VARCHAR(64), nullable=False)
 
     amount = db.Column(db.Numeric(12, 2), nullable=False)
     client_notify_url = db.Column(db.VARCHAR(128))

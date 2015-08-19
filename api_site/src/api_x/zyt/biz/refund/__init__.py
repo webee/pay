@@ -6,7 +6,7 @@ from api_x import db
 from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.refund.dba import update_payment_refunded_amount
 from api_x.zyt.vas.bookkeep import bookkeeping
-from api_x.zyt.user_mapping import get_system_account_user_id
+from api_x.zyt.user_mapping import get_system_account_user_id, get_channel
 from api_x.constant import SECURE_USER_NAME, PaymentTransactionState, RefundTransactionState
 from api_x.dbs import transactional
 from api_x.zyt.vas.user import get_user_cash_balance
@@ -31,14 +31,9 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data):
     # FIXME:
     # 以下事实上是拒绝所有成功的交易进行退款
     # 因为金额可能被提现出去。
-    # 下面的逻辑是冗余的
     if tx.state == PaymentTransactionState.SUCCESS:
         # disable success finished pay refund.
         raise RefundSuccessPayError(tx.sn)
-
-    if payment_record.type == PaymentType.DIRECT:
-        # disable direct pay refund.
-        raise RefundDirectPayError(tx.sn)
 
     try:
         amount_value = Decimal(amount)
@@ -96,6 +91,26 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
     _try_notify_client(tx, refund_record)
 
 
+def _try_notify_client(tx, refund_record):
+    from api_x.utils.notify import notify_client
+    url = refund_record.client_notify_url
+
+    channel = get_channel(refund_record.channel_id)
+
+    # FIXME: 这里为了兼容之前活动平台的client_id=1
+    if tx.state == RefundTransactionState.SUCCESS:
+        params = {'code': 0, 'client_id': '1', 'channel_name': channel.name,
+                  'order_id': refund_record.order_id, 'amount': refund_record.amount}
+    elif tx.state == RefundTransactionState.FAILED:
+        params = {'code': 1, 'client_id': '1', 'channel_name': channel.name,
+                  'order_id': refund_record.order_id, 'amount': refund_record.amount}
+
+    if not notify_client(url, params):
+        # other notify process.
+        from api_x.task import tasks
+        tasks.refund_notify.delay(url, params)
+
+
 def _get_tx_payment_to_refund(channel_id, order_id):
     from ..payment import get_payment_by_channel_order_id
 
@@ -114,9 +129,11 @@ def _get_tx_payment_to_refund(channel_id, order_id):
 def _is_refundable(tx, payment_record):
     pay_type = payment_record.type
     if pay_type == PaymentType.DIRECT:
-        return tx.state == PaymentTransactionState.SUCCESS
+        raise RefundDirectPayError(tx.sn)
+        # return False
+        # return tx.state == PaymentTransactionState.SUCCESS
     if pay_type == PaymentType.GUARANTEE:
-        return tx.state in PaymentTransactionState.SECURED
+        return tx.state == PaymentTransactionState.SECURED
 
 
 @transactional
@@ -170,6 +187,8 @@ def _create_refund(tx, payment_record, amount, client_notify_url):
         'payment_state': cur_payment_state,
         'payer_id': payment_record.payer_id,
         'payee_id': payment_record.payee_id,
+        'channel_id': payment_record.channel_id,
+        'order_id': payment_record.order_id,
         'amount': amount,
         'client_notify_url': client_notify_url
     }
@@ -280,19 +299,3 @@ def succeed_refund_secured(vas_name, payment_record, refund_record):
 def fail_refund(payment_record, refund_record):
     transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING, refund_record.payment_state)
     transit_transaction_state(refund_record.tx_id, RefundTransactionState.CREATED, RefundTransactionState.FAILED)
-
-
-def _try_notify_client(tx, refund_record):
-    from api_x.utils.notify import notify_client
-    url = refund_record.client_notify_url
-    logger.info('refund notify client: {0}'.format(url))
-
-    if tx.state == RefundTransactionState.SUCCESS:
-        params = {'code': 0, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
-    elif tx.state == RefundTransactionState.FAILED:
-        params = {'code': 1, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
-
-    if not notify_client(url, params):
-        # other notify process.
-        from api_x.task import tasks
-        tasks.refund_notify.delay(url, params)

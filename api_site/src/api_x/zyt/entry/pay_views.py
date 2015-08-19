@@ -71,7 +71,7 @@ def pay(sn, vas_name):
 
     tx = get_tx_by_sn(sn)
     if tx is None:
-        abort(404)
+        response.not_found(msg='tx sn=[{0}] not fund.'.format(sn))
     if tx.state != TransactionState.CREATED:
         return render_template("info.html", msg="该订单已支付完成")
 
@@ -80,7 +80,7 @@ def pay(sn, vas_name):
 
 @mod.route('/pay/guarantee_payment/confirm', methods=['POST'])
 def confirm_guarantee_payment():
-    from api_x.util import response
+    from api_x.utils import response
     data = request.values
     channel_name = data['channel_name']
     order_id = data['order_id']

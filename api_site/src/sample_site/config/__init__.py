@@ -19,10 +19,10 @@ class PayAPI:
     CHANNEL_NAME = 'zyt_sample'
 
     ROOT_URL = "http://pay.lvye.com/api"
-    PREPAID_URL = '/prepaid'
-    PRE_PAY_URL = '/pre_pay'
-    CONFIRM_GUARANTEE_PAYMENT_URL = '/pay/guarantee_payment/confirm'
-    REFUND_URL = '/refund'
+    PREPAID_URL = '/biz/prepaid'
+    PRE_PAY_URL = '/biz/pre_pay'
+    CONFIRM_GUARANTEE_PAYMENT_URL = '/biz/pay/guarantee_payment/confirm'
+    REFUND_URL = '/biz/refund'
     WITHDRAW_URL = '/application/account_users/{account_user_id}/withdraw'
 
     GET_CREATE_ACCOUNT_ID_URL = '/user_mapping/user_domains/{user_domain_name}/users/{user_id}'

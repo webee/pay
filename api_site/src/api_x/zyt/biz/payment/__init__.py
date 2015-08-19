@@ -5,13 +5,13 @@ from api_x.zyt.biz.commons import is_duplicated_notify
 from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
-from api_x.zyt.user_mapping import get_system_account_user_id
+from api_x.zyt.user_mapping import get_system_account_user_id, get_channel, get_user_map_by_account_user_id
 from api_x.constant import TransactionState, SECURE_USER_NAME, PaymentTransactionState
 from api_x.dbs import transactional
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, get_tx_by_sn, \
-    update_transaction_info
+    update_transaction_info, get_tx_by_id
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
 from api_x.dbs import require_transaction_context
 from api_x.zyt.biz.error import NonPositiveAmountError
@@ -151,9 +151,16 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
-    trx, payment_record = get_tx_payment_by_sn(sn)
+    tx, payment_record = get_tx_payment_by_sn(sn)
 
     if payment_record.client_callback_url:
+        # FIXME: 为了兼容huodong的secured pay. 修改callback_url.
+        channel = get_channel(payment_record.channel_id)
+        if channel.name == 'lvye_huodong':
+            user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
+            url = '{0}?user_id={1}&order_id={2}&amount={3}&status=money_locked'.\
+                format(payment_record.client_callback_url, user_mapping.user_id, payment_record.order_id, payment_record.amount)
+            return redirect(url)
         return redirect(payment_record.client_callback_url)
     return redirect('/')
 
@@ -189,8 +196,29 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
         else:
             fail_payment(payment_record)
 
-            # TODO
-            # notify client
+    # notify client.
+    tx = get_tx_by_id(tx.id)
+    _try_notify_client(tx, payment_record)
+
+
+def _try_notify_client(tx, refund_record):
+    from api_x.utils.notify import notify_client
+    url = refund_record.client_notify_url
+
+    channel = get_channel(refund_record.channel_id)
+
+    # FIXME: 这里为了兼容之前活动平台的client_id=1, status='money_locked'
+    if tx.state in [PaymentTransactionState.SECURED, PaymentTransactionState.SUCCESS]:
+        params = {'code': 0, 'client_id': '1', 'status': 'money_locked', 'channel_name': channel.name,
+                  'order_id': refund_record.order_id, 'amount': refund_record.amount}
+    elif tx.state == PaymentTransactionState.FAILED:
+        params = {'code': 1, 'client_id': '1', 'status': 'money_locked', 'channel_name': channel.name,
+                  'order_id': refund_record.order_id, 'amount': refund_record.amount}
+
+    if not notify_client(url, params):
+        # other notify process.
+        from api_x.task import tasks
+        tasks.refund_notify.delay(url, params)
 
 
 def _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):

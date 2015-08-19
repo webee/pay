@@ -5,7 +5,7 @@ from api_x.constant import WithdrawTransactionState
 from api_x.dbs import transactional, require_transaction_context
 from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.models import TransactionType, WithdrawRecord
-from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state
+from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, get_tx_by_id
 from api_x.zyt.biz.withdraw.dba import get_tx_withdraw_by_sn
 from api_x.zyt.biz.withdraw.error import WithdrawFailedError
 from api_x.zyt.vas.user import get_user_cash_balance
@@ -241,8 +241,28 @@ def handle_withdraw_notify(is_success, sn, vas_name, vas_sn, data):
         else:
             _fail_withdraw(tx, withdraw_record)
 
-    # TODO
-    # notify
+    # notify client.
+    tx = get_tx_by_id(tx.id)
+    _try_notify_client(tx, withdraw_record)
+
+
+def _try_notify_client(tx, withdraw_record):
+    from api_x.utils.notify import notify_client
+    url = withdraw_record.client_notify_url
+
+    if tx.state == WithdrawTransactionState.SUCCESS:
+        params = {'code': 0, 'account_user_id': withdraw_record.from_user_id, 'sn': tx.sn,
+                  'amount': withdraw_record.amount, 'actual_amount': withdraw_record.actual_amount,
+                  'fee': withdraw_record.fee}
+    elif tx.state == WithdrawTransactionState.FAILED:
+        params = {'code': 1, 'account_user_id': withdraw_record.from_user_id, 'sn': tx.sn,
+                  'amount': withdraw_record.amount, 'actual_amount': withdraw_record.actual_amount,
+                  'fee': withdraw_record.fee}
+
+    if not notify_client(url, params):
+        # other notify process.
+        from api_x.task import tasks
+        tasks.withdraw_notify.delay(url, params)
 
 
 def _record_withdraw_extra_info(withdraw_record, data):

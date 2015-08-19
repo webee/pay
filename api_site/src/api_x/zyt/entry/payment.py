@@ -10,6 +10,7 @@ from ..evas import test_pay, lianlian_pay
 
 def pay(vas_name, tx):
     payment_record = get_payment_by_tx_id(tx.id)
+    # TODO: 注册支付方式
     if vas_name == test_pay.NAME:
         return _pay_by_test_pay(tx, payment_record)
     elif vas_name == lianlian_pay.NAME:

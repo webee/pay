@@ -48,6 +48,11 @@ def get_user_map(user_domain_id, user_id):
     return user_map
 
 
+def get_user_map_by_account_user_id(account_user_id):
+    user_map = UserMapping.query.filter_by(account_user_id=account_user_id).first()
+    return user_map
+
+
 @transactional
 def create_account_user(user_domain_id, user_id, desc=None):
     user_domain = get_user_domain(user_domain_id)

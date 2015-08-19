@@ -14,7 +14,7 @@ def register_mods(app):
     from api_x.zyt.evas.test_pay.entry import test_pay_entry_mod
     from api_x.zyt.evas.lianlian_pay.entry import lianlian_pay_entry_mod
 
-    app.register_blueprint(biz_entry_mod)
+    app.register_blueprint(biz_entry_mod, url_prefix='/biz')
     app.register_blueprint(user_mapping_entry_mod, url_prefix='/user_mapping')
     app.register_blueprint(vas_entry_mod, url_prefix='/vas/zyt')
     app.register_blueprint(test_pay_entry_mod, url_prefix="/vas/test_pay")
@@ -22,6 +22,9 @@ def register_mods(app):
 
     from api_x.application.entry import application_mod
     app.register_blueprint(application_mod, url_prefix="/application")
+
+    from api_x.compatible_entry import compatible_entry_mod
+    app.register_blueprint(compatible_entry_mod)
 
 
 def init_config(app, env):

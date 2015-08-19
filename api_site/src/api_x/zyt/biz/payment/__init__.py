@@ -207,7 +207,7 @@ def _try_notify_client(tx, refund_record):
 
     channel = get_channel(refund_record.channel_id)
 
-    # FIXME: 这里为了兼容之前活动平台的client_id=1, status='money_locked'
+    # FIXME: 这里为了兼容之前活动平台的client_id=1, status='money_locked', methods加上'put'
     if tx.state in [PaymentTransactionState.SECURED, PaymentTransactionState.SUCCESS]:
         params = {'code': 0, 'client_id': '1', 'status': 'money_locked', 'channel_name': channel.name,
                   'order_id': refund_record.order_id, 'amount': refund_record.amount}
@@ -215,7 +215,7 @@ def _try_notify_client(tx, refund_record):
         params = {'code': 1, 'client_id': '1', 'status': 'money_locked', 'channel_name': channel.name,
                   'order_id': refund_record.order_id, 'amount': refund_record.amount}
 
-    if not notify_client(url, params):
+    if not notify_client(url, params, methods=['put', 'post']):
         # other notify process.
         from api_x.task import tasks
         tasks.refund_notify.delay(url, params)

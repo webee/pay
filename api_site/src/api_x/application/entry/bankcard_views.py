@@ -1,12 +1,12 @@
 # coding=utf-8
 from __future__ import unicode_literals
+from api_x.utils import response
 
 from flask import request
 from . import application_mod as mod
 from .. import dba
 from .. import bankcard
-from api_x.util.parser import to_bool
-from api_x.util import response
+from api_x.utils.parser import to_bool
 from tools.mylog import get_logger
 
 logger = get_logger(__name__)

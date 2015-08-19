@@ -1,5 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals
+from api_x.utils import response
 from api_x.zyt.biz import payment
 from api_x.constant import TransactionState
 
@@ -8,7 +9,6 @@ from api_x.zyt.user_mapping import get_or_create_account_user
 from api_x.zyt.biz.transaction import get_tx_by_sn
 from api_x.config import etc as config
 from api_x.constant import VirtualAccountSystemType
-from api_x.util import response
 from api_x.zyt.user_mapping import get_channel_by_name
 from . import biz_entry_mod as mod
 from tools.mylog import get_logger

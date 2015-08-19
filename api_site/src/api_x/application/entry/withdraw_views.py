@@ -2,11 +2,11 @@
 from __future__ import unicode_literals
 from decimal import Decimal
 
+from api_x.utils import response
 from flask import request
 from .. import dba
 from ..withdraw import apply_to_withdraw, calc_user_withdraw_fee, log_user_withdraw
 from . import application_mod as mod
-from api_x.util import response
 from tools.mylog import get_logger
 
 

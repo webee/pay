@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from . import vas_entry_mod as mod
 from .. import user
-from api_x.util import response
+from api_x.utils import response
 
 
 @mod.route('/account_users/<account_user_id>/balance', methods=['GET'])

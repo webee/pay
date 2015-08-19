@@ -91,8 +91,9 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         else:
             fail_refund(payment_record, refund_record)
 
-    # TODO
-    # notify
+    # notify client.
+    tx = get_tx_by_id(tx.id)
+    _try_notify_client(tx, refund_record)
 
 
 def _get_tx_payment_to_refund(channel_id, order_id):
@@ -279,3 +280,19 @@ def succeed_refund_secured(vas_name, payment_record, refund_record):
 def fail_refund(payment_record, refund_record):
     transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING, refund_record.payment_state)
     transit_transaction_state(refund_record.tx_id, RefundTransactionState.CREATED, RefundTransactionState.FAILED)
+
+
+def _try_notify_client(tx, refund_record):
+    from api_x.utils.notify import notify_client
+    url = refund_record.client_notify_url
+    logger.info('refund notify client: {0}'.format(url))
+
+    if tx.state == RefundTransactionState.SUCCESS:
+        params = {'code': 0, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
+    elif tx.state == RefundTransactionState.FAILED:
+        params = {'code': 1, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
+
+    if not notify_client(url, params):
+        # other notify process.
+        from api.task import tasks
+        tasks.refund_notify.delay(url, params)

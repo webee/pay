@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 
 from . import user_mapping_entry_mod as mod
-from api_x.util import response
 from .. import get_or_create_account_user, get_user_map
 from .. import get_user_domain_by_name
+from api_x.utils import response
 
 
 @mod.route('/user_domains/<user_domain_name>/users/<user_id>/account_user_id', methods=['GET'])

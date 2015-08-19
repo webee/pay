@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from . import biz_entry_mod as mod
-from api_x.util import response
+from api_x.utils import response
 from tools.mylog import get_logger
 from api_x.zyt.biz import bankcard
 

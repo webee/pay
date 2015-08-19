@@ -51,6 +51,11 @@ def request_refund(params):
     return requests.post(url, params)
 
 
+def request_withdraw(params):
+    url = _generate_api_url(config.PayAPI)
+    return requests.post(url, params)
+
+
 def request_confirm_guarantee_payment(params):
     url = _generate_api_url(config.PayAPI.CONFIRM_GUARANTEE_PAYMENT_URL)
     req = requests.post(url, params)

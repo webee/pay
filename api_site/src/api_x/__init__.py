@@ -3,7 +3,8 @@ from __future__ import unicode_literals, print_function, division
 import os
 
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
+from pytoolbox.util import dbs
+from pytoolbox.util.dbs import db
 
 
 def register_mods(app):
@@ -54,14 +55,11 @@ def custom_flask(app):
     app.json_encoder = CustomJSONEncoder
 
 
-# extensions.
-db = SQLAlchemy(session_options={'autocommit': True})
-
-
 def create_app(env):
     app = Flask(__name__)
 
     init_config(app, env)
+    dbs.init_db(app)
     register_mods(app)
     init_extensions(app)
     custom_flask(app)

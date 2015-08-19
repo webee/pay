@@ -8,5 +8,9 @@ class BizType:
 
 
 class NotifyType:
-    SYNC = 'SYNC'
-    ASYNC = 'ASYNC'
+    class Pay:
+        SYNC = 'SYNC'
+        ASYNC = 'ASYNC'
+
+    class Refund:
+        ASYNC = 'ASYNC'

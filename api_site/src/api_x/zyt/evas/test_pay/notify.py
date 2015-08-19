@@ -24,7 +24,7 @@ def register_handle(source, biz_type, notify_type):
 
 
 def get_refund_notify_handle(source):
-    return get_notify_handle(source, BizType.REFUND, NotifyType.ASYNC)
+    return get_notify_handle(source, BizType.REFUND, NotifyType.Refund.ASYNC)
 
 
 def register_pay_to_bankcard_notify_handle(source, handle):

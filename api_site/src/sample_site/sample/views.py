@@ -46,7 +46,7 @@ def pay():
         'product_category': '测试',
         'product_desc': '[{0}]用于测试的商品'.format(channel_name),
         'amount': amount,
-        'client_callback_url': config.HOST_URL + url_for('.pay'),
+        'client_callback_url': config.HOST_URL + url_for('.index'),
         'client_notify_url': '',
         'payment_type': payment_type
     }
@@ -87,6 +87,29 @@ def refund():
     logger.info('refund: {0}'.format(params))
     req = pay_client.request_refund(params)
     return render_template('sample/info.html', title='退款结果', msg=req.content)
+
+
+@mod.route('/withdraw', methods=['POST'])
+def withdraw():
+    use_test_pay = request.values.get('use_test_pay')
+    suggest_result = request.values['suggest_result']
+    channel_id = config.PayAPI.CHANNEL_ID
+    params = {
+        'channel_id': channel_id,
+        'amount': Decimal(request.values['amount']),
+        'notify_url': ''
+    }
+    if use_test_pay:
+        # for test.
+        params['use_test_pay'] = '1'
+
+    if suggest_result:
+        # for test.
+        params['result'] = suggest_result
+
+    logger.info('withdraw: {0}'.format(params))
+    req = pay_client.request_refund(params)
+    return render_template('sample/info.html', title='提现结果', msg=req.content)
 
 
 @mod.route('/prepaid', methods=['GET'])

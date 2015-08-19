@@ -11,11 +11,11 @@ def init_test_pay_notify_handles():
     from api_x.zyt.evas.test_pay.notify import register_notify_handle, register_pay_to_bankcard_notify_handle
 
     # payment
-    register_notify_handle(TransactionType.PAYMENT, BizType.PAY, NotifyType.SYNC, handle_payment_result)
-    register_notify_handle(TransactionType.PAYMENT, BizType.PAY, NotifyType.ASYNC, handle_payment_notify)
+    register_notify_handle(TransactionType.PAYMENT, BizType.PAY, NotifyType.Pay.SYNC, handle_payment_result)
+    register_notify_handle(TransactionType.PAYMENT, BizType.PAY, NotifyType.Pay.ASYNC, handle_payment_notify)
 
     # refund
-    register_notify_handle(TransactionType.REFUND, BizType.REFUND, NotifyType.ASYNC, handle_refund_notify)
+    register_notify_handle(TransactionType.REFUND, BizType.REFUND, NotifyType.Refund.ASYNC, handle_refund_notify)
 
     # pay_to_bankcard
     register_pay_to_bankcard_notify_handle(TransactionType.WITHDRAW, handle_withdraw_notify)

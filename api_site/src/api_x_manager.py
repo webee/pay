@@ -84,15 +84,7 @@ def test_prepaid(user_id, amount, failed):
 @manager.option('-a', '--amount', type=Decimal, dest="amount", required=True)
 @manager.option('-b', '--bankcard', type=int, dest="bankcard_id", required=True)
 def test_withdraw(user_id, amount, bankcard_id):
-    from api_x.zyt.biz import withdraw
-    from api_x.zyt.biz.bankcard import query_bankcard
-
-    bankcard = query_bankcard(user_id, bankcard_id)
-
-    withdraw_record = withdraw.create_withdraw(user_id, bankcard_id, amount, bankcard.bank_name, '测试提现')
-
-    print('withdraw_id: {0}'.format(withdraw_record.id))
-    print('sn: {0}'.format(withdraw_record.sn))
+    pass
 
 
 @manager.option('-i', '--id', type=long, dest="withdraw_id", required=True)

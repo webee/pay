@@ -9,7 +9,7 @@
 channel: {{ channel }}<br/>
 payer: {{ payer }}<br/>
 payee: {{ payee }}[{{ payee_account_user_id }}], 全部: {{ balance.total }}, 可用: {{ balance.available }}, 冻结: {{ balance.frozen }}
-<hr>
+<hr/>
 <form action="{{ url_for('sample.pay') }}" method="POST">
     <input type="text" name='order_id' value="" placeholder="留空进行新支付"/>
     <input type="text" name='amount' value="0.01"/>
@@ -19,12 +19,12 @@ payee: {{ payee }}[{{ payee_account_user_id }}], 全部: {{ balance.total }}, �
     </select>
     <input type="submit" value="去支付"/>
 </form>
-<hr>
+<hr/>
 <form action="{{ url_for('sample.confirm_guarantee_payment') }}" method="POST">
     <input type="text" name='order_id' value="" placeholder="order id."/>
     <input type="submit" value="担保支付确认"/>
 </form>
-<hr>
+<hr/>
 <form action="{{ url_for('sample.refund') }}" method="POST">
     <input type="text" name='amount' value="0.01"/>
     <input type="text" name='order_id' value="" placeholder="order id."/>
@@ -34,6 +34,17 @@ payee: {{ payee }}[{{ payee_account_user_id }}], 全部: {{ balance.total }}, �
         <option value="FAILED">失败</option>
     </select>
     <input type="submit" value="退款"/>
+</form>
+<hr/>
+<form action="{{ url_for('sample.withdraw') }}" method="POST">
+    <input type="text" name='amount' value="0.01"/>
+    <select name="suggest_result" title="suggest result for test.">
+        <option value="">_</option>
+        <option value="SUCCESS">成功</option>
+        <option value="FAILED">失败</option>
+    </select>
+    <input type="checkbox" name="use_test_pay" value="1"/>use_test_pay
+    <input type="submit" value="提现"/>
 </form>
 </body>
 </html>

@@ -65,6 +65,6 @@ class BankcardType:
     CREDIT = 'CREDIT'
 
 
-class BankAccount:
-    IS_PRIVATE_ACCOUNT = '0'
-    IS_CORPORATE_ACCOUNT = '1'
+class BankAccountType:
+    PRIVATE = '0'
+    CORPORATE = '1'

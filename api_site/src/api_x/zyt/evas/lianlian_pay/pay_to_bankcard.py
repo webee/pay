@@ -5,11 +5,7 @@ from .api_access import request
 from .util import now_to_str
 from api_x.config import lianlian_pay
 from ..error import EvasError
-
-
-class CardType:
-    DEBIT = 'DEBIT'
-    CREDIT = 'CREDIT'
+from api_x.constant import BankcardType
 
 
 def pay_to_bankcard(no_order, money_order, info_order, notify_url,
@@ -33,9 +29,9 @@ def pay_to_bankcard(no_order, money_order, info_order, notify_url,
         'province_code': province_code,
         'city_code': city_code,
         'brabank_name': brabank_name,
+        'prcptcd': prcptcd,
         'notify_url': notify_url,
-        'api_version': lianlian_pay.PayToBankcard.VERSION,
-        'prcptcd': prcptcd
+        'api_version': lianlian_pay.PayToBankcard.VERSION
     }
     return request(lianlian_pay.PayToBankcard.URL, params)
 
@@ -44,7 +40,7 @@ def _validate_bankcard(flag_card, card_type, bank_code,
                        province_code, city_code, brabank_name,
                        prcptcd):
     # 对私必须是借记卡
-    if not _is_to_corporate(flag_card) and not card_type != CardType.DEBIT:
+    if not _is_to_corporate(flag_card) and not card_type != BankcardType.DEBIT:
         raise PayToBankcardError('对私必须是借记卡')
 
     # 对公 bank_code必须传

@@ -29,3 +29,9 @@ class InsufficientAvailableBalanceError(BizError):
     def __init__(self):
         message = "insufficient available balance error."
         super(InsufficientAvailableBalanceError, self).__init__(message)
+
+
+class RequestAPIError(BizError):
+    def __init__(self, message=None):
+        message = message or 'request api error.'
+        super(RequestAPIError, self).__init__(message)

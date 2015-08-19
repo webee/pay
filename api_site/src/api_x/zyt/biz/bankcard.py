@@ -1,15 +1,16 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
-from api_x.zyt.evas.lianlian_pay import bankcard
-from api_x.zyt.evas.lianlian_pay.commons import is_success_request
 from .error import RequestAPIError
 from api_x.constant import BankcardType
 
 
 def query_bin(card_no):
+    from api_x.zyt.evas.lianlian_pay import query_bin as _query_bin
+    from api_x.zyt.evas.lianlian_pay.commons import is_success_request
+
     try:
-        res = bankcard.query_bin(card_no)
+        res = _query_bin(card_no)
     except Exception as e:
         raise RequestAPIError(e.message)
 

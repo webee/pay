@@ -73,8 +73,8 @@ def _create_withdraw(from_user_id,
     else:
         actual_amount = ac - fee
 
-    comments = "提现至{0}({1}) {2}".format(bank_name, card_no[-4:], acct_name)
-    tx = create_transaction(TransactionType.WITHDRAW, actual_amount + fee, comments, from_user_id)
+    comments = "提现至 {0}({1}) {2}".format(bank_name, card_no[-4:], acct_name)
+    tx = create_transaction(TransactionType.WITHDRAW, actual_amount + fee, comments, [from_user_id])
 
     fields = {
         'tx_id': tx.id,
@@ -91,7 +91,7 @@ def _create_withdraw(from_user_id,
         'brabank_name': brabank_name,
         'prcptcd': prcptcd,
         'amount': amount,
-        'actual_amount': acct_name,
+        'actual_amount': actual_amount,
         'fee': fee,
         'client_notify_url': client_notify_url
     }

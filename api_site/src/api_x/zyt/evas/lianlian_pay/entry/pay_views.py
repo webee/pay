@@ -15,9 +15,9 @@ from tools.mylog import get_logger
 logger = get_logger(__name__)
 
 
-@mod.route("/pay/result/<pay_source>", methods=["POST"])
+@mod.route("/pay/result/<source>", methods=["POST"])
 @parse_and_verify
-def pay_result(pay_source):
+def pay_result(source):
     """支付页面回调, 更多操作可由notify完成，这里只是返回callback"""
     data = request.verified_data
     partner_oid = data['oid_partner']
@@ -28,7 +28,7 @@ def pay_result(pay_source):
     if not is_sending_to_me(partner_oid):
         return render_template('info.html', title='支付结果', msg='支付异常-订单号:{0}'.format(order_no))
 
-    handle = get_pay_notify_handle(pay_source, NotifyType.Pay.SYNC)
+    handle = get_pay_notify_handle(source, NotifyType.Pay.SYNC)
     if handle:
         # 是否成功，订单号，来源系统，来源系统订单号，数据
         return handle(is_success_result(pay_result), order_no, NAME, paybill_oid, data)

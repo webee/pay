@@ -89,6 +89,8 @@ def refund():
 
 @mod.route('/withdraw', methods=['POST'])
 def withdraw():
+    user_id = 'test001'
+
     use_test_pay = request.values.get('use_test_pay')
     suggest_result = request.values['suggest_result']
     params = {
@@ -105,7 +107,7 @@ def withdraw():
         params['result'] = suggest_result
 
     logger.info('withdraw: {0}'.format(params))
-    req = pay_client.request_withdraw(params)
+    req = pay_client.request_withdraw(user_id, params)
     return render_template('sample/info.html', title='提现结果', msg=req.content)
 
 

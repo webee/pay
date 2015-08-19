@@ -11,7 +11,7 @@ def success(**kwargs):
     return jsonify(ret=True, **kwargs)
 
 
-def fail(code, msg, **kwargs):
+def fail(code=1, msg='fail', **kwargs):
     return jsonify(ret=False, code=code, msg=msg, **kwargs)
 
 

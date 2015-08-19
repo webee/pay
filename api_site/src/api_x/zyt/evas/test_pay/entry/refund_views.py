@@ -7,14 +7,14 @@ from api_x.zyt.evas.test_pay.notify import get_refund_notify_handle
 from api_x.zyt.evas.test_pay import NAME
 
 
-@mod.route("/refund/notify/<refund_source>", methods=["POST"])
-def refund_notify(refund_source):
+@mod.route("/refund/notify/<source>", methods=["POST"])
+def refund_notify(source):
     data = request.values
     result = data['result']
     refund_no = data['refund_no']
     vas_sn = data['sn']
 
-    handle = get_refund_notify_handle(refund_source)
+    handle = get_refund_notify_handle(source)
     if handle:
         # 是否成功，订单号，来源系统，来源系统订单号，数据
         handle(is_success_result(result), refund_no, NAME, vas_sn, data)

@@ -10,8 +10,8 @@ NAME = 'TEST_PAY'
 
 
 def pay(source, user_id, order_no, product_name, amount):
-    return_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_result', pay_source=source)
-    notify_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_notify', pay_source=source)
+    return_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_result', source=source)
+    notify_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_notify', source=source)
     params = {
         'merchant_id': test_pay.MERCHANT_ID,
         'user_id': user_id,
@@ -35,7 +35,7 @@ def generate_submit_form(url, req_params):
 
 
 def refund(source, refund_no, amount, pay_sn, result='SUCCESS'):
-    notify_url = generate_absolute_url(url_for('test_pay_entry.refund_notify', refund_source=source))
+    notify_url = generate_absolute_url(url_for('test_pay_entry.refund_notify', source=source))
     params = {
         'merchant_id': test_pay.MERCHANT_ID,
         'refund_no': refund_no,
@@ -50,7 +50,7 @@ def refund(source, refund_no, amount, pay_sn, result='SUCCESS'):
 
 
 def pay_to_bankcard(source, order_no, amount, result='SUCCESS'):
-    notify_url = generate_absolute_url(url_for('test_pay_entry.pay_to_bankcard_notify', refund_source=source))
+    notify_url = generate_absolute_url(url_for('test_pay_entry.pay_to_bankcard_notify', source=source))
     params = {
         'merchant_id': test_pay.MERCHANT_ID,
         'order_no': order_no,

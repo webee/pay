@@ -13,7 +13,7 @@ def notify_client(url, params, methods=['post']):
     if url:
         for method in methods:
             try:
-                resp = requests.request(method, url, params)
+                resp = requests.request(method, url, data=params)
                 logger.info("notify url [{0}] status_code [{1}]".format(url, resp.status_code))
                 if resp.status_code == 200:
                     data = resp.json()

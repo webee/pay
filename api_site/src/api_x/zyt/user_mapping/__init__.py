@@ -6,8 +6,8 @@ from .models import UserDomain, Channel, UserMapping
 
 
 @transactional
-def create_user_domain(name):
-    user_domain = UserDomain(name=name)
+def create_user_domain(name, desc):
+    user_domain = UserDomain(name=name, desc=desc)
     db.session.add(user_domain)
 
     return user_domain
@@ -17,9 +17,13 @@ def get_user_domain(id):
     return UserDomain.query.get(id)
 
 
+def get_user_domain_by_name(name):
+    return UserDomain.query.filter_by(name=name).first()
+
+
 @transactional
-def create_channel(user_domain_id, name):
-    channel = Channel(user_domain_id=user_domain_id, name=name)
+def create_channel(user_domain_id, name, desc):
+    channel = Channel(user_domain_id=user_domain_id, name=name, desc=desc)
     db.session.add(channel)
 
     return channel
@@ -39,19 +43,18 @@ def get_lvye_corp_account_user_id(user_id):
     return user_map.account_user_id
 
 
-def get_account_user_id_by_by_domain_info(user_domain_id, user_id):
+def get_user_map(user_domain_id, user_id):
     user_map = UserMapping.query.filter_by(user_domain_id=user_domain_id, user_id=user_id).first()
-    if user_map is not None:
-        return user_map.account_user_id
+    return user_map
 
 
 @transactional
-def create_account_user(user_domain_id, user_id):
+def create_account_user(user_domain_id, user_id, desc=None):
     user_domain = get_user_domain(user_domain_id)
     if user_domain is not None:
         account_user = create_user()
         user_map = UserMapping(user_domain_id=user_domain_id, user_id=user_id, account_user_id=account_user.id,
-                               info=user_domain.name)
+                               desc=desc or user_domain.desc)
         db.session.add(user_map)
 
         return account_user.id
@@ -66,12 +69,16 @@ def get_or_create_account_user(user_domain_id, user_id):
     return user_map.account_user_id
 
 
-def get_channel_info(channel_id):
-    return Channel.query.get(channel_id)
+def get_channel(id):
+    return Channel.query.get(id)
+
+
+def get_channel_by_name(name):
+    return Channel.query.filter_by(name=name).first()
 
 
 @transactional
 def find_or_create_account_user_by_channel_info(channel_id, user_id):
-    channel_info = get_channel_info(channel_id)
+    channel = get_channel(channel_id)
 
-    return get_or_create_account_user(channel_info.user_domain_id, user_id)
+    return get_or_create_account_user(channel.user_domain_id, user_id)

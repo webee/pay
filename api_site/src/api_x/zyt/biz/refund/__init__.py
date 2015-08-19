@@ -294,5 +294,5 @@ def _try_notify_client(tx, refund_record):
 
     if not notify_client(url, params):
         # other notify process.
-        from api.task import tasks
+        from api_x.task import tasks
         tasks.refund_notify.delay(url, params)

@@ -11,3 +11,6 @@ def load_config(env):
 
     # business
     register_config(__name__, 'application', env=env)
+
+    # celery
+    register_config(__name__, 'api_celery_task', env=env)

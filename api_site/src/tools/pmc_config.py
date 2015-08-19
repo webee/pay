@@ -1,12 +1,32 @@
 # coding=utf-8
 """
 Package, module, class based config utils.
+1.
+x_config/
+    __init__.py
+    dev.py
+    prod.py
+load(x_config)
+x_config.XXX_YYY
+
+2.
+configs/
+    __init__.py
+    a_config/
+        __init__.py
+        ...
+    b_config/
+        __init__.py
+        ...
+load(configs.a_config)
+load(configs.b_config)
+configs.a_config.XXX_YYY
 """
 import sys
 import os
 import re
 import inspect
-from types import ModuleType, FunctionType
+from types import ClassType, ModuleType, FunctionType
 from tools.mylog import get_logger
 
 logger = get_logger(__name__)
@@ -21,7 +41,7 @@ _envs_mapping = {
 ENV_VAR_NAME = 'ENV'
 DEFAULT_ENV = 'default'
 
-CAMEL_NAMING_PATTERN = re.compile(r'([A-Z][a-z]*)+')
+CAMEL_NAMING_PATTERN = re.compile(r'([A-Z][a-z]*)*([A-Z][a-z]+)+([A-Z][a-z]*)*')
 
 
 def register_config(parent_or_config, name=None, env=DEFAULT_ENV, mapping=None):
@@ -54,7 +74,7 @@ def register_config(parent_or_config, name=None, env=DEFAULT_ENV, mapping=None):
             _register_config(config_package, config_mod)
             setattr(config_package, '__env_name__', env_name)
         else:
-            logger.warn("config not found: [{0}.{1}]".format(name, env_name))
+            logger.warn("config not found: [{0}.{1}]".format(config_package.__name__, env_name))
         _safe_del_attr(config_package, env_name)
     # remove none-config vars.
     _remove_none_config_vars(config_package)
@@ -62,7 +82,7 @@ def register_config(parent_or_config, name=None, env=DEFAULT_ENV, mapping=None):
     configs_parent = _get_parent_module(config_package)
     setattr(configs_parent, '__pmc_configs__', {})
     _configs = getattr(configs_parent, '__pmc_configs__')
-    _configs[config_package.__name__] = {'name': name,
+    _configs[config_package.__name__] = {'name': config_package.__name__,
                                          'config': config_package.__env_name__,
                                          'members': config_package.__members__}
 
@@ -82,8 +102,8 @@ def _get_package_mod(pack, name):
     """
     try:
         return __import__('{0}.{1}'.format(pack.__name__, name), fromlist=[pack.__name__])
-    except Exception as e:
-        logger.warn('{0}, {1}'.format(e.message, pack.__name__))
+    except Exception as _:
+        return
 
 
 def _is_camel_name(name):
@@ -103,21 +123,25 @@ def _get_value(m, n):
 
 
 def _is_valid_config_member(mod, n):
-    """ there are three types of config vars, Class, Module and None-[Class&Module].
+    """ config items can be Camel Named [Class, Module, dict] and other upper case named data types.
     :param mod: where var n in.
     :param n: var name.
     :return:
     """
     v = _get_value(mod, n)
-    if _is_class(v) or isinstance(v, (ModuleType, dict)):
+    if _is_class(v):
         return _is_camel_name(n)
+    elif _is_camel_name(n):
+        return isinstance(v, (ModuleType, dict))
     elif isinstance(v, FunctionType):
         return False
     return n[0].isalpha() and n.isupper()
 
 
 def _is_class(v):
-    return inspect.isclass(v)
+    """只接受classobj类型的简单类"""
+    # return inspect.isclass(v)
+    return isinstance(v, ClassType)
 
 
 def _register_config(config_package, config_mod):
@@ -163,6 +187,7 @@ def _merge_config_value(config_package, x, v, fromp=None):
 def _remove_none_config_vars(config_package):
     for x in [_ for _ in dir(config_package) if _[0].isalpha()]:
         v = getattr(config_package, x)
+        # keep modules
         if not _is_valid_config_member(config_package, x):
             delattr(config_package, x)
             continue
@@ -192,11 +217,13 @@ def _get_env_name(name=ENV_VAR_NAME, mapping=None, env=None):
 
 def get_project_root():
     from os.path import dirname, abspath
+
     return os.getenv('PROJ_ROOT', abspath(dirname((dirname(dirname(__file__))))))
 
 
 def read_string(filepath, root=get_project_root()):
     from os import path
+
     with open(path.join(root, filepath)) as fin:
         return fin.read().strip('\n')
 
@@ -239,6 +266,7 @@ def cover_inject_from_file(mod_path, yaml_file, path="", root=get_project_root()
     :return:
     """
     import yaml
+
     target_mod = __import__(mod_path, fromlist=[mod_path])
 
     data = yaml.load(open(os.path.join(root, yaml_file)))

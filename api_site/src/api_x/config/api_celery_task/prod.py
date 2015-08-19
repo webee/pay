@@ -1,0 +1,6 @@
+# coding=utf-8
+import os
+
+
+BROKER_URL = os.environ['PAY_API_SITE_CELERY_BROKER_URL']
+CELERY_RESULT_BACKEND = os.environ['PAY_API_SITE_CELERY_RESULT_BACKEND']

@@ -55,7 +55,10 @@ def custom_flask(app):
     app.json_encoder = CustomJSONEncoder
 
 
-def create_app(env):
+def create_app(env='dev', deploy=False):
+    if deploy:
+        return Flask(__name__)
+
     app = Flask(__name__)
 
     init_config(app, env)

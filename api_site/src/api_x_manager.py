@@ -3,7 +3,7 @@
 from __future__ import unicode_literals, print_function
 from decimal import Decimal
 
-from flask.ext.script import Manager, Shell, Server
+from flask.ext.script import Manager, Shell, Server, Command
 from api_x import create_app
 
 
@@ -14,6 +14,7 @@ manager.add_option('-e', '--env', dest='env', default='dev', required=False)
 def make_shell_context():
     import api_x
     from api_x import config, db
+
     return dict(api=api_x, app=manager.app, config=config, db=db)
 
 
@@ -31,6 +32,7 @@ def init_db(recreate):
 
     def recreate_db():
         from tools.log import info
+
         info('recreating database ...')
         local('mysql -u root -p < migration/init_db.sql')
 
@@ -39,6 +41,31 @@ def init_db(recreate):
     db.drop_all()
     db.create_all()
     init_data()
+
+
+@manager.option('-e', '--env', type=str, dest="environment", required=True)
+def deploy(environment):
+    environment = environment or 'dev'
+    from ops.deploy.deploy import deploy
+
+    deploy(environment)
+
+
+class CeleryCommand(Command):
+    """execute celery"""
+
+    def __init__(self):
+        self.capture_all_args = True
+
+    def run(self, *args, **kwargs):
+        from api_x.task.tasks import app as celery
+        from api_x.task import init_celery_app
+        from api_x.config import api_celery_task as celery_config
+
+        celery = init_celery_app(celery, celery_config, manager.app)
+        celery.start(argv=['celery'] + args[0])
+
+manager.add_command('celery', CeleryCommand())
 
 
 @manager.command
@@ -77,7 +104,6 @@ def test_prepaid(user_id, amount, failed):
     else:
         # es test pay success notify.
         prepaid.succeed_prepaid(vas.id, prepaid_record)
-
 
 
 @manager.option('-i', '--id', type=long, dest="user_id", required=True)

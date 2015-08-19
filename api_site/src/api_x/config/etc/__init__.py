@@ -8,7 +8,7 @@ class App:
     TESTING = False
     DEBUG = True
 
-    SQLALCHEMY_DATABASE_URI = 'mysql://lvye_pay:p@55word@localhost:3306/lvye_pay'
+    SQLALCHEMY_DATABASE_URI = 'mysql://lvye_pay:p@55word@127.0.0.1:3306/lvye_pay'
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_POOL_SIZE = 30
     SQLALCHEMY_POOL_TIMEOUT = 60

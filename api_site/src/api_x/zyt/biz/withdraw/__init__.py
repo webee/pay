@@ -20,7 +20,6 @@ from tools.mylog import get_logger
 logger = get_logger(__name__)
 
 
-@transactional
 def apply_to_withdraw(from_user_id,
                       flag_card, card_type, card_no, acct_name, bank_code, province_code,
                       city_code, bank_name, brabank_name, prcptcd,
@@ -37,6 +36,7 @@ def apply_to_withdraw(from_user_id,
     return withdraw_record
 
 
+@transactional
 def _create_and_request_withdraw(from_user_id,
                                  flag_card, card_type, card_no, acct_name, bank_code, province_code,
                                  city_code, bank_name, brabank_name, prcptcd,
@@ -50,6 +50,7 @@ def _create_and_request_withdraw(from_user_id,
         _withdraw_to_processing(tx)
     except Exception as e:
         logger.exception(e)
+        # FIXME: because this is in a transaction, below is useless.
         _unfreeze_fail_withdraw(tx, withdraw_record)
         raise e
 

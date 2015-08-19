@@ -1,5 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals
+from api_x.zyt.biz.commons import is_duplicated_notify
 
 from flask import redirect
 from api_x import db
@@ -9,7 +10,8 @@ from api_x.constant import TransactionState, SECURE_USER_NAME, PaymentTransactio
 from api_x.dbs import transactional
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.vas.models import EventType
-from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, get_tx_by_sn
+from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, get_tx_by_sn, \
+    update_transaction_info
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
 from api_x.dbs import require_transaction_context
 from api_x.zyt.biz.error import NonPositiveAmountError
@@ -49,8 +51,8 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel, order_id,
     if payment_record.amount <= 0:
         from api_x.zyt import vas as zyt
 
-        tx, payment_record = update_payment_info(tx, payment_record.id, zyt.NAME, payment_record.sn,
-                                                 PaymentTransactionState.CREATED)
+        tx = update_transaction_info(payment_record.tx_id.id, zyt.NAME, payment_record.sn,
+                                     PaymentTransactionState.CREATED)
         succeed_payment(zyt.NAME, payment_record)
     return payment_record
 
@@ -106,19 +108,6 @@ def get_payment_by_id(id):
 
 def get_tx_payment_by_sn(sn):
     return get_tx_by_sn(sn), get_payment_by_sn(sn)
-
-
-@transactional
-def update_payment_info(tx, payment_id, vas_name, vas_sn, state):
-    tx.state = state
-    payment_record = PaymentRecord.query.get(payment_id)
-    payment_record.vas_name = vas_name
-    payment_record.vas_sn = vas_sn
-
-    db.session.add(tx)
-    db.session.add(payment_record)
-
-    return tx, payment_record
 
 
 @transactional
@@ -180,7 +169,7 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
     """
     tx, payment_record = get_tx_payment_by_sn(sn)
 
-    if _is_duplicated_notify(tx, payment_record, vas_name, vas_sn):
+    if is_duplicated_notify(tx, vas_name, vas_sn):
         return
 
     if _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
@@ -190,8 +179,7 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
             payment_record.vas_name, payment_record.vas_sn, vas_name, vas_sn))
 
     with require_transaction_context():
-        tx, payment_record = update_payment_info(tx, payment_record.id, vas_name, vas_sn,
-                                                 PaymentTransactionState.CREATED)
+        tx = update_transaction_info(tx.id, vas_name, vas_sn, PaymentTransactionState.CREATED)
         if is_success:
             # 直付和担保付的不同操作
             if payment_record.type == PaymentType.DIRECT:
@@ -203,10 +191,6 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
 
             # TODO
             # notify client
-
-
-def _is_duplicated_notify(tx, payment_record, vas_name, vas_sn):
-    return vas_name == payment_record.vas_name and vas_sn == payment_record.vas_sn
 
 
 def _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):

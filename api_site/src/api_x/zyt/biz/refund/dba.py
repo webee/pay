@@ -31,14 +31,3 @@ def update_payment_refunded_amount(payment_id, refund_amount):
     payment_record.refunded_amount += refund_amount
 
     db.session.add(payment_record)
-
-
-@transactional
-def update_refund_info(refund_id, vas_name, vas_sn):
-    refund_record = RefundRecord.query.get(refund_id)
-    refund_record.vas_name = vas_name
-    refund_record.vas_sn = vas_sn
-
-    db.session.add(refund_record)
-
-    return refund_record

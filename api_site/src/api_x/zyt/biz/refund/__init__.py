@@ -3,14 +3,16 @@ from __future__ import unicode_literals
 from decimal import InvalidOperation, Decimal
 
 from api_x import db
-from api_x.zyt.biz.refund.dba import update_payment_refunded_amount, update_refund_info
+from api_x.zyt.biz.commons import is_duplicated_notify
+from api_x.zyt.biz.refund.dba import update_payment_refunded_amount
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id
 from api_x.constant import SECURE_USER_NAME, PaymentTransactionState, RefundTransactionState
 from api_x.dbs import transactional
 from api_x.zyt.vas.user import get_user_cash_balance
 from ...vas.models import EventType
-from ..transaction import create_transaction, transit_transaction_state, get_tx_by_sn, get_tx_by_id
+from ..transaction import create_transaction, transit_transaction_state, get_tx_by_sn, get_tx_by_id, \
+    update_transaction_info
 from ..models import TransactionType, RefundRecord, PaymentType
 from .error import *
 from ..payment import get_payment_by_id, get_tx_payment_by_sn
@@ -68,7 +70,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         logger.warning('refund [{0}] not exits.'.format(sn))
         return
 
-    if _is_duplicated_notify(tx, refund_record, vas_name, vas_sn):
+    if is_duplicated_notify(tx, vas_name, vas_sn):
         logger.warning('refund notify duplicated: [{0}, {1}]'.format(vas_name, vas_sn))
         return
 
@@ -77,7 +79,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         return
 
     with require_transaction_context():
-        refund_record = update_refund_info(refund_record.id, vas_name, vas_sn)
+        tx = update_transaction_info(refund_record.tx_id, vas_name, vas_sn)
         if is_success:
             # 直付和担保付的不同操作
             if payment_record.type == PaymentType.DIRECT:
@@ -91,10 +93,6 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
 
     # TODO
     # notify
-
-
-def _is_duplicated_notify(tx, refund_record, vas_name, vas_sn):
-    return vas_name == refund_record.vas_name and vas_sn == refund_record.vas_sn
 
 
 def _get_tx_payment_to_refund(channel_id, order_id):
@@ -120,13 +118,15 @@ def _is_refundable(tx, payment_record):
         return tx.state in PaymentTransactionState.SECURED
 
 
+@transactional
 def _create_and_request_refund(tx, payment_record, amount, client_notify_url, data):
     payment_record, refund_record = _create_refund(tx, payment_record, amount, client_notify_url)
 
     try:
-        _request_refund(payment_record, refund_record, data)
+        _request_refund(tx, payment_record, refund_record, data)
     except Exception as e:
         logger.exception(e)
+        # FIXME: because this is in a transaction, below is useless.
         fail_refund(payment_record, refund_record)
         raise RefundFailedError(e.message)
 
@@ -179,24 +179,24 @@ def _create_refund(tx, payment_record, amount, client_notify_url):
     return payment_record, refund_record
 
 
-def _request_refund(payment_record, refund_record, data):
+def _request_refund(tx, payment_record, refund_record, data):
     from api_x.zyt.evas import test_pay, lianlian_pay
 
-    vas_name = payment_record.vas_name
+    vas_name = tx.vas_name
 
     if vas_name == test_pay.NAME:
-        return _refund_by_test_pay(payment_record, refund_record, data)
+        return _refund_by_test_pay(tx, payment_record, refund_record, data)
     if vas_name == lianlian_pay.NAME:
-        return _refund_by_lianlian_pay(payment_record, refund_record)
+        return _refund_by_lianlian_pay(tx, payment_record, refund_record)
     raise RefundFailedError('unknown vas {0}'.format(vas_name))
 
 
-def _refund_by_test_pay(payment_record, refund_record, data):
+def _refund_by_test_pay(tx, payment_record, refund_record, data):
     """测试支付退款"""
     from api_x.zyt.evas.test_pay import refund
     from api_x.zyt.evas.test_pay.commons import is_success_request
 
-    vas_sn = payment_record.vas_sn
+    vas_sn = tx.vas_sn
 
     sn = refund_record.sn
     amount = refund_record.amount
@@ -210,12 +210,12 @@ def _refund_by_test_pay(payment_record, refund_record, data):
     return res
 
 
-def _refund_by_lianlian_pay(payment_record, refund_record):
+def _refund_by_lianlian_pay(tx, payment_record, refund_record):
     """连连退款"""
     from api_x.zyt.evas.lianlian_pay import refund
     from api_x.zyt.evas.lianlian_pay.commons import is_success_request
 
-    vas_sn = payment_record.vas_sn
+    vas_sn = tx.vas_sn
 
     sn = refund_record.sn
     created_on = refund_record.created_on

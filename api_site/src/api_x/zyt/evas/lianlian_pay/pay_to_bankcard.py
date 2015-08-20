@@ -40,7 +40,7 @@ def _validate_bankcard(flag_card, card_type, bank_code,
                        province_code, city_code, brabank_name,
                        prcptcd):
     # 对私必须是借记卡
-    if not _is_to_corporate(flag_card) and not card_type != BankcardType.DEBIT:
+    if not _is_to_corporate(flag_card) and card_type != BankcardType.DEBIT:
         raise PayToBankcardError('对私必须是借记卡')
 
     # 对公 bank_code必须传

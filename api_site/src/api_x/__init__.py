@@ -43,6 +43,7 @@ def init_extensions(app):
     from api_x.zyt.vas import models
     from api_x.zyt.user_mapping import models
 
+    dbs.init_db(app)
     db.init_app(app)
 
 
@@ -65,7 +66,6 @@ def create_app(env='dev', deploy=False):
     app = Flask(__name__)
 
     init_config(app, env)
-    dbs.init_db(app)
     register_mods(app)
     init_extensions(app)
     custom_flask(app)

@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from pub_site import config
 from flask.ext.login import current_user
-from pytoolbox.util.dbe import from_db
+from pytoolbox.util.dbs import from_db
 
 
 def generate_and_send_identifying_code():

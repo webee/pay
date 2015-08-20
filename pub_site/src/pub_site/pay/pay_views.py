@@ -6,7 +6,7 @@ from . import pay_mod as mod
 from ..constant import PayType
 from pub_site.pay.forms import PayForm
 from pub_site.withdraw.pay_client import PayClient
-from pytoolbox.util.dbe import from_db
+from pytoolbox.util.dbs import from_db
 from datetime import datetime
 from pytoolbox.util.log import get_logger
 import os

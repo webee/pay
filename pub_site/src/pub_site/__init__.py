@@ -6,9 +6,14 @@ from datetime import timedelta
 import os
 from flask import Flask, render_template, current_app
 from flask.ext.login import LoginManager
+from flask_wtf.csrf import CsrfProtect
 from tools.filters import register_filters, register_global_functions
-from pytoolbox.util import dbe
-from tools import log
+from pytoolbox.util import dbs
+from pytoolbox.util.dbs import db
+from pytoolbox.util.log import get_logger
+
+
+logger = get_logger(__name__)
 
 
 def init_template(app):
@@ -51,22 +56,9 @@ def register_mods(app):
     app.register_blueprint(pay_mod)
 
 
-# extensions.
-login_manager = LoginManager()
-login_manager.session_protection = 'strong'
-login_manager.login_view = 'auth.login'
-login_manager.login_message = None
-
-
-def create_app(env, deploy):
-    if deploy:
-        return Flask(__name__)
-
+def init_config(app, env):
     from pytoolbox.conf import config as conf
     from pub_site import config
-
-    app = Flask(__name__, template_folder='./templates')
-    app.permanent_session_lifetime = timedelta(minutes=10)
 
     env = env or 'dev'
     os.environ['ENV'] = env
@@ -74,15 +66,49 @@ def create_app(env, deploy):
 
     app.config.from_object(config.App)
 
-    dbe.create_db_engine(config.DataBase.HOST, config.DataBase.PORT, config.DataBase.INSTANCE,
-                         config.DataBase.USERNAME, config.DataBase.PASSWORD)
+
+def init_extensions(app):
+    dbs.init_db(app)
+    db.init_app(app)
+
+    login_manager.init_app(app)
+    csrf.init_app(app)
+
+
+def custom_flask(app):
+    from flask.json import JSONEncoder
+    from datetime import datetime
+
+    class CustomJSONEncoder(JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime):
+                return obj.isoformat(sep=str(' '))
+            return super(CustomJSONEncoder, self).default(obj)
+    app.json_encoder = CustomJSONEncoder
+    app.permanent_session_lifetime = timedelta(minutes=10)
+
+
+# extensions.
+login_manager = LoginManager()
+login_manager.session_protection = 'strong'
+login_manager.login_view = 'auth.login'
+login_manager.login_message = None
+
+csrf = CsrfProtect()
+
+
+def create_app(env, deploy):
+    if deploy:
+        return Flask(__name__)
+
+    app = Flask(__name__)
+
+    init_config(app, env)
     register_mods(app)
+    init_extensions(app)
+    custom_flask(app)
+
     init_template(app)
     init_errors(app)
-    login_manager.init_app(app)
-
-    from flask_wtf.csrf import CsrfProtect
-    csrf = CsrfProtect()
-    csrf.init_app(app)
 
     return app

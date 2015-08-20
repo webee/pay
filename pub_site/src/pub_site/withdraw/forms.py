@@ -10,7 +10,7 @@ from wtforms import StringField, SelectField, SubmitField, HiddenField, FloatFie
 from wtforms.compat import text_type
 from wtforms.validators import DataRequired, NumberRange, StopValidation
 import requests
-from pytoolbox.util.dbe import from_db
+from pytoolbox.util.dbs import from_db
 from pay_client import PayClient
 import re
 from wtforms.compat import string_types

@@ -89,10 +89,6 @@ class PaymentRecord(db.Model):
     client_notify_url = db.Column(db.VARCHAR(128))
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    # need update on notify.
-    vas_name = db.Column(db.VARCHAR(32))
-    vas_sn = db.Column(db.VARCHAR(128))
-
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # index
@@ -117,9 +113,6 @@ class RefundRecord(db.Model):
     client_notify_url = db.Column(db.VARCHAR(128))
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    vas_name = db.Column(db.VARCHAR(32))
-    vas_sn = db.Column(db.VARCHAR(128))
-
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
@@ -137,20 +130,6 @@ class PrepaidRecord(db.Model):
 
     def __repr__(self):
         return '<Prepaid %r, %r>' % (self.user_id, self.amount)
-
-
-class TransferRecord(db.Model):
-    __tablename__ = 'transfer_record'
-
-    id = db.Column(db.BigInteger, primary_key=True)
-    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False)
-    sn = db.Column(db.CHAR(32), nullable=False)
-
-    from_user_id = db.Column(db.Integer, nullable=False)
-    to_user_id = db.Column(db.Integer, nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
-
-    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
 class WithdrawRecord(db.Model):
@@ -180,6 +159,20 @@ class WithdrawRecord(db.Model):
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class TransferRecord(db.Model):
+    __tablename__ = 'transfer_record'
+
+    id = db.Column(db.BigInteger, primary_key=True)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False)
+    sn = db.Column(db.CHAR(32), nullable=False)
+
+    from_user_id = db.Column(db.Integer, nullable=False)
+    to_user_id = db.Column(db.Integer, nullable=False)
+    amount = db.Column(db.Numeric(12, 2), nullable=False)
+
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
 # third party payments specific infos related to corresponding biz record.

@@ -38,19 +38,23 @@ class UserCenter:
 
 HOST_URL = 'http://pay.lvye.com'
 
-# 绿野用户中心
-USER_DOMAIN_ID = 2
+# 自游通渠道，用户域为绿野用户中心
+CHANNEL_NAME = 'lvye_pay'
+# 绿野公司域和用户
+LVYE_CORP_DOMAIN_NAME = 'lvye_corp'
+LVYE_CORP_USER_NAME = 'lvye'
 
 
 # # pay api
 class PayAPI:
-    LVYE_USER_ID = 0
-    CHANNEL_ID = 2
 
     ROOT_URL = "http://localhost:5000"
     GET_ACCOUNT_ID_URL = "user_domains/{user_domain_id}/users/{uid}/account"
     GET_USER_BALANCE_URL = "accounts/{account_id}/balance"
     GET_USER_ORDERS_URL = "accounts/{account_id}/orders"
+
+    GET_CREATE_ACCOUNT_ID_URL = '/user_mapping/user_domains/{user_domain_name}/users/{user_id}'
+    GET_USER_BALANCE_URL = "/vas/zyt/account_users/{account_user_id}/balance"
 
 
 # #### data #######

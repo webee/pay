@@ -1,8 +1,11 @@
 from pub_site import config
 from flask.ext.login import current_user
-import requests, json, functools
+import requests
+import json
+import functools
 from pytoolbox.util.log import get_logger
 import os
+from pub_site import pay_client
 
 _logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 
@@ -22,16 +25,15 @@ def handle_response(func):
 
 
 class PayClient:
-    accounts = {}
+    account_user_ids = {}
 
-    def __init__(self, server=pay_server, user_domain_id=config.USER_DOMAIN_ID):
+    def __init__(self, server=pay_server):
         self.server = server
-        self.user_domain_id = user_domain_id
 
     @handle_response
     def bind_bankcards(self, card_number, account_name, province_code, city_code, branch_bank_name):
         uid = current_user.user_id
-        account_id = self._get_account(uid)['account_id']
+        account_id = pay_client.get_account_user_id(uid)
         url = '%s/accounts/%s/bankcards' % (self.server, account_id)
         data = {
             "card_no": card_number,
@@ -46,21 +48,21 @@ class PayClient:
     @handle_response
     def get_bankcards(self):
         uid = current_user.user_id
-        account_id = self._get_account(uid)['account_id']
+        account_id = pay_client.get_account_user_id(uid)
         url = '%s/accounts/%s/bankcards' % (self.server, account_id)
         return requests.get(url)
 
     @handle_response
     def get_balance(self):
         uid = current_user.user_id
-        account_id = self._get_account(uid)['account_id']
+        account_id = pay_client.get_account_user_id(uid)
         url = '%s/accounts/%s/balance' % (self.server, account_id)
         return requests.get(url)
 
     @handle_response
     def withdraw(self, amount, fee, bankcard_id, callback_url=''):
         uid = current_user.user_id
-        account_id = self._get_account(uid)['account_id']
+        account_id = pay_client.get_account_user_id(uid)
         url = '%s/accounts/%s/charged-withdraw' % (self.server, account_id)
         data = {
             'bankcard_id': bankcard_id,
@@ -72,8 +74,8 @@ class PayClient:
 
     @handle_response
     def transfer_to_lvye(self, amount, order_id, order_info):
-        from_id = self._get_account(current_user.user_id)['account_id']
-        to_id = self._get_account(lvye_user_id)['account_id']
+        from_id = pay_client.get_account_user_id(current_user.user_id)
+        to_id = pay_client.get_account_user_id(lvye_user_id)
         url = '%s/accounts/%s/transfer/to/%s' % (self.server, from_id, to_id)
         data = {
             "order_no": order_id,
@@ -86,7 +88,7 @@ class PayClient:
     def pay_to_lvye(self, amount, order_id, order_name, order_description, create_on, callback_url):
         url = '%s/direct/pre-pay' % self.server
         data = {
-            "client_id": config.PayAPI.CHANNEL_ID,
+            "channel_name": config.CHANNEL_NAME,
             "payer": current_user.user_id,
             "payee": config.PayAPI.LVYE_USER_ID,
             "order_no": order_id,
@@ -97,15 +99,3 @@ class PayClient:
             "amount": amount
         }
         return requests.post(url, data=data)
-
-    def _get_account(self, uid):
-        if uid in PayClient.accounts:
-            return PayClient.accounts[uid]
-        url = '%s/user_domains/%s/users/%s/account' % (self.server, self.user_domain_id, uid)
-        _logger.info("get account url: %s" % url)
-        resp = requests.get(url)
-        if resp.status_code != 200:
-            return {"account_id": 0}
-        account = json.loads(resp.content)
-        PayClient.accounts[uid] = account
-        return account

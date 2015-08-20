@@ -25,8 +25,11 @@ def add_system_users():
     # 绿野公司
     _ = create_account_user(lvye_corp_user_domain.id, LVYE_CORP_USER_NAME, '绿野公司')
 
-    # 添加渠道
+    # 添加渠道: 绿野活动
     channel = create_channel(lvye_account_user_domain.id, 'lvye_huodong', '绿野活动')
+
+    # 添加渠道: 绿野自游通
+    channel = create_channel(lvye_account_user_domain.id, 'lvye_pay', '绿野自游通')
 
 
 def add_vases():

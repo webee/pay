@@ -4,6 +4,7 @@
 class App:
     import os
 
+    JSON_AS_ASCII = False
     SECRET_KEY = os.environ.get('SECRET_KEY') or '.yek eyvl'
     TESTING = False
     DEBUG = True

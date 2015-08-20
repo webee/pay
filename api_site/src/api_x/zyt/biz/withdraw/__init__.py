@@ -212,7 +212,7 @@ def _withdraw_by_lianlian_pay(tx, withdraw_record):
                           withdraw_record.city_code, withdraw_record.brabank_name, withdraw_record.prcptcd)
 
     if not is_success_request(res):
-        raise WithdrawFailedError(res['reg_msg'])
+        raise WithdrawFailedError(res['ret_msg'])
     return res
 
 

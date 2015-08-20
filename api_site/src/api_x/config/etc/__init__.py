@@ -18,3 +18,7 @@ class App:
 
 
 HOST_URL = 'http://pay.lvye.com/api'
+
+
+class Transaction:
+    SN_PREFIX = '__'

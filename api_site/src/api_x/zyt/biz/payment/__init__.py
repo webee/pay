@@ -219,6 +219,10 @@ def _try_notify_client(tx, payment_record):
                   'channel_name': channel.name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
 
+    # FIXME: 为了兼容huodong的secured pay. 修改callback_url.
+    if channel.name == 'lvye_huodong':
+        url = '{0}?user_id={1}&order_id={2}&amount={3}&status=money_locked'. \
+            format(payment_record.client_callback_url, user_id, payment_record.order_id, payment_record.amount)
     if not notify_client(url, params, methods=['put', 'post']):
         # other notify process.
         from api_x.task import tasks

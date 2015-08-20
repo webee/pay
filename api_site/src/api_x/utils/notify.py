@@ -9,16 +9,18 @@ logger = get_logger(__name__)
 
 
 def notify_client(url, params, methods=['post']):
-    logger.info("notify [{0}]: [{1}]".format(url, params))
+    logger.info("notify [{0}]: {1}".format(url, params))
     if url:
         for method in methods:
             try:
                 resp = requests.request(method, url, data=params)
-                logger.info("notify url [{0}] status_code [{1}]".format(url, resp.status_code))
+                logger.info("notify url {0} [{1}] status_code [{2}]".format(method, url, resp.status_code))
                 if resp.status_code == 200:
                     data = resp.json()
                     if data['code'] == 0:
                         return True
+                else:
+                    logger.warning(resp.content)
             except Exception as e:
                 logger.exception(e)
 

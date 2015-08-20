@@ -49,6 +49,22 @@ def secured_pre_pay():
         return response.fail(code=1, msg=e.message)
 
 
+@mod.route('/secured/refund', methods=['POST'])
+def apply_for_refund():
+    data = request.values
+    channel_id = data['client_id']
+    order_no = data['order_no']
+    amount = data['amount']
+    callback_url = data['callback_url']
+
+    pay_record = get_secured_payment(channel_id, order_no)
+    if not pay_record:
+        return response.not_found({'client_id': channel_id, 'order_no': order_no})
+
+    refund_id = apply_to_refund(pay_record, amount, callback_url)
+    return response.accepted(refund_id)
+
+
 def _generate_order_desc(order_no, order_name, payer_name):
     return u"{1}[{0}]；付款人：{2}".format(order_no, order_name, payer_name)
 

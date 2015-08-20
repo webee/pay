@@ -38,20 +38,20 @@ def pay_result(source):
     return render_template('info.html', title='支付结果', msg='支付失败(来源未知)-订单号:{0}'.format(order_no))
 
 
-@mod.route("/pay/notify/<pay_source>", methods=["POST"])
+@mod.route("/pay/notify/<source>", methods=["POST"])
 @parse_and_verify
-def pay_notify(pay_source):
+def pay_notify(source):
     data = request.verified_data
     partner_oid = data['oid_partner']
     order_no = data['no_order']
     pay_result = data['result_pay']
     paybill_oid = data['oid_paybill']
 
-    logger.info('pay notify {0}: {1}'.format(pay_source, data))
+    logger.info('pay notify {0}: {1}'.format(source, data))
     if not is_sending_to_me(partner_oid):
         return notification.is_invalid()
 
-    handle = get_pay_notify_handle(pay_source, NotifyType.Pay.ASYNC)
+    handle = get_pay_notify_handle(source, NotifyType.Pay.ASYNC)
     if handle is None:
         return notification.miss()
 

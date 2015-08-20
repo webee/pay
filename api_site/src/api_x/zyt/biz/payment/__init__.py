@@ -201,19 +201,23 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
     _try_notify_client(tx, payment_record)
 
 
-def _try_notify_client(tx, refund_record):
+def _try_notify_client(tx, payment_record):
     from api_x.utils.notify import notify_client
-    url = refund_record.client_notify_url
+    url = payment_record.client_notify_url
 
-    channel = get_channel(refund_record.channel_id)
+    channel = get_channel(payment_record.channel_id)
+    user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
+    user_id = user_mapping.user_id
 
     # FIXME: 这里为了兼容之前活动平台的client_id=1, status='money_locked', methods加上'put'
     if tx.state in [PaymentTransactionState.SECURED, PaymentTransactionState.SUCCESS]:
-        params = {'code': 0, 'client_id': '1', 'status': 'money_locked', 'channel_name': channel.name,
-                  'order_id': refund_record.order_id, 'amount': refund_record.amount}
+        params = {'code': 0, 'client_id': '1', 'user_id': user_id, 'status': 'money_locked',
+                  'channel_name': channel.name,
+                  'order_id': payment_record.order_id, 'amount': payment_record.amount}
     elif tx.state == PaymentTransactionState.FAILED:
-        params = {'code': 1, 'client_id': '1', 'status': 'money_locked', 'channel_name': channel.name,
-                  'order_id': refund_record.order_id, 'amount': refund_record.amount}
+        params = {'code': 1, 'client_id': '1', 'user_id': user_id, 'status': 'money_locked',
+                  'channel_name': channel.name,
+                  'order_id': payment_record.order_id, 'amount': payment_record.amount}
 
     if not notify_client(url, params, methods=['put', 'post']):
         # other notify process.

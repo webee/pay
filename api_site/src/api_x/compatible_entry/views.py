@@ -79,6 +79,25 @@ def apply_for_refund():
         return response.fail(code=1, msg=e.message)
 
 
+@mod.route('/clients/<int:channel_id>/orders/<order_id>/confirm-pay', methods=['PUT'])
+def confirm_to_pay(channel_id, order_id):
+    # FIXME
+    # NOTE: this is for lvye huodong only.
+    if channel_id != "2":
+        return response.fail()
+
+    channel_name = 'lvye_huodong'
+    channel = get_channel_by_name(channel_name)
+    if channel is None:
+        return response.fail(msg='channel not exits: [{0}]'.format(channel_name))
+
+    try:
+        payment.confirm_payment(channel, order_id)
+        return response.success()
+    except Exception as e:
+        return response.bad_request(msg=e.message)
+
+
 def _generate_order_desc(order_no, order_name, payer_name):
     return u"{1}[{0}]；付款人：{2}".format(order_no, order_name, payer_name)
 

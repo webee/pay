@@ -31,10 +31,10 @@ def create_schema():
 
 def exec_sql_script(script_name):
     local('mysql -h {} -u {} -p{} {} < {}'.format(
-        config.DataBase.HOST,
-        config.DataBase.USERNAME,
-        config.DataBase.PASSWORD,
-        config.DataBase.INSTANCE,
+        config.HOST,
+        config.USERNAME,
+        config.PASSWORD,
+        config.INSTANCE,
         script_name))
 
 

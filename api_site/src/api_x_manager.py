@@ -43,12 +43,11 @@ def init_db(recreate):
     init_data()
 
 
-@manager.option('-e', '--env', type=str, dest="environment", required=True)
-def deploy(environment):
-    environment = environment or 'dev'
+@manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')
+def deploy(environ):
     from ops.deploy.deploy import deploy
 
-    deploy(environment)
+    deploy(environ)
 
 
 class CeleryCommand(Command):
@@ -68,13 +67,14 @@ class CeleryCommand(Command):
 manager.add_command('celery', CeleryCommand())
 
 
-@manager.command
-def test_create_user():
-    from api_x.zyt.vas.user import create_user
+@manager.option('-d', '--domain', type=str, dest="user_domain_name", required=True)
+@manager.option('-u', '--user', type=str, dest="user_id", required=True)
+def test_add_user(user_domain_name, user_id):
+    from api_x.zyt.user_mapping import create_domain_account_user
 
-    user = create_user()
+    account_user_id = create_domain_account_user(user_domain_name, user_id)
 
-    print('user_id: {0}'.format(user.id))
+    print('account_user_id: {0}'.format(account_user_id))
 
 
 @manager.option('-i', '--id', type=long, dest="user_id", required=True)

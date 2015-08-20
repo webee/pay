@@ -24,6 +24,8 @@ class AccountUser(db.Model):
     __tablename__ = 'account_user'
 
     id = db.Column(db.Integer, primary_key=True)
+
+    is_locked = db.Column(db.Boolean, nullable=False, default=False)
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):

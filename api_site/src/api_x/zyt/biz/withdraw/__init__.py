@@ -196,7 +196,7 @@ def _withdraw_by_test_pay(tx, withdraw_record, data):
     res = pay_to_bankcard(TransactionType.WITHDRAW, tx.sn, withdraw_record.actual_amount, result or 'SUCCESS')
 
     if not is_success_request(res):
-        raise WithdrawFailedError(res['reg_msg'])
+        raise WithdrawFailedError(res['ret_msg'])
     return res
 
 

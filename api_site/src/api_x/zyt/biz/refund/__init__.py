@@ -225,7 +225,7 @@ def _refund_by_test_pay(tx, payment_record, refund_record, data):
 
     if not is_success_request(res):
         logger.error('request refund failed: {0}'.format(res))
-        raise RefundFailedError(res['reg_msg'])
+        raise RefundFailedError(res['ret_msg'])
     return res
 
 
@@ -244,7 +244,7 @@ def _refund_by_lianlian_pay(tx, payment_record, refund_record):
 
     if not is_success_request(res):
         logger.error('request refund failed: {0}'.format(res))
-        raise RefundFailedError(res['reg_msg'])
+        raise RefundFailedError(res['ret_msg'])
     return res
 
 

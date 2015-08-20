@@ -57,6 +57,7 @@ class Bankcard(db.Model):
 
     def to_dict(self):
         return {
+            'id': self.id,
             'flag': self.flag,
             'card_no': self.card_no,
             'card_type': self.card_type,

@@ -15,7 +15,7 @@ def create_user():
     return user
 
 
-def get_user_by_id(id):
+def get_account_user(id):
     return AccountUser.query.get(id)
 
 

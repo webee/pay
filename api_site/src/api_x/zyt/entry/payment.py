@@ -26,8 +26,8 @@ def _pay_by_test_pay(tx, payment_record):
 
 def _pay_by_lianlian_pay(tx, payment_record):
     from api_x.zyt.evas.lianlian_pay import pay
-    from api_x.zyt.vas.user import get_user_by_id
+    from api_x.zyt.vas.user import get_account_user
 
-    payer = get_user_by_id(payment_record.payer_id)
+    payer = get_account_user(payment_record.payer_id)
     return pay(TransactionType.PAYMENT, payer.id, payer.created_on, req.ip(),
                tx.sn, tx.created_on, payment_record.product_name, payment_record.product_desc, payment_record.amount)

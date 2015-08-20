@@ -79,7 +79,7 @@ def apply_for_refund():
         return response.fail(code=1, msg=e.message)
 
 
-@mod.route('/clients/<int:channel_id>/orders/<order_id>/confirm-pay', methods=['PUT'])
+@mod.route('/secured/clients/<int:channel_id>/orders/<order_id>/confirm-pay', methods=['PUT'])
 def confirm_to_pay(channel_id, order_id):
     # FIXME
     # NOTE: this is for lvye huodong only.

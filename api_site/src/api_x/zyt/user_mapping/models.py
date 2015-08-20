@@ -41,11 +41,13 @@ class UserMapping(db.Model):
     user_domain = db.relationship('UserDomain', backref=db.backref('user_maps', lazy='dynamic'))
     user_id = db.Column(db.VARCHAR(32), nullable=False)
     account_user_id = db.Column(db.Integer, nullable=False, unique=True)
+
     desc = db.Column(db.VARCHAR(64), default='')
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     # index
+    # 目前<user_domain_id, user_id>唯一确定一个账号用户，之后可能对应多个
     __table_args__ = (db.UniqueConstraint('user_domain_id', 'user_id', name='domain_user_id_uniq_idx'),)
 
     def __repr__(self):

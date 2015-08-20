@@ -66,6 +66,12 @@ def create_account_user(user_domain_id, user_id, desc=None):
 
 
 @transactional
+def create_domain_account_user(user_domain_name, user_id, desc=None):
+    user_domain = get_user_domain_by_name(user_domain_name)
+    return create_account_user(user_domain.id, user_id, desc)
+
+
+@transactional
 def get_or_create_account_user(user_domain_id, user_id):
     user_map = UserMapping.query.filter_by(user_domain_id=user_domain_id, user_id=user_id).first()
     if user_map is None:

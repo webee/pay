@@ -15,7 +15,7 @@ def query_bin(card_no):
         raise RequestAPIError(e.message)
 
     if not is_success_request(res):
-        raise RequestAPIError(res['reg_msg'])
+        raise RequestAPIError(res['ret_msg'])
     bank_code = res['bank_code']
     bank_name = res['bank_name']
     card_type = _parse_card_type(res['card_type'])

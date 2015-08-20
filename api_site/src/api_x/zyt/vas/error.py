@@ -24,3 +24,9 @@ class AmountValueError(VASError):
     def __init__(self):
         message = "amount value error."
         super(AmountValueError, self).__init__(message)
+
+
+class AccountUserLockedError(VASError):
+    def __init__(self, user_id):
+        message = "account user [{0}] is locked.".format(user_id)
+        super(AmountValueError, self).__init__(message)

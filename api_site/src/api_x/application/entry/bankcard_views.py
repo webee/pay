@@ -43,7 +43,7 @@ def add_bankcard(account_user_id):
 
 
 @mod.route('/account_users/<int:account_user_id>/bankcards', methods=['GET'])
-def list_all_bankcards(account_user_id):
+def list_user_bankcards(account_user_id):
     bankcards = dba.query_all_bankcards(account_user_id)
     bankcards = [bankcard.to_dict() for bankcard in bankcards]
     return response.success(bankcards=bankcards)

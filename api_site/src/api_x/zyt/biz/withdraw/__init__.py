@@ -49,7 +49,6 @@ def _create_and_request_withdraw(from_user_id,
         _request_pay_to_bankcard(tx, withdraw_record, data)
         _withdraw_to_processing(tx)
     except Exception as e:
-        logger.exception(e)
         # FIXME: because this is in a transaction, below is useless.
         _unfreeze_fail_withdraw(tx, withdraw_record)
         raise e

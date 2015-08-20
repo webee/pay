@@ -84,7 +84,7 @@ def refund():
 
     logger.info('refund: {0}'.format(params))
     req = pay_client.request_refund(params)
-    return render_template('sample/info.html', title='退款结果', msg=req.content)
+    return render_template('sample/info.html', title='退款结果', msg=req.text)
 
 
 @mod.route('/withdraw', methods=['POST'])
@@ -108,7 +108,7 @@ def withdraw():
 
     logger.info('withdraw: {0}'.format(params))
     req = pay_client.request_withdraw(user_id, params)
-    return render_template('sample/info.html', title='提现结果', msg=req.content)
+    return render_template('sample/info.html', title='提现结果', msg=req.text)
 
 
 @mod.route('/prepaid', methods=['GET'])

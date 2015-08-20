@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from api_x.zyt.user_mapping import get_channel_by_name, get_or_create_account_user
 from api_x.zyt.biz import payment
+from api_x.zyt.biz import refund
 
 from flask import request, url_for
 from api_x.utils import response
@@ -25,7 +26,9 @@ def secured_pre_pay():
     client_callback_url = data['client_callback_url']
     client_async_callback_url = data['client_async_callback_url']
 
-    # payment_type in PaymentTypes.
+    logger.info('receive secure pre pay: {0}'.format({k: v for k, v in data.items()}))
+    # FIXME
+    # NOTE: this is for lvye huodong only.
     if channel_id != "1":
         return response.fail()
 
@@ -57,12 +60,23 @@ def apply_for_refund():
     amount = data['amount']
     callback_url = data['callback_url']
 
-    pay_record = get_secured_payment(channel_id, order_no)
-    if not pay_record:
-        return response.not_found({'client_id': channel_id, 'order_no': order_no})
+    logger.info('receive secured refund: {0}'.format({k: v for k, v in data.items()}))
+    # FIXME
+    # NOTE: this is for lvye huodong only.
+    if channel_id != "1":
+        return response.fail()
 
-    refund_id = apply_to_refund(pay_record, amount, callback_url)
-    return response.accepted(refund_id)
+    channel_name = 'lvye_huodong'
+    channel = get_channel_by_name(channel_name)
+    if channel is None:
+        return response.fail(msg='channel not exits: [{0}]'.format(channel_name))
+
+    try:
+        refund_record = refund.apply_to_refund(channel, order_no, amount, callback_url, data)
+        return response.accepted(id=refund_record.sn)
+    except Exception as e:
+        logger.exception(e)
+        return response.fail(code=1, msg=e.message)
 
 
 def _generate_order_desc(order_no, order_name, payer_name):

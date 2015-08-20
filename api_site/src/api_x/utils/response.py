@@ -21,3 +21,7 @@ def bad_request(code=1, msg='bad request', **kwargs):
 
 def not_found(code=404, msg='not found.', **kwargs):
     return fail(code, msg, **kwargs), 404
+
+
+def accepted(**kwargs):
+    return success(**kwargs), 202

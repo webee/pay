@@ -5,7 +5,7 @@ from flask import request, redirect, session, url_for
 from flask_login import UserMixin, AnonymousUserMixin, login_user, logout_user, login_required
 
 from . import auth_mod as mod
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 from pub_site import login_manager
 from pub_site import config
 from tools.urls import build_url

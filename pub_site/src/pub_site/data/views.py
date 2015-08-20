@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, division
 
 from flask import request, jsonify
 from . import data_mod as mod
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 from pub_site import config
 import time
 

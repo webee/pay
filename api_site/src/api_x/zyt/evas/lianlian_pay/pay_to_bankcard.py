@@ -12,7 +12,7 @@ def pay_to_bankcard(no_order, money_order, info_order, notify_url,
                     flag_card, card_type, card_no, acct_name,
                     bank_code='', province_code='', city_code='', brabank_name='',
                     prcptcd=''):
-    _validate_bankcard(flag_card, card_type, bank_code)
+    _validate_bankcard(flag_card, card_type, bank_code, province_code, city_code, brabank_name, prcptcd)
 
     params = {
         'platform': lianlian_pay.PLATFORM,

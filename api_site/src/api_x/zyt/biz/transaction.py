@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from api_x.constant import TransactionState
-from api_x.dbs import transactional
+from pytoolbox.util.dbs import transactional
 from api_x import db
 from .models import TransactionRecord, TransactionStateLog, UserTransaction
 from .utils import generate_sn

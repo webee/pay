@@ -1,7 +1,7 @@
 # coding=utf-8
 from api_x import db
 from api_x.zyt.vas.models import AccountUser, UserCashBalance
-from api_x.dbs import transactional
+from pytoolbox.util.dbs import transactional
 
 
 @transactional

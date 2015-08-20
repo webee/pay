@@ -8,8 +8,8 @@ from api_x.zyt.biz.refund.dba import update_payment_refunded_amount
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id, get_channel
 from api_x.constant import SECURE_USER_NAME, PaymentTransactionState, RefundTransactionState
-from api_x.dbs import transactional
 from api_x.zyt.vas.user import get_user_cash_balance
+from pytoolbox.util.dbs import transactional, require_transaction_context
 from ...vas.models import EventType
 from ..transaction import create_transaction, transit_transaction_state, get_tx_by_sn, get_tx_by_id, \
     update_transaction_info
@@ -19,7 +19,6 @@ from ..payment import get_payment_by_id, get_tx_payment_by_sn
 from api_x.zyt.biz.error import *
 from .dba import get_tx_refund_by_sn
 from tools.mylog import get_logger
-from api_x.dbs import require_transaction_context
 
 
 logger = get_logger(__name__)

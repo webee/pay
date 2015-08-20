@@ -2,10 +2,10 @@
 from api_x import db
 from api_x.zyt.vas import bookkeep
 from api_x.constant import TransactionState
-from api_x.dbs import transactional
 from api_x.zyt.biz.models import TransactionType, TransferRecord
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.vas import NAME
+from pytoolbox.util.dbs import transactional
 from .vas import get_vas_by_name
 from .transaction import create_transaction, transit_transaction_state
 

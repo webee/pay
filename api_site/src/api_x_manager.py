@@ -116,8 +116,8 @@ def test_withdraw(user_id, amount, bankcard_id):
 @manager.option('-i', '--id', type=long, dest="withdraw_id", required=True)
 @manager.option('-s', '--success', type=int, dest="success", default=1)
 def test_done_withdraw(withdraw_id, success):
+    from pytoolbox.util.dbs import require_transaction_context
     from api_x.zyt.biz.vas import get_vas_by_name
-    from api_x.dbs import require_transaction_context
     from datetime import datetime
     from api_x.zyt.biz import withdraw
 

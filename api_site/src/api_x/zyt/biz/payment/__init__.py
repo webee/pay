@@ -7,14 +7,13 @@ from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id, get_channel, get_user_map_by_account_user_id
 from api_x.constant import TransactionState, SECURE_USER_NAME, PaymentTransactionState
-from api_x.dbs import transactional
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, get_tx_by_sn, \
     update_transaction_info, get_tx_by_id
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
-from api_x.dbs import require_transaction_context
 from api_x.zyt.biz.error import NonPositiveAmountError
+from pytoolbox.util.dbs import require_transaction_context, transactional
 from tools.mylog import get_logger
 
 

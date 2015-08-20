@@ -3,9 +3,9 @@ from api_x import db
 from api_x.zyt.vas import bookkeep
 from api_x.constant import TransactionState
 from api_x.zyt.vas.models import EventType
-from api_x.dbs import transactional
+from pytoolbox.util.dbs import transactional
 from api_x.zyt.biz.models import TransactionType, PrepaidRecord
-from .api.zyt.biz.transaction import create_transaction, transit_transaction_state, get_transaction_by_sn
+from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state
 
 
 @transactional
@@ -31,21 +31,8 @@ def fail_prepaid(prepaid_record):
 
 
 def handle_payment_result(sn):
-    transaction = get_transaction_by_sn(sn)
-    payment_record = get_payment_by_transaction_id(transaction.id)
-
-    if payment_record.client_callbackk_url:
-        return redirect(payment_record.client_callback_url)
+    pass
 
 
 def handle_payment_notify(sn, vas_name, vas_sn):
-    transaction = get_transaction_by_sn(sn)
-    payment_record = get_payment_by_transaction_id(transaction.id)
-
-    update_payment_info(payment_record.id, vas_name, vas_sn)
-    if payment_record.type == PaymentType.DIRECT:
-        succeed_payment()
-    elif payment_record.type == PaymentType.SECURED:
-        pass
-        # TODO
-        # notify
+    pass

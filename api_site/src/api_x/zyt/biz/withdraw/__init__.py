@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 from api_x import db
 from api_x.constant import WithdrawTransactionState
-from api_x.dbs import transactional, require_transaction_context
 from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.models import TransactionType, WithdrawRecord
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, get_tx_by_id
@@ -14,6 +13,7 @@ from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.biz.transaction import update_transaction_info
 from api_x.zyt.biz.error import *
+from pytoolbox.util.dbs import transactional, require_transaction_context
 from tools.mylog import get_logger
 
 

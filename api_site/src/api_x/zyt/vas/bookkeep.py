@@ -5,8 +5,8 @@ from datetime import datetime
 from api_x import db
 from api_x.zyt.vas.models import Event, SystemAssetAccountItem, UserLiabilityAccountItem, LiabilityType, EventType
 from api_x.zyt.vas.models import UserCashBalanceLog, UserCashBalance
-from api_x.dbs import transactional
 from .error import InsufficientAvailableBalanceError, InsufficientFrozenBalanceError, AmountValueError
+from pytoolbox.util.dbs import transactional
 
 
 DEBIT = 'DEBIT'

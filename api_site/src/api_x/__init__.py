@@ -42,6 +42,7 @@ def init_extensions(app):
     from api_x.zyt.biz import models
     from api_x.zyt.vas import models
     from api_x.zyt.user_mapping import models
+    from api_x.application import models
 
     dbs.init_db(app)
     db.init_app(app)

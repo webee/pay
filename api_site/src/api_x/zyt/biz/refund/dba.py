@@ -1,11 +1,11 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x import db
-from api_x.dbs import transactional
 
 from api_x.zyt.biz.models import RefundRecord
 from api_x.zyt.biz.payment import get_payment_by_id
 from api_x.zyt.biz.transaction import get_tx_by_sn
+from pytoolbox.util.dbs import transactional
 
 
 def get_refund_by_tx_id(tx_id):

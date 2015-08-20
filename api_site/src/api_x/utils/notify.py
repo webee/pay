@@ -18,7 +18,7 @@ def notify_client(url, params, methods=['post']):
                 if resp.status_code == 200:
                     logger.info('return: {0}'.format(resp.content))
                     data = resp.json()
-                    if data['code'] == 0:
+                    if data['code'] in [0, '0']:
                         return True
                 else:
                     logger.warning('return {0}'.format(resp.content))

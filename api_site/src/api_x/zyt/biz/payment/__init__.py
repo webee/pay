@@ -63,7 +63,7 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel, order_id,
 def _create_payment(payment_type, payer_id, payee_id, channel, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url):
-    comments = "在线支付-{0}:{0}|{1}".format(channel.name, product_name, order_id)
+    comments = "在线支付-{0}:{0}|{1}".format(channel.desc, product_name, order_id)
     user_ids = [(payer_id, UserRole.FROM), (payee_id, UserRole.TO)]
     if payment_type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)

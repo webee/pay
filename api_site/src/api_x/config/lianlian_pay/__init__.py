@@ -1,5 +1,5 @@
 # coding=utf-8
-from tools.pmc_config import read_string
+from pytoolbox.util.pmc_config import read_string
 PLATFORM = 'lvye.com'
 OID_PARTNER = '201507021000395502'
 

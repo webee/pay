@@ -37,7 +37,7 @@ payee: {{ payee }}[{{ payee_account_user_id }}], 全部: {{ balance.total }}, �
 </form>
 <hr/>
 <form action="{{ url_for('sample.withdraw') }}" method="POST">
-    bankcard_id: <input type="text" name='bankcard_id' value="1"/>
+    bankcard_id: <input type="text" name='bankcard_id' value="{{ bankcards[0].id }}"/>
     <input type="text" name='amount' value="0.01"/>
     <select name="suggest_result" title="suggest result for test.">
         <option value="">_</option>

@@ -62,3 +62,13 @@ def request_confirm_guarantee_payment(params):
     url = _generate_api_url(config.PayAPI.CONFIRM_GUARANTEE_PAYMENT_URL)
     req = requests.post(url, params)
     return req.json()
+
+
+def list_user_bankcards(user_id):
+    account_user_id = get_account_user_id(user_id)
+    url = _generate_api_url(config.PayAPI.LIST_USER_BANKCARDS_URL, account_user_id=account_user_id)
+    req = requests.get(url)
+
+    if req.status_code == 200:
+        return req.json()['bankcards']
+    return []

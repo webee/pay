@@ -51,7 +51,6 @@ class PayAPI:
 
     ROOT_URL = "http://localhost:5000"
     GET_ACCOUNT_ID_URL = "user_domains/{user_domain_id}/users/{uid}/account"
-    GET_USER_BALANCE_URL = "accounts/{account_id}/balance"
     GET_USER_TRANSACTIONS_URL = "biz/account_users/{account_user_id}/transactions"
 
     GET_CREATE_ACCOUNT_ID_URL = 'user_mapping/user_domains/{user_domain_name}/users/{user_id}'

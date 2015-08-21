@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, division
 import os
 
 from flask import Flask
-from tools import pmc_config
+from pytoolbox.util import pmc_config
 
 
 def register_mods(app):

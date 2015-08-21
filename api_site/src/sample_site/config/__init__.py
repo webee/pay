@@ -29,3 +29,4 @@ class PayAPI:
 
     GET_CREATE_ACCOUNT_ID_URL = '/user_mapping/user_domains/{user_domain_name}/users/{user_id}'
     GET_USER_BALANCE_URL = "/vas/zyt/account_users/{account_user_id}/balance"
+    LIST_USER_BANKCARDS_URL = 'application/account_users/{account_user_id}/bankcards'

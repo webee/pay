@@ -21,15 +21,17 @@ def index():
 
     payee_account_user_id = pay_client.get_account_user_id(payee)
     balance = pay_client.get_user_balance(payee)
+    bankcards = pay_client.list_user_bankcards(payee)
     return render_template('sample/index.html', channel=channel_name, payer=payer, payee=payee,
-                           payee_account_user_id=payee_account_user_id, balance=balance)
+                           payee_account_user_id=payee_account_user_id, balance=balance,
+                           bankcards=bankcards)
 
 
 @mod.route('/pay', methods=['POST'])
 def pay():
     """支付一分钱"""
     channel_name = config.PayAPI.CHANNEL_NAME
-    payer = 'webee'
+    payer = '96355632'
     payee = config.PAYEE
 
     amount = Decimal(request.values['amount'])
@@ -41,7 +43,7 @@ def pay():
         'order_id': request.values.get('order_id') or generate_order_id(),
         'product_name': '测试{1}支付{0}元'.format(amount, '担保' if payment_type == 'GUARANTEE' else ''),
         'product_category': '测试',
-        'product_desc': '[{0}]用于测试的商品'.format(channel_name),
+        'product_desc': '用于测试的商品',
         'amount': amount,
         'client_callback_url': config.HOST_URL + url_for('.index'),
         'client_notify_url': '',

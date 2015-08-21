@@ -11,6 +11,6 @@ class PayAPI:
     # 绿野用户中心
     USER_DOMAIN_NAME = 'lvye_account'
 
-    CHANNEL_NAME = 'lvye_huodong'
+    CHANNEL_NAME = 'lvye_test_channel'
 
     ROOT_URL = "http://pay.lvye.com/api"

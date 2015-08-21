@@ -21,15 +21,15 @@ TX_STATE_MSG = {
     'PAYMENT:CREATED': '等待支付',
     'PAYMENT:SECURED': '支付完成|等待确认',
     'PAYMENT:FAILED': '支付失败',
-    'PAYMENT:SUCCESS': '支付成功',
+    'PAYMENT:SUCCESS': '交易完成',
     'PAYMENT:REFUNDED': '已退款',
     'PAYMENT:REFUNDING': '退款中',
     'REFUND:CREATED': '正在处理',
     'REFUND:FAILED': '退款失败',
-    'REFUND:SUCCESS': '退款成功',
+    'REFUND:SUCCESS': '交易完成',
     'WITHDRAW:PROCESSING': '正在处理',
     'WITHDRAW:FAILED': '提现失败',
-    'WITHDRAW:SUCCESS': '提现成功',
+    'WITHDRAW:SUCCESS': '交易完成',
 }
 
 

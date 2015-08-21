@@ -63,7 +63,7 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel, order_id,
 def _create_payment(payment_type, payer_id, payee_id, channel, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url):
-    comments = "在线支付-{0}|{1}".format(product_name, order_id)
+    comments = "在线支付-{0}:{0}|{1}".format(channel.name, product_name, order_id)
     user_ids = [(payer_id, UserRole.FROM), (payee_id, UserRole.TO)]
     if payment_type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
@@ -185,8 +185,8 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
     if _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
         # 重复支付
         # TODO, 退款到余额(短信通知)或者原路返回
-        logger.warning('duplicated payment: [{0}], [{1}], [{2}, {3}]'.format(
-            payment_record.vas_name, payment_record.vas_sn, vas_name, vas_sn))
+        logger.warning('duplicated payment: [{0}], [{1}], [{2}, {3}]'.format(payment_record.vas_name,
+                                                                             payment_record.vas_sn, vas_name, vas_sn))
 
     with require_transaction_context():
         tx = update_transaction_info(tx.id, vas_name, vas_sn, PaymentTransactionState.CREATED)

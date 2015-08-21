@@ -42,7 +42,7 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data):
     if amount_value <= 0:
         raise NonPositiveAmountError(amount_value)
 
-    refund_record = _create_and_request_refund(tx, payment_record, amount_value, client_notify_url, data)
+    refund_record = _create_and_request_refund(channel, tx, payment_record, amount_value, client_notify_url, data)
 
     return refund_record
 
@@ -137,8 +137,8 @@ def _is_refundable(tx, payment_record):
 
 
 @transactional
-def _create_and_request_refund(tx, payment_record, amount, client_notify_url, data):
-    payment_record, refund_record = _create_refund(tx, payment_record, amount, client_notify_url)
+def _create_and_request_refund(channel, tx, payment_record, amount, client_notify_url, data):
+    payment_record, refund_record = _create_refund(channel, tx, payment_record, amount, client_notify_url)
 
     try:
         _request_refund(tx, payment_record, refund_record, data)
@@ -152,7 +152,7 @@ def _create_and_request_refund(tx, payment_record, amount, client_notify_url, da
 
 
 @transactional
-def _create_refund(tx, payment_record, amount, client_notify_url):
+def _create_refund(channel, tx, payment_record, amount, client_notify_url):
     cur_payment_state = tx.state
 
     # start refunding.
@@ -166,7 +166,7 @@ def _create_refund(tx, payment_record, amount, client_notify_url):
     if amount + payment_record.refunded_amount > payment_record.amount:
         raise RefundAmountError(payment_record.amount, payment_record.refunded_amount, amount)
 
-    comments = "退款:{0}|{1}".format(payment_record.product_name, payment_record.order_id)
+    comments = "退款-{0}:{1}|{2}".format(channel.name, payment_record.product_name, payment_record.order_id)
 
     user_ids = [(payment_record.payer_id, UserRole.TO), (payment_record.payee_id, UserRole.FROM)]
     if payment_record.type == PaymentType.GUARANTEE:

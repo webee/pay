@@ -3,19 +3,24 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
+    <style>
+        body {
+            font-size: 120%;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-<h2>商品信息: {{ tx.comments }}</h2>
+<h2>商品信息</h2>
+<p>{{ tx.comments }}</p>
 <h2>金额: {{ tx.amount }}</h2>
 <p>
-    <h1>请选择支付方式：</h1>
-    <ul>
-        <li><a href="{{ root_url + url_for('biz_entry.pay', sn=tx.sn, vas_name=vas.TEST_PAY) }}">test_pay</a></li>
-        <li><a href="{{ root_url + url_for('biz_entry.pay', sn=tx.sn, vas_name=vas.ZYT) }}">ZYT</a></li>
-        <li><a href="{{ root_url + url_for('biz_entry.pay', sn=tx.sn, vas_name=vas.LIANLIAN_PAY) }}">连连支付</a></li>
-        <li><a href="{{ root_url + url_for('biz_entry.pay', sn=tx.sn, vas_name=vas.WEIXIN_PAY) }}">微信支付</a></li>
-        <li><a href="{{ root_url + url_for('biz_entry.pay', sn=tx.sn, vas_name=vas.ALI_PAY) }}">支付宝</a></li>
-    </ul>
+    <h1>请选择支付方式</h1>
+        <p><a href="{{ root_url + url_for('biz_entry.pay', sn=tx.sn, vas_name=vas.TEST_PAY) }}">测试支付</a></p>
+{#        <p><a href="{{ root_url + url_for('biz_entry.pay', sn=tx.sn, vas_name=vas.ZYT) }}">ZYT</a></p>#}
+        <p><a href="{{ root_url + url_for('biz_entry.pay', sn=tx.sn, vas_name=vas.LIANLIAN_PAY) }}">连连支付</a></p>
+        <p><a href="#weixin">微信支付</a></p>
+        <p><a href="#alipay">支付宝</a></p>
 </p>
 </body>
 </html>

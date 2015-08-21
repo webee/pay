@@ -48,15 +48,15 @@ $(document).ready(function () {
             clear_class(ts);
 
             $("#total_tx").click(function() {
-                get_tx_list({category: 'ALL'}, gen_activate_tab_cb('#total_tx'))
+                get_tx_list({role: ''}, gen_activate_tab_cb('#total_tx'))
             });
 
             $("#in_tx").click(function() {
-                get_tx_list({category: 'INCOME'}, gen_activate_tab_cb('#in_tx'))
+                get_tx_list({role: 'TO'}, gen_activate_tab_cb('#in_tx'))
             });
 
             $("#out_tx").click(function() {
-                get_tx_list({category: 'EXPENSE'}, gen_activate_tab_cb('#out_tx'))
+                get_tx_list({role: 'FROM'}, gen_activate_tab_cb('#out_tx'))
             });
         }
     }
@@ -110,7 +110,7 @@ $(document).ready(function () {
         }
 
         requestRunning = true;
-        $.get('/orders', params)
+        $.get('/transactions', params)
             .done(function (data) {
                 $("#tx_list").html(data);
                 if (callback != null) {
@@ -128,6 +128,6 @@ $(document).ready(function () {
     // update balance.
     update_balance(function() {
         // activate total.
-        get_tx_list({category: 'ALL', page_no: 1}, gen_activate_tab_cb('#total_tx'))
+        get_tx_list({role: '', page_no: 1}, gen_activate_tab_cb('#total_tx'))
     });
 });

@@ -4,7 +4,7 @@ from flask import request, render_template, jsonify
 from flask.ext.login import login_required, current_user
 from . import main_mod as mod
 from pub_site import pay_client
-from .transaction_log import list_trade_orders
+from .transaction import query_transactions
 from ..constant import TradeType
 
 
@@ -14,34 +14,33 @@ def index():
     return render_template('main/index.html')
 
 
-@mod.route('/orders', methods=['GET'])
+@mod.route('/transactions', methods=['GET'])
 @login_required
-def list_orders():
+def list_transactions():
     uid = current_user.user_id
     data = request.args
-    category = data['category']
+    role = data['role']
     page_no = int(data.get('page_no', 1))
-    keyword = data.get('keyword', '').strip()
-    keyword = None if not keyword else keyword
+    q = data.get('q', '').strip()
+    q = q if q else None
 
     page_size = 10
-    count, records = list_trade_orders(uid, category, page_no, page_size, keyword)
+    count, transactions = query_transactions(uid, role, page_no, page_size, q)
     res = {
         'count': count,
         'page_no': page_no,
         'page_size': page_size,
         'page_count': (count - 1) / page_size + 1,
-        'records': records,
+        'transactions': transactions,
     }
     return render_template('main/tx_list.html', res=res)
-
 
 
 @mod.route('/balance', methods=['GET'])
 @login_required
 def balance():
     uid = current_user.user_id
-    balance = pay_client.get_user_balance(uid)
+    balance = pay_client.get_user_available_balance(uid)
 
     return jsonify(balance=balance)
 

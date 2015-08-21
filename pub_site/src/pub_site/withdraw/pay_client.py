@@ -7,10 +7,7 @@ from pytoolbox.util.log import get_logger
 import os
 from pub_site import pay_client
 
-_logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
-
-pay_server = config.PayAPI.ROOT_URL
-lvye_user_id = config.PayAPI.LVYE_USER_ID
+logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 
 
 def handle_response(func):
@@ -27,7 +24,7 @@ def handle_response(func):
 class PayClient:
     account_user_ids = {}
 
-    def __init__(self, server=pay_server):
+    def __init__(self, server=config.PayAPI.ROOT_URL):
         self.server = server
 
     @handle_response
@@ -44,13 +41,6 @@ class PayClient:
             "branch_bank_name": branch_bank_name
         }
         return requests.post(url, data=data)
-
-    @handle_response
-    def get_bankcards(self):
-        uid = current_user.user_id
-        account_id = pay_client.get_account_user_id(uid)
-        url = '%s/accounts/%s/bankcards' % (self.server, account_id)
-        return requests.get(url)
 
     @handle_response
     def get_balance(self):
@@ -75,7 +65,7 @@ class PayClient:
     @handle_response
     def transfer_to_lvye(self, amount, order_id, order_info):
         from_id = pay_client.get_account_user_id(current_user.user_id)
-        to_id = pay_client.get_account_user_id(lvye_user_id)
+        to_id = pay_client.get_account_user_id(config.LVYE_USER_NAME)
         url = '%s/accounts/%s/transfer/to/%s' % (self.server, from_id, to_id)
         data = {
             "order_no": order_id,

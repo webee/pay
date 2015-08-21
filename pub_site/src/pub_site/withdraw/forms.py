@@ -15,6 +15,7 @@ from pay_client import PayClient
 import re
 from wtforms.compat import string_types
 from . import WITHDRAW_COMMISSION
+from pub_site import pay_client
 
 
 def name_and_id_card_should_match(form, field):
@@ -38,21 +39,21 @@ def identifying_code_should_match(form, field):
 
 
 def card_number_should_be_legal(form, field):
-    url = '%s/bankcards/%s/bin' % (config.PayAPI.ROOT_URL, field.data.replace(" ", ""))
-    resp = requests.get(url)
-    if resp.status_code != 200:
+    card_bin = pay_client.get_bin(field.data.replace(" ", ""))
+    if not card_bin['ret']:
         raise ValidationError(u"无效的银行卡")
-    card_type = resp.json().get('card_type')
+    card_type = card_bin['card_type']
     if card_type != 'DEBIT':
         raise ValidationError(u"银行卡必须为借记卡")
 
 
 def card_is_not_in_use(form, field):
-    result = PayClient().get_bankcards()
-    if result['status_code'] == 200:
-        for card in result['data']:
-            if card['card_no'] == field.data:
-                raise ValidationError(u"卡已绑定")
+    uid = current_user.user_id
+    bankcards = pay_client.list_user_bankcards(uid)
+
+    for card in bankcards:
+        if card['card_no'] == field.data:
+            raise ValidationError(u"卡已绑定")
 
 
 class BindCardForm(Form):

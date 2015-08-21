@@ -29,17 +29,18 @@ def migrate():
     do_migration()
 
 
-@manager.command
-def init_db():
+@manager.option('-e', '--env', type=str, dest="envx", required=False, default='dev')
+@manager.option('-r', '--recreate', action="store_true", dest="recreate", required=False, default=False)
+def init_db(envx, recreate):
     from ops.deploy.init_db import init_db
-    init_db()
+
+    init_db(envx, recreate)
 
 
-@manager.option('-e', '--env', type=str, dest="environment", required=True)
-def deploy(environment):
-    environment = environment or 'dev'
+@manager.option('-e', '--env', type=str, dest="env", required=True, default='dev')
+def deploy(env):
     from ops.deploy.deploy import deploy
-    deploy(environment)
+    deploy(env)
 
 
 def main():

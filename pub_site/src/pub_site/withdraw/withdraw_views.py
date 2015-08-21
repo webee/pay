@@ -10,6 +10,7 @@ from identifying_code_manager import generate_and_send_identifying_code
 from pay_client import PayClient
 from flask import flash
 from pytoolbox.util.log import get_logger
+from pub_site import pay_client
 
 
 logger = get_logger(__name__)
@@ -39,7 +40,8 @@ def set_current_channel():
 @mod.route('/withdraw', methods=['GET', 'POST'])
 @login_required
 def withdraw():
-    bankcards = PayClient().get_bankcards()['data']
+    uid = current_user.user_id
+    bankcards = pay_client.list_user_bankcards(uid)
     if len(bankcards) == 0:
         return redirect(url_for('.bind_card'))
     form = WithdrawForm()
@@ -50,8 +52,10 @@ def withdraw():
 
         actual_amount = form.amount.data - WITHDRAW_COMMISSION
         return _withdraw_succeed(actual_amount)
-    return render_template('withdraw/withdraw.html', balance=_get_balance(), bankcards=bankcards, form=form,
-                           selected_card=_find_selected_card(bankcards, long(form.bankcard.data)))
+    bankcard_id = long(form.bankcard.data) if form.bankcard.data else 0
+    return render_template('withdraw/withdraw.html', balance=pay_client.get_user_available_balance(uid),
+                           bankcards=bankcards, form=form,
+                           selected_card=_find_selected_card(bankcards, bankcard_id))
 
 
 @mod.route('/withdraw/bind-card', methods=['GET', 'POST'])
@@ -75,13 +79,6 @@ def generate_identifying_code():
     return resp.content, resp.status_code
 
 
-def _get_balance():
-    result = PayClient().get_balance()
-    if result['status_code'] != 200:
-        return 0.0
-    return result['data']['balance']
-
-
 def _update_preferred_card(card_id):
     db = from_db()
     current_user_id = current_user.user_id
@@ -91,7 +88,6 @@ def _update_preferred_card(card_id):
     else:
         db.execute('update preferred_card set bankcard_id=%(card_id)s where user_id=%(user_id)s',
                    card_id=card_id, user_id=current_user_id)
-
 
 
 def _do_bind_card(form):
@@ -113,6 +109,8 @@ def _find_selected_card(bankcards, selected_card_id):
     for card in bankcards:
         if card['id'] == selected_card_id:
             return card
+    if len(bankcards) > 0:
+        return bankcards[0]
     return None
 
 

@@ -8,7 +8,7 @@ from .transaction import query_transactions
 from ..constant import TradeType
 
 
-@mod.route('/', methods=['GET'])
+@mod.route('/main', methods=['GET'])
 @login_required
 def index():
     return render_template('main/index.html')

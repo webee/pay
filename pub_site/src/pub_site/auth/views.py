@@ -70,7 +70,7 @@ def load_user(user_id):
 
 @mod.route('/auth/login/')
 def login():
-    next_url = request.args.get('next', '/')
+    next_url = request.args.get('next', '/main')
 
     auth_url = build_url(config.HOST_URL + url_for('auth.auth'), next=next_url)
     login_url = build_url(config.UserCenter.PASSPORT_LOGIN_URL, refererUrl=auth_url)
@@ -86,7 +86,7 @@ def auth():
         login_user(user)
         session['current_user'] = user.to_dict()
 
-    next_url = request.args.get('next') or '/'
+    next_url = request.args.get('next') or '/main'
     return redirect(next_url)
 
 

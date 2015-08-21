@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xml:lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=1200">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/frontpage.css') }}" type="text/css">
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.8.3.min.js') }}"></script>
+<!--<script src="js/modernizr.custom.js"></script>-->
+<title></title>
+</head>
+
+<body>
+
+<div class="opa-a">
+	<div class="middle-box">
+
+		<a href="http://www.lvye.cn/"><img src="{{ url_for('static', filename='images/frontpage/logo_zyt.png') }}" width="224"></a>
+		
+		<ul class="header-bar">
+			<li><a class="first-noborder" target="_self" href="/main">进入新版</a></li>
+			<li><a target="_self" href="http://pay.lvye.cn">旧版</a></li>
+		</ul>
+	</div>
+</div>
+
+<div class="banner">
+	<div class="banner_center">
+    	<img src="{{ url_for('static', filename='images/frontpage/bc_c1.jpg') }}" width="1200" height="641" />
+        <img src="{{ url_for('static', filename='images/frontpage/bc_c2.jpg') }}" width="1200" height="353"/>
+        <a href="###" target="_blank" title=""></a>
+        <span class="mouse-down "></span>
+        <div class="computer bounceIn">
+        	<img src="{{ url_for('static', filename='images/frontpage/computerImg.png') }}" width="746" height="445"/>
+        </div>
+        <p>绿野自游通（在线支付）</p>
+    </div>
+</div>
+
+<div class="tabox">
+    <div class="section block1" style="background-position: 50% 0px;">
+    	<p class="introtit"></p>
+    </div>
+    <div class="section giveus">
+    	<div class="fpoint">
+        	<img src="{{ url_for('static', filename='images/frontpage/function_point.jpg') }}" />
+        </div>
+    </div>
+
+	<div class="section block2" style="background-position: 50% 0px;">
+    	<div class="blockTit blk2"></div>
+    </div>
+    <div class="section quickly">
+    	<!--<h2>便捷的在线支付功能</h2>-->
+    	<div class="cardzf">
+        	<img src="{{ url_for('static', filename='images/frontpage/cardImg.jpg') }}">
+        </div>
+    </div>
+    
+    <div class="section block3" style="background-position: 50% 0px;">
+    	<div class="blockTit blk3"></div>
+    </div>
+	<div class="section quickly">
+    	<!--<h2>方便高效的提现功能</h2>-->
+    	<div class="cardzf">
+        	<img src="{{ url_for('static', filename='images/frontpage/tixianImg.jpg') }}">
+        </div>
+    </div>
+    
+    <div class="section block4" style="background-position: 50% 0px;">
+    	<div class="blockTit blk4"></div>
+    </div>
+    <div class="section quickly">
+    	<!--<h2 class="xianshi">稳定易用的操作界面</h2>-->
+    	<div class="interFace">
+        	<img src="{{ url_for('static', filename='images/frontpage/Interface.png') }}">
+        </div>
+        <p>收支明细展示更清晰    支持绑定提现银行卡</p>
+    </div>
+    
+</div>
+
+<div class="join">
+	<div class="join_center">
+    	<img src="{{ url_for('static', filename='images/frontpage/join_c1.jpg') }}" width="1200" height="456">
+        <img src="{{ url_for('static', filename='images/frontpage/join_c2.jpg') }}" width="1200" height="458">
+        <a href="###" target="_blank" title=""></a>
+        <p>注意事项：<br>备案领队可在此申请试用新版自游通，申请提交后，<br>客服会与您沟通相关事项，并在开通新版自游通后通知您。</p>
+    </div>
+</div>
+
+
+<div class="bottom">
+<p class="about">
+<a href="http://www.lvye.cn/about/#aboutUs" target="_blank">关于绿野</a><span>|</span>
+<a href="http://www.lvye.cn/about/#connectUs" target="_blank">联系我们</a><span>|</span>
+<a href="http://www.lvye.cn/link/" target="_blank">友情链接</a><span>|</span>
+<a href="http://www.lvye.cn/article-9644-1.html" target="_blank">帮助中心</a><span>|</span>
+<a href="mailto:hi@lvye.cn" target="_blank">广告与合作</a><span>|</span>
+<a href="http://www.lvye.com" target="_blank">绿野户外网</a>
+</p>
+<p class="bmd">Copyright 1999-2015 lvye.cn All Rights Reserved 绿野户外网版权所有　京ICP证100311号　京公网安备1101081556</p>
+<p>电信业务审批[2003]字第361号 广告经营许可证:京海工商广字第0386号《主持计算机站（网站）》商标注册证书</p>
+</div>
+
+<!--<script src="js/jquery.easing.min.js"></script>
+<script src="js/waypoints.min.js"></script>
+<script src="js/jquery.debouncedresize.js"></script>
+		<script src="js/cbpFixedScrollLayout.min.js"></script>
+		<script>
+			$(function() {
+				cbpFixedScrollLayout.init();
+			});
+		</script>-->
+        
+<script type="text/javascript">
+	$(function(){
+			$(window).scroll(function() {
+			var scrollY = $(document).scrollTop();
+			//alert($('.block1').offset().top);	
+			if (scrollY >=$('.block1').offset().top){
+				//alert(1);
+				$('.block1 .introtit').addClass('pjump');
+			}else{
+				//$('.block1 .introtit').removeClass('pjump');
+				}	
+			if (scrollY >=$('.block2').offset().top){
+				//alert(1);
+				$(".block2 .blk2").addClass('blockTitcur');
+			}else{
+				//$(".block2 .blk2").removeClass('blockTitcur');
+				}
+			if (scrollY >=$('.block3').offset().top){
+				//alert(1);
+				$(".block3 .blk3").addClass('blockTitcur');
+			}else{
+				//$(".block3 .blk3").removeClass('blockTitcur');
+				}
+			if (scrollY >=$('.block4').offset().top){
+				//alert(1);
+				$(".block4 .blk4").addClass('blockTitcur');
+			}else{
+				//$(".block4 .blk4").removeClass('blockTitcur');
+				}	
+			if (scrollY >=$('.block4').offset().top+450){
+				//alert(1);
+				$(".quickly .interFace").addClass('danru');
+				$(".quickly p").addClass('xianshi');
+			}	
+				 
+			});
+		})
+
+</script>
+        
+        
+        
+        
+
+</body>
+</html>

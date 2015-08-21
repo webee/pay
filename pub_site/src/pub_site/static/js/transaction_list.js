@@ -1,9 +1,5 @@
 var requestRunning = false;
 
-function get_cur_balance() {
-    return Number($("#balance")[0].textContent);
-}
-
 function update_balance(callback) {
     if (requestRunning) {
         return;

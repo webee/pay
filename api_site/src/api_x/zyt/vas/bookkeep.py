@@ -6,8 +6,7 @@ from api_x import db
 from api_x.zyt.vas.models import Event, SystemAssetAccountItem, UserLiabilityAccountItem, LiabilityType, EventType
 from api_x.zyt.vas.models import UserCashBalanceLog, UserCashBalance
 from api_x.zyt.vas.user import get_account_user
-from .error import InsufficientAvailableBalanceError, InsufficientFrozenBalanceError, AmountValueError, \
-    AccountUserLockedError
+from .error import InsufficientAvailableBalanceError, InsufficientFrozenBalanceError, AmountValueError
 from pytoolbox.util.dbs import transactional
 
 
@@ -28,10 +27,6 @@ def _register_event_action(event_type):
 def bookkeeping(event_type, transaction_sn, user_id, vas_name, amount):
     if amount <= 0:
         raise AmountValueError()
-
-    account_user = get_account_user(user_id)
-    if account_user.is_locked:
-        raise AccountUserLockedError(user_id)
 
     event = _create_event(transaction_sn, user_id, vas_name, event_type, amount)
     _event_actions[event_type](event)

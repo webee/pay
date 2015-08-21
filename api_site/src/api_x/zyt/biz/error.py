@@ -35,3 +35,9 @@ class RequestAPIError(BizError):
     def __init__(self, message=None):
         message = message or 'request api error.'
         super(RequestAPIError, self).__init__(message)
+
+
+class TransactionNotFoundError(BizError):
+    def __init__(self, message=None):
+        message = message or 'transaction not found.'
+        super(BizError, self).__init__(message)

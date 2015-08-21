@@ -44,7 +44,7 @@ def pay_to_bankcard():
 
 def notify_client(notify_url, params):
     logger.info('before notify: {0}'.format(notify_url))
-    time.sleep(10)
+    time.sleep(30)
 
     logger.info('start notify: {0}'.format(notify_url))
     try:

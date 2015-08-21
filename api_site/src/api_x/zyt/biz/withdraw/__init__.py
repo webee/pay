@@ -4,11 +4,13 @@ from api_x import db
 from api_x.constant import WithdrawTransactionState
 from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.models import TransactionType, WithdrawRecord
-from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, get_tx_by_id
+from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state
+from api_x.zyt.biz.transaction.dba import get_tx_by_id
 from api_x.zyt.biz.withdraw.dba import get_tx_withdraw_by_sn
 from api_x.zyt.biz.withdraw.error import WithdrawFailedError
 from api_x.zyt.vas.user import get_user_cash_balance
 from api_x.zyt.vas.models import EventType
+from api_x.zyt.biz.models import UserRole
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.biz.transaction import update_transaction_info
@@ -73,8 +75,9 @@ def _create_withdraw(from_user_id,
     else:
         actual_amount = ac - fee
 
-    comments = "提现至 {0}({1}) {2}".format(bank_name, card_no[-4:], acct_name)
-    tx = create_transaction(TransactionType.WITHDRAW, actual_amount + fee, comments, [from_user_id])
+    mask_name = acct_name[1:]
+    comments = "提现至 {0}({1}) *{2} 金额: {3}, 手续费: {4}".format(bank_name, card_no[-4:], mask_name, actual_amount, fee)
+    tx = create_transaction(TransactionType.WITHDRAW, actual_amount + fee, comments, [(from_user_id, UserRole.FROM)])
 
     fields = {
         'tx_id': tx.id,

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function
 
 from decimal import Decimal
-from flask import request, render_template, redirect, url_for
+from flask import request, render_template, redirect, url_for, flash
 from . import sample_mod as mod
 from sample_site import config
 from sample_site.utils import generate_order_id
@@ -15,10 +15,9 @@ logger = get_logger(__name__)
 
 @mod.route('/', methods=['GET'])
 def index():
-    """支付一分钱"""
     channel_name = config.PayAPI.CHANNEL_NAME
     payer = 'webee'
-    payee = 'test001'
+    payee = config.PAYEE
 
     payee_account_user_id = pay_client.get_account_user_id(payee)
     balance = pay_client.get_user_balance(payee)
@@ -31,7 +30,7 @@ def pay():
     """支付一分钱"""
     channel_name = config.PayAPI.CHANNEL_NAME
     payer = 'webee'
-    payee = 'test001'
+    payee = config.PAYEE
 
     amount = Decimal(request.values['amount'])
     payment_type = request.values['payment_type']
@@ -52,7 +51,10 @@ def pay():
     print("order_id: {0}".format(params['order_id']))
 
     data = pay_client.request_prepay(params)
-    return redirect(data['pay_url'])
+    if data['ret']:
+        return redirect(data['pay_url'])
+    flash('请求支付失败')
+    return redirect(url_for('.index'))
 
 
 @mod.route('/pay/guarantee_payment/confirm', methods=['POST'])
@@ -89,7 +91,7 @@ def refund():
 
 @mod.route('/withdraw', methods=['POST'])
 def withdraw():
-    user_id = 'test001'
+    user_id = config.PAYEE
 
     use_test_pay = request.values.get('use_test_pay')
     suggest_result = request.values['suggest_result']

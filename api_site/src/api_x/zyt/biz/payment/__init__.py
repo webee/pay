@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x.zyt.biz.commons import is_duplicated_notify
+from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
 
 from flask import redirect
 from api_x import db
@@ -9,10 +10,12 @@ from api_x.zyt.user_mapping import get_system_account_user_id, get_channel, get_
 from api_x.constant import TransactionState, SECURE_USER_NAME, PaymentTransactionState
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.vas.models import EventType
-from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, get_tx_by_sn, \
-    update_transaction_info, get_tx_by_id
+from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
 from api_x.zyt.biz.error import NonPositiveAmountError
+from api_x.zyt.biz.error import TransactionNotFoundError
+from api_x.zyt.biz.transaction.error import TransactionStateError
+from api_x.zyt.biz.models import UserRole
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from tools.mylog import get_logger
 
@@ -60,11 +63,11 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel, order_id,
 def _create_payment(payment_type, payer_id, payee_id, channel, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url):
-    comments = "在线支付-{0}:{1}|{2}".format(channel.name, product_name, order_id)
-    user_ids = [payer_id, payee_id]
+    comments = "在线支付-{0}|{1}".format(product_name, order_id)
+    user_ids = [(payer_id, UserRole.FROM), (payee_id, UserRole.TO)]
     if payment_type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-        user_ids.append(secure_user_id)
+        user_ids.append((secure_user_id, UserRole.GUARANTOR))
     tx_record = create_transaction(TransactionType.PAYMENT, amount, comments, user_ids)
 
     fields = {
@@ -157,8 +160,9 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
         channel = get_channel(payment_record.channel_id)
         if channel.name == 'lvye_huodong':
             user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
-            url = '{0}?user_id={1}&order_id={2}&amount={3}&status=money_locked'.\
-                format(payment_record.client_callback_url, user_mapping.user_id, payment_record.order_id, payment_record.amount)
+            url = '{0}?user_id={1}&order_id={2}&amount={3}&status=money_locked'. \
+                format(payment_record.client_callback_url, user_mapping.user_id, payment_record.order_id,
+                       payment_record.amount)
             return redirect(url)
         return redirect(payment_record.client_callback_url)
     return redirect('/')
@@ -202,6 +206,7 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
 
 def _try_notify_client(tx, payment_record):
     from api_x.utils.notify import notify_client
+
     url = payment_record.client_notify_url
 
     channel = get_channel(payment_record.channel_id)
@@ -225,6 +230,7 @@ def _try_notify_client(tx, payment_record):
     if not notify_client(url, params, methods=['put', 'post']):
         # other notify process.
         from api_x.task import tasks
+
         tasks.refund_notify.delay(url, params)
 
 
@@ -237,5 +243,11 @@ def _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
 
 def confirm_payment(channel, order_id):
     payment_record = get_payment_by_channel_order_id(channel.id, order_id)
-    if payment_record is not None and payment_record.type == PaymentType.GUARANTEE:
-        _confirm_payment(payment_record)
+    if payment_record is None or payment_record.type != PaymentType.GUARANTEE:
+        raise TransactionNotFoundError('tx channel={0}, order_id={1} not found.'.format(channel.name, order_id))
+
+    tx = get_tx_by_id(payment_record.tx_id)
+    if tx.state != PaymentTransactionState.SECURED:
+        raise TransactionStateError('payment state must be SECURED.')
+
+    _confirm_payment(payment_record)

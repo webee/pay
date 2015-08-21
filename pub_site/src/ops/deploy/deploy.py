@@ -3,12 +3,12 @@ import fabric.api as fab
 
 def get_config(env):
     import os
-    from ops import config
-    import pytoolbox.conf.config as conf
+    from ops.config import deploy as config
+    from pytoolbox.util import pmc_config
 
     env = env or 'dev'
     os.environ['ENV'] = env
-    conf.load(config, env=env)
+    pmc_config.register_config(config, env=env)
     return config
 
 

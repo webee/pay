@@ -9,6 +9,12 @@ class PaymentType:
     GUARANTEE = 'GUARANTEE'
 
 
+class UserRole:
+    FROM = 'FROM'
+    TO = 'TO'
+    GUARANTOR = 'GUARANTOR'
+
+
 class VirtualAccountSystem(db.Model):
     __tablename__ = 'virtual_account_system'
 
@@ -20,8 +26,8 @@ class VirtualAccountSystem(db.Model):
         return '<VirtualAccountSystem %r, %r>' % (self.id, self.name)
 
 
-class TransactionRecord(db.Model):
-    __tablename__ = 'transaction_record'
+class Transaction(db.Model):
+    __tablename__ = 'transaction'
 
     id = db.Column(db.BigInteger, primary_key=True)
     sn = db.Column(db.CHAR(32))
@@ -40,24 +46,44 @@ class TransactionRecord(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    @property
+    def record(self):
+        if self.type == TransactionType.PAYMENT:
+            return self.payment_record.one()
+        elif self.type == TransactionType.REFUND:
+            return self.refund_record.one()
+        elif self.type == TransactionType.WITHDRAW:
+            return self.withdraw_record.one()
+        elif self.type == TransactionType.TRANSFER:
+            return self.transfer_record.one()
+        elif self.type == TransactionType.PREPAID:
+            return self.prepaid_record.one()
+
     def __repr__(self):
-        return '<Transaction %r, %r, %r>' % (self.type, self.amount, self.state)
+        return '<Transaction %s, %s, %s, %s>' % (self.type, str(self.amount), self.state, str(self.created_on))
 
 
 class UserTransaction(db.Model):
     __tablename__ = 'user_transaction'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('account_user.id'), nullable=False)
-    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False)
-    tx_record = db.relationship('TransactionRecord', backref=db.backref('users', lazy='dynamic'))
+    user_id = db.Column(db.Integer, nullable=False)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
+    tx = db.relationship('Transaction', backref=db.backref('users', lazy='dynamic'), lazy='joined')
+
+    role = db.Column(db.Enum(UserRole.FROM, UserRole.GUARANTOR, UserRole.TO), nullable=False)
+
+    def __repr__(self):
+        return '<UserTransaction #%.6d %9s:%.5d, %.6d>' % (self.id, self.role, self.user_id, self.tx_id)
 
 
 class TransactionStateLog(db.Model):
     __tablename__ = 'transaction_state_log'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
+    tx = db.relationship('Transaction', backref=db.backref('state_logs', lazy='dynamic'), lazy='joined')
+
     prev_state = db.Column(db.VARCHAR(32), nullable=False)
     state = db.Column(db.VARCHAR(32), nullable=False)
 
@@ -65,12 +91,17 @@ class TransactionStateLog(db.Model):
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+    def __repr__(self):
+        return '<TransactionStateLog %r: %r->%r@%r>' % (self.tx_id, self.prev_state, self.state, self.event_id)
+
 
 class PaymentRecord(db.Model):
     __tablename__ = 'payment_record'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False, unique=True)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False, unique=True)
+    tx = db.relationship('Transaction', backref=db.backref('payment_record', lazy='dynamic'), lazy='joined')
+
     sn = db.Column(db.CHAR(32), nullable=False)
 
     type = db.Column(db.Enum(PaymentType.DIRECT, PaymentType.GUARANTEE), nullable=False)
@@ -94,12 +125,17 @@ class PaymentRecord(db.Model):
     # index
     __table_args__ = (db.UniqueConstraint('channel_id', 'order_id', name='channel_order_id_uniq_idx'),)
 
+    def __repr__(self):
+        return '<Payment %r>' % (self.id,)
+
 
 class RefundRecord(db.Model):
     __tablename__ = 'refund_record'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False, unique=True)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False, unique=True)
+    tx = db.relationship('Transaction', backref=db.backref('refund_record', lazy='dynamic'), lazy='joined')
+
     sn = db.Column(db.CHAR(32), nullable=False)
 
     payment_sn = db.Column(db.CHAR(32), nullable=False)
@@ -115,12 +151,17 @@ class RefundRecord(db.Model):
 
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    def __repr__(self):
+        return '<Refund %r>' % (self.id,)
+
 
 class PrepaidRecord(db.Model):
     __tablename__ = 'prepaid_record'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False, unique=True)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False, unique=True)
+    tx = db.relationship('Transaction', backref=db.backref('prepaid_record', lazy='dynamic'), lazy='joined')
+
     sn = db.Column(db.CHAR(32), nullable=False)
 
     to_user_id = db.Column(db.Integer, nullable=False)
@@ -129,14 +170,16 @@ class PrepaidRecord(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return '<Prepaid %r, %r>' % (self.user_id, self.amount)
+        return '<Prepaid %r>' % (self.user_id, self.amount)
 
 
 class WithdrawRecord(db.Model):
     __tablename__ = 'withdraw_record'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
+    tx = db.relationship('Transaction', backref=db.backref('withdraw_record', lazy='dynamic'), lazy='joined')
+
     sn = db.Column(db.CHAR(32), nullable=False)
 
     from_user_id = db.Column(db.Integer, nullable=False)
@@ -160,12 +203,17 @@ class WithdrawRecord(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    def __repr__(self):
+        return '<Withdraw %r>' % (self.id,)
+
 
 class TransferRecord(db.Model):
     __tablename__ = 'transfer_record'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction_record.id'), nullable=False)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
+    tx = db.relationship('Transaction', backref=db.backref('transfer_record', lazy='dynamic'), lazy='joined')
+
     sn = db.Column(db.CHAR(32), nullable=False)
 
     from_user_id = db.Column(db.Integer, nullable=False)
@@ -173,6 +221,9 @@ class TransferRecord(db.Model):
     amount = db.Column(db.Numeric(12, 2), nullable=False)
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<Transfer %r>' % (self.id,)
 
 
 # third party payments specific infos related to corresponding biz record.

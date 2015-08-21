@@ -36,7 +36,8 @@ def get_user_balance(user_id):
 
     if req.status_code == 200:
         data = req.json()
-        return data
+        print data
+        return data['data']
     return {'total': Decimal(0), 'available': Decimal(0), 'frozen': Decimal(0)}
 
 

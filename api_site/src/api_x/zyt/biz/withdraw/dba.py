@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from api_x.zyt.biz.models import WithdrawRecord
-from api_x.zyt.biz.transaction import get_tx_by_sn
+from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 
 
 def get_withdraw_by_sn(sn):

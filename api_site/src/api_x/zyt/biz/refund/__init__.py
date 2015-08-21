@@ -5,14 +5,15 @@ from decimal import InvalidOperation, Decimal
 from api_x import db
 from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.refund.dba import update_payment_refunded_amount
+from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id, get_channel
 from api_x.constant import SECURE_USER_NAME, PaymentTransactionState, RefundTransactionState
 from api_x.zyt.vas.user import get_user_cash_balance
+from api_x.zyt.biz.models import UserRole
 from pytoolbox.util.dbs import transactional, require_transaction_context
 from ...vas.models import EventType
-from ..transaction import create_transaction, transit_transaction_state, get_tx_by_sn, get_tx_by_id, \
-    update_transaction_info
+from ..transaction import create_transaction, transit_transaction_state, update_transaction_info
 from ..models import TransactionType, RefundRecord, PaymentType
 from .error import *
 from ..payment import get_payment_by_id, get_tx_payment_by_sn
@@ -165,12 +166,12 @@ def _create_refund(tx, payment_record, amount, client_notify_url):
     if amount + payment_record.refunded_amount > payment_record.amount:
         raise RefundAmountError(payment_record.amount, payment_record.refunded_amount, amount)
 
-    comments = "退款-交易流水号: [{0}]".format(payment_record.sn)
+    comments = "退款:{0}-支付流水号:[{1}]".format(payment_record.product_name, payment_record.sn)
 
-    user_ids = [payment_record.payer_id, payment_record.payee_id]
+    user_ids = [(payment_record.payer_id, UserRole.TO), (payment_record.payee_id, UserRole.FROM)]
     if payment_record.type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-        user_ids.append(secure_user_id)
+        user_ids.append((secure_user_id, UserRole.GUARANTOR))
     elif payment_record.type == PaymentType.DIRECT:
         # check balance.
         # 直付退款时收款方余额必须足够

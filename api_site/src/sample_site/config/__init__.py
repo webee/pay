@@ -11,6 +11,8 @@ class App:
     TESTING = False
     DEBUG = True
 
+PAYEE = 'test001'
+
 
 class PayAPI:
     # 测试用户

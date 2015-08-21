@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 from api_x.utils import response
 from api_x.zyt.biz import payment
 from api_x.constant import TransactionState
+from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 
 from flask import request, render_template, url_for, abort
 from api_x.zyt.user_mapping import get_or_create_account_user
-from api_x.zyt.biz.transaction import get_tx_by_sn
 from api_x.config import etc as config
 from api_x.constant import VirtualAccountSystemType
 from api_x.zyt.user_mapping import get_channel_by_name
@@ -93,4 +93,5 @@ def confirm_guarantee_payment():
         payment.confirm_payment(channel, order_id)
         return response.success()
     except Exception as e:
+        logger.exception(e)
         return response.bad_request(msg=e.message)

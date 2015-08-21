@@ -6,11 +6,13 @@ from api_x.zyt.vas.models import EventType
 from pytoolbox.util.dbs import transactional
 from api_x.zyt.biz.models import TransactionType, PrepaidRecord
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state
+from api_x.zyt.biz.models import UserRole
 
 
 @transactional
 def create_prepaid(user_id, amount, pay_type, comments):
-    transaction_record = create_transaction(TransactionType.PREPAID, amount, pay_type, comments, [user_id])
+    transaction_record = create_transaction(TransactionType.PREPAID, amount, pay_type, comments,
+                                            [(user_id, UserRole.TO)])
 
     prepaid_record = PrepaidRecord(transaction_id=transaction_record.id, sn=transaction_record.sn,
                                    user_id=user_id, amount=amount)

@@ -46,18 +46,26 @@ class Transaction(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    def __init__(self, *args, **kwargs):
+        super(Transaction, self).__init__(*args, **kwargs)
+        self.__record = None
+
     @property
     def record(self):
+        if self.__record:
+            return self.__record
         if self.type == TransactionType.PAYMENT:
-            return self.payment_record.one()
+            self.__record = self.payment_record.one()
         elif self.type == TransactionType.REFUND:
-            return self.refund_record.one()
+            self.__record = self.refund_record.one()
         elif self.type == TransactionType.WITHDRAW:
-            return self.withdraw_record.one()
+            self.__record = self.withdraw_record.one()
         elif self.type == TransactionType.TRANSFER:
-            return self.transfer_record.one()
+            self.__record = self.transfer_record.one()
         elif self.type == TransactionType.PREPAID:
-            return self.prepaid_record.one()
+            self.__record = self.prepaid_record.one()
+
+        return self.__record
 
     def __repr__(self):
         return '<Transaction %s, %s, %s, %s>' % (self.type, str(self.amount), self.state, str(self.created_on))

@@ -3,16 +3,15 @@
         <table width="952" cellspacing="0" cellpadding="0">
             <tr class="first">
                 <td width="70" height="40">发生时间</td>
-                <td width="100" height="40">交易流水号</td>
                 <td width="80">类型</td>
                 <td width="87">金额(元)</td>
                 <td width="120">状态</td>
                 <td width="270">交易名称</td>
+                <td width="100" height="40">交易流水号</td>
             </tr>
             {% for tx in txs %}
                 <tr>
                     <td width="70" height="60">{{ tx.created_on }}</td>
-                    <td width="100" height="40">{{ tx.sn }}</td>
                     <td>{{ tx.type }}</td>
                     {% if tx.is_failed %}
                         <td class="grey">{{ "+%.2f"|format(tx.amount) }}</td>
@@ -25,6 +24,7 @@
                     {% endif %}
                     <td>{{ tx.state }}</td>
                     <td>{{ tx.comments }}</td>
+                    <td width="100" height="40">{{ tx.sn }}</td>
                 </tr>
             {% endfor %}
         </table>

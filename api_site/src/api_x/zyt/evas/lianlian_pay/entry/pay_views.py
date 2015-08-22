@@ -22,7 +22,7 @@ def pay_result(source):
     data = request.verified_data
     partner_oid = data['oid_partner']
     order_no = data['no_order']
-    pay_result = data['result_pay']
+    result = data['result_pay']
     paybill_oid = data['oid_paybill']
 
     if not is_sending_to_me(partner_oid):
@@ -31,9 +31,9 @@ def pay_result(source):
     handle = get_pay_notify_handle(source, NotifyType.Pay.SYNC)
     if handle:
         # 是否成功，订单号，来源系统，来源系统订单号，数据
-        return handle(is_success_result(pay_result), order_no, NAME, paybill_oid, data)
+        return handle(is_success_result(result), order_no, NAME, paybill_oid, data)
 
-    if is_success_result(pay_result):
+    if is_success_result(result):
         return render_template('info.html', title='支付结果', msg='支付成功(来源未知)-订单号:{0}'.format(order_no))
     return render_template('info.html', title='支付结果', msg='支付失败(来源未知)-订单号:{0}'.format(order_no))
 
@@ -44,7 +44,7 @@ def pay_notify(source):
     data = request.verified_data
     partner_oid = data['oid_partner']
     order_no = data['no_order']
-    pay_result = data['result_pay']
+    result = data['result_pay']
     paybill_oid = data['oid_paybill']
 
     logger.info('pay notify {0}: {1}'.format(source, data))
@@ -59,7 +59,7 @@ def pay_notify(source):
         # 此通知的调用协议
         # 是否成功，订单号，来源系统，来源系统订单号，数据
         # TODO: 提出接口
-        handle(is_success_result(pay_result), order_no, NAME, paybill_oid, data)
+        handle(is_success_result(result), order_no, NAME, paybill_oid, data)
         return notification.succeed()
     except Exception as e:
         logger.exception(e)

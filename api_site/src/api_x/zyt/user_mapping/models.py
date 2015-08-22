@@ -17,26 +17,10 @@ class UserDomain(db.Model):
         return 'UserDomain<%r>' % (self.name,)
 
 
-class Channel(db.Model):
-    __tablename__ = 'channel'
-
-    id = db.Column(db.BigInteger, primary_key=True)
-    user_domain_id = db.Column(db.Integer, db.ForeignKey('user_domain.id'), nullable=False)
-    user_domain = db.relationship('UserDomain', backref=db.backref('channels', lazy='dynamic'))
-
-    name = db.Column(db.VARCHAR(32), nullable=False, unique=True)
-    desc = db.Column(db.VARCHAR(64), nullable=False, default='')
-
-    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-    def __repr__(self):
-        return 'Channel<%r>' % (self.name,)
-
-
 class UserMapping(db.Model):
     __tablename__ = 'user_mapping'
 
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_domain_id = db.Column(db.Integer, db.ForeignKey('user_domain.id'), nullable=False)
     user_domain = db.relationship('UserDomain', backref=db.backref('user_maps', lazy='dynamic'))
     user_id = db.Column(db.VARCHAR(32), nullable=False)
@@ -52,3 +36,53 @@ class UserMapping(db.Model):
 
     def __repr__(self):
         return 'UserMapping<%r, %r>' % (self.user_id, self.account_user_id)
+
+
+class Channel(db.Model):
+    __tablename__ = 'channel'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_domain_id = db.Column(db.Integer, db.ForeignKey('user_domain.id'), nullable=False)
+    user_domain = db.relationship('UserDomain', backref=db.backref('channels', lazy='dynamic'))
+
+    # channel name唯一对应一个user_domain
+    name = db.Column(db.VARCHAR(32), nullable=False, unique=True)
+
+    md5_key = db.Column(db.VARCHAR(64))
+    public_key = db.Column(db.TEXT)
+    desc = db.Column(db.VARCHAR(64), nullable=False, default='')
+
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __init__(self, *args, **kwargs):
+        super(Channel, self).__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return 'Channel<%r>' % (self.name,)
+
+
+class ApiEntry(db.Model):
+    __tablename__ = 'api_entry'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.VARCHAR(64), nullable=False, unique=True)
+    desc = db.Column(db.VARCHAR(128), nullable=False)
+
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class ChannelPermission(db.Model):
+    __tablename__ = 'channel_permission'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    channel_id = db.Column(db.Integer, db.ForeignKey('channel.id'), nullable=False)
+    channel = db.relationship('Channel', backref=db.backref('perms', lazy='dynamic'), lazy='joined')
+
+    api_entry_id = db.Column(db.Integer, db.ForeignKey('api_entry.id'), nullable=False)
+    api_entry = db.relationship('ApiEntry', backref=db.backref('channel_perms', lazy='dynamic'), lazy='joined')
+
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    __table_args__ = (db.UniqueConstraint('channel_id', 'api_entry_id', name='channel_api_entry_uniq_idx'),)

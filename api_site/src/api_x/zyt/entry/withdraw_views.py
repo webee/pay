@@ -14,6 +14,7 @@ logger = get_logger(__name__)
 @mod.route('/withdraw', methods=['POST'])
 def apply_to_withdraw():
     data = request.values
+    # TODO: 添加渠道，限制任意渠道提现
     from_user_id = data['from_user_id']
     # bankcard info
     flag_card = data['flag_card']

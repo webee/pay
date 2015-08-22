@@ -5,10 +5,9 @@ from api_x.zyt.biz import payment
 from api_x.constant import TransactionState
 from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 
-from flask import request, render_template, url_for, abort
+from flask import request, render_template, url_for, abort, redirect
 from api_x.zyt.user_mapping import get_or_create_account_user
 from api_x.config import etc as config
-from api_x.constant import VirtualAccountSystemType
 from api_x.zyt.user_mapping import get_channel_by_name
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
@@ -60,8 +59,13 @@ def cashier_desk(sn):
     if tx is None:
         abort(404)
     if tx.state != TransactionState.CREATED:
-        return render_template("info.html", msg="该订单已支付完成")
-    return render_template("cashier_desk.html", root_url=config.HOST_URL, tx=tx, vas=VirtualAccountSystemType)
+        return render_template("info.html", msg="该订单已支付")
+
+    if len(config.Biz.ACTIVATED_EVAS) == 1:
+        # 只有一种支付方式，则直接跳转到支付页面
+        vas_name = config.Biz.ACTIVATED_EVAS[0]
+        return redirect(url_for('.pay', sn=sn, vas_name=vas_name))
+    return render_template("cashier_desk.html", root_url=config.HOST_URL, tx=tx, vases=config.Biz.ACTIVATED_EVAS)
 
 
 @mod.route("/pay/<sn>/<vas_name>", methods=["GET"])
@@ -73,7 +77,11 @@ def pay(sn, vas_name):
     if tx is None:
         response.not_found(msg='tx sn=[{0}] not fund.'.format(sn))
     if tx.state != TransactionState.CREATED:
-        return render_template("info.html", msg="该订单已支付完成")
+        return render_template("info.html", msg="该订单已支付")
+
+    if vas_name not in config.Biz.ACTIVATED_EVAS:
+        # 不支持此支付方式
+        abort(404)
 
     return payment.pay(vas_name, tx)
 

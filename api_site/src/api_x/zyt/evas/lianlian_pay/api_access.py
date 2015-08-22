@@ -3,13 +3,13 @@ from __future__ import unicode_literals
 
 import json
 import requests
-from .sign import sign, verify
 from .error import *
+from . import signer
 
 
 def sign_params(params):
     params = {unicode(k): unicode(v) for k, v in params.items()}
-    params['sign'] = sign(params, params['sign_type'])
+    params['sign'] = signer.sign(params, params['sign_type'])
 
     return params
 
@@ -33,7 +33,7 @@ def parse_and_verify_request_data(values, raw_data):
 
 
 def _verify_sign(data):
-    return 'sign_type' in data and verify(data, data['sign_type'])
+    return 'sign_type' in data and signer.verify(data, data['sign_type'])
 
 
 def _parse_data(raw_data):
@@ -49,7 +49,7 @@ def _parse_response_data(raw_data):
     except Exception, e:
         raise ApiError(str(e))
 
-    if 'sign_type' not in parsed_data or not verify(parsed_data, parsed_data['sign_type']):
+    if 'sign_type' not in parsed_data or not signer.verify(parsed_data, parsed_data['sign_type']):
         InvalidSignError(parsed_data.get('sign_type'), parsed_data)
 
     return parsed_data

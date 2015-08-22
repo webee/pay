@@ -72,12 +72,17 @@ def create_app(env='dev', deploy=False):
 
     app = Flask(__name__)
 
+    # 最先初始化配置
     init_config(app, env)
+
     register_mods(app)
     init_extensions(app)
     custom_flask(app)
 
     from api_x.zyt.biz import init_register_notify_handles
     init_register_notify_handles()
+
+    from api_x.zyt import evas
+    evas.init()
 
     return app

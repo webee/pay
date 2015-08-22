@@ -7,9 +7,12 @@ from .pay import pay as _pay
 from .refund import refund as _refund
 from .pay_to_bankcard import pay_to_bankcard as _pay_to_bankcard
 from .bankcard import query_bin as _query_bin
+from pytoolbox.util.sign import Signer
 
 
 NAME = 'LIANLIAN_PAY'
+
+signer = Signer()
 
 
 def pay(source, user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount):

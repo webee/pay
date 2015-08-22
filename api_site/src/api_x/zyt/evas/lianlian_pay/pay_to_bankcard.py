@@ -6,6 +6,7 @@ from .util import now_to_str
 from api_x.config import lianlian_pay
 from ..error import EvasError
 from api_x.constant import BankcardType
+from pytoolbox.util.sign import SignType
 
 
 def pay_to_bankcard(no_order, money_order, info_order, notify_url,
@@ -17,7 +18,7 @@ def pay_to_bankcard(no_order, money_order, info_order, notify_url,
     params = {
         'platform': lianlian_pay.PLATFORM,
         'oid_partner': lianlian_pay.OID_PARTNER,
-        'sign_type': lianlian_pay.SignType.RSA,
+        'sign_type': SignType.RSA,
         'no_order': no_order,
         'dt_order': now_to_str(),
         'money_order': money_order,

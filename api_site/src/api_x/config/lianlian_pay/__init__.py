@@ -6,11 +6,6 @@ OID_PARTNER = '201507021000395502'
 ROOT_URL = "http://pay.lvye.com/api"
 
 
-class SignType:
-    MD5 = 'MD5'
-    RSA = 'RSA'
-
-
 MD5_KEY = read_string('conf/keys/md5_key.txt')
 YT_PUB_KEY = read_string('conf/keys/yt_pub_key.txt')
 LVYE_PRI_KEY = read_string('conf/keys/lvye_pri_key.txt')

@@ -6,7 +6,7 @@ from test_pay_site import config
 from . import main_mod as mod
 import requests
 from test_pay_site.main.commons import generate_sn
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 
 
 logger = get_logger(__name__)

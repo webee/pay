@@ -5,7 +5,7 @@ from flask import request, jsonify
 from . import main_mod as mod
 import requests
 from .commons import generate_sn
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 import time
 import thread
 

@@ -7,7 +7,7 @@ from . import sample_mod as mod
 from sample_site import config
 from sample_site.utils import generate_order_id
 from sample_site import pay_client
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 
 
 logger = get_logger(__name__)

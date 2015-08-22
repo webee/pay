@@ -5,7 +5,7 @@ from flask import request, jsonify
 from . import test_pay_entry_mod as mod
 from api_x.zyt.evas.test_pay.notify import get_pay_to_bankcard_notify_handle
 from api_x.zyt.evas.test_pay import NAME
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 
 
 logger = get_logger(__name__)

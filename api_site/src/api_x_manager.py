@@ -31,7 +31,7 @@ def init_db(recreate):
     from api_x.data import init_data
 
     def recreate_db():
-        from tools.log import info
+        from tools.console_log import info
 
         info('recreating database ...')
         local('mysql -u root -p < migration/init_db.sql')

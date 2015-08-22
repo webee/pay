@@ -3,7 +3,7 @@ import os
 import requests
 from sample_site import config
 from decimal import Decimal
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 
 
 logger = get_logger(__name__)

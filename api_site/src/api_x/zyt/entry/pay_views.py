@@ -11,7 +11,7 @@ from api_x.config import etc as config
 from api_x.constant import VirtualAccountSystemType
 from api_x.zyt.user_mapping import get_channel_by_name
 from . import biz_entry_mod as mod
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 
 
 logger = get_logger(__name__)

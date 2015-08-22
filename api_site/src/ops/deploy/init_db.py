@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from fabric.api import local
-from tools.log import *
+from tools.console_log import *
 from ops.config import db as config
 import pytoolbox.conf.config as conf
 

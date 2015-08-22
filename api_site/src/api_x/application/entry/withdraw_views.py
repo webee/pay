@@ -7,7 +7,7 @@ from flask import request
 from .. import dba
 from ..withdraw import apply_to_withdraw, calc_user_withdraw_fee, log_user_withdraw
 from . import application_mod as mod
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 
 
 logger = get_logger(__name__)

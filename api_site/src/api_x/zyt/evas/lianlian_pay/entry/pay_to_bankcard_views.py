@@ -9,7 +9,7 @@ from api_x.zyt.evas.test_pay import NAME
 from .commons import parse_and_verify
 from . import notification
 from ..pay_to_bankcard import is_success_result, is_failed_result
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 
 
 logger = get_logger(__name__)

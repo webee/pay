@@ -16,7 +16,7 @@ from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.biz.transaction import update_transaction_info
 from api_x.zyt.biz.error import *
 from pytoolbox.util.dbs import transactional, require_transaction_context
-from tools.mylog import get_logger
+from pytoolbox.util.log import get_logger
 
 
 logger = get_logger(__name__)

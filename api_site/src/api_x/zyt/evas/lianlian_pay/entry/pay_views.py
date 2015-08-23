@@ -24,6 +24,7 @@ def pay_result(source):
     order_no = data['no_order']
     result = data['result_pay']
     paybill_oid = data['oid_paybill']
+    # 这里一定是成功的
 
     if not is_sending_to_me(partner_oid):
         return render_template('info.html', title='支付结果', msg='支付异常-订单号:{0}'.format(order_no))

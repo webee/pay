@@ -16,6 +16,6 @@ def parse_and_verify(f):
             verified_data = parse_and_verify_request_data(request.values, request.data)
             request.__dict__['verified_data'] = verified_data
         except (DictParsingError, InvalidSignError):
-            return notification.is_invalid()
+            return notification.wrong()
         return f(*args, **kwargs)
     return wrapper

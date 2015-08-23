@@ -21,7 +21,7 @@ logger = get_logger(__name__)
 @verify_request('prepay')
 def prepay():
     data = request.values
-    channel_name = data['channel_name']
+    channel = request.channel
     payer_user_id = data['payer_user_id']
     payee_user_id = data['payee_user_id']
     order_id = data['order_id']
@@ -33,17 +33,15 @@ def prepay():
     client_notify_url = data['client_notify_url']
     payment_type = data['payment_type']
 
-    # TODO: check parameters
-    # payment_type in PaymentTypes.
-    channel = get_channel_by_name(channel_name)
-    if channel is None:
-        return response.fail(msg='channel not exits: [{0}]'.format(channel_name))
+    # check
+    if payment_type not in ['DIRECT', 'SECURED']:
+        return response.fail(msg="payment_type [{0}] not supported.".format(payment_type))
 
     payer_id = get_or_create_account_user(channel.user_domain_id, payer_user_id)
     payee_id = get_or_create_account_user(channel.user_domain_id, payee_user_id)
 
     try:
-        payment_record = payment.find_or_create_payment(payment_type, payer_id, payee_id, channel, order_id,
+        payment_record = payment.find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
                                                         product_name, product_category, product_desc, amount,
                                                         client_callback_url, client_notify_url)
         pay_url = config.HOST_URL + url_for('biz_entry.cashier_desk', sn=payment_record.sn)
@@ -86,6 +84,16 @@ def pay(sn, vas_name):
         abort(404)
 
     return payment.pay(vas_name, tx)
+
+
+@mod.route("/pay/result/<sn>/<vas_name>", methods=["GET"])
+def pay_result(sn, vas_name):
+    data = request.data
+    code = data['code']
+    vas_sn = data['vas_sn']
+
+    msg = "支付成功" if code == 0 else "支付失败"
+    return render_template('pay_result.html', title='支付结果', sn=sn, vas_name=vas_name, vas_sn=vas_sn, msg=msg)
 
 
 @mod.route('/pay/guarantee_payment/confirm', methods=['POST'])

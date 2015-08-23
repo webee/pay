@@ -16,16 +16,12 @@ logger = get_logger(__name__)
 @verify_request('refund')
 def apply_to_refund():
     data = request.values
-    channel_name = data['channel_name']
+    channel = request.channel
     order_id = data['order_id']
     amount = data['amount']
     client_notify_url = data['notify_url']
 
     logger.info('receive refund: {0}'.format({k: v for k, v in data.items()}))
-    channel = get_channel_by_name(channel_name)
-    if channel is None:
-        return response.fail(msg='channel not exits: [{0}]'.format(channel_name))
-
     try:
         refund_record = refund.apply_to_refund(channel, order_id, amount, client_notify_url, data)
         return response.success(sn=refund_record.sn)

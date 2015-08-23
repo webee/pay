@@ -6,7 +6,8 @@ from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
 from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
-from api_x.zyt.user_mapping import get_system_account_user_id, get_channel, get_user_map_by_account_user_id
+from api_x.zyt.user_mapping import get_system_account_user_id, get_channel, get_user_map_by_account_user_id, \
+    get_channel_by_name
 from api_x.constant import TransactionState, SECURE_USER_NAME, PaymentTransactionState
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.vas.models import EventType
@@ -18,12 +19,13 @@ from api_x.zyt.biz.transaction.error import TransactionStateError
 from api_x.zyt.biz.models import UserRole
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
+from api_x.utils import response
 
 
 logger = get_logger(__name__)
 
 
-def find_or_create_payment(payment_type, payer_id, payee_id, channel, order_id,
+def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
                            product_name, product_category, product_desc, amount,
                            client_callback_url, client_notify_url):
     """
@@ -35,7 +37,7 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel, order_id,
         if amount <= 0:
             raise NonPositiveAmountError(amount)
 
-        payment_record = _create_payment(payment_type, payer_id, payee_id, channel, order_id,
+        payment_record = _create_payment(channel, payment_type, payer_id, payee_id, order_id,
                                          product_name, product_category, product_desc, amount,
                                          client_callback_url, client_notify_url)
     else:
@@ -60,7 +62,7 @@ def find_or_create_payment(payment_type, payer_id, payee_id, channel, order_id,
 
 
 @transactional
-def _create_payment(payment_type, payer_id, payee_id, channel, order_id,
+def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url):
     comments = "在线支付-{0}:{0}|{1}".format(channel.desc, product_name, order_id)
@@ -68,14 +70,13 @@ def _create_payment(payment_type, payer_id, payee_id, channel, order_id,
     if payment_type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
         user_ids.append((secure_user_id, UserRole.GUARANTOR))
-    tx_record = create_transaction(TransactionType.PAYMENT, amount, comments, user_ids)
+    tx_record = create_transaction(channel.name, TransactionType.PAYMENT, amount, comments, user_ids)
 
     fields = {
         'tx_id': tx_record.id,
         'sn': tx_record.sn,
         'payer_id': payer_id,
         'payee_id': payee_id,
-        'channel_id': channel.id,
         'order_id': order_id,
         'product_name': product_name,
         'product_category': product_category,
@@ -153,19 +154,20 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
+    from flask import url_for
     tx, payment_record = get_tx_payment_by_sn(sn)
+    client_callback_url = payment_record.client_callback_url
 
-    if payment_record.client_callback_url:
-        # FIXME: 为了兼容huodong的secured pay. 修改callback_url.
-        channel = get_channel(payment_record.channel_id)
-        if channel.name == 'lvye_huodong':
-            user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
-            url = '{0}?user_id={1}&order_id={2}&amount={3}&status=money_locked'. \
-                format(payment_record.client_callback_url, user_mapping.user_id, payment_record.order_id,
-                       payment_record.amount)
-            return redirect(url)
-        return redirect(payment_record.client_callback_url)
-    return redirect('/')
+    if client_callback_url and is_success:
+        channel = get_channel_by_name(tx.channel_name)
+        user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
+        user_id = user_mapping.user_id
+        params = {'code': 0, 'user_id': user_id, 'sn': payment_record.sn,
+                  'channel_name': channel.name,
+                  'order_id': payment_record.order_id, 'amount': payment_record.amount}
+        return response.submit_form(client_callback_url, params)
+    code = 0 if is_success else 1
+    return redirect(url_for('biz_entry.pay_result', sn=sn, vas_name=vas_name, code=code, vas_sn=vas_sn))
 
 
 def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
@@ -205,29 +207,25 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
 
 
 def _try_notify_client(tx, payment_record):
-    from api_x.utils.notify import notify_client
+    from api_x.utils.notify import sign_and_notify_client
 
     url = payment_record.client_notify_url
 
-    channel = get_channel(payment_record.channel_id)
+    channel = get_channel_by_name(tx.channel_name)
     user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
     user_id = user_mapping.user_id
 
-    # FIXME: 这里为了兼容之前活动平台的client_id=1, status='money_locked', methods加上'put'
+    params = None
     if tx.state in [PaymentTransactionState.SECURED, PaymentTransactionState.SUCCESS]:
-        params = {'code': 0, 'client_id': '1', 'user_id': user_id, 'status': 'money_locked',
+        params = {'code': 0, 'user_id': user_id, 'sn': payment_record.sn,
                   'channel_name': channel.name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
     elif tx.state == PaymentTransactionState.FAILED:
-        params = {'code': 1, 'client_id': '1', 'user_id': user_id, 'status': 'money_locked',
+        params = {'code': 1, 'user_id': user_id, 'sn': payment_record.sn,
                   'channel_name': channel.name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
 
-    # FIXME: 为了兼容huodong的secured pay. 修改callback_url.
-    if channel.name == 'lvye_huodong' and url:
-        url = '{0}?user_id={1}&order_id={2}&amount={3}&status=money_locked'. \
-            format(payment_record.client_callback_url, user_id, payment_record.order_id, payment_record.amount)
-    if not notify_client(url, params, methods=['put', 'post']):
+    if params and not sign_and_notify_client(url, channel.name, params):
         # other notify process.
         from api_x.task import tasks
 

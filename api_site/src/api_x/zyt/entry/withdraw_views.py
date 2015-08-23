@@ -16,8 +16,7 @@ logger = get_logger(__name__)
 @verify_request('withdraw')
 def apply_to_withdraw():
     data = request.values
-    # TODO: 添加渠道，限制任意渠道提现
-    channel_name = data['channel_name']
+    channel = request.channel
     from_user_id = data['from_user_id']
     # bankcard info
     flag_card = data['flag_card']
@@ -45,7 +44,7 @@ def apply_to_withdraw():
         return response.bad_request(msg=e.message)
 
     try:
-        withdraw_record = withdraw.apply_to_withdraw(from_user_id,
+        withdraw_record = withdraw.apply_to_withdraw(channel, from_user_id,
                                                      flag_card, card_type, card_no, acct_name, bank_code, province_code,
                                                      city_code, bank_name, brabank_name, prcptcd,
                                                      amount_value, fee_value, client_notify_url, data)

@@ -2,10 +2,17 @@
 from __future__ import unicode_literals
 
 import requests
+from pytoolbox.util.sign import SignType
 from pytoolbox.util.log import get_logger
+from api_x.zyt.user_mapping.auth import add_sign
 
 
 logger = get_logger(__name__)
+
+
+def sign_and_notify_client(url, channel_name, params, sign_type=SignType.RSA, methods=['post']):
+    params = add_sign(channel_name, params, sign_type)
+    return notify_client(url, params, methods)
 
 
 def notify_client(url, params, methods=['post']):

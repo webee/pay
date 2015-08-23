@@ -92,20 +92,18 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
 
 
 def _try_notify_client(tx, refund_record):
-    from api_x.utils.notify import notify_client
+    from api_x.utils.notify import sign_and_notify_client
     url = refund_record.client_notify_url
 
-    channel = get_channel(refund_record.channel_id)
+    channel = get_channel(tx.channel_name)
 
-    # FIXME: 这里为了兼容之前活动平台的client_id=1
+    params = None
     if tx.state == RefundTransactionState.SUCCESS:
-        params = {'code': 0, 'client_id': '1', 'channel_name': channel.name,
-                  'order_id': refund_record.order_id, 'amount': refund_record.amount}
+        params = {'code': 0, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
     elif tx.state == RefundTransactionState.FAILED:
-        params = {'code': 1, 'client_id': '1', 'channel_name': channel.name,
-                  'order_id': refund_record.order_id, 'amount': refund_record.amount}
+        params = {'code': 1, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
 
-    if not notify_client(url, params):
+    if params and not sign_and_notify_client(url, channel.name, params):
         # other notify process.
         from api_x.task import tasks
         tasks.refund_notify.delay(url, params)
@@ -178,7 +176,7 @@ def _create_refund(channel, tx, payment_record, amount, client_notify_url):
         balance = get_user_cash_balance(payment_record.payee_id)
         if amount > balance.available:
             raise RefundBalanceError(amount, balance.available)
-    tx_record = create_transaction(TransactionType.REFUND, amount, comments, user_ids)
+    tx_record = create_transaction(channel.name, TransactionType.REFUND, amount, comments, user_ids)
 
     fields = {
         'tx_id': tx_record.id,
@@ -187,7 +185,6 @@ def _create_refund(channel, tx, payment_record, amount, client_notify_url):
         'payment_state': cur_payment_state,
         'payer_id': payment_record.payer_id,
         'payee_id': payment_record.payee_id,
-        'channel_id': payment_record.channel_id,
         'order_id': payment_record.order_id,
         'amount': amount,
         'client_notify_url': client_notify_url

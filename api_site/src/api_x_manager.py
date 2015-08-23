@@ -92,18 +92,7 @@ def test_get_user_balance(user_id):
 @manager.option('-a', '--amount', type=Decimal, dest="amount", required=True)
 @manager.option('-f', '--fail', action="store_true", dest="failed", default=False)
 def test_prepaid(user_id, amount, failed):
-    from api_x.zyt.biz.vas import get_vas_by_name
-    from api_x.zyt.biz import prepaid
-
-    vas = get_vas_by_name('test_pay')
-    prepaid_record = prepaid.create_prepaid(user_id, amount, vas.name, '测试充值')
-
-    if failed:
-        # es test pay failed notify.
-        prepaid.fail_prepaid(prepaid_record)
-    else:
-        # es test pay success notify.
-        prepaid.succeed_prepaid(vas.id, prepaid_record)
+    pass
 
 
 @manager.option('-i', '--id', type=long, dest="user_id", required=True)

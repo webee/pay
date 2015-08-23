@@ -13,17 +13,24 @@ def verify_request(entry_name):
         def wrapper(*args, **kwargs):
             try:
                 data = request.values
+                # check perm
                 channel_name = data['channel_name']
                 channel = get_channel_by_name(channel_name)
+                if channel is None:
+                    return response.fail(msg='channel not exits: [{0}]'.format(channel_name))
+
                 if not channel.has_entry_perm(entry_name):
                     return response.refused()
 
+                # verify sign
                 sign_type = data['sign_type']
                 signer = Signer('key', 'sign', channel.md5_key, config.LVYE_PRI_KEY, channel.public_key)
                 if not signer.verify(data, sign_type):
                     return response.refused()
             except Exception as e:
                 return response.bad_request(msg=e.message)
+
+            request.__dict__['channel'] = channel
             return f(*args, **kwargs)
         return wrapper
     return do_verify_request

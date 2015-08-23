@@ -33,6 +33,8 @@ class Transaction(db.Model):
     sn = db.Column(db.CHAR(32))
     type = db.Column(db.Enum(TransactionType.PAYMENT, TransactionType.REFUND, TransactionType.WITHDRAW,
                              TransactionType.TRANSFER, TransactionType.PREPAID), nullable=False)
+
+    channel_name = db.Column(db.VARCHAR(32), nullable=False)
     # 涉及到的总金额
     # 支付金额，退款金额，提现金额(+手续费)
     amount = db.Column(db.Numeric(12, 2), nullable=False)
@@ -117,7 +119,6 @@ class PaymentRecord(db.Model):
 
     payer_id = db.Column(db.Integer, nullable=False)
     payee_id = db.Column(db.Integer, nullable=False)
-    channel_id = db.Column(db.Integer, nullable=False)
     order_id = db.Column(db.VARCHAR(64), nullable=False)
     product_name = db.Column(db.VARCHAR(150), nullable=False)
     product_category = db.Column(db.VARCHAR(50), nullable=False)
@@ -129,9 +130,6 @@ class PaymentRecord(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    # index
-    __table_args__ = (db.UniqueConstraint('channel_id', 'order_id', name='channel_order_id_uniq_idx'),)
 
     def __repr__(self):
         return '<Payment %r>' % (self.id,)
@@ -150,7 +148,6 @@ class RefundRecord(db.Model):
     payment_state = db.Column(db.VARCHAR(32), nullable=False)
     payer_id = db.Column(db.Integer, nullable=False)
     payee_id = db.Column(db.Integer, nullable=False)
-    channel_id = db.Column(db.Integer, nullable=False)
     order_id = db.Column(db.VARCHAR(64), nullable=False)
 
     amount = db.Column(db.Numeric(12, 2), nullable=False)

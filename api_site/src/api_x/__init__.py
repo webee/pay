@@ -29,9 +29,6 @@ def register_mods(app):
     from api_x.application.entry import application_mod
     app_register_blueprint(app, application_mod, url_prefix="/application")
 
-    from api_x.compatible_entry import compatible_entry_mod
-    app_register_blueprint(app, compatible_entry_mod, url_prefix='')
-
 
 def init_config(app, env):
     from api_x import config

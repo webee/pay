@@ -11,9 +11,10 @@ from .error import TransactionError, TransactionNotFoundError, TransactionStateE
 
 
 @transactional
-def create_transaction(tp, amount, comments, user_id_roles, vas_name=None):
+def create_transaction(channel_name, tp, amount, comments, user_id_roles, vas_name=None):
+    # [(user_id, role), ...]
     sn = generate_sn(user_id_roles[0][0])
-    tx = Transaction(sn=sn, amount=amount, state=TransactionState.CREATED, type=tp, comments=comments)
+    tx = Transaction(sn=sn, channel_name=channel_name, amount=amount, state=TransactionState.CREATED, type=tp, comments=comments)
     if vas_name is not None:
         tx.vas_name = vas_name
     for user_id, role in user_id_roles:

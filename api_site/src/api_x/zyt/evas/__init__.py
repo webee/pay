@@ -6,4 +6,4 @@ def init():
     from lianlian_pay import signer
     from api_x.config import lianlian_pay
 
-    signer.init('key', 'sign', lianlian_pay.MD5_KEY, lianlian_pay.LVYE_PRI_KEY, lianlian_pay.YT_PUB_KEY)
+    signer.init(lianlian_pay.MD5_KEY, lianlian_pay.LVYE_PRI_KEY, lianlian_pay.YT_PUB_KEY)

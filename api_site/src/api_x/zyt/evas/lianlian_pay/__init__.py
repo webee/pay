@@ -8,7 +8,7 @@ from pytoolbox.util.sign import Signer
 
 NAME = 'LIANLIAN_PAY'
 
-signer = Signer()
+signer = Signer('key', 'sign')
 
 
 def pay(source, user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount):

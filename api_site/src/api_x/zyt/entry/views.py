@@ -4,12 +4,16 @@ from __future__ import unicode_literals
 from flask import request
 from api_x.utils import response
 from . import biz_entry_mod as mod
+from api_x.utils.entry_auth import verify_request
 from api_x.zyt.biz.transaction import query_user_transactions
 
 
 @mod.route('/account_users/<int:account_user_id>/transactions', methods=['GET'])
+@verify_request('list_transactions')
 def list_transactions(account_user_id):
     data = request.args
+    # TODO: 限制渠道
+    channel_name = data['channel_name']
     role = data.get('role')
     page_no = int(data.get('page_no', 1))
     page_size = int(data.get('page_size', 20))

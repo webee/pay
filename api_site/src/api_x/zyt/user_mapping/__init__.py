@@ -1,7 +1,7 @@
 # coding=utf-8
 from api_x import db
 from api_x.zyt.vas.user import create_user
-from .models import UserDomain, Channel, UserMapping
+from .models import UserDomain, Channel, UserMapping, ChannelPermission, ApiEntry
 from pytoolbox.util.dbs import transactional
 
 

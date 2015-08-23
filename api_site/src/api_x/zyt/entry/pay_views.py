@@ -11,13 +11,15 @@ from api_x.config import etc as config
 from api_x.zyt.user_mapping import get_channel_by_name
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
+from api_x.utils.entry_auth import verify_request
 
 
 logger = get_logger(__name__)
 
 
-@mod.route('/pre_pay', methods=['POST'])
-def pre_pay():
+@mod.route('/prepay', methods=['POST'])
+@verify_request('prepay')
+def prepay():
     data = request.values
     channel_name = data['channel_name']
     payer_user_id = data['payer_user_id']
@@ -87,6 +89,7 @@ def pay(sn, vas_name):
 
 
 @mod.route('/pay/guarantee_payment/confirm', methods=['POST'])
+@verify_request('confirm_guarantee_payment')
 def confirm_guarantee_payment():
     from api_x.utils import response
     data = request.values

@@ -1,4 +1,5 @@
 # coding=utf-8
+from pytoolbox.util.pmc_config import read_string
 
 
 class App:
@@ -23,6 +24,11 @@ HOST_URL = 'http://pay.lvye.com/api'
 
 
 class Biz:
+    # 是否全面开放
+    IS_ALL_OPENED = False
     TX_SN_PREFIX = '__'
 
     ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY']
+
+
+LVYE_PRI_KEY = read_string('conf/keys/lvye_pri_key.txt')

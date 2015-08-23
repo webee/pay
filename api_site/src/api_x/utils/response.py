@@ -15,7 +15,7 @@ def fail(code=1, msg='fail', **kwargs):
     return jsonify(ret=False, code=code, msg=msg, **kwargs)
 
 
-def bad_request(code=1, msg='bad request', **kwargs):
+def bad_request(code=400, msg='bad request', **kwargs):
     return fail(code, msg, **kwargs), 400
 
 
@@ -25,3 +25,7 @@ def not_found(code=404, msg='not found.', **kwargs):
 
 def accepted(**kwargs):
     return success(**kwargs), 202
+
+
+def refused(code=403, msg='refused', **kwargs):
+    return fail(code, msg, **kwargs), 403

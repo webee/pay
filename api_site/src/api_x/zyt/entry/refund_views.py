@@ -6,12 +6,14 @@ from api_x.zyt.user_mapping import get_channel_by_name
 from flask import request
 from . import biz_entry_mod as mod
 from api_x.zyt.biz import refund
+from api_x.utils.entry_auth import verify_request
 from pytoolbox.util.log import get_logger
 
 logger = get_logger(__name__)
 
 
 @mod.route('/refund', methods=['POST'])
+@verify_request('refund')
 def apply_to_refund():
     data = request.values
     channel_name = data['channel_name']

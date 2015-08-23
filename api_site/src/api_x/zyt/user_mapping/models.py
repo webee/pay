@@ -26,6 +26,9 @@ class UserMapping(db.Model):
     user_id = db.Column(db.VARCHAR(32), nullable=False)
     account_user_id = db.Column(db.Integer, nullable=False, unique=True)
 
+    # 是否已开通
+    is_opened = db.Column(db.BOOLEAN, nullable=False, default=False)
+
     desc = db.Column(db.VARCHAR(64), default='')
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -56,6 +59,10 @@ class Channel(db.Model):
 
     def __init__(self, *args, **kwargs):
         super(Channel, self).__init__(*args, **kwargs)
+
+    def has_entry_perm(self, api_entry_name):
+        from sqlalchemy.orm import lazyload
+        return self.perms.options(lazyload('api_entry')).filter(ApiEntry.name == api_entry_name).count() > 0
 
     def __repr__(self):
         return 'Channel<%r>' % (self.name,)

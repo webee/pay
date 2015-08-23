@@ -6,15 +6,18 @@ from api_x.utils import response
 from flask import request
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
+from api_x.utils.entry_auth import verify_request
 from api_x.zyt.biz import withdraw
 
 logger = get_logger(__name__)
 
 
 @mod.route('/withdraw', methods=['POST'])
+@verify_request('withdraw')
 def apply_to_withdraw():
     data = request.values
     # TODO: 添加渠道，限制任意渠道提现
+    channel_name = data['channel_name']
     from_user_id = data['from_user_id']
     # bankcard info
     flag_card = data['flag_card']

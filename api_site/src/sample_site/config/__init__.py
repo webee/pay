@@ -22,7 +22,7 @@ class PayAPI:
 
     ROOT_URL = "http://pay.lvye.com/api"
     PREPAID_URL = '/biz/prepaid'
-    PRE_PAY_URL = '/biz/pre_pay'
+    PREPAY_URL = '/biz/prepay'
     CONFIRM_GUARANTEE_PAYMENT_URL = '/biz/pay/guarantee_payment/confirm'
     REFUND_URL = '/biz/refund'
     WITHDRAW_URL = '/application/account_users/{account_user_id}/withdraw'

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+<p>
+    {% if data.code == "0" %}支付成功{% else %}支付失败{% endif %} <br/>
+    sn: {{ data.sn }}<br/>
+    order_id: {{ data.order_id }}<br/>
+    user_id: {{ data.user_id }}<br/>
+    amount: {{ data.amount }}
+</p>
+
+<a href="{{ url_for('sample.index') }}">返回首页</a>
+</body>
+</html>

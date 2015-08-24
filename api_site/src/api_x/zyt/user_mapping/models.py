@@ -74,7 +74,6 @@ class ApiEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.VARCHAR(64), nullable=False, unique=True)
-    desc = db.Column(db.VARCHAR(128), nullable=False)
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 

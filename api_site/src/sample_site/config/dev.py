@@ -5,5 +5,5 @@ class App:
     DEBUG = True
 
 
-class PayAPI:
-    ROOT_URL = "http://localhost:5000"
+class PayClientConfig:
+    ROOT_URL = "http://localhost:5100/__"

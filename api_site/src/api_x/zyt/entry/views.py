@@ -12,8 +12,7 @@ from api_x.zyt.biz.transaction import query_user_transactions
 @verify_request('list_transactions')
 def list_transactions(account_user_id):
     data = request.args
-    # TODO: 限制渠道
-    channel_name = data['channel_name']
+    channel = request.channel
     role = data.get('role')
     page_no = int(data.get('page_no', 1))
     page_size = int(data.get('page_size', 20))

@@ -7,4 +7,4 @@ class App:
     SQLALCHEMY_ECHO = True
 
 
-HOST_URL = 'http://test_pay.webee.com:8088'
+HOST_URL = 'http://test_pay.webee.com:5100'

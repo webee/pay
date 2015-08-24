@@ -7,7 +7,7 @@ HOST_URL = "http://prod_sample_pay.lvye.com:8189"
 PAYEE = '169658002'
 
 
-class PayAPI:
+class PayClientConfig:
     # 绿野用户中心
     USER_DOMAIN_NAME = 'lvye_account'
 

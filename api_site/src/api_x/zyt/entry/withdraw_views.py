@@ -6,7 +6,7 @@ from api_x.utils import response
 from flask import request
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
-from api_x.utils.entry_auth import verify_request
+from api_x.utils.entry_auth import verify_request, _register_api_entry
 from api_x.zyt.biz import withdraw
 
 logger = get_logger(__name__)

@@ -1,8 +1,12 @@
 # coding=utf-8
 from api_x import db
 from api_x.zyt.vas.user import create_user
-from .models import UserDomain, Channel, UserMapping, ChannelPermission, ApiEntry
+from .models import UserDomain, Channel, UserMapping, ApiEntry, ChannelPermission
 from pytoolbox.util.dbs import transactional
+from pytoolbox.util.log import get_logger
+
+
+logger = get_logger(__name__)
 
 
 @transactional
@@ -22,8 +26,8 @@ def get_user_domain_by_name(name):
 
 
 @transactional
-def create_channel(user_domain_id, name, desc):
-    channel = Channel(user_domain_id=user_domain_id, name=name, desc=desc)
+def create_channel(user_domain_id, name, desc, md5_key='', public_key=''):
+    channel = Channel(user_domain_id=user_domain_id, name=name, desc=desc, md5_key=md5_key, public_key=public_key)
     db.session.add(channel)
 
     return channel
@@ -93,3 +97,29 @@ def find_or_create_account_user_by_channel_info(channel_id, user_id):
     channel = get_channel(channel_id)
 
     return get_or_create_account_user(channel.user_domain_id, user_id)
+
+
+@transactional
+def add_perm_to_channel(channel_name, api_entry_name):
+    channel = get_channel_by_name(channel_name)
+    if channel.has_entry_perm(api_entry_name):
+        return
+
+    api_entry = ApiEntry.query.filter_by(name=api_entry_name).first()
+
+    channel_perm = ChannelPermission(channel_id=channel.id, api_entry_id=api_entry.id)
+
+    db.session.add(channel_perm)
+
+
+@transactional
+def init_api_entries():
+    from api_x.utils.entry_auth import get_api_entry_name_list
+
+    entry_names = get_api_entry_name_list()
+
+    for name in entry_names:
+        api_entry = ApiEntry.query.filter_by(name=name).first()
+        if api_entry is None:
+            api_entry = ApiEntry(name=name)
+        db.session.add(api_entry)

@@ -19,7 +19,7 @@ def request(api_url, params):
 
     resp = requests.post(api_url, data)
     if resp.status_code == 200:
-        return _parse_response_data(resp.content)
+        return _parse_and_verify_response_data(resp.content)
     return UnExpectedResponseError(resp.status_code, resp.content)
 
 
@@ -43,7 +43,7 @@ def _parse_data(raw_data):
     return data
 
 
-def _parse_response_data(raw_data):
+def _parse_and_verify_response_data(raw_data):
     try:
         parsed_data = _parse_data(raw_data)
     except Exception, e:

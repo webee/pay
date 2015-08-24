@@ -20,6 +20,7 @@ from api_x.zyt.biz.models import UserRole
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
 from api_x.utils import response
+from api_x.zyt.user_mapping.auth import add_sign_for_params
 
 
 logger = get_logger(__name__)
@@ -77,6 +78,7 @@ def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
         'sn': tx_record.sn,
         'payer_id': payer_id,
         'payee_id': payee_id,
+        'channel_id': channel.id,
         'order_id': order_id,
         'product_name': product_name,
         'product_category': product_category,
@@ -159,13 +161,13 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
     client_callback_url = payment_record.client_callback_url
 
     if client_callback_url and is_success:
+        from api_x.utils.notify import sign_and_return_client_callback
         channel = get_channel_by_name(tx.channel_name)
         user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
         user_id = user_mapping.user_id
         params = {'code': 0, 'user_id': user_id, 'sn': payment_record.sn,
-                  'channel_name': channel.name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
-        return response.submit_form(client_callback_url, params)
+        return sign_and_return_client_callback(client_callback_url, channel.name, params, method="POST")
     code = 0 if is_success else 1
     return redirect(url_for('biz_entry.pay_result', sn=sn, vas_name=vas_name, code=code, vas_sn=vas_sn))
 

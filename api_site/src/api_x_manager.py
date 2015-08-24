@@ -20,7 +20,7 @@ def make_shell_context():
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
 
-server = Server(host="0.0.0.0", port=5000)
+server = Server(host="0.0.0.0", port=5100)
 manager.add_command("runserver", server)
 
 
@@ -29,6 +29,7 @@ def init_db(recreate):
     from fabric.api import local
     from api_x import db
     from api_x.data import init_data
+    from api_x.zyt.user_mapping import init_api_entries
 
     def recreate_db():
         from tools.console_log import info
@@ -41,6 +42,14 @@ def init_db(recreate):
     db.drop_all()
     db.create_all()
     init_data()
+
+    init_api_entries()
+
+@manager.command
+def update_api_entries():
+    from api_x.zyt.user_mapping import init_api_entries
+
+    init_api_entries()
 
 
 @manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')
@@ -65,6 +74,14 @@ class CeleryCommand(Command):
         celery.start(argv=['celery'] + args[0])
 
 manager.add_command('celery', CeleryCommand())
+
+
+@manager.option('-c', '--channel', type=str, dest="channel_name", required=True)
+@manager.option('-e', '--entry', type=str, dest="entry_name", required=True)
+def add_channel_perm(channel_name, entry_name):
+    from api_x.zyt.user_mapping import add_perm_to_channel
+
+    add_perm_to_channel(channel_name, entry_name)
 
 
 @manager.option('-d', '--domain', type=str, dest="user_domain_name", required=True)

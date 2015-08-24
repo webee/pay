@@ -18,8 +18,8 @@
     <h1>请选择支付方式</h1>
         {% for vas_name in vases %}
             {# TODO: 重新设计此页面 #}
-            <p><a href="{{ root_url + url_for('biz_entry.pay', sn=tx.sn, vas_name=vas_name) }}">vas_name</a></p>
-        {% endif %}
+            <p><a href="{{ root_url + url_for('biz_entry.pay', sn=tx.sn, vas_name=vas_name) }}">{{ vas_name }}</a></p>
+        {% endfor %}
 </p>
 </body>
 </html>

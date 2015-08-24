@@ -4,14 +4,20 @@ from __future__ import unicode_literals
 import requests
 from pytoolbox.util.sign import SignType
 from pytoolbox.util.log import get_logger
-from api_x.zyt.user_mapping.auth import add_sign
+from api_x.zyt.user_mapping.auth import add_sign_for_params
+from api_x.utils import response
 
 
 logger = get_logger(__name__)
 
 
+def sign_and_return_client_callback(client_callback_url, channel_name, params, sign_type=SignType.RSA, method='POST'):
+    params = add_sign_for_params(channel_name, params, sign_type)
+    return response.submit_form(client_callback_url, params, method)
+
+
 def sign_and_notify_client(url, channel_name, params, sign_type=SignType.RSA, methods=['post']):
-    params = add_sign(channel_name, params, sign_type)
+    params = add_sign_for_params(channel_name, params, sign_type)
     return notify_client(url, params, methods)
 
 

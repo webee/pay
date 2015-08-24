@@ -4,12 +4,16 @@ import os
 
 from flask import Flask
 from pytoolbox.util import pmc_config
+from sample_site.pay_client import PayClient
 
 
 def register_mods(app):
     from sample_site.sample import sample_mod
 
     app.register_blueprint(sample_mod)
+
+
+pay_client = PayClient()
 
 
 def create_app(env='dev'):
@@ -21,5 +25,7 @@ def create_app(env='dev'):
 
     app.config.from_object(config.App)
     register_mods(app)
+
+    pay_client.init_config(config.PayClientConfig)
 
     return app

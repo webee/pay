@@ -1,6 +1,6 @@
 # coding=utf-8
 
-ROOT_URL = "http://dev_pay.lvye.com:8088"
+ROOT_URL = "http://dev_pay.lvye.com:5100"
 
 
 OID_PARTNER = '201408071000001546'

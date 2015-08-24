@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 
 @mod.route('/', methods=['GET'])
 def index():
-    channel_name = config.PayAPI.CHANNEL_NAME
+    channel_name = config.PayClientConfig.CHANNEL_NAME
     payer = 'webee'
     payee = config.PAYEE
 
@@ -30,14 +30,12 @@ def index():
 @mod.route('/pay', methods=['POST'])
 def pay():
     """支付一分钱"""
-    channel_name = config.PayAPI.CHANNEL_NAME
     payer = '96355632'
     payee = config.PAYEE
 
     amount = Decimal(request.values['amount'])
     payment_type = request.values['payment_type']
     params = {
-        'channel_name': channel_name,
         'payer_user_id': payer,
         'payee_user_id': payee,
         'order_id': request.values.get('order_id') or generate_order_id(),
@@ -45,29 +43,43 @@ def pay():
         'product_category': '测试',
         'product_desc': '用于测试的商品',
         'amount': amount,
-        'client_callback_url': config.HOST_URL + url_for('.index'),
+        'client_callback_url': config.HOST_URL + url_for('.pay_result'),
         'client_notify_url': '',
         'payment_type': payment_type
     }
 
     print("order_id: {0}".format(params['order_id']))
 
-    data = pay_client.request_prepay(params)
+    data = pay_client.prepay(params)
     if data['ret']:
         return redirect(data['pay_url'])
+    logger.info('prepay ret: {0}'.format(data))
     flash('请求支付失败')
     return redirect(url_for('.index'))
 
 
+@mod.route('/pay_result', methods=['POST'])
+@pay_client.verify_request
+def pay_result():
+    is_verify_pass = request.is_verify_pass
+    if not is_verify_pass:
+        return render_template('sample/info.html', title='支付结果', msg="请求异常")
+    data = request.values
+
+    return render_template('sample/pay_result.html', title='支付结果', data=data)
+
+
+
+
 @mod.route('/pay/guarantee_payment/confirm', methods=['POST'])
 def confirm_guarantee_payment():
-    channel_name = config.PayAPI.CHANNEL_NAME
+    channel_name = config.PayClientConfig.CHANNEL_NAME
     params = {
         'channel_name': channel_name,
         'order_id': request.values['order_id']
     }
 
-    data = pay_client.request_confirm_guarantee_payment(params)
+    data = pay_client.confirm_guarantee_payment(params)
     print('confirm guarantee pay: {0}'.format(data))
     return redirect(url_for('sample.index'))
 
@@ -75,7 +87,7 @@ def confirm_guarantee_payment():
 @mod.route('/refund', methods=['POST'])
 def refund():
     suggest_result = request.values['suggest_result']
-    channel_name = config.PayAPI.CHANNEL_NAME
+    channel_name = config.PayClientConfig.CHANNEL_NAME
     params = {
         'channel_name': channel_name,
         'order_id': request.values['order_id'],
@@ -87,7 +99,7 @@ def refund():
         params['result'] = suggest_result
 
     logger.info('refund: {0}'.format(params))
-    req = pay_client.request_refund(params)
+    req = pay_client.refund(params)
     return render_template('sample/info.html', title='退款结果', msg=req.text)
 
 
@@ -111,11 +123,11 @@ def withdraw():
         params['result'] = suggest_result
 
     logger.info('withdraw: {0}'.format(params))
-    req = pay_client.request_withdraw(user_id, params)
+    req = pay_client.withdraw(user_id, params)
     return render_template('sample/info.html', title='提现结果', msg=req.text)
 
 
 @mod.route('/prepaid', methods=['GET'])
 def prepaid():
     """充值"""
-    return render_template('sample/prepaid.html', user_id=2, prepaid_url=config.PayAPI.PREPAID_URL)
+    return render_template('sample/prepaid.html', user_id=2, prepaid_url=config.PayClientConfig.PREPAID_URL)

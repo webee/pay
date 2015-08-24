@@ -28,8 +28,8 @@ def refused(code=403, msg='refused', **kwargs):
     return fail(code, msg, **kwargs), 403
 
 
-def submit_form(url, req_params):
-    submit_page = '<form id="formName" action="{0}" method="POST">'.format(url)
+def submit_form(url, req_params, method='POST'):
+    submit_page = '<form id="formName" action="{0}" method="{1}">'.format(url, method)
     for key in req_params:
         submit_page += '''<input type="hidden" name="{0}" value='{1}' />'''.format(key, req_params[key])
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'

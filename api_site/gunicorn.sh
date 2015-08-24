@@ -28,4 +28,5 @@ exec gunicorn main:app -b ${host}:${port} \
   --name $NAME \
   -k gevent \
   -w $NUM_WORKERS \
+  --access-logfile - \
   --log-level=info \

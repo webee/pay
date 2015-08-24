@@ -30,7 +30,6 @@ pytz==2015.4
 PyYAML
 redis==2.10.3
 requests==2.7.0
-requests[security]
 simplejson==3.8.0
 uWSGI==2.0.11
 wsgiref==0.1.2

@@ -1,6 +1,6 @@
 # coding=utf-8
 
-ROOT_URL = 'http://pay.lvye.com/api'
+ROOT_URL = 'http://pay.lvye.com/api/__'
 
 
 class Pay:

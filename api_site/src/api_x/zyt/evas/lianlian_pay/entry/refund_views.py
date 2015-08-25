@@ -8,7 +8,7 @@ from api_x.zyt.evas.lianlian_pay.notify import get_refund_notify_handle
 from api_x.zyt.evas.test_pay import NAME
 from .commons import parse_and_verify
 from . import notification
-from ..refund import is_success_status
+from .._refund import is_success_status
 from pytoolbox.util.log import get_logger
 
 

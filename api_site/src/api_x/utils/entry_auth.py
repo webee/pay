@@ -11,20 +11,19 @@ from api_x.config import etc as config
 
 logger = get_logger(__name__)
 
-
 _func_idx_api_entries = {}
 _name_idx_api_entries = {}
 
 
 def _register_api_entry(f, name):
     if f in _func_idx_api_entries:
-        logger.warn('func [0] already registered'.format(f))
+        logger.warn('func [{0}] already registered'.format(f))
     _func_idx_api_entries[f] = name
 
     if name in _name_idx_api_entries:
-        logger.warn('name [0] already registered'.format(name))
+        logger.warn('name [{0}] already registered'.format(name))
         if f != _name_idx_api_entries[name]:
-            msg = 'name [0] already registered by [1]'.format(name, _name_idx_api_entries[name])
+            msg = 'name [{0}] already registered by [{1}]'.format(name, _name_idx_api_entries[name])
             logger.error(msg)
             raise ValueError(msg)
     _name_idx_api_entries[name] = f
@@ -57,7 +56,7 @@ def verify_request(entry_name):
                     return response.fail(msg='channel not exits: [{0}]'.format(channel_name))
 
                 if not channel.has_entry_perm(entry_name):
-                    msg='channel [{0}] has no perm for entry [{1}]'.format(channel_name, entry_name)
+                    msg = 'channel [{0}] has no perm for entry [{1}]'.format(channel_name, entry_name)
                     logger.info(msg)
                     return response.refused(msg=msg)
 
@@ -72,6 +71,7 @@ def verify_request(entry_name):
 
             request.__dict__['channel'] = channel
             return f(*args, **kwargs)
+
         return wrapper
 
     return do_verify_request

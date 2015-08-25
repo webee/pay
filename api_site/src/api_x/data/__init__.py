@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals, print_function
 
+from api_x.config import etc as config
 from api_x.zyt.user_mapping import create_user_domain, create_channel
 from api_x.zyt.user_mapping import create_account_user
 
@@ -49,9 +50,7 @@ def init_test_data():
     # sample渠道#1
     # 测试用户001(test001)
     test_user_domain = create_user_domain(DefaultUserDomain.TEST_DOMAIN_NAME, '测试用户')
-    md5_key = 'md5_key_zyt_sample'
-    public_key = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlm+T9BGVeE7KOf+RMbqpzVGj3O+UmLlYKDEiTty69Ixjwu5vUOJ8/DlR2fcmKdpZjX+wOf7f7d85RcbvH/0Q/SEdrIM359PWuOfKCTIkmsrXnvrAyMVDZboUF0etJiakZT0COsDOvRKM9N+RrWBhVhv0gJ25TuOAOhSiSxb4QxRHFf0pNZKUawGD5fgPXyfHO+Py9v16xAxTqt4cS+PCQnfiYBhiJ1OONr60XkCJrtQev6R1/QfRp4AcwkiwssUbJb/aVF084t/PuAFZYrEzbSssq5GS+2l/rHVr2vSE/ZUEJhsVgLFCDraiFuAWnbbGjh3pZ57oMXWftuKdQCyPhQIDAQAB'
-    channel = create_channel(test_user_domain.id, 'zyt_sample', '自游通sample系统', md5_key=md5_key, public_key=public_key)
+    channel = create_channel(test_user_domain.id, 'zyt_sample', '自游通sample系统')
 
     user_id = create_account_user(channel.user_domain_id, 'test001', '测试001')
 

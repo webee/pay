@@ -32,7 +32,7 @@ def init_db(recreate):
     from api_x.zyt.user_mapping import init_api_entries
 
     def recreate_db():
-        from tools.console_log import info
+        from pytoolbox.util.console_log import info
 
         info('recreating database ...')
         local('mysql -u root -p < migration/init_db.sql')

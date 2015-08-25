@@ -4,7 +4,7 @@ import os
 
 from flask import Flask
 from pytoolbox.util import pmc_config
-from sample_site.pay_client import PayClient
+from pytoolbox.pay_client import PayClient
 
 
 def register_mods(app):

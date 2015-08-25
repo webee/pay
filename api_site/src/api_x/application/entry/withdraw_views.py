@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from decimal import Decimal
 
 from api_x.utils import response
+from api_x.utils.entry_auth import verify_request
 from flask import request
 from .. import dba
 from ..withdraw import apply_to_withdraw, calc_user_withdraw_fee, log_user_withdraw
@@ -14,8 +15,10 @@ logger = get_logger(__name__)
 
 
 @mod.route('/account_users/<int:account_user_id>/withdraw', methods=['POST'])
-def withdraw(account_user_id):
+@verify_request('app_withdraw')
+def app_withdraw(account_user_id):
     data = request.values
+    channel = request.channel
     bankcard_id = data['bankcard_id']
     amount = data['amount']
     client_notify_url = data.get('notify_url', '')
@@ -35,7 +38,7 @@ def withdraw(account_user_id):
         if bankcard.user_id != account_user_id:
             return response.fail(msg='bankcard [{0}] is not bound to user [{1}]'.format(bankcard_id, account_user_id))
 
-        tx_sn = apply_to_withdraw(account_user_id, bankcard, amount_value, fee, client_notify_url, data)
+        tx_sn = apply_to_withdraw(channel, account_user_id, bankcard, amount_value, fee, client_notify_url, data)
         log_user_withdraw(account_user_id, tx_sn, bankcard_id, amount, fee)
         return response.success(sn=tx_sn)
     except Exception as e:

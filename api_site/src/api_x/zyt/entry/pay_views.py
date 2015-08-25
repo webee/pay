@@ -12,6 +12,7 @@ from api_x.zyt.user_mapping import get_channel_by_name
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
 from api_x.utils.entry_auth import verify_request
+from api_x.zyt.biz.models import PaymentType
 
 
 logger = get_logger(__name__)
@@ -34,7 +35,7 @@ def prepay():
     payment_type = data['payment_type']
 
     # check
-    if payment_type not in ['DIRECT', 'SECURED']:
+    if payment_type not in [PaymentType.DIRECT, PaymentType.GUARANTEE]:
         return response.fail(msg="payment_type [{0}] not supported.".format(payment_type))
 
     payer_id = get_or_create_account_user(channel.user_domain_id, payer_user_id)

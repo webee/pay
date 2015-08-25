@@ -8,6 +8,7 @@ from sample_site import config
 from sample_site.utils import generate_order_id
 from sample_site import pay_client
 from pytoolbox.util.log import get_logger
+import json
 
 
 logger = get_logger(__name__)
@@ -73,23 +74,18 @@ def pay_result():
 
 @mod.route('/pay/guarantee_payment/confirm', methods=['POST'])
 def confirm_guarantee_payment():
-    channel_name = config.PayClientConfig.CHANNEL_NAME
     params = {
-        'channel_name': channel_name,
         'order_id': request.values['order_id']
     }
 
     data = pay_client.confirm_guarantee_payment(params)
-    print('confirm guarantee pay: {0}'.format(data))
-    return redirect(url_for('sample.index'))
+    return render_template('sample/info.html', title='确认担保支付结果', msg=json.dumps(data))
 
 
 @mod.route('/refund', methods=['POST'])
 def refund():
     suggest_result = request.values['suggest_result']
-    channel_name = config.PayClientConfig.CHANNEL_NAME
     params = {
-        'channel_name': channel_name,
         'order_id': request.values['order_id'],
         'amount': Decimal(request.values['amount']),
         'notify_url': ''
@@ -99,8 +95,8 @@ def refund():
         params['result'] = suggest_result
 
     logger.info('refund: {0}'.format(params))
-    req = pay_client.refund(params)
-    return render_template('sample/info.html', title='退款结果', msg=req.text)
+    data = pay_client.refund(params)
+    return render_template('sample/info.html', title='退款结果', msg=json.dumps(data))
 
 
 @mod.route('/withdraw', methods=['POST'])
@@ -123,8 +119,8 @@ def withdraw():
         params['result'] = suggest_result
 
     logger.info('withdraw: {0}'.format(params))
-    req = pay_client.withdraw(user_id, params)
-    return render_template('sample/info.html', title='提现结果', msg=req.text)
+    data = pay_client.withdraw(user_id, params)
+    return render_template('sample/info.html', title='提现结果', msg=json.dumps(data))
 
 
 @mod.route('/prepaid', methods=['GET'])

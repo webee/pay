@@ -6,8 +6,7 @@ from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
 from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
-from api_x.zyt.user_mapping import get_system_account_user_id, get_channel, get_user_map_by_account_user_id, \
-    get_channel_by_name
+from api_x.zyt.user_mapping import get_system_account_user_id, get_user_map_by_account_user_id, get_channel_by_name
 from api_x.constant import TransactionState, SECURE_USER_NAME, PaymentTransactionState
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.vas.models import EventType
@@ -19,8 +18,6 @@ from api_x.zyt.biz.transaction.error import TransactionStateError
 from api_x.zyt.biz.models import UserRole
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
-from api_x.utils import response
-from api_x.zyt.user_mapping.auth import add_sign_for_params
 
 
 logger = get_logger(__name__)
@@ -66,7 +63,7 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
 def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url):
-    comments = "在线支付-{0}:{0}|{1}".format(channel.desc, product_name, order_id)
+    comments = "在线支付-{0}:{1}|{2}".format(channel.desc, product_name, order_id)
     user_ids = [(payer_id, UserRole.FROM), (payee_id, UserRole.TO)]
     if payment_type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
@@ -244,7 +241,7 @@ def _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
 def confirm_payment(channel, order_id):
     payment_record = get_payment_by_channel_order_id(channel.id, order_id)
     if payment_record is None or payment_record.type != PaymentType.GUARANTEE:
-        raise TransactionNotFoundError('tx channel={0}, order_id={1} not found.'.format(channel.name, order_id))
+        raise TransactionNotFoundError('guarantee payment tx channel={0}, order_id={1} not found.'.format(channel.name, order_id))
 
     tx = get_tx_by_id(payment_record.tx_id)
     if tx.state != PaymentTransactionState.SECURED:

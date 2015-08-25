@@ -57,6 +57,12 @@ def get_user_map(user_domain_id, user_id):
     return user_map
 
 
+def get_user_map_by_domain_name_and_user_id(user_domain_name, user_id):
+    user_domain = UserDomain.query.filter_by(name=user_domain_name).first()
+
+    return user_domain.user_maps.filter_by(user_id=user_id).first()
+
+
 def get_user_map_by_account_user_id(account_user_id):
     user_map = UserMapping.query.filter_by(account_user_id=account_user_id).first()
     return user_map
@@ -128,3 +134,11 @@ def init_api_entries():
         if api_entry is None:
             api_entry = ApiEntry(name=name)
         db.session.add(api_entry)
+
+
+@transactional
+def set_user_is_opened(user_domain_name, user_id, status):
+    user_map = get_user_map_by_domain_name_and_user_id(user_domain_name, user_id)
+
+    user_map.is_opened = status
+    db.session.add(user_map)

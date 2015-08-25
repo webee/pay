@@ -84,6 +84,22 @@ def add_channel_perm(channel_name, entry_name):
     add_perm_to_channel(channel_name, entry_name)
 
 
+@manager.option('-d', '--domain', type=str, dest="domain_name", required=True)
+@manager.option('-u', '--user', type=str, dest="user_id", required=True)
+def open_domain_user(domain_name, user_id):
+    from api_x.zyt.user_mapping import set_user_is_opened
+
+    set_user_is_opened(domain_name, user_id, True)
+
+
+@manager.option('-d', '--domain', type=str, dest="domain_name", required=True)
+@manager.option('-u', '--user', type=str, dest="user_id", required=True)
+def close_domain_user(domain_name, user_id):
+    from api_x.zyt.user_mapping import set_user_is_opened
+
+    set_user_is_opened(domain_name, user_id, False)
+
+
 @manager.option('-d', '--domain', type=str, dest="user_domain_name", required=True)
 @manager.option('-u', '--user', type=str, dest="user_id", required=True)
 def test_add_user(user_domain_name, user_id):

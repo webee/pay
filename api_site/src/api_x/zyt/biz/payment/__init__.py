@@ -6,7 +6,7 @@ from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
 from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
-from api_x.zyt.user_mapping import get_system_account_user_id, get_user_map_by_account_user_id, get_channel_by_name
+from api_x.zyt.user_mapping import get_system_account_user_id, get_user_map_by_account_user_id
 from api_x.constant import TransactionState, SECURE_USER_NAME, PaymentTransactionState
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.vas.models import EventType
@@ -159,12 +159,11 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
 
     if client_callback_url and is_success:
         from api_x.utils.notify import sign_and_return_client_callback
-        channel = get_channel_by_name(tx.channel_name)
         user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
         user_id = user_mapping.user_id
         params = {'code': 0, 'user_id': user_id, 'sn': payment_record.sn,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
-        return sign_and_return_client_callback(client_callback_url, channel.name, params, method="POST")
+        return sign_and_return_client_callback(client_callback_url, tx.channel_name, params, method="POST")
     code = 0 if is_success else 1
     return redirect(url_for('biz_entry.pay_result', sn=sn, vas_name=vas_name, code=code, vas_sn=vas_sn))
 
@@ -210,21 +209,20 @@ def _try_notify_client(tx, payment_record):
 
     url = payment_record.client_notify_url
 
-    channel = get_channel_by_name(tx.channel_name)
     user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
     user_id = user_mapping.user_id
 
     params = None
     if tx.state in [PaymentTransactionState.SECURED, PaymentTransactionState.SUCCESS]:
         params = {'code': 0, 'user_id': user_id, 'sn': payment_record.sn,
-                  'channel_name': channel.name,
+                  'channel_name': tx.channel_name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
     elif tx.state == PaymentTransactionState.FAILED:
         params = {'code': 1, 'user_id': user_id, 'sn': payment_record.sn,
-                  'channel_name': channel.name,
+                  'channel_name': tx.channel_name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
 
-    if params and not sign_and_notify_client(url, channel.name, params):
+    if params and not sign_and_notify_client(url, tx.channel_name, params):
         # other notify process.
         from api_x.task import tasks
 

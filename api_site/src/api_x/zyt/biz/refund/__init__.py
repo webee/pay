@@ -7,7 +7,7 @@ from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.refund.dba import update_payment_refunded_amount
 from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
 from api_x.zyt.vas.bookkeep import bookkeeping
-from api_x.zyt.user_mapping import get_system_account_user_id, get_channel
+from api_x.zyt.user_mapping import get_system_account_user_id
 from api_x.constant import SECURE_USER_NAME, PaymentTransactionState, RefundTransactionState
 from api_x.zyt.vas.user import get_user_cash_balance
 from api_x.zyt.biz.models import UserRole
@@ -95,15 +95,13 @@ def _try_notify_client(tx, refund_record):
     from api_x.utils.notify import sign_and_notify_client
     url = refund_record.client_notify_url
 
-    channel = get_channel(tx.channel_name)
-
     params = None
     if tx.state == RefundTransactionState.SUCCESS:
         params = {'code': 0, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
     elif tx.state == RefundTransactionState.FAILED:
         params = {'code': 1, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
 
-    if params and not sign_and_notify_client(url, channel.name, params):
+    if params and not sign_and_notify_client(url, tx.channel_name, params):
         # other notify process.
         from api_x.task import tasks
         tasks.refund_notify.delay(url, params)

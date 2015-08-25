@@ -171,7 +171,7 @@ def _success_withdraw(tx, withdraw_record):
         # 手续费转账
         event_ids.extend(transfer_frozen(tx.sn, from_user_id, lvye_corp_user_id, fee))
     # 提现金额转出
-    event_id = bookkeeping(EventType.TRANSFER_OUT_FROZEN, tx.sn, from_user_id, ZYT_NAME, actual_amount)
+    event_id = bookkeeping(EventType.TRANSFER_OUT_FROZEN, tx.sn, from_user_id, tx.vas_name, actual_amount)
     event_ids.append(event_id)
 
     transit_transaction_state(tx.id, WithdrawTransactionState.PROCESSING, WithdrawTransactionState.SUCCESS, event_ids)

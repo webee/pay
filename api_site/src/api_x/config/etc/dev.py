@@ -8,3 +8,6 @@ class App:
 
 
 HOST_URL = 'http://localhost:5100'
+
+
+TEST_CHANNELS = {'zyt_sample'}

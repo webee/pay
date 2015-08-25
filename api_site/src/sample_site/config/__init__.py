@@ -2,7 +2,7 @@
 from pytoolbox.util.pmc_config import read_string
 
 
-HOST_URL = "http://localhost:8089"
+HOST_URL = "http://dev_pay.lvye.com:8089"
 
 
 class App:

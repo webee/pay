@@ -27,12 +27,7 @@ def deploy(env):
         reread_config_file()
 
         stop_python_server('pay_api_site')
-        # do_migration()
         start_python_server('pay_api_site')
-
-
-def do_migration():
-    fab.run('python src/manager.py migrate')
 
 
 def reread_config_file():

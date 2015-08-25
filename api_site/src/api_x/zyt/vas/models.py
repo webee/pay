@@ -36,7 +36,7 @@ class Event(db.Model):
     __tablename__ = 'event'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    transaction_sn = db.Column(db.CHAR(32), nullable=False)
+    tx_sn = db.Column(db.CHAR(32), nullable=False)
     vas_name = db.Column(db.VARCHAR(32), nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('account_user.id'), nullable=False)

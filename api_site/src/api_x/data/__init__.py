@@ -1,7 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals, print_function
 
-from api_x.config import etc as config
 from api_x.zyt.user_mapping import create_user_domain, create_channel
 from api_x.zyt.user_mapping import create_account_user
 

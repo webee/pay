@@ -34,3 +34,5 @@ class Biz:
 LVYE_PRI_KEY = read_string('conf/keys/lvye_pri_key.txt')
 TEST_MD5_KEY = read_string('conf/test/md5_key.txt')
 TEST_CHANNEL_PUB_KEY = read_string('conf/test/channel_pub_key.txt')
+
+TEST_CHANNELS = set()

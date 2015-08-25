@@ -24,11 +24,11 @@ def _register_event_action(event_type):
 
 
 @transactional
-def bookkeeping(event_type, transaction_sn, user_id, vas_name, amount):
+def bookkeeping(event_type, tx_sn, user_id, vas_name, amount):
     if amount <= 0:
         raise AmountValueError()
 
-    event = _create_event(transaction_sn, user_id, vas_name, event_type, amount)
+    event = _create_event(tx_sn, user_id, vas_name, event_type, amount)
     _event_actions[event_type](event)
     _update_balance(event)
 
@@ -93,9 +93,9 @@ def _transfer_out_frozen(event):
     _bkkp_liability(user_id, event, LiabilityType.TOTAL, DEBIT, amount)
 
 
-def _create_event(transaction_sn, user_id, vas_name, event_type, amount):
+def _create_event(tx_sn, user_id, vas_name, event_type, amount):
     now = datetime.utcnow()
-    event = Event(transaction_sn=transaction_sn, user_id=user_id, vas_name=vas_name,
+    event = Event(tx_sn=tx_sn, user_id=user_id, vas_name=vas_name,
                   type=event_type, amount=amount, created_on=now)
     db.session.add(event)
     db.session.flush()

@@ -8,3 +8,5 @@ class App:
 
 
 HOST_URL = 'http://test_pay.webee.com:5100'
+
+TEST_CHANNELS = {'zyt_sample'}

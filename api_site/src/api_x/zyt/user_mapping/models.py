@@ -63,7 +63,8 @@ class Channel(db.Model):
     def has_entry_perm(self, api_entry_name):
         from sqlalchemy.orm import lazyload
 
-        return self.perms.options(lazyload('api_entry')).outerjoin(ApiEntry).filter(ApiEntry.name == api_entry_name).count() > 0
+        return self.perms.options(lazyload('api_entry')).outerjoin(ApiEntry).\
+                   filter(ApiEntry.name == api_entry_name).count() > 0
 
     def __repr__(self):
         return 'Channel<%r>' % (self.name,)

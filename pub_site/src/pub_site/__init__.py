@@ -31,16 +31,17 @@ def init_template(app):
 def init_errors(app):
     @app.errorhandler(404)
     def page_not_found(e):
+        logger.exception(e)
         return render_template('404.html', error=e), 404
 
     @app.errorhandler(400)
     def request_error(e):
-        current_app.error("internal server error.")
+        logger.exception(e)
         return render_template('500.html', error=e), 500
 
     @app.errorhandler(500)
     def internal_server_error(e):
-        current_app.error("internal server error.")
+        logger.exception(e)
         return render_template('500.html', error=e), 500
 
 

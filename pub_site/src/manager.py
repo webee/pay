@@ -46,10 +46,10 @@ def init_db(recreate):
     db.create_all()
 
 
-@manager.option('-e', '--env', type=str, dest="env", required=True, default='dev')
-def deploy(env):
+@manager.option('-e', '--env', type=str, dest="envx", required=True, default='dev')
+def deploy(envx):
     from ops.deploy.deploy import deploy
-    deploy(env)
+    deploy(envx)
 
 
 def main():

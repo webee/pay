@@ -6,4 +6,4 @@ class App:
 
 
 class PayClientConfig:
-    ROOT_URL = "http://localhost:5100/__"
+    ROOT_URL = "http://localhost:5100"

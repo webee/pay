@@ -17,8 +17,6 @@ class App:
     SQLALCHEMY_MAX_OVERFLOW = 60
     SQLALCHEMY_POOL_RECYCLE = 3600
 
-    ENTRY_PREFIX = '/__'
-
 
 HOST_URL = 'http://pay.lvye.com/api'
 

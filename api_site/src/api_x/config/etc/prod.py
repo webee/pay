@@ -10,8 +10,6 @@ class App:
     SQLALCHEMY_DATABASE_URI = os.environ['PAY_API_SITE_DATABASE_URI']
     SQLALCHEMY_ECHO = False
 
-    ENTRY_PREFIX = ''
-
 HOST_URL = 'http://pay.lvye.com/api'
 
 

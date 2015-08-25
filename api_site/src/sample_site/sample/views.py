@@ -55,7 +55,7 @@ def pay():
     if data['ret']:
         return redirect(data['pay_url'])
     else:
-        return render_template('sample/info.html', title='请求支付结果', data=json.dumps(data))
+        return render_template('sample/info.html', title='请求支付结果', msg=json.dumps(data))
     logger.info('prepay ret: {0}'.format(data))
     flash('请求支付失败')
     return redirect(url_for('.index'))

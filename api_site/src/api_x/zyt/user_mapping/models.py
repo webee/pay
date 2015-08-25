@@ -32,6 +32,7 @@ class UserMapping(db.Model):
     desc = db.Column(db.VARCHAR(64), default='')
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    opened_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # index
     # 目前<user_domain_id, user_id>唯一确定一个账号用户，之后可能对应多个

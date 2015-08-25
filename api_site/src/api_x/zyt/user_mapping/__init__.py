@@ -139,6 +139,9 @@ def init_api_entries():
 @transactional
 def set_user_is_opened(user_domain_name, user_id, status):
     user_map = get_user_map_by_domain_name_and_user_id(user_domain_name, user_id)
+    if user_map is None:
+        create_domain_account_user(user_domain_name, user_id)
+        user_map = get_user_map_by_domain_name_and_user_id(user_domain_name, user_id)
 
     user_map.is_opened = status
     db.session.add(user_map)

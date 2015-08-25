@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import g, render_template, redirect, url_for, flash
-from flask.ext.login import login_required, current_user
+from flask.ext.login import current_user
 from . import pay_mod as mod
 from ..constant import PayType
 from pub_site.pay.forms import PayForm
@@ -10,6 +10,7 @@ from pytoolbox.util.dbs import from_db
 from datetime import datetime
 from pytoolbox.util.log import get_logger
 import os
+from pub_site.auth.utils import login_required
 
 _logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 

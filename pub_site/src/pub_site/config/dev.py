@@ -6,7 +6,7 @@ class App:
 
 
 class PayClientConfig:
-    ROOT_URL = "http://localhost:5000"
+    ROOT_URL = "http://localhost:5100"
 
 
 HOST_URL = 'http://dev_pay.lvye.com:5102'

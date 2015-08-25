@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xml:lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/frontpage.css') }}" type="text/css">
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.8.3.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/scrollin.js') }}"></script>
+<title>{% block title %}{% endblock %}</title>
+</head>
+
+<body>
+<div class="opa-a">
+	<div class="middle-box">
+        <a href="http://www.lvye.cn/"><img src="{{ url_for('static', filename='images/frontpage/logo_zyt.png') }}" width="224"></a>
+
+        <ul class="header-bar">
+            <li><a class="first-noborder" target="_self" href="/main">进入新版</a></li>
+            <li><a target="_self" href="http://pay.lvye.cn">旧版</a></li>
+            <li><a target="_self" href="http://account.lvye.cn">用户中心</a></li>
+        </ul>
+	</div>
+</div>
+
+{% block content %}
+{% endblock %}
+
+<div class="bottom">
+<p class="about">
+<a href="http://www.lvye.cn/about/#aboutUs" target="_blank">关于绿野</a><span>|</span>
+<a href="http://www.lvye.cn/about/#connectUs" target="_blank">联系我们</a><span>|</span>
+<a href="http://www.lvye.cn/link/" target="_blank">友情链接</a><span>|</span>
+<a href="http://www.lvye.cn/article-9644-1.html" target="_blank">帮助中心</a><span>|</span>
+<a href="mailto:hi@lvye.cn" target="_blank">广告与合作</a><span>|</span>
+<a href="http://www.lvye.com" target="_blank">绿野户外网</a>
+</p>
+<p class="bmd">Copyright 1999-2015 lvye.cn All Rights Reserved 绿野户外网版权所有　京ICP证100311号　京公网安备1101081556</p>
+<p>电信业务审批[2003]字第361号 广告经营许可证:京海工商广字第0386号《主持计算机站（网站）》商标注册证书</p>
+</div>
+</body>
+</html>

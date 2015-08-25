@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
-from flask.ext.login import login_required, current_user
+from flask.ext.login import current_user
 from flask import render_template, url_for, redirect, g, current_app
 from . import withdraw_mod as mod
 from pytoolbox.util.dbs import from_db
@@ -11,6 +11,7 @@ from pay_client import PayClient
 from flask import flash
 from pytoolbox.util.log import get_logger
 from pub_site import pay_client
+from pub_site.auth.utils import login_required
 
 
 logger = get_logger(__name__)

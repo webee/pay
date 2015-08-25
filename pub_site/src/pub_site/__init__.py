@@ -8,9 +8,11 @@ from flask import Flask, render_template, current_app
 from flask.ext.login import LoginManager
 from flask_wtf.csrf import CsrfProtect
 from tools.filters import register_filters, register_global_functions
+from pytoolbox.pay_client import PayClient
 from pytoolbox.util import dbs
 from pytoolbox.util.dbs import db
 from pytoolbox.util.log import get_logger
+from pub_site import config
 
 
 logger = get_logger(__name__)
@@ -99,6 +101,7 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message = None
 
 csrf = CsrfProtect()
+pay_client = PayClient()
 
 
 def create_app(env='dev', deploy=False):
@@ -114,5 +117,6 @@ def create_app(env='dev', deploy=False):
 
     init_template(app)
     init_errors(app)
+    pay_client.init_config(config.PayClientConfig)
 
     return app

@@ -1,11 +1,12 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from flask import request, render_template, jsonify
-from flask.ext.login import login_required, current_user
+from flask.ext.login import current_user
 from . import main_mod as mod
 from pub_site import pay_client
 from .transaction import query_transactions
 from ..constant import TradeType
+from pub_site.auth.utils import login_required
 
 
 @mod.route('/main', methods=['GET'])

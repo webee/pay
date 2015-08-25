@@ -1,0 +1,85 @@
+{% extends "frontpage/layout.html" %}
+{% block title %}自游通欢迎页{% endblock %}
+{% block content %}
+<div class="banner">
+	<div class="banner_center">
+    	<img src="{{ url_for('static', filename='images/frontpage/bc_c1.jpg') }}" width="1200" height="641" />
+        <img src="{{ url_for('static', filename='images/frontpage/bc_c2.jpg') }}" width="1200" height="353"/>
+        <a href="###" target="_blank" title=""></a>
+        <span class="mouse-down "></span>
+        <div class="computer bounceIn">
+        	<img src="{{ url_for('static', filename='images/frontpage/computerImg.png') }}" width="746" height="445"/>
+        </div>
+        <p>绿野自游通（在线支付）</p>
+    </div>
+</div>
+
+<div class="tabox">
+    <div class="section block1" style="background-position: 50% 0px;">
+    	<p class="introtit"></p>
+    </div>
+    <div class="section giveus">
+    	<div class="fpoint">
+        	<img src="{{ url_for('static', filename='images/frontpage/function_point.jpg') }}" />
+        </div>
+    </div>
+
+	<div class="section block2" style="background-position: 50% 0px;">
+    	<div class="blockTit blk2"></div>
+    </div>
+    <div class="section quickly">
+    	<!--<h2>便捷的在线支付功能</h2>-->
+    	<div class="cardzf">
+        	<img src="{{ url_for('static', filename='images/frontpage/cardImg.jpg') }}">
+        </div>
+    </div>
+    
+    <div class="section block3" style="background-position: 50% 0px;">
+    	<div class="blockTit blk3"></div>
+    </div>
+	<div class="section quickly">
+    	<!--<h2>方便高效的提现功能</h2>-->
+    	<div class="cardzf">
+        	<img src="{{ url_for('static', filename='images/frontpage/tixianImg.jpg') }}">
+        </div>
+    </div>
+    
+    <div class="section block4" style="background-position: 50% 0px;">
+    	<div class="blockTit blk4"></div>
+    </div>
+    <div class="section quickly">
+    	<!--<h2 class="xianshi">稳定易用的操作界面</h2>-->
+    	<div class="interFace">
+        	<img src="{{ url_for('static', filename='images/frontpage/interFace.png') }}">
+        </div>
+        <p>收支明细展示更清晰    支持绑定提现银行卡</p>
+    </div>
+    
+</div>
+
+<div id="leader-application" class="join">
+	<div class="join_center">
+    	<img src="{{ url_for('static', filename='images/frontpage/join_c1.jpg') }}" width="1200" height="496" >
+        <img src="{{ url_for('static', filename='images/frontpage/join_c2.jpg') }}" width="1200" height="417" >
+        <a href="javascript:void(0)" target="_blank" title=""></a>
+        <p>注意事项：<br>备案领队可在此申请试用新版自游通，申请提交后，<br>客服会与您沟通相关事项，并在开通新版自游通后通知您。</p>
+    </div>
+</div>
+
+<!--S遮罩层-->
+<div class="bgLayer"></div>
+<!--E遮罩层-->
+<div class="confirm">
+	<h2>申请规则</h2>
+    <div class="confirm_cont">
+    	<p>1、备案领队可在此申请试用新版自游通，申请提交后，客服会与您沟通相关事项，并在开通新版自游通后通知您。备案领队可在此申请试用新版自游通。</p>
+        <p>2、申请提交后，客服会与您沟通相关事项，并在开通新版自游通后通知您。备案领队可在此申请试用新版自游通，申请提交后，客服会与您沟通相关事项。</p>
+        <p>3、并在开通新版自游通后通知您。备案领队可在此申请试用新版自游通，申请提交后，客服会与您沟通相关事项，并在开通新版自游通后通知您。备案领队可在此申请试用新版.</p>
+        <!--<p>3、并在开通新版自游通后通知您。备案领队可在此申请试用新版自游通，申请提交后，客服会与您沟通相关事项，并在开通新版自游通后通知您。备案领队可在此申请试用新版.</p>-->
+    </div>
+    <div class="confirm_btn">
+    	<a href="{{ url_for('frontpage.application') }}" target="_self">申请试用</a>
+    </div>
+    <a href="javascript:void(0)" class="close"></a>
+</div>
+{% endblock %}

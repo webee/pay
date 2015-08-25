@@ -1,0 +1,10 @@
+{% extends "frontpage/layout.html" %}
+{% block title %}申请成功{% endblock %}
+{% block content %}
+<div class="mainSq">
+	<p>
+    	<span>{{ current_user.user_name }}, 您已申请成功, 请等待后续通知。</span>
+        <a href="{{ url_for('frontpage.main') }}" target="_self" title="">返回首页&gt;&gt;</a>
+    </p>
+</div>
+{% endblock %}

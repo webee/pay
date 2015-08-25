@@ -1,0 +1,10 @@
+{% extends "frontpage/layout.html" %}
+{% block title %}提示信息{% endblock %}
+{% block content %}
+<div class="mainSq">
+	<p>
+    	<span>新版自游通暂只对领队开放。</span>
+        <a href="{{ url_for('frontpage.main') }}" target="_self" title="">返回首页&gt;&gt;</a>
+    </p>
+</div>
+{% endblock %}

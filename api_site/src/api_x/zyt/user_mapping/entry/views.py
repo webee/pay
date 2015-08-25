@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from . import user_mapping_entry_mod as mod
 from .. import get_or_create_account_user, get_user_map
 from .. import get_user_domain_by_name
+from api_x.utils.entry_auth import verify_request
 from api_x.utils import response
 from api_x.config import etc as config
 
@@ -24,7 +25,8 @@ def get_create_account_user(user_domain_name, user_id):
     return response.success(account_user_id=account_user_id)
 
 
-@mod.route('/user_domains/<user_domain_name>/users/<user_id>', methods=['GET'])
+@mod.route('/user_domains/<user_domain_name>/users/<user_id>/is_opened', methods=['GET'])
+@verify_request('query_user_is_opened')
 def query_user_is_opened(user_domain_name, user_id):
     user_domain = get_user_domain_by_name(user_domain_name)
     if user_domain is None:
@@ -35,4 +37,4 @@ def query_user_is_opened(user_domain_name, user_id):
         return response.not_found()
 
     is_opened = config.Biz.IS_ALL_OPENED or user_map.is_opened
-    return response.success(is_opened=is_opened)
+    return response.success(is_opened=is_opened, opened_on=user_map.opened_on)

@@ -9,7 +9,6 @@ from pytoolbox.util.log import get_logger
 from pub_site import login_manager
 from pub_site import config
 from tools.urls import build_url
-from .dba import is_leader_applied
 
 logger = get_logger(__name__)
 
@@ -20,7 +19,7 @@ class User(UserMixin):
         self.user_domain_name = user_domain_name
         self.user_id = user_id
         self.user_name = user_name
-        self.id_leader = is_leader
+        self.is_leader = is_leader
         self.phone_no = phone_no
 
     def to_dict(self):
@@ -62,7 +61,7 @@ class User(UserMixin):
             txt = urllib2.urlopen(req, timeout=3).read()
             logger.warn('user json: ' + txt)
             user_json = json.loads(txt.strip()[5:-1])
-            user_json['user_domain'] = config.LVYE_ACCOUNT_USER_DOMAIN_NAME
+            user_json['user_domain_name'] = config.LVYE_ACCOUNT_USER_DOMAIN_NAME
             return User.from_json(user_json, xid)
 
         except Exception as _:
@@ -96,23 +95,11 @@ def auth():
     user_cookie = request.cookies.get(config.UserCenter.AUTH_COOKIE)
     user = User.get(user_cookie)
     logger.info('user cookie: {}, user: {}'.format(user_cookie, user))
-    user.is_authenticated()
     if user is not None:
-        if not user.is_leader:
-            return render_template('user_is_not_allowed.html')
-        # 为领队
-        if not is_leader_applied(user.user_domain_name, user.user_id):
-            # 没有申请的，则到申请页面
-            pass
-        # 已申请，则判断是否开通
         login_user(user)
         session['current_user'] = user.to_dict()
 
-        # 为领队，且已登录
-        if is_leader_applied(user.user_domain_name, user.user_id):
-            pass
-
-    next_url = request.args.get('next') or '/main'
+    next_url = request.args.get('next') or url_for('main.index')
     return redirect(next_url)
 
 
@@ -123,9 +110,3 @@ def logout():
     session.clear()
 
     return redirect(config.UserCenter.LOGOUT_URL)
-
-
-@mod.route('/auth/user_is_not_allowed/')
-def user_is_not_allowed():
-    return ren
-    pass

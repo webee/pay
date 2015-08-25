@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-from flask import request, redirect, session, url_for
+from flask import request, redirect, session, url_for, render_template
 from flask_login import UserMixin, AnonymousUserMixin, login_user, logout_user, login_required
 
 from . import auth_mod as mod
@@ -9,47 +9,61 @@ from pytoolbox.util.log import get_logger
 from pub_site import login_manager
 from pub_site import config
 from tools.urls import build_url
+from .dba import is_leader_applied
 
 logger = get_logger(__name__)
 
 
 class User(UserMixin):
+    def __init__(self, xid, user_domain_name, user_id, user_name, is_leader, phone_no):
+        self.id = xid
+        self.user_domain_name = user_domain_name
+        self.user_id = user_id
+        self.user_name = user_name
+        self.id_leader = is_leader
+        self.phone_no = phone_no
+
     def to_dict(self):
-        return dict(id=self.id, user_id=self.user_id, user_name=self.user_name, is_leader=self.is_leader)
+        return dict(id=self.id, user_domain_name=self.user_domain_name, user_id=self.user_id, user_name=self.user_name,
+                    is_leader=self.is_leader, phone_no=self.phone_no)
 
     @classmethod
     def from_json(cls, user_json, cookie_id):
-        user = User()
-        user.id = cookie_id
-        user.user_id = user_json.get('uid')
-        user.user_name = user_json.get('username')
-        user.is_leader = user_json.get('isleader')
-        return user
+        xid = cookie_id
+        user_domain_name = user_json.get('user_domain_name')
+        user_id = int(user_json.get('uid'))
+        user_name = user_json.get('username')
+        is_leader = user_json.get('isleader') == "1"
+        # FIXME: get real user phone no.
+        phone_no = "18810928956"
+
+        return User(xid, user_domain_name, user_id, user_name, is_leader, phone_no)
 
     @classmethod
     def from_dict(cls, user_dict):
-        user = User()
-        user.id = user_dict.get('id')
-        user.user_id = user_dict.get('user_id')
-        user.user_name = user_dict.get('user_name')
-        user.is_leader = user_dict.get('is_leader')
-        return user
+        xid = user_dict.get('id')
+        user_domain_name = user_dict.get('user_domain_name')
+        user_id = user_dict.get('user_id')
+        user_name = user_dict.get('user_name')
+        is_leader = user_dict.get('is_leader')
+        phone_no = user_dict.get('phone_no')
+        return User(xid, user_domain_name, user_id, user_name, is_leader, phone_no)
 
     @classmethod
-    def get(cls, id):
+    def get(cls, xid):
         import urllib2
         import json
         url = config.UserCenter.IS_PASSPORT_LOGIN_URL
-        logger.info(' url: {}'.format(url))
-        request = urllib2.Request(
+        req = urllib2.Request(
             url=url,
-            headers={'Content-Type': 'text/xml', 'Cookie': config.UserCenter.AUTH_COOKIE + "=%s" % id},
+            headers={'Content-Type': 'text/xml', 'Cookie': config.UserCenter.AUTH_COOKIE + "=%s" % xid},
         )
         try:
-            txt = urllib2.urlopen(request, timeout=3).read()
+            txt = urllib2.urlopen(req, timeout=3).read()
             logger.warn('user json: ' + txt)
             user_json = json.loads(txt.strip()[5:-1])
-            return User.from_json(user_json, id)
+            user_json['user_domain'] = config.LVYE_ACCOUNT_USER_DOMAIN_NAME
+            return User.from_json(user_json, xid)
 
         except Exception as _:
             logger.exception(_)
@@ -82,9 +96,21 @@ def auth():
     user_cookie = request.cookies.get(config.UserCenter.AUTH_COOKIE)
     user = User.get(user_cookie)
     logger.info('user cookie: {}, user: {}'.format(user_cookie, user))
+    user.is_authenticated()
     if user is not None:
+        if not user.is_leader:
+            return render_template('user_is_not_allowed.html')
+        # 为领队
+        if not is_leader_applied(user.user_domain_name, user.user_id):
+            # 没有申请的，则到申请页面
+            pass
+        # 已申请，则判断是否开通
         login_user(user)
         session['current_user'] = user.to_dict()
+
+        # 为领队，且已登录
+        if is_leader_applied(user.user_domain_name, user.user_id):
+            pass
 
     next_url = request.args.get('next') or '/main'
     return redirect(next_url)
@@ -97,3 +123,9 @@ def logout():
     session.clear()
 
     return redirect(config.UserCenter.LOGOUT_URL)
+
+
+@mod.route('/auth/user_is_not_allowed/')
+def user_is_not_allowed():
+    return ren
+    pass

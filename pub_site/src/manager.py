@@ -13,13 +13,13 @@ manager.add_option('-d', '--deploy', action='store_true', dest='deploy', require
 
 
 def make_shell_context():
-    from pub_site import config
-    return dict(app=manager.app, config=config)
+    from pub_site import config, db
+    return dict(app=manager.app, config=config, db=db)
 
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
 
-server = Server(host="0.0.0.0", port=5002)
+server = Server(host="0.0.0.0", port=5102)
 manager.add_command("runserver", server)
 
 
@@ -29,12 +29,21 @@ def migrate():
     do_migration()
 
 
-@manager.option('-e', '--env', type=str, dest="envx", required=False, default='dev')
 @manager.option('-r', '--recreate', action="store_true", dest="recreate", required=False, default=False)
-def init_db(envx, recreate):
-    from ops.deploy.init_db import init_db
+def init_db(recreate):
+    from fabric.api import local
+    from pub_site import db
 
-    init_db(envx, recreate)
+    def recreate_db():
+        from pytoolbox.util.console_log import info
+
+        info('recreating database ...')
+        local('mysql -u root -p < migration/init_db.sql')
+
+    if recreate:
+        recreate_db()
+    db.drop_all()
+    db.create_all()
 
 
 @manager.option('-e', '--env', type=str, dest="env", required=True, default='dev')

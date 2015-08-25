@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
-from pytoolbox import conf
+from pytoolbox.util import pmc_config
+from pytoolbox.util.pmc_config import read_string
 
 
 class App:
@@ -12,7 +13,7 @@ class App:
     LOGIN_DISABLED = False
     WTF_CSRF_SECRET_KEY = 'a random string'
 
-    SQLALCHEMY_DATABASE_URI = 'mysql://lvye_pay:p@55word@127.0.0.1:3306/lvye_pay'
+    SQLALCHEMY_DATABASE_URI = 'mysql://lvye_pay:p@55word@127.0.0.1:3306/lvye_pay_pub'
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_POOL_SIZE = 30
     SQLALCHEMY_POOL_TIMEOUT = 60
@@ -39,7 +40,7 @@ class UserCenter:
 HOST_URL = 'http://pay.lvye.com'
 
 # 自游通渠道，用户域为绿野用户中心
-USER_DOMAIN_NAME = 'lvye_account'
+LVYE_ACCOUNT_USER_DOMAIN_NAME = 'lvye_account'
 CHANNEL_NAME = 'lvye_pay'
 # 绿野公司域和用户
 LVYE_CORP_DOMAIN_NAME = 'lvye_corp'
@@ -47,17 +48,15 @@ LVYE_USER_NAME = 'lvye'
 
 
 # # pay api
-class PayAPI:
+class PayClientConfig:
+    MD5_KEY = read_string('conf/test/md5_key.txt')
+    LVYE_PUB_KEY = read_string('conf/test/lvye_pub_key.txt')
+    CHANNEL_PRI_KEY = read_string('conf/test/channel_pri_key.txt')
 
-    ROOT_URL = "http://localhost:5000"
-    GET_ACCOUNT_ID_URL = "user_domains/{user_domain_id}/users/{uid}/account"
-    GET_USER_TRANSACTIONS_URL = "biz/account_users/{account_user_id}/transactions"
+    USER_DOMAIN_NAME = 'lvye_account'
+    CHANNEL_NAME = 'lvye_pay'
 
-    GET_CREATE_ACCOUNT_ID_URL = 'user_mapping/user_domains/{user_domain_name}/users/{user_id}'
-    GET_USER_BALANCE_URL = 'vas/zyt/account_users/{account_user_id}/balance'
-
-    LIST_USER_BANKCARDS_URL = 'application/account_users/{account_user_id}/bankcards'
-    QUERY_BIN_URL = 'application/bankcard/{card_no}/bin'
+    ROOT_URL = "http://pay.lvye.com/api"
 
 
 # #### data #######
@@ -68,7 +67,7 @@ def load_provinces_and_cities(filepath):
 
     UTF8Reader = codecs.getreader('utf-8')
 
-    with UTF8Reader(open(path.join(conf.project_root(), filepath))) as fin:
+    with UTF8Reader(open(path.join(pmc_config.get_project_root(), filepath))) as fin:
         provinces = OrderedDict()
         cities = OrderedDict()
         for line in fin:

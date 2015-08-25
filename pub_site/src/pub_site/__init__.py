@@ -70,6 +70,8 @@ def init_config(app, env):
 
 
 def init_extensions(app):
+    from pub_site import models
+
     dbs.init_db(app)
     db.init_app(app)
 
@@ -99,7 +101,7 @@ login_manager.login_message = None
 csrf = CsrfProtect()
 
 
-def create_app(env, deploy):
+def create_app(env='dev', deploy=False):
     if deploy:
         return Flask(__name__)
 

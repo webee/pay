@@ -24,7 +24,7 @@ def handle_response(func):
 class PayClient:
     account_user_ids = {}
 
-    def __init__(self, server=config.PayAPI.ROOT_URL):
+    def __init__(self, server=config.PayClientConfig.ROOT_URL):
         self.server = server
 
     @handle_response
@@ -80,7 +80,7 @@ class PayClient:
         data = {
             "channel_name": config.CHANNEL_NAME,
             "payer": current_user.user_id,
-            "payee": config.PayAPI.LVYE_USER_ID,
+            "payee": config.PayClientConfig.LVYE_USER_ID,
             "order_no": order_id,
             "order_name": order_name,
             "order_desc": order_description,

@@ -15,14 +15,14 @@ logger = get_logger(__name__)
 
 def _generate_api_url(url, **kwargs):
     url = url.lstrip('/')
-    url = os.path.join(config.PayAPI.ROOT_URL, url.format(**kwargs))
+    url = os.path.join(config.PayClientConfig.ROOT_URL, url.format(**kwargs))
     logger.info("request url %s" % url)
     return url
 
 
-def get_account_user_id(user_id, user_domain_name=config.USER_DOMAIN_NAME):
+def get_account_user_id(user_id, user_domain_name=config.LVYE_ACCOUNT_USER_DOMAIN_NAME):
     if user_id not in _uid_accounts:
-        url = _generate_api_url(config.PayAPI.GET_CREATE_ACCOUNT_ID_URL,
+        url = _generate_api_url(config.PayClientConfig.GET_CREATE_ACCOUNT_ID_URL,
                                 user_domain_name=user_domain_name, user_id=user_id)
         req = requests.post(url)
         if req.status_code == 200:
@@ -33,7 +33,7 @@ def get_account_user_id(user_id, user_domain_name=config.USER_DOMAIN_NAME):
 
 def get_user_balance(uid):
     account_user_id = get_account_user_id(uid)
-    url = _generate_api_url(config.PayAPI.GET_USER_BALANCE_URL, account_user_id=account_user_id)
+    url = _generate_api_url(config.PayClientConfig.GET_USER_BALANCE_URL, account_user_id=account_user_id)
     req = requests.get(url)
 
     if req.status_code == 200:
@@ -48,7 +48,7 @@ def get_user_available_balance(uid):
 
 def list_user_bankcards(uid):
     account_user_id = get_account_user_id(uid)
-    url = _generate_api_url(config.PayAPI.LIST_USER_BANKCARDS_URL, account_user_id=account_user_id)
+    url = _generate_api_url(config.PayClientConfig.LIST_USER_BANKCARDS_URL, account_user_id=account_user_id)
     req = requests.get(url)
 
     if req.status_code == 200:
@@ -57,7 +57,7 @@ def list_user_bankcards(uid):
 
 
 def get_bin(card_no):
-    url = _generate_api_url(config.PayAPI.QUERY_BIN_URL, card_no=card_no)
+    url = _generate_api_url(config.PayClientConfig.QUERY_BIN_URL, card_no=card_no)
 
     req = requests.get(url)
     return req.json()
@@ -65,7 +65,7 @@ def get_bin(card_no):
 
 def query_transactions(uid, role, page_no, page_size, q):
     account_user_id = get_account_user_id(uid)
-    url = _generate_api_url(config.PayAPI.GET_USER_TRANSACTIONS_URL, account_user_id=account_user_id)
+    url = _generate_api_url(config.PayClientConfig.GET_USER_TRANSACTIONS_URL, account_user_id=account_user_id)
 
     params = {
         'role': role,

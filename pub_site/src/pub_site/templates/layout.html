@@ -40,7 +40,10 @@
         </ul>
         <div class="loginBtn clearfix">
             <div class="yh">
-                <span class="userName">当前用户：{{ current_user.user_name }}</span>
+                {% if current_user.is_authenticated() %}
+                    <span class="userName">当前用户：{{ current_user.user_name }}</span>
+                    |<a href="{{ url_for('auth.logout') }}">安全退出</a>
+                {% endif %}
             </div>
 
         </div>
@@ -49,10 +52,11 @@
 
 <div class="main" id="main">
 	<div class="mainCont clearfix">
-    	<div class="contLeft">
-        	<h2 class="padding20">自游通</h2>
+    {% block main %}
+        <div class="contLeft">
+            <h2 class="padding20">自游通</h2>
             <ul class="listli">
-            	<li class="padding20 {{ 'cur' if g.current_channel == 'main' else '' }}">
+                <li class="padding20 {{ 'cur' if g.current_channel == 'main' else '' }}">
                     <a href="{{ url_for('main.index') }}">我的自游通</a>
                 </li>
                 <li class="padding20 {{ 'cur' if g.current_channel == 'withdraw' else '' }}">
@@ -63,7 +67,8 @@
                 </li>
             </ul>
         </div>
-            {% block content %}{% endblock %}
+        {% block content %}{% endblock %}
+    {% endblock %}
     </div>
 </div>
 

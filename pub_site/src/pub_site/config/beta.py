@@ -5,8 +5,8 @@ class App:
     TESTING = True
 
 
-class PayAPI:
-    ROOT_URL = "http://192.168.0.165:5000"
+class PayClientConfig:
+    ROOT_URL = "http://192.168.0.165:5100"
 
 
-HOST_URL = 'http://pay.lvye.com'
+HOST_URL = 'http://pay.lvye.com/__'

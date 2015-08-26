@@ -66,7 +66,8 @@ def verify_request(entry_name):
                 sign_type = data['sign_type']
                 signer = Signer('key', 'sign', channel.md5_key, config.LVYE_PRI_KEY, channel.public_key)
                 if not signer.verify(data, sign_type):
-                    return response.refused()
+                    msg = 'sign error.'
+                    return response.refused(msg=msg)
             except Exception as e:
                 logger.exception(e)
                 return response.bad_request(msg=e.message)

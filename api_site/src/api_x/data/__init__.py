@@ -12,6 +12,12 @@ def init_data():
     init_test_data()
 
 
+def init_channel_perms():
+    from api_x.zyt.user_mapping import add_perm_to_channel
+
+    add_perm_to_channel('lvye_pay_site', 'query_user_is_opened')
+
+
 def add_system_users():
     # user mapping
     # 系统用户

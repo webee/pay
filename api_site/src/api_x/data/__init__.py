@@ -27,10 +27,10 @@ def add_system_users():
 
     # 添加渠道: 绿野活动
     create_channel(lvye_account_user_domain.id, 'lvye_huodong', '绿野活动')
-    create_channel(lvye_account_user_domain.id, 'lvye_test_channel', '绿野测试渠道')
+    create_channel(lvye_account_user_domain.id, 'lvye_pay_test', '绿野自游通测试渠道')
 
     # 添加渠道: 绿野自游通
-    create_channel(lvye_account_user_domain.id, 'lvye_pay', '绿野自游通')
+    create_channel(lvye_account_user_domain.id, 'lvye_pay_site', '绿野自游通网站')
 
 
 def add_vases():

@@ -44,8 +44,8 @@ def pay():
         'product_category': '测试',
         'product_desc': '用于测试的商品',
         'amount': amount,
-        'client_callback_url': config.HOST_URL + url_for('.pay_result'),
-        'client_notify_url': '',
+        'callback_url': config.HOST_URL + url_for('.pay_result'),
+        'notify_url': '',
         'payment_type': payment_type
     }
 
@@ -76,11 +76,10 @@ def pay_result():
 
 @mod.route('/pay/guarantee_payment/confirm', methods=['POST'])
 def confirm_guarantee_payment():
-    params = {
-        'order_id': request.values['order_id']
-    }
+    data = request.values
+    order_id = data['order_id']
 
-    data = pay_client.confirm_guarantee_payment(params)
+    data = pay_client.confirm_guarantee_payment(order_id)
     return render_template('sample/info.html', title='确认担保支付结果', msg=json.dumps(data))
 
 

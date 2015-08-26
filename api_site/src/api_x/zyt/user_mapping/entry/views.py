@@ -37,4 +37,4 @@ def query_user_is_opened(user_domain_name, user_id):
         return response.not_found()
 
     is_opened = config.Biz.IS_ALL_OPENED or user_map.is_opened
-    return response.success(is_opened=is_opened, opened_on=user_map.opened_on)
+    return response.success(is_opened=is_opened)

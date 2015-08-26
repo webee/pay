@@ -30,8 +30,8 @@ def prepay():
     product_category = data['product_category']
     product_desc = data['product_desc']
     amount = data['amount']
-    client_callback_url = data['client_callback_url']
-    client_notify_url = data['client_notify_url']
+    client_callback_url = data['callback_url']
+    client_notify_url = data['notify_url']
     payment_type = data['payment_type']
 
     # check

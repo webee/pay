@@ -9,6 +9,7 @@ class LeaderApplication(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_domain_name = db.Column(db.VARCHAR(32), nullable=False)
     user_id = db.Column(db.VARCHAR(32), nullable=False)
+    user_name = db.Column(db.VARCHAR(64), nullable=False)
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     __table_args__ = (db.UniqueConstraint('user_domain_name', 'user_id', name='domain_user_id_uniq_idx'),)

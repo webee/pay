@@ -46,7 +46,7 @@ class PayClientConfig:
     CHANNEL_PRI_KEY = read_string('conf/test/channel_pri_key.txt')
 
     USER_DOMAIN_NAME = 'lvye_account'
-    CHANNEL_NAME = 'lvye_pay'
+    CHANNEL_NAME = 'lvye_pay_site'
 
     ROOT_URL = "http://pay.lvye.com/api"
 

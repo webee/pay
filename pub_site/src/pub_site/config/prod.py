@@ -15,13 +15,6 @@ class App:
 HOST_URL = 'http://pay.lvye.com'
 
 
-class DataBase:
-    HOST = os.environ['PAY_PUB_SITE_DATABASE_HOST']
-    INSTANCE = 'lvye_pay'
-    USERNAME = 'lvye_pay'
-    PASSWORD = os.environ['PAY_PUB_SITE_DATABASE_PASSWORD']
-
-
 class PayClientConfig:
     MD5_KEY = read_string('conf/md5_key.txt')
     LVYE_PUB_KEY = read_string('conf/lvye_pub_key.txt')

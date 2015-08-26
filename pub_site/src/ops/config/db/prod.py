@@ -5,4 +5,4 @@ import os
 HOST = os.environ['PAY_PUB_SITE_DATABASE_HOST']
 USERNAME = 'lvye_pay'
 PASSWORD = os.environ['PAY_PUB_SITE_DATABASE_PASSWORD']
-INSTANCE = 'lvye_pay'
+INSTANCE = 'lvye_pay_pub'

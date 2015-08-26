@@ -45,7 +45,9 @@ def verify_request(entry_name):
         @wraps(f)
         def wrapper(*args, **kwargs):
             try:
-                data = request.values
+                data = {}
+                data.update(request.values.items())
+                data.update(request.view_args)
                 # check perm
                 channel_name = data.get('channel_name')
                 if channel_name is None:

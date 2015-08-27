@@ -1,37 +1,43 @@
 import fabric.api as fab
 
+from pytoolbox.util import pmc_config
+from ops.config import deploy as config
 
-def get_config(env):
+
+def init_config(env):
     import os
-    from ops.config import deploy as config
-    import pytoolbox.conf.config as conf
 
     env = env or 'dev'
     os.environ['ENV'] = env
-    conf.load(config, env=env)
-    return config
+    pmc_config.register_config(config, env=env)
 
 
-def deploy(env):
-    env = env or 'dev'
-    cfg = get_config(env)
+def deploy(env, name):
+    init_config(env)
+
     fab.use_ssh_config = True
-    fab.env.host_string = cfg.HOST_STRING
-    code_dir = cfg.CODE_DIR
-    toolbox_dir = "{}/../libraries/pytoolbox".format(code_dir)
-    with fab.cd(toolbox_dir):
-        fab.run('git pull --ff-only origin master')
+    fab.env.host_string = config.HOST_STRING
+    code_dir = config.CODE_DIR
+    root_dir = "{}/../".format(code_dir)
+    update_code(code_dir, root_dir)
+
     with fab.cd(code_dir), fab.prefix('source api_venv/bin/activate'):
+        update_deploy_file(name)
+
+        stop_python_server(name)
+        start_python_server(name)
+
+
+def update_code(code_dir, root_dir):
+    with fab.cd(code_dir):
         fab.run('git pull --ff-only origin master')
 
-        reread_config_file()
-
-        stop_python_server('pay_api_site')
-        start_python_server('pay_api_site')
+    with fab.cd(root_dir):
+        fab.run('git submodule update')
 
 
-def reread_config_file():
-    fab.run('sudo cp deploy/pay_api_site.conf /etc/supervisord.d/')
+def update_deploy_file(file_name="pay_api_site"):
+    fab.run('sudo cp deploy/{}.conf /etc/supervisord.d/'.format(file_name))
     fab.run('sudo /usr/local/bin/supervisorctl reread')
     fab.run('sudo /usr/local/bin/supervisorctl update')
 

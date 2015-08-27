@@ -58,7 +58,14 @@ def update_api_entries():
 def deploy(environ):
     from ops.deploy.deploy import deploy
 
-    deploy(environ)
+    deploy(environ, 'pay_api_site')
+
+
+@manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')
+def deploy_celery(environ):
+    from ops.deploy.deploy import deploy
+
+    deploy(environ, 'pay_api_celery')
 
 
 class CeleryCommand(Command):

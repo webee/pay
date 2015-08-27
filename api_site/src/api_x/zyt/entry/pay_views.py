@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from api_x.utils import response
 from api_x.zyt.biz import payment
-from api_x.constant import TransactionState
+from api_x.constant import TransactionState, PaymentTxState
 from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 
 from flask import request, render_template, url_for, abort, redirect
@@ -59,7 +59,7 @@ def cashier_desk(sn):
     tx = get_tx_by_sn(sn)
     if tx is None:
         abort(404)
-    if tx.state != TransactionState.CREATED:
+    if tx.state != PaymentTxState.CREATED:
         return render_template("info.html", msg="该订单已支付")
 
     if len(config.Biz.ACTIVATED_EVAS) == 1:
@@ -77,7 +77,7 @@ def pay(sn, vas_name):
     tx = get_tx_by_sn(sn)
     if tx is None:
         response.not_found(msg='tx sn=[{0}] not fund.'.format(sn))
-    if tx.state != TransactionState.CREATED:
+    if tx.state != PaymentTxState.CREATED:
         return render_template("info.html", msg="该订单已支付")
 
     if vas_name not in config.Biz.ACTIVATED_EVAS:

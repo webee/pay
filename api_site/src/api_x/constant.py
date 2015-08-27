@@ -30,7 +30,7 @@ class TransactionType:
     WITHDRAW = 'WITHDRAW'
 
 
-class PaymentTransactionState:
+class PaymentTxState:
     CREATED = 'CREATED'
     FAILED = 'FAILED'
     SUCCESS = 'SUCCESS'
@@ -39,13 +39,13 @@ class PaymentTransactionState:
     REFUNDING = 'REFUNDING'
 
 
-class RefundTransactionState:
+class RefundTxState:
     CREATED = 'CREATED'
     FAILED = 'FAILED'
     SUCCESS = 'SUCCESS'
 
 
-class WithdrawTransactionState:
+class WithdrawTxState:
     CREATED = 'CREATED'
     FAILED = 'FAILED'
     SUCCESS = 'SUCCESS'

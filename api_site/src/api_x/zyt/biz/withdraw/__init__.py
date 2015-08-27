@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x import db
-from api_x.constant import WithdrawTransactionState
+from api_x.constant import WithdrawTxState
 from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.models import TransactionType, WithdrawRecord
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state
@@ -124,19 +124,19 @@ def _freeze_withdraw(tx, withdraw_record):
     event_id = bookkeeping(EventType.FREEZE, tx.sn, from_user_id, ZYT_NAME, actual_amount)
     event_ids.append(event_id)
 
-    transit_transaction_state(tx.id, WithdrawTransactionState.CREATED, WithdrawTransactionState.FROZEN, event_ids)
+    transit_transaction_state(tx.id, WithdrawTxState.CREATED, WithdrawTxState.FROZEN, event_ids)
 
 
 @transactional
 def _unfreeze_fail_withdraw(tx, withdraw_record):
     event_ids = _unfreeze_withdraw_amount(tx, withdraw_record)
-    transit_transaction_state(tx.id, WithdrawTransactionState.FROZEN, WithdrawTransactionState.FAILED, event_ids)
+    transit_transaction_state(tx.id, WithdrawTxState.FROZEN, WithdrawTxState.FAILED, event_ids)
 
 
 @transactional
 def _fail_withdraw(tx, withdraw_record):
     event_ids = _unfreeze_withdraw_amount(tx, withdraw_record)
-    transit_transaction_state(tx.id, WithdrawTransactionState.PROCESSING, WithdrawTransactionState.FAILED, event_ids)
+    transit_transaction_state(tx.id, WithdrawTxState.PROCESSING, WithdrawTxState.FAILED, event_ids)
 
 
 def _unfreeze_withdraw_amount(tx, withdraw_record):
@@ -175,12 +175,12 @@ def _success_withdraw(tx, withdraw_record):
     event_id = bookkeeping(EventType.TRANSFER_OUT_FROZEN, tx.sn, from_user_id, tx.vas_name, actual_amount)
     event_ids.append(event_id)
 
-    transit_transaction_state(tx.id, WithdrawTransactionState.PROCESSING, WithdrawTransactionState.SUCCESS, event_ids)
+    transit_transaction_state(tx.id, WithdrawTxState.PROCESSING, WithdrawTxState.SUCCESS, event_ids)
 
 
 @transactional
 def _withdraw_to_processing(tx):
-    transit_transaction_state(tx.id, WithdrawTransactionState.FROZEN, WithdrawTransactionState.PROCESSING)
+    transit_transaction_state(tx.id, WithdrawTxState.FROZEN, WithdrawTxState.PROCESSING)
 
 
 def _request_pay_to_bankcard(tx, withdraw_record, data):
@@ -232,7 +232,7 @@ def handle_withdraw_notify(is_success, sn, vas_name, vas_sn, data):
         logger.warning('withdraw notify duplicated: [{0}, {1}]'.format(vas_name, vas_sn))
         return
 
-    if tx.state != WithdrawTransactionState.PROCESSING:
+    if tx.state != WithdrawTxState.PROCESSING:
         logger.warning('bad withdraw notify: [sn: {0}]'.format(sn))
         return
 
@@ -254,11 +254,11 @@ def _try_notify_client(tx, withdraw_record):
     url = withdraw_record.client_notify_url
 
     params = None
-    if tx.state == WithdrawTransactionState.SUCCESS:
+    if tx.state == WithdrawTxState.SUCCESS:
         params = {'code': 0, 'account_user_id': withdraw_record.from_user_id, 'sn': tx.sn,
                   'amount': withdraw_record.amount, 'actual_amount': withdraw_record.actual_amount,
                   'fee': withdraw_record.fee}
-    elif tx.state == WithdrawTransactionState.FAILED:
+    elif tx.state == WithdrawTxState.FAILED:
         params = {'code': 1, 'account_user_id': withdraw_record.from_user_id, 'sn': tx.sn,
                   'amount': withdraw_record.amount, 'actual_amount': withdraw_record.actual_amount,
                   'fee': withdraw_record.fee}

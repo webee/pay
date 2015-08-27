@@ -8,7 +8,7 @@ from api_x.zyt.biz.refund.dba import update_payment_refunded_amount
 from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id
-from api_x.constant import SECURE_USER_NAME, PaymentTransactionState, RefundTransactionState
+from api_x.constant import SECURE_USER_NAME, PaymentTxState, RefundTxState
 from api_x.zyt.vas.user import get_user_cash_balance
 from api_x.zyt.biz.models import UserRole
 from pytoolbox.util.dbs import transactional, require_transaction_context
@@ -32,7 +32,7 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data):
     # FIXME:
     # 以下事实上是拒绝所有成功的交易进行退款
     # 因为金额可能被提现出去。
-    if tx.state == PaymentTransactionState.SUCCESS:
+    if tx.state == PaymentTxState.SUCCESS:
         # disable success finished pay refund.
         raise RefundSuccessPayError(tx.sn)
 
@@ -70,7 +70,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         logger.warning('refund notify duplicated: [{0}, {1}]'.format(vas_name, vas_sn))
         return
 
-    if payment_tx.state != PaymentTransactionState.REFUNDING and tx.state != RefundTransactionState.CREATED:
+    if payment_tx.state != PaymentTxState.REFUNDING and tx.state != RefundTxState.CREATED:
         logger.warning('bad refund notify: [sn: {0}]'.format(sn))
         return
 
@@ -97,9 +97,9 @@ def _try_notify_client(tx, refund_record):
     url = refund_record.client_notify_url
 
     params = None
-    if tx.state == RefundTransactionState.SUCCESS:
+    if tx.state == RefundTxState.SUCCESS:
         params = {'code': 0, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
-    elif tx.state == RefundTransactionState.FAILED:
+    elif tx.state == RefundTxState.FAILED:
         params = {'code': 1, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
 
     # notify
@@ -114,7 +114,7 @@ def _get_tx_payment_to_refund(channel_id, order_id):
         raise NoPaymentFoundError(channel_id, order_id)
 
     tx = get_tx_by_sn(payment_record.sn)
-    if tx.state == PaymentTransactionState.REFUNDING:
+    if tx.state == PaymentTxState.REFUNDING:
         raise PaymentIsRefundingError()
     if not _is_refundable(tx, payment_record):
         raise PaymentNotRefundableError()
@@ -128,7 +128,7 @@ def _is_refundable(tx, payment_record):
         # return False
         # return tx.state == PaymentTransactionState.SUCCESS
     if pay_type == PaymentType.GUARANTEE:
-        return tx.state == PaymentTransactionState.SECURED
+        return tx.state == PaymentTxState.SECURED
 
 
 @transactional
@@ -151,11 +151,11 @@ def _create_refund(channel, tx, payment_record, amount, client_notify_url):
     cur_payment_state = tx.state
 
     # start refunding.
-    transit_transaction_state(tx.id, tx.state, PaymentTransactionState.REFUNDING)
+    transit_transaction_state(tx.id, tx.state, PaymentTxState.REFUNDING)
 
     tx = get_tx_by_id(tx.id)
     payment_record = get_payment_by_id(payment_record.id)
-    if tx.state != PaymentTransactionState.REFUNDING:
+    if tx.state != PaymentTxState.REFUNDING:
         raise PaymentNotRefundableError()
 
     if amount + payment_record.refunded_amount > payment_record.amount:
@@ -254,14 +254,14 @@ def succeed_refund(vas_name, payment_record, refund_record):
     is_refunded = payment_amount == refunded_amount + refund_amount
 
     if is_refunded:
-        transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
-                                  PaymentTransactionState.REFUNDED, event_id)
+        transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING,
+                                  PaymentTxState.REFUNDED, event_id)
     else:
-        transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
+        transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING,
                                   refund_record.payment_state, event_id)
 
-    transit_transaction_state(refund_record.tx_id, RefundTransactionState.CREATED,
-                              RefundTransactionState.SUCCESS, event_id)
+    transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED,
+                              RefundTxState.SUCCESS, event_id)
 
     update_payment_refunded_amount(payment_record.id, refund_amount)
 
@@ -278,18 +278,18 @@ def succeed_refund_secured(vas_name, payment_record, refund_record):
     is_refunded = payment_amount == refunded_amount + refund_amount
 
     if is_refunded:
-        transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
-                                  PaymentTransactionState.REFUNDED, event_id)
+        transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING,
+                                  PaymentTxState.REFUNDED, event_id)
     else:
-        transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING,
+        transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING,
                                   refund_record.payment_state, event_id)
-    transit_transaction_state(refund_record.tx_id, RefundTransactionState.CREATED,
-                              RefundTransactionState.SUCCESS, event_id)
+    transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED,
+                              RefundTxState.SUCCESS, event_id)
 
     update_payment_refunded_amount(payment_record.id, refund_amount)
 
 
 @transactional
 def fail_refund(payment_record, refund_record):
-    transit_transaction_state(payment_record.tx_id, PaymentTransactionState.REFUNDING, refund_record.payment_state)
-    transit_transaction_state(refund_record.tx_id, RefundTransactionState.CREATED, RefundTransactionState.FAILED)
+    transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING, refund_record.payment_state)
+    transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED, RefundTxState.FAILED)

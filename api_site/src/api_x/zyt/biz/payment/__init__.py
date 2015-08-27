@@ -7,7 +7,7 @@ from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id, get_user_map_by_account_user_id
-from api_x.constant import TransactionState, SECURE_USER_NAME, PaymentTransactionState
+from api_x.constant import SECURE_USER_NAME, PaymentTxState
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
@@ -43,7 +43,7 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
         # update payment info, if not paid.
         with require_transaction_context():
             tx = get_tx_by_sn(payment_record.sn)
-            if tx.state == PaymentTransactionState.CREATED:
+            if tx.state == PaymentTxState.CREATED:
                 PaymentRecord.query.filter_by(id=payment_record.id) \
                     .update({'amount': amount,
                              'product_name': product_name,
@@ -55,7 +55,7 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
         from api_x.zyt import vas as zyt
 
         tx = update_transaction_info(payment_record.tx_id.id, zyt.NAME, payment_record.sn,
-                                     PaymentTransactionState.CREATED)
+                                     PaymentTxState.CREATED)
         succeed_payment(zyt.NAME, payment_record)
     return payment_record
 
@@ -117,7 +117,7 @@ def get_tx_payment_by_sn(sn):
 def succeed_payment(vas_name, payment_record):
     event_id = bookkeeping(EventType.TRANSFER_IN, payment_record.sn, payment_record.payee_id, vas_name,
                            payment_record.amount)
-    transit_transaction_state(payment_record.tx_id, TransactionState.CREATED, TransactionState.SUCCESS, event_id)
+    transit_transaction_state(payment_record.tx_id, PaymentTxState.CREATED, PaymentTxState.SUCCESS, event_id)
 
 
 @transactional
@@ -125,7 +125,7 @@ def secure_payment(vas_name, payment_record):
     secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
     event_id = bookkeeping(EventType.TRANSFER_IN_FROZEN, payment_record.sn, secure_user_id, vas_name,
                            payment_record.amount)
-    transit_transaction_state(payment_record.tx_id, TransactionState.CREATED, TransactionState.SECURED, event_id)
+    transit_transaction_state(payment_record.tx_id, PaymentTxState.CREATED, PaymentTxState.SECURED, event_id)
 
 
 @transactional
@@ -136,13 +136,13 @@ def _confirm_payment(payment_record):
     event_id1 = bookkeeping(EventType.TRANSFER_OUT_FROZEN, payment_record.sn, secure_user_id, ZYT_NAME, amount)
     event_id2 = bookkeeping(EventType.TRANSFER_IN, payment_record.sn, payment_record.payee_id, ZYT_NAME, amount)
 
-    transit_transaction_state(payment_record.tx_id, TransactionState.SECURED, TransactionState.SUCCESS,
+    transit_transaction_state(payment_record.tx_id, PaymentTxState.SECURED, PaymentTxState.SUCCESS,
                               [event_id1, event_id2])
 
 
 @transactional
 def fail_payment(payment_record):
-    transit_transaction_state(payment_record.tx_id, TransactionState.CREATED, TransactionState.FAILED)
+    transit_transaction_state(payment_record.tx_id, PaymentTxState.CREATED, PaymentTxState.FAILED)
 
 
 def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
@@ -190,7 +190,7 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
                                                                              payment_record.vas_sn, vas_name, vas_sn))
 
     with require_transaction_context():
-        tx = update_transaction_info(tx.id, vas_name, vas_sn, PaymentTransactionState.CREATED)
+        tx = update_transaction_info(tx.id, vas_name, vas_sn, PaymentTxState.CREATED)
         if is_success:
             # 直付和担保付的不同操作
             if payment_record.type == PaymentType.DIRECT:
@@ -214,11 +214,11 @@ def _try_notify_client(tx, payment_record):
     user_id = user_mapping.user_id
 
     params = None
-    if tx.state in [PaymentTransactionState.SECURED, PaymentTransactionState.SUCCESS]:
+    if tx.state in [PaymentTxState.SECURED, PaymentTxState.SUCCESS]:
         params = {'code': 0, 'user_id': user_id, 'sn': payment_record.sn,
                   'channel_name': tx.channel_name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
-    elif tx.state == PaymentTransactionState.FAILED:
+    elif tx.state == PaymentTxState.FAILED:
         params = {'code': 1, 'user_id': user_id, 'sn': payment_record.sn,
                   'channel_name': tx.channel_name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
@@ -228,7 +228,7 @@ def _try_notify_client(tx, payment_record):
 
 
 def _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
-    if tx.state in [PaymentTransactionState.CREATED, PaymentTransactionState.FAILED]:
+    if tx.state in [PaymentTxState.CREATED, PaymentTxState.FAILED]:
         return False
 
     return vas_name != payment_record.vas_name or vas_sn != payment_record.vas_sn
@@ -240,7 +240,7 @@ def confirm_payment(channel, order_id):
         raise TransactionNotFoundError('guarantee payment tx channel={0}, order_id={1} not found.'.format(channel.name, order_id))
 
     tx = get_tx_by_id(payment_record.tx_id)
-    if tx.state != PaymentTransactionState.SECURED:
+    if tx.state != PaymentTxState.SECURED:
         raise TransactionStateError('payment state must be SECURED.')
 
     _confirm_payment(payment_record)

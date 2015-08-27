@@ -11,9 +11,10 @@ from api_x.utils import response
 logger = get_logger(__name__)
 
 
-def sign_and_return_client_callback(client_callback_url, channel_name, params, sign_type=SignType.RSA, method='POST'):
+def sign_and_return_client_callback(url, channel_name, params, sign_type=SignType.RSA, method='POST'):
     params = add_sign_for_params(channel_name, params, sign_type)
-    return response.submit_form(client_callback_url, params, method)
+    logger.info("return {0} [{1}] status_code [{2}]".format(method, url, params))
+    return response.submit_form(url, params, method)
 
 
 def sign_and_notify_client(url, channel_name, params, sign_type=SignType.RSA, methods=['post']):
@@ -29,9 +30,9 @@ def notify_client(url, params, methods=['post']):
     for method in methods:
         try:
             resp = requests.request(method, url, data=params)
-            logger.info("notify url {0} [{1}] status_code [{2}]".format(method, url, resp.status_code))
+            logger.info("notify {0} [{1}] status_code [{2}]".format(method, url, resp.status_code))
             if resp.status_code == 200:
-                logger.info('return: {0}'.format(resp.content))
+                logger.info('notify response: {0}'.format(resp.content))
                 data = resp.json()
                 if data['code'] in [0, '0']:
                     return True

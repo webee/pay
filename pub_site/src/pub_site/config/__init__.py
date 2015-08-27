@@ -38,6 +38,9 @@ CHANNEL_NAME = 'lvye_pay'
 LVYE_CORP_DOMAIN_NAME = 'lvye_corp'
 LVYE_USER_NAME = 'lvye'
 
+# TODO: 同步该配置
+IS_ALL_OPENED = False
+
 
 # # pay api
 class PayClientConfig:

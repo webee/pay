@@ -65,7 +65,7 @@ def cashier_desk(sn):
     if len(config.Biz.ACTIVATED_EVAS) == 1:
         # 只有一种支付方式，则直接跳转到支付页面
         vas_name = config.Biz.ACTIVATED_EVAS[0]
-        return redirect(url_for('.pay', sn=sn, vas_name=vas_name))
+        return redirect(config.HOST_URL + url_for('.pay', sn=sn, vas_name=vas_name))
     return render_template("cashier_desk.html", root_url=config.HOST_URL, tx=tx, vases=config.Biz.ACTIVATED_EVAS)
 
 

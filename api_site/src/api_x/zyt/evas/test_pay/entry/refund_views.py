@@ -9,7 +9,7 @@ from api_x.zyt.evas.test_pay import NAME
 
 @mod.route("/refund/notify/<source>", methods=["POST"])
 def refund_notify(source):
-    data = request.values
+    data = dict(request.values.items())
     result = data['result']
     refund_no = data['refund_no']
     vas_sn = data['sn']

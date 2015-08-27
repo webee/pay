@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 @mod.route("/pay_to_bankcard/notify/<source>", methods=["POST"])
 def pay_to_bankcard_notify(source):
-    data = request.values
+    data = dict(request.values.items())
     result = data['result']
     order_no = data['order_no']
     vas_sn = data['sn']

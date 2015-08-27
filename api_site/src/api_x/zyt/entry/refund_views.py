@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 @mod.route('/refund', methods=['POST'])
 @verify_request('refund')
 def apply_to_refund():
-    data = request.values
+    data = request.params
     channel = request.channel
     order_id = data['order_id']
     amount = data['amount']

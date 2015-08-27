@@ -14,8 +14,8 @@ def parse_and_verify(f):
     def wrapper(*args, **kwargs):
         try:
             verified_data = parse_and_verify_request_data(request.values, request.data)
-            request.__dict__['verified_data'] = verified_data
         except (DictParsingError, InvalidSignError):
             return notification.wrong()
+        request.__dict__['verified_data'] = verified_data
         return f(*args, **kwargs)
     return wrapper

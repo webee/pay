@@ -11,7 +11,7 @@ from api_x.zyt.evas.test_pay import NAME
 @mod.route("/pay/result/<source>", methods=["POST"])
 def pay_result(source):
     """支付页面回调, 更多操作可由notify完成，这里只是返回callback"""
-    data = request.values
+    data = dict(request.values.items())
     order_no = data['order_no']
     vas_order_no = data['sn']
     result = data['result']
@@ -29,7 +29,7 @@ def pay_result(source):
 
 @mod.route("/pay/notify/<source>", methods=["POST"])
 def pay_notify(source):
-    data = request.values
+    data = dict(request.values.items())
     order_no = data['order_no']
     vas_order_no = data['sn']
     result = data['result']

@@ -45,11 +45,11 @@ def verify_request(entry_name):
         @wraps(f)
         def wrapper(*args, **kwargs):
             try:
-                data = {}
-                data.update(request.values.items())
-                data.update(request.view_args)
+                params = {}
+                params.update(request.values.items())
+                params.update(request.view_args)
                 # check perm
-                channel_name = data.get('channel_name')
+                channel_name = params.get('channel_name')
                 if channel_name is None:
                     return response.fail(msg='channel_name is needed.')
 
@@ -63,9 +63,9 @@ def verify_request(entry_name):
                     return response.refused(msg=msg)
 
                 # verify sign
-                sign_type = data['sign_type']
+                sign_type = params['sign_type']
                 signer = Signer('key', 'sign', channel.md5_key, config.LVYE_PRI_KEY, channel.public_key)
-                if not signer.verify(data, sign_type):
+                if not signer.verify(params, sign_type):
                     msg = 'sign error.'
                     return response.refused(msg=msg)
             except Exception as e:
@@ -73,6 +73,7 @@ def verify_request(entry_name):
                 return response.bad_request(msg=e.message)
 
             request.__dict__['channel'] = channel
+            request.__dict__['params'] = params
             return f(*args, **kwargs)
 
         return wrapper

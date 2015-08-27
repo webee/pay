@@ -101,13 +101,9 @@ def pay_result(sn, vas_name):
 @verify_request('confirm_guarantee_payment')
 def confirm_guarantee_payment():
     from api_x.utils import response
-    data = request.values
-    channel_name = data['channel_name']
+    data = request.params
+    channel = request.channel
     order_id = data['order_id']
-
-    channel = get_channel_by_name(channel_name)
-    if channel is None:
-        return response.fail(msg='channel not exits: [{0}]'.format(channel_name))
 
     try:
         payment.confirm_payment(channel, order_id)

@@ -19,6 +19,7 @@ def default_create_channel(user_domain_name, channel_name, channel_desc):
     add_perm_to_channel(channel.name, 'query_user_is_opened')
     add_perm_to_channel(channel.name, 'prepay')
     add_perm_to_channel(channel.name, 'refund')
+    add_perm_to_channel(channel.name, 'confirm_guarantee_payment')
 
 
 def add_system_users():

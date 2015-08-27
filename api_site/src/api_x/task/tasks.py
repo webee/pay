@@ -50,10 +50,10 @@ def do_notify_client(task, url, params, next_time, count, max_times=30, interval
         return
 
     now = datetime.now()
-    if next_time and now < next_time:
+    if next_time is not None and now < next_time:
         task.delay(url, params, next_time, count=count, max_times=max_times, interval=interval)
 
     if not notify_client(url, params):
         # retry every two minutes.
-        next_time = timedelta(minutes=interval)
+        next_time = now + timedelta(minutes=interval)
         task.delay(url, params, next_time, count + 1, max_times=max_times, interval=interval)

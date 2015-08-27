@@ -20,6 +20,7 @@ from ..payment import get_payment_by_id, get_tx_payment_by_sn
 from api_x.zyt.biz.error import *
 from .dba import get_tx_refund_by_sn
 from pytoolbox.util.log import get_logger
+from api_x.task import tasks
 
 
 logger = get_logger(__name__)
@@ -101,10 +102,8 @@ def _try_notify_client(tx, refund_record):
     elif tx.state == RefundTransactionState.FAILED:
         params = {'code': 1, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
 
-    with sign_and_notify_client(url, params, tx.channel_name) as params:
-        # other notify process.
-        from api_x.task import tasks
-        tasks.refund_notify.delay(url, params)
+    # notify
+    sign_and_notify_client(url, params, tx.channel_name, tasks.pay_notify)
 
 
 def _get_tx_payment_to_refund(channel_id, order_id):

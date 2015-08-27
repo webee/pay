@@ -18,6 +18,7 @@ from api_x.zyt.biz.transaction.error import TransactionStateError
 from api_x.zyt.biz.models import UserRole
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
+from api_x.task import tasks
 
 
 logger = get_logger(__name__)
@@ -222,11 +223,8 @@ def _try_notify_client(tx, payment_record):
                   'channel_name': tx.channel_name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
 
-    with sign_and_notify_client(url, params, tx.channel_name) as params:
-        # other notify process.
-        from api_x.task import tasks
-
-        tasks.pay_notify.delay(url, params)
+    # notify
+    sign_and_notify_client(url, params, tx.channel_name, tasks.pay_notify)
 
 
 def _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):

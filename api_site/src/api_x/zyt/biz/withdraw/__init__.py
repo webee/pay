@@ -17,6 +17,7 @@ from api_x.zyt.biz.transaction import update_transaction_info
 from api_x.zyt.biz.error import *
 from pytoolbox.util.dbs import transactional, require_transaction_context
 from pytoolbox.util.log import get_logger
+from api_x.task import tasks
 
 
 logger = get_logger(__name__)
@@ -262,10 +263,8 @@ def _try_notify_client(tx, withdraw_record):
                   'amount': withdraw_record.amount, 'actual_amount': withdraw_record.actual_amount,
                   'fee': withdraw_record.fee}
 
-    with sign_and_notify_client(url, params, tx.channel_name) as params:
-        # other notify process.
-        from api_x.task import tasks
-        tasks.withdraw_notify.delay(url, params)
+    # notify
+    sign_and_notify_client(url, params, tx.channel_name, tasks.pay_notify)
 
 
 def _record_withdraw_extra_info(withdraw_record, data):

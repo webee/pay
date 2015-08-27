@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from contextlib import contextmanager
 import requests
 from pytoolbox.util.sign import SignType
 from pytoolbox.util.log import get_logger
@@ -18,11 +17,10 @@ def sign_and_return_client_callback(url, channel_name, params, sign_type=SignTyp
     return response.submit_form(url, params, method)
 
 
-@contextmanager
-def sign_and_notify_client(url, params, channel_name, methods=['post']):
+def sign_and_notify_client(url, params, channel_name, methods=['post'], task=None):
     params = add_sign_for_params(channel_name, params)
     if params and not notify_client(url, params, methods):
-        yield params
+        task.delay(url, params)
 
 
 def notify_client(url, params, methods=['post']):

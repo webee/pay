@@ -24,7 +24,7 @@ def test_task(i):
     print(i)
 
 
-@app.task(ignore_result=True, queue='test_task', routing_key='test_task')
+@app.task(queue='test_task', routing_key='test_task')
 def add(a, b):
     return a + b
 

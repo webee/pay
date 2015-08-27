@@ -37,7 +37,7 @@ def notify_client(url, params, methods=['post']):
                 if data['code'] in [0, '0']:
                     return True
             else:
-                logger.warning('return {0}'.format(resp.content))
+                logger.warning('notify response: {0}'.format(resp.content))
         except Exception as e:
             logger.exception(e)
 

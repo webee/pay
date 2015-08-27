@@ -14,8 +14,9 @@ manager.add_option('-e', '--env', dest='env', default='dev', required=False)
 def make_shell_context():
     import api_x
     from api_x import config, db
+    from api_x.task import tasks
 
-    return dict(api=api_x, app=manager.app, config=config, db=db)
+    return dict(api=api_x, app=manager.app, config=config, db=db, tasks=tasks)
 
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
@@ -67,12 +68,9 @@ class CeleryCommand(Command):
         self.capture_all_args = True
 
     def run(self, *args, **kwargs):
-        from api_x.task.tasks import app as celery
-        from api_x.task import init_celery_app
-        from api_x.config import api_celery_task as celery_config
+        from api_x.task import tasks
 
-        celery = init_celery_app(celery, celery_config, manager.app)
-        celery.start(argv=['celery'] + args[0])
+        tasks.app.start(argv=['celery'] + args[0])
 
 manager.add_command('celery', CeleryCommand())
 

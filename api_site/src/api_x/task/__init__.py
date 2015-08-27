@@ -7,14 +7,12 @@ def init_celery_app(app, config, flask_app=None):
     app.conf.update(os.environ)
 
     if flask_app is not None:
-        TaskBase = app.Task
-
-        class ContextTask(TaskBase):
+        class ContextTask(app.Task):
             abstract = True
 
             def __call__(self, *args, **kwargs):
                 with flask_app.app_context():
-                    return TaskBase.__call__(self, *args, **kwargs)
+                    return app.Task.__call__(self, *args, **kwargs)
 
         app.Task = ContextTask
 

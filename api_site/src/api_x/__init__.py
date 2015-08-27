@@ -47,6 +47,14 @@ def init_extensions(app):
     db.init_app(app)
 
 
+def init_tasks(app):
+    from api_x.task.tasks import app as celery
+    from api_x.task import init_celery_app
+    from api_x.config import api_celery_task as celery_config
+
+    init_celery_app(celery, celery_config, app)
+
+
 def custom_flask(app):
     from flask.json import JSONEncoder
     from datetime import datetime
@@ -77,5 +85,7 @@ def create_app(env='dev', deploy=False):
 
     from api_x.zyt import evas
     evas.init()
+
+    init_tasks(app)
 
     return app

@@ -103,7 +103,7 @@ def _try_notify_client(tx, refund_record):
         params = {'code': 1, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
 
     # notify
-    sign_and_notify_client(url, params, tx.channel_name, tasks.pay_notify)
+    sign_and_notify_client(url, params, tx.channel_name, task=tasks.refund_notify)
 
 
 def _get_tx_payment_to_refund(channel_id, order_id):

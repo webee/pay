@@ -224,7 +224,7 @@ def _try_notify_client(tx, payment_record):
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
 
     # notify
-    sign_and_notify_client(url, params, tx.channel_name, tasks.pay_notify)
+    sign_and_notify_client(url, params, tx.channel_name, task=tasks.pay_notify)
 
 
 def _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):

@@ -264,7 +264,7 @@ def _try_notify_client(tx, withdraw_record):
                   'fee': withdraw_record.fee}
 
     # notify
-    sign_and_notify_client(url, params, tx.channel_name, tasks.pay_notify)
+    sign_and_notify_client(url, params, tx.channel_name, task=tasks.withdraw_notify)
 
 
 def _record_withdraw_extra_info(withdraw_record, data):

@@ -138,7 +138,8 @@ def init_api_entries():
 
 
 @transactional
-def set_user_is_opened(user_domain_name, user_id, status):
+def set_user_is_opened(user_domain_name, user_id, status=True):
+    """status=True: 开通, False: 关闭"""
     user_map = get_user_map_by_domain_name_and_user_id(user_domain_name, user_id)
     if user_map is None:
         create_domain_account_user(user_domain_name, user_id)

@@ -13,6 +13,16 @@ def init_data():
     init_test_data()
 
 
+def add_vases():
+    from api_x.zyt.biz.vas import add_vas
+    from api_x.zyt import vas as zyt
+    from api_x.zyt.evas import test_pay, lianlian_pay
+
+    add_vas(zyt.NAME)
+    add_vas(test_pay.NAME)
+    add_vas(lianlian_pay.NAME)
+
+
 def default_create_channel(user_domain_name, channel_name, channel_desc):
     """默认加上查看「是否开通」, 「支付」和「退款权限」"""
     channel = create_channel(user_domain_name, channel_name, channel_desc)
@@ -26,12 +36,16 @@ def add_system_users():
     # user mapping
     # 系统用户
     from api_x.constant import DefaultUserDomain, SECURE_USER_NAME, LVYE_CORP_USER_NAME
+    from api_x.zyt.user_mapping import set_user_is_opened
+
     system_user_domain = create_user_domain(DefaultUserDomain.SYSTEM_USER_DOMAIN_NAME, '系统用户')
     lvye_corp_user_domain = create_user_domain(DefaultUserDomain.LVYE_CORP_DOMAIN_NAME, '绿野公司用户')
     lvye_account_user_domain = create_user_domain(DefaultUserDomain.LVYE_ACCOUNT_DOMAIN_NAME, '绿野用户中心')
     # 添加测试用户iyinbo
-    user_id = create_account_user(lvye_account_user_domain.id, '169658002', 'iyinbo测试用户')
-    add_test_bankcard(user_id)
+    user_id = '169658002'
+    account_user_id = create_account_user(lvye_account_user_domain.id, user_id, 'iyinbo测试用户')
+    add_test_bankcard(account_user_id)
+    set_user_is_opened(lvye_account_user_domain.name, user_id)
 
     # 担保用户(secure)
     _ = create_account_user(system_user_domain.id, SECURE_USER_NAME, '担保用户')
@@ -46,16 +60,6 @@ def add_system_users():
     default_create_channel(lvye_account_user_domain.name, 'lvye_pay_site', '绿野自游通网站')
 
 
-def add_vases():
-    from api_x.zyt.biz.vas import add_vas
-    from api_x.zyt import vas as zyt
-    from api_x.zyt.evas import test_pay, lianlian_pay
-
-    add_vas(zyt.NAME)
-    add_vas(test_pay.NAME)
-    add_vas(lianlian_pay.NAME)
-
-
 def init_test_data():
     from api_x.constant import DefaultUserDomain
     # 测试用户
@@ -68,9 +72,9 @@ def init_test_data():
     default_create_channel(test_user_domain.name, 'zyt_sample', '自游通sample系统')
 
 
-def add_test_bankcard(user_id):
+def add_test_bankcard(account_user_id):
     from api_x.application import bankcard
 
-    bankcard_id = bankcard.add_bankcard(user_id, '6217000010057123526', '易旺', False, '110000', '110000', '芍药居支行')
+    bankcard_id = bankcard.add_bankcard(account_user_id, '6217000010057123526', '易旺', False, '110000', '110000', '芍药居支行')
 
-    print('add bankcard: [{0}] to user_id: [{1}]'.format(bankcard_id, user_id))
+    print('add bankcard: [{0}] to user_id: [{1}]'.format(bankcard_id, account_user_id))

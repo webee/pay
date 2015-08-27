@@ -101,7 +101,7 @@ def _try_notify_client(tx, refund_record):
     elif tx.state == RefundTransactionState.FAILED:
         params = {'code': 1, 'order_id': refund_record.order_id, 'amount': refund_record.amount}
 
-    if params and not sign_and_notify_client(url, tx.channel_name, params):
+    with sign_and_notify_client(url, params, tx.channel_name) as params:
         # other notify process.
         from api_x.task import tasks
         tasks.refund_notify.delay(url, params)

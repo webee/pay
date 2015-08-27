@@ -222,7 +222,7 @@ def _try_notify_client(tx, payment_record):
                   'channel_name': tx.channel_name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
 
-    if params and not sign_and_notify_client(url, tx.channel_name, params):
+    with sign_and_notify_client(url, params, tx.channel_name) as params:
         # other notify process.
         from api_x.task import tasks
 

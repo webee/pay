@@ -262,7 +262,7 @@ def _try_notify_client(tx, withdraw_record):
                   'amount': withdraw_record.amount, 'actual_amount': withdraw_record.actual_amount,
                   'fee': withdraw_record.fee}
 
-    if params and not sign_and_notify_client(url, tx.channel_name, params):
+    with sign_and_notify_client(url, params, tx.channel_name) as params:
         # other notify process.
         from api_x.task import tasks
         tasks.withdraw_notify.delay(url, params)

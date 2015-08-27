@@ -5,6 +5,6 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 import os
-from api import create_app
+from api_x import create_app
 
 app = create_app(os.getenv('ENV') or 'prod')

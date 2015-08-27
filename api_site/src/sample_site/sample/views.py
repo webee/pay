@@ -67,7 +67,8 @@ def pay_result():
     is_verify_pass = request.is_verify_pass
     if not is_verify_pass:
         return render_template('sample/info.html', title='支付结果', msg="请求异常")
-    data = request.values
+    data = request.params
+    print(data)
 
     return render_template('sample/pay_result.html', title='支付结果', data=data)
 

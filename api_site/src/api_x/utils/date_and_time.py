@@ -3,10 +3,10 @@ from datetime import datetime
 
 
 def today():
-    today = datetime.today()
-    return datetime(today.year, today.month, today.day)
+    td = datetime.today()
+    return datetime(td.year, td.month, td.day)
 
 
 def utctoday():
-    today, n, un = datetime.today(), datetime.now(), datetime.utcnow()
-    return datetime(today.year, today.month, today.day) - (n - un)
+    td, n, un = datetime.today(), datetime.now(), datetime.utcnow()
+    return datetime(td.year, td.month, td.day) - (n - un)

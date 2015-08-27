@@ -27,12 +27,13 @@ def get_user_domain_by_name(name):
 
 
 @transactional
-def create_channel(user_domain_id, name, desc, md5_key='', public_key=''):
+def create_channel(user_domain_name, name, desc, md5_key='', public_key=''):
     # NOTE: 为方便，非线上创建channel自动加上统一的md5_key和public_key
     if config.__env_name__ != 'prod':
         md5_key = md5_key or config.TEST_MD5_KEY
         public_key = public_key or config.TEST_CHANNEL_PUB_KEY
-    channel = Channel(user_domain_id=user_domain_id, name=name, desc=desc, md5_key=md5_key, public_key=public_key)
+    user_domain = get_user_domain_by_name(user_domain_name)
+    channel = Channel(user_domain_id=user_domain.id, name=name, desc=desc, md5_key=md5_key, public_key=public_key)
     db.session.add(channel)
 
     return channel

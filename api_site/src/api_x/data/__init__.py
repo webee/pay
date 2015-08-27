@@ -3,6 +3,7 @@ from __future__ import unicode_literals, print_function
 
 from api_x.zyt.user_mapping import create_user_domain, create_channel
 from api_x.zyt.user_mapping import create_account_user
+from api_x.zyt.user_mapping import add_perm_to_channel
 
 
 def init_data():
@@ -12,10 +13,12 @@ def init_data():
     init_test_data()
 
 
-def init_channel_perms():
-    from api_x.zyt.user_mapping import add_perm_to_channel
-
-    add_perm_to_channel('lvye_pay_site', 'query_user_is_opened')
+def default_create_channel(user_domain_name, channel_name, channel_desc):
+    """默认加上查看「是否开通」, 「支付」和「退款权限」"""
+    channel = create_channel(user_domain_name, channel_name, channel_desc)
+    add_perm_to_channel(channel.name, 'query_user_is_opened')
+    add_perm_to_channel(channel.name, 'prepay')
+    add_perm_to_channel(channel.name, 'refund')
 
 
 def add_system_users():
@@ -25,6 +28,9 @@ def add_system_users():
     system_user_domain = create_user_domain(DefaultUserDomain.SYSTEM_USER_DOMAIN_NAME, '系统用户')
     lvye_corp_user_domain = create_user_domain(DefaultUserDomain.LVYE_CORP_DOMAIN_NAME, '绿野公司用户')
     lvye_account_user_domain = create_user_domain(DefaultUserDomain.LVYE_ACCOUNT_DOMAIN_NAME, '绿野用户中心')
+    # 添加测试用户iyinbo
+    user_id = create_account_user(lvye_account_user_domain.id, '169658002', 'iyinbo测试用户')
+    add_test_bankcard(user_id)
 
     # 担保用户(secure)
     _ = create_account_user(system_user_domain.id, SECURE_USER_NAME, '担保用户')
@@ -32,11 +38,11 @@ def add_system_users():
     _ = create_account_user(lvye_corp_user_domain.id, LVYE_CORP_USER_NAME, '绿野公司')
 
     # 添加渠道: 绿野活动
-    create_channel(lvye_account_user_domain.id, 'lvye_huodong', '绿野活动')
-    create_channel(lvye_account_user_domain.id, 'lvye_pay_test', '绿野自游通测试渠道')
+    default_create_channel(lvye_account_user_domain.name, 'lvye_huodong', '绿野活动')
+    default_create_channel(lvye_account_user_domain.name, 'lvye_pay_test', '绿野自游通测试渠道')
 
     # 添加渠道: 绿野自游通
-    create_channel(lvye_account_user_domain.id, 'lvye_pay_site', '绿野自游通网站')
+    default_create_channel(lvye_account_user_domain.name, 'lvye_pay_site', '绿野自游通网站')
 
 
 def add_vases():
@@ -55,12 +61,15 @@ def init_test_data():
     # sample渠道#1
     # 测试用户001(test001)
     test_user_domain = create_user_domain(DefaultUserDomain.TEST_DOMAIN_NAME, '测试用户')
-    channel = create_channel(test_user_domain.id, 'zyt_sample', '自游通sample系统')
+    user_id = create_account_user(test_user_domain.id, 'test001', '测试001')
+    add_test_bankcard(user_id)
 
-    user_id = create_account_user(channel.user_domain_id, 'test001', '测试001')
+    default_create_channel(test_user_domain.name, 'zyt_sample', '自游通sample系统')
 
+
+def add_test_bankcard(user_id):
     from api_x.application import bankcard
 
     bankcard_id = bankcard.add_bankcard(user_id, '6217000010057123526', '易旺', False, '110000', '110000', '芍药居支行')
 
-    print('add bankcard: [{0}]'.format(bankcard_id))
+    print('add bankcard: [{0}] to user_id: [{1}]'.format(bankcard_id, user_id))

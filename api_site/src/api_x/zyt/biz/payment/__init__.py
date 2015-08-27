@@ -226,7 +226,7 @@ def _try_notify_client(tx, payment_record):
         # other notify process.
         from api_x.task import tasks
 
-        tasks.refund_notify.delay(url, params)
+        tasks.pay_notify.delay(url, params)
 
 
 def _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):

@@ -9,6 +9,7 @@ from api_x import create_app
 
 manager = Manager(create_app)
 manager.add_option('-e', '--env', dest='env', default='dev', required=False)
+manager.add_option('-d', '--deploy', action='store_true', dest='deploy', required=False, default=False)
 
 
 def make_shell_context():

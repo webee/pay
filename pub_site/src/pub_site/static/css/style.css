@@ -2,7 +2,7 @@
 @charset "utf-8";
 /* CSS Document */
 body,h1,h2,h3,h4,h5,h6,hr,p,blockquote,dl,dt,dd,ul,ol,li,pre,form,fieldset,legend,button,input,textarea,th,td{margin:0;padding:0}
-body,button,input,select,textarea{font-size:12px;font-family:"微软雅黑"}
+body,button,input,select,textarea{font-size:12px;font-family:"Helvetica Neue",Helvetica,Arial,"Hiragino Sans GB","Microsoft Yahei",sans-serif}
 h1,h2,h3,h4,h5,h6{font-size:100%}
 address,cite,dfn,em,var{font-style:normal}
 code,kbd,pre,samp{font-family:courier new,courier,monospace}
@@ -12,7 +12,7 @@ sup{vertical-align:text-top}
 sub{vertical-align:text-bottom}
 fieldset,img{border:0}
 img{display:block;}
-button,input,select,textarea{font-size:100%}
+button,input,select,textarea{font-size:100%;border:0;outline:medium}
 table{border-collapse:collapse;border-spacing:0}
 a{text-decoration:none}
 a:hover{text-decoration:none}
@@ -22,18 +22,18 @@ a:hover{text-decoration:none}
 .fr{float:right}
 .Arial{font-family:Arial}
 article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video{display:block;margin:0;padding:0}
-a,input{-webkit-tap-highlight-color:rgba(255,0,0,0);}
+a,input{-webkit-tap-highlight-color:rgba(255,0,0,0);tap-highlight-color:rgba(255,0,0,0);}
 .padding20{padding-left:20px;}
 .margin48{margin-left:48px;}
 
 /*公共头*/
 header{height:58px;background:#3cb43c;}
 .hdCont{width:1170px;height:58px;margin:0 auto;min-width:1200px;}
-.hdCont .logo{float:left;margin:4px 0 0 20px;display:inline;}
-.hdCont ul.newaLine {float: left;margin-left: 110px;display: inline;}
-.hdCont ul.newaLine li {float: left;line-height: 58px;margin-right: 80px;}
-.hdCont ul.newaLine li a {color: #fff;font-size: 16px;}
-.loginBtn{float:right; line-height: 58px;}
+.hdCont .logo{float:left;margin:10px 0 0 20px;display:inline;}
+.hdCont ul.newaLine{float:left;margin-left:110px;display:inline;}
+.hdCont ul.newaLine li{float:left;line-height:58px;margin-right:80px;}
+.hdCont ul.newaLine li a{color:#fff;font-size:16px;}
+.loginBtn{float:right;line-height:58px;}
 .loginBtn .emailBtn{display:inline-block;width:26px;height:18px;background:url(../images/email_yes.jpg) no-repeat 0 0;margin:18px 100px 0 0;cursor:pointer;}
 .loginBtn .emailBtno{background:url(../images/email_no.jpg) no-repeat 0 0;}/*无消息*/
 .loginBtn .sx,.loginBtn .yh{display:inline-block;position:relative;}

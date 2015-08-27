@@ -24,6 +24,11 @@ def test_task(i):
     print(i)
 
 
+@app.task(ignore_result=True, queue='test_task', routing_key='test_task')
+def add(a, b):
+    return a + b
+
+
 @app.task(ignore_result=True, queue='pay_notify', routing_key='pay_notify')
 def pay_notify(url, params, next_time=None, count=1, max_times=30, interval=0.5):
     do_notify_client(pay_notify, url, params, next_time, count, max_times, interval)

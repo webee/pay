@@ -41,9 +41,10 @@ def init_db(recreate):
         recreate_db()
     db.drop_all()
     db.create_all()
-    init_data()
 
     init_api_entries()
+    init_data()
+
 
 @manager.command
 def update_api_entries():

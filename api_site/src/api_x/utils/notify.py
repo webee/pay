@@ -20,7 +20,7 @@ def sign_and_return_client_callback(url, channel_name, params, sign_type=SignTyp
 def sign_and_notify_client(url, params, channel_name, methods=['post'], task=None):
     params = add_sign_for_params(channel_name, params)
     if params and not notify_client(url, params, methods):
-        task.delay(url, params)
+        task.apply_async(args=[url, params], countdown=3)
 
 
 def notify_client(url, params, methods=['post']):

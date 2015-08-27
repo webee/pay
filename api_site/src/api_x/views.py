@@ -7,6 +7,7 @@ import time
 
 main_mod = Blueprint('main', __name__)
 
+
 @main_mod.route('/ping')
 def ping():
     return jsonify(env=config.__env_name__,

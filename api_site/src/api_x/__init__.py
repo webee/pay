@@ -8,7 +8,7 @@ from pytoolbox.util.dbs import db
 
 
 def register_mods(app):
-    from api_x.views import main_mod
+    from api_x.main import main_mod
     from api_x.zyt.entry import biz_entry_mod
     from api_x.zyt.user_mapping.entry import user_mapping_entry_mod
     from api_x.zyt.vas.entry import vas_entry_mod

@@ -1,0 +1,33 @@
+# coding=utf-8
+from __future__ import unicode_literals
+
+from api_x.config import etc as config
+from flask import jsonify
+from . import main_mod as mod
+import time
+from tools.utils import str_generator
+from pytoolbox.util import public_key
+
+
+@mod.route('/ping')
+def ping():
+    return jsonify(env=config.__env_name__,
+                   host_url=config.HOST_URL,
+                   t=time.time())
+
+
+@mod.route('/keys_gen')
+def keys_gen():
+    md5_key_str = str_generator(32)
+    lvye_pri_key = public_key.loads_b64encoded_key(config.LVYE_PRI_KEY)
+    lvye_pub_key = lvye_pri_key.gen_public_key()
+    lvye_pub_key_str = lvye_pub_key.b64encoded_binary_key_data()
+
+    channel_pri_key = public_key.generate_key()
+    channel_pub_key = channel_pri_key.gen_public_key()
+    channel_pri_key_str = channel_pri_key.b64encoded_binary_key_data()
+    channel_pub_key_str = channel_pub_key.b64encoded_binary_key_data()
+    return jsonify(MD5_KEY=md5_key_str,
+                   LVYE_PUB_KEY=lvye_pub_key_str,
+                   CHANNEL_PRI_KEY=channel_pri_key_str,
+                   CHANNEL_PUB_KEY=channel_pub_key_str)

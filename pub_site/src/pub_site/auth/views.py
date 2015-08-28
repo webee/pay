@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-from flask import request, redirect, session, url_for, render_template
-from flask_login import UserMixin, AnonymousUserMixin, login_user, logout_user, login_required
+from flask import request, redirect, session, url_for, render_template, jsonify
+from flask_login import UserMixin, AnonymousUserMixin, login_user, logout_user, login_required, current_user
 
 from . import auth_mod as mod
 from pytoolbox.util.log import get_logger
@@ -80,7 +80,7 @@ def load_user(user_id):
     return User.from_dict(session.get('current_user'))
 
 
-@mod.route('/auth/login/')
+@mod.route('/login/')
 def login():
     next_url = request.args.get('next', '/main')
 
@@ -89,7 +89,7 @@ def login():
     return redirect(login_url)
 
 
-@mod.route('/auth/auth/')
+@mod.route('/auth/')
 def auth():
     user_cookie = request.cookies.get(config.UserCenter.AUTH_COOKIE)
     user = User.get(user_cookie)
@@ -102,10 +102,18 @@ def auth():
     return redirect(next_url)
 
 
-@mod.route('/auth/logout/')
+@mod.route('/logout/')
 @login_required
 def logout():
     logout_user()
     session.clear()
 
     return redirect(config.UserCenter.LOGOUT_URL)
+
+
+@mod.route('/info/')
+@login_required
+def info():
+    user = current_user._get_current_object()
+
+    return jsonify(**(user.to_dict()))

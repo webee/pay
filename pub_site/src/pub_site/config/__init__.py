@@ -48,21 +48,20 @@ class PayClientConfig:
     LVYE_PUB_KEY = read_string('conf/test/lvye_pub_key.txt')
     CHANNEL_PRI_KEY = read_string('conf/test/channel_pri_key.txt')
 
-    USER_DOMAIN_NAME = 'lvye_account'
     CHANNEL_NAME = 'lvye_pay_site'
 
     ROOT_URL = "http://pay.lvye.com/api"
 
 
 # #### data #######
-def load_provinces_and_cities(filepath):
+def load_provinces_and_cities(file_path):
     from os import path
     from collections import OrderedDict
     import codecs
 
-    UTF8Reader = codecs.getreader('utf-8')
+    utf8reader = codecs.getreader('utf-8')
 
-    with UTF8Reader(open(path.join(pmc_config.get_project_root(), filepath))) as fin:
+    with utf8reader(open(path.join(pmc_config.get_project_root(), file_path))) as fin:
         provinces = OrderedDict()
         cities = OrderedDict()
         for line in fin:

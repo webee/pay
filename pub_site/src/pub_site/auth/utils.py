@@ -25,8 +25,7 @@ def require_leader_and_is_opened(f):
             return redirect(url_for('frontpage.main') + '#leader-application')
 
         # 已申请
-        data = pay_client.query_user_is_opened(user.user_id)
-        if not (data and data['is_opened']):
+        if not pay_client.query_user_is_opened(user.user_id):
             # 未开通
             return redirect(url_for('frontpage.application_success'))
 

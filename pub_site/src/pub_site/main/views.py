@@ -37,13 +37,13 @@ def list_transactions():
     return render_template('main/tx_list.html', res=res)
 
 
-@mod.route('/balance', methods=['GET'])
+@mod.route('/available_balance', methods=['GET'])
 @login_required
-def balance():
+def available_balance():
     uid = current_user.user_id
-    balance = pay_client.get_user_available_balance(uid)
+    balance = pay_client.query_user_available_balance(uid)
 
-    return jsonify(balance=balance)
+    return jsonify(available_balance='%.2f' % balance)
 
 
 @mod.route('/trade/<int:id>', methods=['GET'])

@@ -53,7 +53,7 @@ def register_mods(app):
     from pub_site.pay import pay_mod
     from pub_site.frontpage import frontpage_mod
 
-    app.register_blueprint(auth_mod)
+    app.register_blueprint(auth_mod, url_prefix='/auth')
     app.register_blueprint(main_mod)
     app.register_blueprint(withdraw_mod)
     app.register_blueprint(data_mod)

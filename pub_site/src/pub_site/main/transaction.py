@@ -35,9 +35,12 @@ TX_STATE_MSG = {
 
 def query_transactions(uid, role, page_no, page_size, keyword):
     data = pay_client.query_transactions(uid, role, page_no, page_size, keyword)
-    txs = [_process_tx(tx) for tx in data['transactions']]
+    if data is None:
+        return 0, []
 
-    return data['total'], data['transactions']
+    txs = [_process_tx(tx) for tx in data['txs']]
+
+    return data['total'], txs
 
 
 def _process_tx(tx):

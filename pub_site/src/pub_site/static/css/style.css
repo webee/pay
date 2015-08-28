@@ -37,7 +37,9 @@ header{height:58px;background:#3cb43c;}
 .loginBtn .emailBtn{display:inline-block;width:26px;height:18px;background:url(../images/email_yes.jpg) no-repeat 0 0;margin:18px 100px 0 0;cursor:pointer;}
 .loginBtn .emailBtno{background:url(../images/email_no.jpg) no-repeat 0 0;}/*无消息*/
 .loginBtn .sx,.loginBtn .yh{display:inline-block;position:relative;}
-.loginBtn .yh .userName{color:#fff;font-size:12px;}.loginBtn .yh .userName em{display:inline-block;width:10px;height:5px;font-size:0;background:url(../images/point.jpg) no-repeat 0 0;margin-left:6px;}
+.loginBtn .yh .userName{color:#fff;font-size:12px;}
+.loginBtn .yh .logout{color:#fff;font-size:12px;}
+.loginBtn .yh .userName em{display:inline-block;width:10px;height:5px;font-size:0;background:url(../images/point.jpg) no-repeat 0 0;margin-left:6px;}
 .loginBtn .sx .sEmail{position:absolute;top:45px;left:-40px;}
 .loginBtn .sx .sEmail em,.loginBtn .yh .userexit em{display:block;position:absolute;width:10px;height:8px;font-size:0;background:url(../images/sanjiao.jpg) no-repeat 0 0;left:50%;magin-left:-5px;top:-8px;}
 .loginBtn .yh .userexit{position:absolute;top:28px;left:-24px;width:66px;}

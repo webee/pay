@@ -43,11 +43,6 @@ def add_system_users():
     system_user_domain = create_user_domain(DefaultUserDomain.SYSTEM_USER_DOMAIN_NAME, '系统用户')
     lvye_corp_user_domain = create_user_domain(DefaultUserDomain.LVYE_CORP_DOMAIN_NAME, '绿野公司用户')
     lvye_account_user_domain = create_user_domain(DefaultUserDomain.LVYE_ACCOUNT_DOMAIN_NAME, '绿野用户中心')
-    # 添加测试用户iyinbo
-    user_id = '169658002'
-    account_user_id = create_account_user(lvye_account_user_domain.id, user_id, 'iyinbo测试用户')
-    add_test_bankcard(account_user_id)
-    set_user_is_opened(lvye_account_user_domain.name, user_id)
 
     # 担保用户(secure)
     _ = create_account_user(system_user_domain.id, SECURE_USER_NAME, '担保用户')
@@ -63,6 +58,12 @@ def add_system_users():
     add_perm_to_channel(channel.name, 'list_transactions')
     add_perm_to_channel(channel.name, 'withdraw')
     add_perm_to_channel(channel.name, 'app_withdraw')
+
+    # 添加测试用户iyinbo
+    user_id = '169658002'
+    account_user_id = create_account_user(lvye_account_user_domain.id, user_id, 'iyinbo测试用户')
+    add_test_bankcard(account_user_id)
+    set_user_is_opened(lvye_account_user_domain.name, user_id)
 
 
 def init_test_data():

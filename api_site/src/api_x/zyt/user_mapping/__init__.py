@@ -125,16 +125,22 @@ def add_perm_to_channel(channel_name, api_entry_name):
 
 
 @transactional
-def init_api_entries():
+def update_api_entries():
     from api_x.utils.entry_auth import get_api_entry_name_list
 
     entry_names = get_api_entry_name_list()
 
+    # add news.
     for name in entry_names:
         api_entry = ApiEntry.query.filter_by(name=name).first()
         if api_entry is None:
             api_entry = ApiEntry(name=name)
         db.session.add(api_entry)
+
+    # delete discards.
+    for api_entry in ApiEntry.query.all():
+        if api_entry.name not in entry_names:
+            db.session.delete(api_entry)
 
 
 @transactional

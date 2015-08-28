@@ -31,7 +31,7 @@ def init_db(recreate):
     from fabric.api import local
     from api_x import db
     from api_x.data import init_data
-    from api_x.zyt.user_mapping import init_api_entries
+    from api_x.zyt.user_mapping import update_api_entries
 
     def recreate_db():
         from pytoolbox.util.console_log import info
@@ -44,15 +44,15 @@ def init_db(recreate):
     db.drop_all()
     db.create_all()
 
-    init_api_entries()
+    update_api_entries()
     init_data()
 
 
 @manager.command
-def update_api_entries():
-    from api_x.zyt.user_mapping import init_api_entries
+def update_api_entry():
+    from api_x.zyt.user_mapping import update_api_entries
 
-    init_api_entries()
+    update_api_entries()
 
 
 @manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')

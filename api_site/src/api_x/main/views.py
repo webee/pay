@@ -5,8 +5,7 @@ from api_x.config import etc as config
 from flask import jsonify
 from . import main_mod as mod
 import time
-from tools.utils import str_generator
-from pytoolbox.util import public_key
+from pytoolbox.util import public_key, strings
 
 
 @mod.route('/ping')
@@ -18,7 +17,7 @@ def ping():
 
 @mod.route('/keys_gen')
 def keys_gen():
-    md5_key_str = str_generator(32)
+    md5_key_str = strings.gen_rand_str(32)
     lvye_pri_key = public_key.loads_b64encoded_key(config.LVYE_PRI_KEY)
     lvye_pub_key = lvye_pri_key.gen_public_key()
     lvye_pub_key_str = lvye_pub_key.b64encoded_binary_key_data()

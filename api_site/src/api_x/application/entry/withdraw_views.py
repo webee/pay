@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 def app_withdraw():
     data = request.values
     channel = request.channel
-    from_user_id = data['from_user_id']
+    from_user_id = long(data['from_user_id'])
     bankcard_id = data['bankcard_id']
     amount = data['amount']
     client_notify_url = data.get('notify_url', '')

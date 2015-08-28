@@ -31,6 +31,8 @@ def default_create_channel(user_domain_name, channel_name, channel_desc):
     add_perm_to_channel(channel.name, 'refund')
     add_perm_to_channel(channel.name, 'confirm_guarantee_payment')
 
+    return channel
+
 
 def add_system_users():
     # user mapping
@@ -57,7 +59,10 @@ def add_system_users():
     default_create_channel(lvye_account_user_domain.name, 'lvye_pay_test', '绿野自游通测试渠道')
 
     # 添加渠道: 绿野自游通
-    default_create_channel(lvye_account_user_domain.name, 'lvye_pay_site', '绿野自游通网站')
+    channel = default_create_channel(lvye_account_user_domain.name, 'lvye_pay_site', '绿野自游通网站')
+    add_perm_to_channel(channel.name, 'list_transactions')
+    add_perm_to_channel(channel.name, 'withdraw')
+    add_perm_to_channel(channel.name, 'app_withdraw')
 
 
 def init_test_data():

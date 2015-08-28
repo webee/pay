@@ -55,9 +55,12 @@ def add_system_users():
 
     # 添加渠道: 绿野自游通
     channel = default_create_channel(lvye_account_user_domain.name, 'lvye_pay_site', '绿野自游通网站')
-    add_perm_to_channel(channel.name, 'list_transactions')
+    add_perm_to_channel(channel.name, 'get_account_user')
+    add_perm_to_channel(channel.name, 'get_create_account_user')
+    add_perm_to_channel(channel.name, 'query_account_user_balance')
     add_perm_to_channel(channel.name, 'withdraw')
     add_perm_to_channel(channel.name, 'app_withdraw')
+    add_perm_to_channel(channel.name, 'list_transactions')
 
     # 添加测试用户iyinbo
     user_id = '169658002'

@@ -11,6 +11,6 @@ PAYEE = '169658002'
 
 
 class PayClientConfig:
-    CHANNEL_NAME = 'lvye_huodong'
+    CHANNEL_NAME = 'lvye_pay_test'
 
     ROOT_URL = "http://pay.lvye.com/api/__"

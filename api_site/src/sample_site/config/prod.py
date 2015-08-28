@@ -12,9 +12,6 @@ class PayClientConfig:
     LVYE_PUB_KEY = read_string('conf/lvye_pub_key.txt')
     CHANNEL_PRI_KEY = read_string('conf/channel_pri_key.txt')
 
-    # 绿野用户中心
-    USER_DOMAIN_NAME = 'lvye_account'
-
-    CHANNEL_NAME = 'lvye_test_channel'
+    CHANNEL_NAME = 'lvye_pay_test'
 
     ROOT_URL = "http://pay.lvye.com/api"

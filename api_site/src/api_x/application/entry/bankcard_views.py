@@ -21,7 +21,7 @@ def query_bin(card_no):
             bankcard_bin = bankcard.query_bin(card_no)
             dba.add_bankcard_bin(bankcard_bin)
         card_bin_info = bankcard_bin.to_dict()
-        return response.success(**card_bin_info)
+        return response.success(data=card_bin_info)
     except Exception as e:
         logger.exception(e)
         return response.bad_request(msg=e.message)

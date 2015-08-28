@@ -12,7 +12,7 @@ from api_x.zyt.biz.transaction import query_user_transactions
 @verify_request('list_transactions')
 def list_transactions(account_user_id):
     data = request.args
-    channel = request.channel
+    # channel = request.channel
     role = data.get('role')
     page_no = int(data.get('page_no', 1))
     page_size = int(data.get('page_size', 20))
@@ -21,7 +21,7 @@ def list_transactions(account_user_id):
     total_num, utxs = query_user_transactions(account_user_id, role, page_no, page_size, q)
     txs = [_get_tx(utx) for utx in utxs]
 
-    return response.success(total=total_num, transactions=txs)
+    return response.success(data={'total': total_num, 'txs': txs})
 
 
 def _get_tx(utx):

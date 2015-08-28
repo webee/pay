@@ -1,14 +1,14 @@
 var requestRunning = false;
 
-function update_balance(callback) {
+function update_available_balance(callback) {
     if (requestRunning) {
         return;
     }
 
     requestRunning = true;
-    $.getJSON('/balance')
+    $.getJSON('/available_balance')
         .done(function (res) {
-            $("#balance").html(res.balance+ ' 元');
+            $("#available_balance").html(res.available_balance);
         }).complete(function() {
             requestRunning = false;
             if (callback != null) {
@@ -121,8 +121,8 @@ $(document).ready(function () {
             });
     }
 
-    // update balance.
-    update_balance(function() {
+    // update available balance.
+    update_available_balance(function() {
         // activate total.
         get_tx_list({role: '', page_no: 1}, gen_activate_tab_cb('#total_tx'))
     });

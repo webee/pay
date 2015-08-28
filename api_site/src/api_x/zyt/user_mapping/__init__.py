@@ -140,6 +140,9 @@ def update_api_entries():
     # delete discards.
     for api_entry in ApiEntry.query.all():
         if api_entry.name not in entry_names:
+            for channel_perm in api_entry.channel_perms.all():
+                # delete exists perm.
+                db.session.delete(channel_perm)
             db.session.delete(api_entry)
 
 

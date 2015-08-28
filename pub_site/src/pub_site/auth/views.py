@@ -33,8 +33,7 @@ class User(UserMixin):
         user_id = int(user_json.get('uid'))
         user_name = user_json.get('username')
         is_leader = user_json.get('isleader') == "1"
-        # FIXME: get real user phone no.
-        phone_no = "18810928956"
+        phone_no = user_json.get('phone')
 
         return User(xid, user_domain_name, user_id, user_name, is_leader, phone_no)
 

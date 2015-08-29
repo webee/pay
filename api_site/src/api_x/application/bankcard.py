@@ -16,7 +16,7 @@ def query_bin(card_no):
     return bankcard.query_bin(card_no)
 
 
-def add_bankcard(user_id, card_no, acct_name, is_corporate_account, province_code, city_code, brabank_name):
+def bind_bankcard(user_id, card_no, acct_name, is_corporate_account, province_code, city_code, brabank_name):
     bankcard_info = BankCardInfo.load_base_info(card_no)
     if not bankcard_info:
         raise InvalidCardNoError(card_no)
@@ -25,8 +25,12 @@ def add_bankcard(user_id, card_no, acct_name, is_corporate_account, province_cod
     if bankcard_info.is_not_using_debit_card_as_private_account:
         raise TryToBindCreditCardToPrivateAccountError(card_no)
 
-    bankcard = dba.add_bankcard(user_id, bankcard_info)
+    bankcard = dba.bind_bankcard(user_id, bankcard_info)
     return bankcard.id
+
+
+def unbind_bankcard(user_id, bankcard_id):
+    dba.unbind_bankcard(user_id, bankcard_id)
 
 
 class BankCardInfo(object):

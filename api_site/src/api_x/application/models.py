@@ -52,8 +52,13 @@ class Bankcard(db.Model):
     bank_name = db.Column(db.VARCHAR(32), nullable=False)
     brabank_name = db.Column(db.VARCHAR(50), nullable=False)
     prcptcd = db.Column(db.CHAR(12), default='')
+    is_bounded = db.Column(db.Boolean, nullable=False, default=True)
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # index
+    __table_args__ = (db.UniqueConstraint('user_id', 'card_no', name='user_card_uniq_idx'),)
 
     def to_dict(self):
         return {

@@ -1,4 +1,5 @@
 # coding=utf-8
+from api_x.application.error import BankcardNotFoundError
 from pytoolbox.util.dbs import transactional
 from api_x import db
 from api_x.constant import BankAccountType
@@ -17,23 +18,36 @@ def add_bankcard_bin(info):
 
 
 @transactional
-def add_bankcard(user_id, bankcard_info):
-    fields = {
-        'user_id': user_id,
-        'card_no': bankcard_info.card_no,
-        'card_type': bankcard_info.card_type,
-        'acct_name': bankcard_info.acct_name,
-        'flag': BankAccountType.CORPORATE if bankcard_info.is_corporate_account else BankAccountType.PRIVATE,
-        'bank_code': bankcard_info.bank_code,
-        'province_code': bankcard_info.province_code,
-        'city_code': bankcard_info.city_code,
-        'bank_name': bankcard_info.bank_name,
-        'brabank_name': bankcard_info.brabank_name,
-    }
-    bankcard = Bankcard(**fields)
+def bind_bankcard(user_id, bankcard_info):
+    bankcard = Bankcard.query.filter_by(user_id=user_id, card_no=bankcard_info.card_no)
+    if bankcard is None:
+        bankcard = Bankcard()
+
+    bankcard.user_id = user_id,
+    bankcard.card_no = bankcard_info.card_no,
+    bankcard.card_type = bankcard_info.card_type,
+    bankcard.acct_name = bankcard_info.acct_name,
+    bankcard.flag = BankAccountType.CORPORATE if bankcard_info.is_corporate_account else BankAccountType.PRIVATE,
+    bankcard.bank_code = bankcard_info.bank_code,
+    bankcard.province_code = bankcard_info.province_code,
+    bankcard.city_code = bankcard_info.city_code,
+    bankcard.bank_name = bankcard_info.bank_name,
+    bankcard.brabank_name = bankcard_info.brabank_name,
+    bankcard.is_bounded = True
+
     db.session.add(bankcard)
 
     return bankcard
+
+@transactional
+def unbind_bankcard(user_id, bankcard_id):
+    bankcard = Bankcard.query.get(bankcard_id)
+
+    if bankcard is None or bankcard.user_id != user_id:
+        raise BankcardNotFoundError()
+
+    bankcard.is_bounded = False
+    db.session.add(bankcard)
 
 
 @transactional
@@ -57,7 +71,7 @@ def get_bankcard_bin(card_no):
 
 
 def query_all_bankcards(user_id):
-    return Bankcard.query.filter_by(user_id=user_id).all()
+    return Bankcard.query.filter_by(user_id=user_id, is_bounded=True).all()
 
 
 def query_bankcard_by_id(id):

@@ -17,3 +17,8 @@ class TryToBindCreditCardToPrivateAccountError(BankcardError):
         message = "The bank card must be a Debit Card if it was added as private account [card_no={0}].".format(
             card_no)
         super(TryToBindCreditCardToPrivateAccountError, self).__init__(message)
+
+
+class BankcardNotFoundError(BankcardError):
+    def __init__(self):
+        super(BankcardNotFoundError, self).__init__("bankcard not found.")

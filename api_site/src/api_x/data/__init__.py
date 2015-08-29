@@ -67,7 +67,7 @@ def add_system_users():
     # 添加测试用户iyinbo
     user_id = '169658002'
     account_user_id = create_account_user(lvye_account_user_domain.id, user_id, 'iyinbo测试用户')
-    add_test_bankcard(account_user_id)
+    bind_test_bankcard(account_user_id)
     set_user_is_opened(lvye_account_user_domain.name, user_id)
 
 
@@ -78,14 +78,14 @@ def init_test_data():
     # 测试用户001(test001)
     test_user_domain = create_user_domain(DefaultUserDomain.TEST_DOMAIN_NAME, '测试用户')
     user_id = create_account_user(test_user_domain.id, 'test001', '测试001')
-    add_test_bankcard(user_id)
+    bind_test_bankcard(user_id)
 
     default_create_channel(test_user_domain.name, 'zyt_sample', '自游通sample系统')
 
 
-def add_test_bankcard(account_user_id):
+def bind_test_bankcard(account_user_id):
     from api_x.application import bankcard
 
-    bankcard_id = bankcard.add_bankcard(account_user_id, '6217000010057123526', '易旺', False, '110000', '110000', '芍药居支行')
+    bankcard_id = bankcard.bind_bankcard(account_user_id, '6217000010057123526', '易旺', False, '110000', '110000', '芍药居支行')
 
     print('add bankcard: [{0}] to user_id: [{1}]'.format(bankcard_id, account_user_id))

@@ -1,5 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals
+from api_x.application.error import BankcardNotFoundError
 from api_x.utils import response
 from api_x.utils.entry_auth import verify_request
 
@@ -29,9 +30,9 @@ def query_bin(card_no):
         return response.bad_request(msg=e.message)
 
 
-@mod.route('/users/<user_id>/bankcards', methods=['POST'])
-@verify_request('app_add_bankcard')
-def add_bankcard(user_id):
+@mod.route('/users/<user_id>/bankcards/bind', methods=['POST'])
+@verify_request('app_bind_bankcard')
+def bind_bankcard(user_id):
     data = request.params
     channel = request.channel
     card_no = data['card_no']
@@ -46,9 +47,20 @@ def add_bankcard(user_id):
         return response.bad_request(msg='user not exists: [{0}]'.format(user_id))
     account_user_id = user_map.account_user_id
 
-    bankcard_id = bankcard.add_bankcard(account_user_id, card_no, acct_name, is_corporate_account,
-                                        province_code, city_code, brabank_name)
+    bankcard_id = bankcard.bind_bankcard(account_user_id, card_no, acct_name, is_corporate_account,
+                                         province_code, city_code, brabank_name)
     return response.success(id=bankcard_id)
+
+
+@mod.route('/users/<user_id>/bankcards/<int:bankcard_id>/unbind', methods=['POST'])
+@verify_request('app_unbind_bankcard')
+def unbind_bankcard(user_id, bankcard_id):
+    try:
+        bankcard.unbind_bankcard(user_id, bankcard_id)
+        response.success()
+    except Exception as e:
+        logger.exception(e)
+        response.fail()
 
 
 @mod.route('/users/<user_id>/bankcards', methods=['GET'])

@@ -20,12 +20,10 @@ def index():
     payer = 'webee'
     payee = config.PAYEE
 
-    payee_account_user_id = pay_client.get_account_user(payee)
-    balance = pay_client.query_user_balance(payee)
-    bankcards = pay_client.list_user_bankcards(payee)
+    balance = pay_client.app_query_user_balance(payee)
+    bankcards = pay_client.app_list_user_bankcards(payee)
     return render_template('sample/index.html', channel=channel_name, payer=payer, payee=payee,
-                           payee_account_user_id=payee_account_user_id, balance=balance,
-                           bankcards=bankcards)
+                           balance=balance, bankcards=bankcards)
 
 
 @mod.route('/pay', methods=['POST'])

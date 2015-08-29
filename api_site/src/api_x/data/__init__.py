@@ -24,7 +24,7 @@ def add_vases():
 
 
 def default_create_channel(user_domain_name, channel_name, channel_desc):
-    """默认加上查看「是否开通」, 「支付」和「退款权限」"""
+    """默认加上查看「是否开通」, 「支付」, 「退款」和「确认支付」权限"""
     channel = create_channel(user_domain_name, channel_name, channel_desc)
     add_perm_to_channel(channel.name, 'query_user_is_opened')
     add_perm_to_channel(channel.name, 'prepay')
@@ -58,7 +58,9 @@ def add_system_users():
     add_perm_to_channel(channel.name, 'get_account_user')
     add_perm_to_channel(channel.name, 'get_create_account_user')
     add_perm_to_channel(channel.name, 'query_account_user_balance')
-    add_perm_to_channel(channel.name, 'withdraw')
+    add_perm_to_channel(channel.name, 'query_bin')
+    add_perm_to_channel(channel.name, 'add_bankcard')
+    add_perm_to_channel(channel.name, 'list_user_bankcards')
     add_perm_to_channel(channel.name, 'app_withdraw')
     add_perm_to_channel(channel.name, 'list_transactions')
 

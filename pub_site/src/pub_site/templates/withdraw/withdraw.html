@@ -44,7 +44,7 @@
                 </div>
             </div>
             {% from 'forms.html' import input, verification_code_and_submit, submit %}
-            {{ input(form.amount, "每天除第一笔外含手续费2元") }}
+            {{ input(form.amount, "每天第一笔免费，更多提现每笔收取手续费2元") }}
             {{ verification_code_and_submit(form) }}
         </form>
     </div>

@@ -8,6 +8,7 @@ from api_x.zyt.biz.transaction import create_transaction, transit_transaction_st
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
 from api_x.zyt.biz.withdraw.dba import get_tx_withdraw_by_sn
 from api_x.zyt.biz.withdraw.error import WithdrawFailedError
+from api_x.zyt.user_mapping import get_user_map_by_account_user_id
 from api_x.zyt.vas.user import get_user_cash_balance
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.models import UserRole
@@ -253,15 +254,15 @@ def _try_notify_client(tx, withdraw_record):
     from api_x.utils.notify import sign_and_notify_client
     url = withdraw_record.client_notify_url
 
+    user_mapping = get_user_map_by_account_user_id(withdraw_record.from_user_id)
+    user_id = user_mapping.user_id
     params = None
     if tx.state == WithdrawTxState.SUCCESS:
-        params = {'code': 0, 'account_user_id': withdraw_record.from_user_id, 'sn': tx.sn,
-                  'amount': withdraw_record.amount, 'actual_amount': withdraw_record.actual_amount,
-                  'fee': withdraw_record.fee}
+        params = {'code': 0, 'user_id': user_id, 'sn': tx.sn, 'amount': withdraw_record.amount,
+                  'actual_amount': withdraw_record.actual_amount, 'fee': withdraw_record.fee}
     elif tx.state == WithdrawTxState.FAILED:
-        params = {'code': 1, 'account_user_id': withdraw_record.from_user_id, 'sn': tx.sn,
-                  'amount': withdraw_record.amount, 'actual_amount': withdraw_record.actual_amount,
-                  'fee': withdraw_record.fee}
+        params = {'code': 1, 'user_id': user_id, 'sn': tx.sn, 'amount': withdraw_record.amount,
+                  'actual_amount': withdraw_record.actual_amount, 'fee': withdraw_record.fee}
 
     # notify
     sign_and_notify_client(url, params, tx.channel_name, task=tasks.withdraw_notify)

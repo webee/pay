@@ -9,4 +9,4 @@ class PayClientConfig:
     ROOT_URL = "http://pay.lvye.com/api/__"
 
 
-HOST_URL = 'http://pay.lvye.com/__'
+HOST_URL = 'http://dev_pay.lvye.com:5102'

@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime
 from pub_site import config
 from flask.ext.wtf import Form
 from flask.ext.login import current_user
 from wtforms import StringField, SelectField, SubmitField, HiddenField, FloatField, ValidationError
 from wtforms.compat import text_type
 from wtforms.validators import DataRequired, NumberRange, StopValidation
-from pytoolbox.util.dbs import from_db
-from pay_client import PayClient
+from decimal import Decimal
+from . import dba
 from pub_site.sms import verification_code_manager
 import re
 from wtforms.compat import string_types
@@ -98,11 +97,9 @@ class MyHiddenField(HiddenField):
 
 
 def amount_less_than_balance(form, field):
-    result = PayClient().get_balance()
-    if result['status_code'] == 200:
-        balance = result['data']['balance']
-        if float(field.data) > balance:
-            raise StopValidation(u"提现金额不能超过账户余额")
+    balance = pay_client.app_query_user_available_balance(current_user.user_id)
+    if Decimal(field.data) > balance:
+        raise StopValidation(u"提现金额不能超过账户余额")
 
 
 class MyRegexp(object):
@@ -134,6 +131,5 @@ class WithdrawForm(gen_verification_code_form("form-withdraw")):
     def __init__(self, *args, **kwargs):
         super(WithdrawForm, self).__init__(*args, **kwargs)
         if not self.is_submitted():
-            preferred_bankcard_id = from_db().get_scalar(
-                'select bankcard_id from preferred_card where user_id=%(user_id)s', user_id=current_user.user_id)
+            preferred_bankcard_id = dba.get_preferred_card_id(current_user.user_id)
             self.bankcard.data = preferred_bankcard_id

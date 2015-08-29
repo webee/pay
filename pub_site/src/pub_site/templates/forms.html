@@ -9,7 +9,13 @@
     </div>
 {%- endmacro %}
 
-{% macro verification_code(form) -%}
+{% macro submit(field, id) -%}
+    <div class="line">
+        {{ field(class="tijiao firsttj", id=id) }}
+    </div>
+{%- endmacro %}
+
+{% macro verification_code_and_submit(form) -%}
     <div class="line">
         <label>{{ form.verification_code.label }}</label>
         {{ form.verification_code(class="txk small" + (' orangetxk' if form.verification_code.errors | length > 0 else '')) }}
@@ -23,10 +29,5 @@
             <em class="mistake">{{ error }}</em>
         {% endfor %}
     </div>
-{%- endmacro %}
-
-{% macro submit(field, id) -%}
-    <div class="line">
-        {{ field(class="tijiao firsttj", id=id) }}
-    </div>
+    {{ submit(form.submit, "submit-"+form.verification_code_source.default) }}
 {%- endmacro %}

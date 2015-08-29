@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
+from flask import render_template, url_for, redirect, g, current_app, flash, request, jsonify
 from flask.ext.login import current_user
-from flask import render_template, url_for, redirect, g, current_app
-from . import withdraw_mod as mod
-from . import WITHDRAW_COMMISSION
-from .forms import BindCardForm, WithdrawForm
-from pay_client import PayClient
-from flask import flash
+from decimal import Decimal
 from pytoolbox.util.log import get_logger
 from pub_site import pay_client
 from pub_site.auth.utils import login_required
-from . import dba
+from . import withdraw_mod as mod, dba
+from .forms import BindCardForm, WithdrawForm
+from pub_site.sms import sms
+from pub_site import config
 
 
 logger = get_logger(__name__)
@@ -46,18 +45,49 @@ def withdraw():
         return redirect(url_for('.bind_card'))
     form = WithdrawForm()
     if form.validate_on_submit():
-        if not _do_withdraw(form.amount.data, WITHDRAW_COMMISSION, form.bankcard.data):
+        user_id = current_user.user_id
+        phone_no = current_user.phone_no
+        amount = Decimal(form.amount.data)
+        bankcard_id = long(form.bankcard.data)
+        result = _do_withdraw(user_id, bankcard_id, phone_no, amount)
+        if result is None:
             return _withdraw_failed()
 
-        bankcard_id = form.bankcard.data
-        dba.update_user_preferred_card(current_user.user_id, bankcard_id)
-
-        actual_amount = form.amount.data - WITHDRAW_COMMISSION
-        return _withdraw_succeed(actual_amount)
+        actual_amount = result['actual_amount']
+        fee = result['fee']
+        return _withdraw_succeed(actual_amount, fee)
     bankcard_id = long(form.bankcard.data) if form.bankcard.data else 0
     return render_template('withdraw/withdraw.html', balance=pay_client.app_query_user_available_balance(uid),
                            bankcards=bankcards, form=form,
                            selected_card=_find_selected_card(bankcards, bankcard_id))
+
+
+@mod.route('/withdraw_notify', methods=['POST'])
+@pay_client.verify_request
+def withdraw_notify():
+    is_verify_pass = request.is_verify_pass
+    if not is_verify_pass:
+        return jsonify(code=1)
+
+    data = request.params
+    code = data['code']
+    sn = data['sn']
+    user_id = data['user_id']
+
+    withdraw_record = dba.get_withdraw_record(sn, user_id)
+    if withdraw_record is None:
+        return jsonify(code=1)
+
+    if code in [0, '0']:
+        # 成功
+        msg = "您的提现请求已处理，请等待到账"
+    else:
+        # 失败
+        msg = "您的提现请求失败"
+
+    if sms.send(withdraw_record.phone_no, msg):
+        return jsonify(code=0)
+    return jsonify(code=1)
 
 
 @mod.route('/withdraw/bind-card', methods=['GET', 'POST'])
@@ -96,9 +126,17 @@ def _find_selected_card(bankcards, selected_card_id):
     return None
 
 
-def _do_withdraw(amount, fee, card_number):
-    result = PayClient().withdraw(amount, fee, card_number)
-    return result['status_code'] == 202
+def _do_withdraw(user_id, bankcard_id, phone_no, amount):
+    notify_url = config.HOST_URL + url_for('.withdraw_notify')
+    result = pay_client.app_withdraw(user_id, bankcard_id, amount, notify_url)
+    if result is not None:
+        dba.update_user_preferred_card(user_id, bankcard_id)
+        sn = result['sn']
+        actual_amount = result['actual_amount']
+        fee = result['fee']
+        dba.add_withdraw_record(sn, user_id, bankcard_id, phone_no, amount, actual_amount, fee)
+
+    return result
 
 
 def _withdraw_failed():
@@ -106,7 +144,7 @@ def _withdraw_failed():
     return redirect(url_for('.withdraw'))
 
 
-def _withdraw_succeed(amount):
-    success_message = u"提现 %s元 申请成功！绿野将于3-5个工作日内审核并处理。" % amount
+def _withdraw_succeed(actual_amount, fee):
+    success_message = u"提现 %s元, 手续费 %s元 申请成功！绿野将于3-5个工作日内审核并处理。" % (actual_amount, fee)
     flash(success_message, category="success")
     return redirect(url_for('main.index'))

@@ -13,7 +13,7 @@
             {% include 'message.html' %}
             {{ form.csrf_token }}
             <h2>付款给绿野</h2>
-            {% from 'forms.html' import input, verification_code, radio, submit %}
+            {% from 'forms.html' import input, verification_code_and_submit, radio, submit %}
             {{ input(form.amount, "") }}
             <div class="line pay-type">
                 <label>{{ form.pay_type.label }}</label>

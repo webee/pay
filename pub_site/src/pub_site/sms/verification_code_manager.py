@@ -61,4 +61,4 @@ def _generate_verification_code(source, user_id):
 
 
 def _build_message(code):
-    return u"【绿野】验证码%s，该验证码五分钟内有效。" % code
+    return "验证码%s，该验证码五分钟内有效。" % code

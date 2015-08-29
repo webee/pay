@@ -43,10 +43,9 @@
                     </p>
                 </div>
             </div>
-            {% from 'forms.html' import input, verification_code, submit %}
+            {% from 'forms.html' import input, verification_code_and_submit, submit %}
             {{ input(form.amount, "每天除第一笔外含手续费2元") }}
-            {{ verification_code(form) }}
-            {{ submit(form.submit, form.verification_code_source.default) }}
+            {{ verification_code_and_submit(form) }}
         </form>
     </div>
 {% endblock %}

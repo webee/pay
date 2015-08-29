@@ -38,11 +38,30 @@ class PreferredCard(db.Model):
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
+class WithdrawRecord(db.Model):
+    __tablename__ = 'withdraw_record'
+
+    id = db.Column(db.Integer, primary_key=True)
+    sn = db.Column(db.VARCHAR(40), nullable=False, unique=True)
+    user_id = db.Column(db.VARCHAR(32), nullable=False)
+    bankcard_id = db.Column(db.Integer, nullable=False)
+    phone_no = db.Column(db.VARCHAR(18), nullable=False)
+    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    actual_amount = db.Column(db.Numeric(12, 2), nullable=False)
+    fee = db.Column(db.Numeric(12, 2), nullable=False)
+
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    # index
+    __table_args__ = (db.UniqueConstraint('sn', 'user_id', name='sn_user_id_uniq_idx'),)
+
+
 class PayToLvyeRecord(db.Model):
     __tablename__ = 'pay_to_lvye_record'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.VARCHAR(32), nullable=False)
+    phone_no = db.Column(db.VARCHAR(18), nullable=False)
     pay_type = db.Column(db.Integer, nullable=False)
     name = db.Column(db.VARCHAR(100), nullable=False)
     amount = db.Column(db.Numeric(12, 2), nullable=False)

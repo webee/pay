@@ -11,6 +11,7 @@ logger = get_logger(__name__)
 
 
 def send(phone_no, msg):
+    msg = _build_message(msg)
     req = requests.post(config.SMSConfig.URL, data={
         'cdkey': config.SMSConfig.CD_KEY,
         'password': config.SMSConfig.PASSWORD,
@@ -28,3 +29,7 @@ def send(phone_no, msg):
         logger.exception(e)
 
     return False
+
+
+def _build_message(msg):
+    return "【绿野】%s" % msg

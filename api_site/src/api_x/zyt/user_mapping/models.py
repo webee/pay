@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 from api_x import db
 from datetime import datetime
+from ..vas import user
+from pytoolbox.util.dbs import transactional
 
 
 class UserDomain(db.Model):
@@ -12,6 +14,16 @@ class UserDomain(db.Model):
     desc = db.Column(db.VARCHAR(64), nullable=False, default='')
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    @transactional
+    def get_add_user_map(self, user_id, desc=None):
+        account_user = user.create_user()
+        user_map = self.user_maps.filter_by(user_id=user_id).first()
+        if user_map is None:
+            user_map = UserMapping(user_domain_id=self.id, user_id=user_id, account_user_id=account_user.id,
+                                   desc=desc or self.desc)
+            db.session.add(user_map)
+        return user_map
 
     def __repr__(self):
         return 'UserDomain<%r>' % (self.name,)
@@ -69,6 +81,9 @@ class Channel(db.Model):
 
     def get_user_map(self, user_id):
         return self.user_domain.user_maps.filter_by(user_id=user_id).first()
+
+    def get_add_user_map(self, user_id):
+        return self.user_domain.get_add_user_map(user_id)
 
     def __repr__(self):
         return 'Channel<%r>' % (self.name,)

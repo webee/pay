@@ -87,28 +87,12 @@ def create_domain_account_user(user_domain_name, user_id, desc=None):
     return create_account_user(user_domain.id, user_id, desc)
 
 
-@transactional
-def get_or_create_account_user(user_domain_id, user_id):
-    user_map = UserMapping.query.filter_by(user_domain_id=user_domain_id, user_id=user_id).first()
-    if user_map is None:
-        return create_account_user(user_domain_id, user_id)
-
-    return user_map.account_user_id
-
-
 def get_channel(id):
     return Channel.query.get(id)
 
 
 def get_channel_by_name(name):
     return Channel.query.filter_by(name=name).first()
-
-
-@transactional
-def find_or_create_account_user_by_channel_info(channel_id, user_id):
-    channel = get_channel(channel_id)
-
-    return get_or_create_account_user(channel.user_domain_id, user_id)
 
 
 @transactional

@@ -50,7 +50,8 @@ def apply_to_withdraw(user_id):
                                                      flag_card, card_type, card_no, acct_name, bank_code, province_code,
                                                      city_code, bank_name, brabank_name, prcptcd,
                                                      amount_value, fee_value, client_notify_url, data)
-        return response.success(sn=withdraw_record.sn)
+        return response.success(sn=withdraw_record.sn,
+                                actual_amount=withdraw_record.actual_amount, fee=withdraw_record.fee)
     except Exception as e:
         logger.exception(e)
         return response.fail(code=1, msg=e.message)

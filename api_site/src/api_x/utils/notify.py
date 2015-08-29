@@ -18,6 +18,8 @@ def sign_and_return_client_callback(url, channel_name, params, sign_type=SignTyp
 
 
 def sign_and_notify_client(url, params, channel_name, methods=['post'], task=None):
+    if not url:
+        return
     params = add_sign_for_params(channel_name, params)
     if params and not notify_client(url, params, methods):
         task.apply_async(args=[url, params], countdown=3)
@@ -25,9 +27,6 @@ def sign_and_notify_client(url, params, channel_name, methods=['post'], task=Non
 
 def notify_client(url, params, methods=['post']):
     logger.info("notify [{0}]: {1}".format(url, params))
-    if not url:
-        return True
-
     for method in methods:
         try:
             resp = requests.request(method, url, data=params)

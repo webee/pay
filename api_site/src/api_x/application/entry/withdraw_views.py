@@ -43,9 +43,10 @@ def app_withdraw(user_id):
         if bankcard.user_id != from_user_id:
             return response.fail(msg='bankcard [{0}] is not bound to user [{1}]'.format(bankcard_id, from_user_id))
 
-        tx_sn = apply_to_withdraw(channel, from_user_id, bankcard, amount_value, fee, client_notify_url, data)
-        log_user_withdraw(from_user_id, tx_sn, bankcard_id, amount, fee)
-        return response.success(sn=tx_sn)
+        withdraw_record = apply_to_withdraw(channel, from_user_id, bankcard, amount_value, fee, client_notify_url, data)
+        log_user_withdraw(from_user_id, withdraw_record.sn, bankcard_id, amount, fee)
+        return response.success(sn=withdraw_record.sn,
+                                actual_amount=withdraw_record.actual_amount, fee=withdraw_record.fee)
     except Exception as e:
         logger.exception(e)
         return response.fail(code=1, msg=e.message)

@@ -17,7 +17,7 @@ def apply_to_withdraw(channel, from_user_id, bankcard, amount, fee, client_notif
                                                  bankcard.prcptcd,
                                                  amount, fee, client_notify_url, data)
 
-    return withdraw_record.sn
+    return withdraw_record
 
 
 def log_user_withdraw(user_id, tx_sn, bankcard_id, amount, fee):

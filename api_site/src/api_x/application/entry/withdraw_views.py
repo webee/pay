@@ -14,15 +14,19 @@ from pytoolbox.util.log import get_logger
 logger = get_logger(__name__)
 
 
-@mod.route('/withdraw', methods=['POST'])
+@mod.route('/users/<user_id>/withdraw', methods=['POST'])
 @verify_request('app_withdraw')
-def app_withdraw():
+def app_withdraw(user_id):
     data = request.values
     channel = request.channel
-    from_user_id = long(data['from_user_id'])
     bankcard_id = data['bankcard_id']
     amount = data['amount']
     client_notify_url = data.get('notify_url', '')
+
+    user_map = channel.get_user_map(user_id)
+    if user_map is None:
+        return response.bad_request(msg='user not exists: [{0}]'.format(user_id))
+    from_user_id = user_map.account_user_id
 
     try:
         amount_value = Decimal(amount)

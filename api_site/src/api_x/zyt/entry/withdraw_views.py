@@ -12,12 +12,11 @@ from api_x.zyt.biz import withdraw
 logger = get_logger(__name__)
 
 
-@mod.route('/withdraw', methods=['POST'])
+@mod.route('/users/<user_id>/withdraw', methods=['POST'])
 @verify_request('withdraw')
-def apply_to_withdraw():
+def apply_to_withdraw(user_id):
     data = request.values
     channel = request.channel
-    from_user_id = data['from_user_id']
     # bankcard info
     flag_card = data['flag_card']
     card_type = data['card_type']
@@ -34,7 +33,10 @@ def apply_to_withdraw():
     fee = data['fee']
     client_notify_url = data['notify_url']
 
-    logger.info('receive withdraw: {0}'.format({k: v for k, v in data.items()}))
+    user_map = channel.get_user_map(user_id)
+    if user_map is None:
+        return response.bad_request(msg='user not exists: [{0}]'.format(user_id))
+    from_user_id = user_map.account_user_id
 
     try:
         amount_value = Decimal(amount)

@@ -47,7 +47,7 @@ class Channel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_domain_id = db.Column(db.Integer, db.ForeignKey('user_domain.id'), nullable=False)
-    user_domain = db.relationship('UserDomain', backref=db.backref('channels', lazy='dynamic'))
+    user_domain = db.relationship('UserDomain', backref=db.backref('channels', lazy='dynamic'), lazy='joined')
 
     # channel name唯一对应一个user_domain
     name = db.Column(db.VARCHAR(32), nullable=False, unique=True)
@@ -64,8 +64,11 @@ class Channel(db.Model):
     def has_entry_perm(self, api_entry_name):
         from sqlalchemy.orm import lazyload
 
-        return self.perms.options(lazyload('api_entry')).outerjoin(ApiEntry).\
-                   filter(ApiEntry.name == api_entry_name).count() > 0
+        return self.perms.options(lazyload('api_entry')).outerjoin(ApiEntry).filter(
+            ApiEntry.name == api_entry_name).count() > 0
+
+    def get_user_map(self, user_id):
+        return self.user_domain.user_maps.filter_by(user_id=user_id).first()
 
     def __repr__(self):
         return 'Channel<%r>' % (self.name,)

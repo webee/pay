@@ -22,6 +22,3 @@ class PayClientConfig:
 
     ROOT_URL = os.environ['PAY_API_SITE'] or 'http://pay.lvye.com/api'
 
-
-class Services:
-    LEADER_SERVER = "http://leader.lvye.com"

@@ -76,10 +76,6 @@ class Data:
     PROVINCES, CITIES = load_provinces_and_cities('conf/province_and_city_code.txt')
 
 
-class Services:
-    LEADER_SERVER = "http://tleader.lvye.com"
-
-
 class SMSConfig:
     URL = 'http://sdk999ws.eucp.b2m.cn:8080/sdkproxy/sendsms.action'
     CD_KEY = '9SDK-EMY-0999-JBQOO'

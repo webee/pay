@@ -8,15 +8,20 @@ from api_x.utils.entry_auth import verify_request
 from api_x.zyt.biz.transaction import query_user_transactions
 
 
-@mod.route('/account_users/<int:account_user_id>/transactions', methods=['GET'])
+@mod.route('/users/<user_id>/transactions', methods=['GET'])
 @verify_request('list_transactions')
-def list_transactions(account_user_id):
+def list_transactions(user_id):
     data = request.args
-    # channel = request.channel
+    channel = request.channel
     role = data.get('role')
     page_no = int(data.get('page_no', 1))
     page_size = int(data.get('page_size', 20))
     q = data.get('q')
+
+    user_map = channel.get_user_map(user_id)
+    if user_map is None:
+        return response.bad_request(msg='user not exists: [{0}]'.format(user_id))
+    account_user_id = user_map.account_user_id
 
     total_num, utxs = query_user_transactions(account_user_id, role, page_no, page_size, q)
     txs = [_get_tx(utx) for utx in utxs]

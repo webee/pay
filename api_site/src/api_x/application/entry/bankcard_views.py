@@ -63,4 +63,4 @@ def list_user_bankcards(user_id):
 
     bankcards = dba.query_all_bankcards(account_user_id)
     bankcards = [bc.to_dict() for bc in bankcards]
-    return response.success(bankcards=bankcards)
+    return response.success(data=bankcards)

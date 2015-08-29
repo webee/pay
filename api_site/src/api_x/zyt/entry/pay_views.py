@@ -2,13 +2,11 @@
 from __future__ import unicode_literals
 from api_x.utils import response
 from api_x.zyt.biz import payment
-from api_x.constant import TransactionState, PaymentTxState
+from api_x.constant import PaymentTxState
 from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 
 from flask import request, render_template, url_for, abort, redirect
-from api_x.zyt.user_mapping import get_or_create_account_user
 from api_x.config import etc as config
-from api_x.zyt.user_mapping import get_channel_by_name
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
 from api_x.utils.entry_auth import verify_request
@@ -38,8 +36,8 @@ def prepay():
     if payment_type not in [PaymentType.DIRECT, PaymentType.GUARANTEE]:
         return response.fail(msg="payment_type [{0}] not supported.".format(payment_type))
 
-    payer_id = get_or_create_account_user(channel.user_domain_id, payer_user_id)
-    payee_id = get_or_create_account_user(channel.user_domain_id, payee_user_id)
+    payer_id = channel.get_add_user_map(payer_user_id)
+    payee_id = channel.get_add_user_map(payee_user_id)
 
     try:
         payment_record = payment.find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,

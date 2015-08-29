@@ -17,7 +17,8 @@ _name_idx_api_entries = {}
 
 def _register_api_entry(f, name):
     if f in _func_idx_api_entries:
-        logger.warn('func [{0}] already registered'.format(f))
+        logger.error('func [{0}] already registered'.format(f))
+        raise RuntimeError('duplicated api entries.')
     _func_idx_api_entries[f] = name
 
     if name in _name_idx_api_entries:
@@ -48,6 +49,8 @@ def verify_request(entry_name):
                 params = {}
                 params.update(request.values.items())
                 params.update(request.view_args)
+
+                logger.info("[{0}] {1}: {2}".format(entry_name, request.url, params))
                 # check perm
                 channel_name = params.get('channel_name')
                 if channel_name is None:

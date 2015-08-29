@@ -12,10 +12,10 @@
 <body>
 <div class="opa-a">
 	<div class="middle-box">
-        <a href="http://www.lvye.cn/"><img src="{{ url_for('static', filename='images/frontpage/logo_zyt.png') }}" width="224"></a>
+        <a href="http://www.lvye.com/"><img src="{{ url_for('static', filename='images/frontpage/logo_zyt.png') }}" width="224"></a>
 
         <ul class="header-bar">
-            <li><a class="first-noborder" target="_self" href="/main">进入新版</a></li>
+            <li><a class="first-noborder" target="_self" href="{{ url_for('main.index') }}">进入新版</a></li>
             <li><a target="_self" href="http://pay.lvye.cn">旧版</a></li>
             <li><a target="_self" href="http://account.lvye.cn">用户中心</a></li>
         </ul>

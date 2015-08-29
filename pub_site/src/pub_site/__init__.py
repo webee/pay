@@ -55,7 +55,7 @@ def register_mods(app):
     from pub_site.frontpage import frontpage_mod
 
     app.register_blueprint(auth_mod, url_prefix=config.App.URL_PREFIX + '/auth')
-    app.register_blueprint(main_mod)
+    app.register_blueprint(main_mod, url_prefix=config.App.URL_PREFIX)
     app.register_blueprint(sms_mod, url_prefix=config.App.URL_PREFIX + '/sms')
     app.register_blueprint(withdraw_mod, url_prefix=config.App.URL_PREFIX)
     app.register_blueprint(data_mod, url_prefix=config.App.URL_PREFIX)

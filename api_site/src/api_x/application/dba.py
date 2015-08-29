@@ -19,7 +19,7 @@ def add_bankcard_bin(info):
 
 @transactional
 def bind_bankcard(user_id, bankcard_info):
-    bankcard = Bankcard.query.filter_by(user_id=user_id, card_no=bankcard_info.card_no)
+    bankcard = Bankcard.query.filter_by(user_id=user_id, card_no=bankcard_info.card_no).first()
     if bankcard is None:
         bankcard = Bankcard()
 

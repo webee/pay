@@ -20,6 +20,7 @@
             </p>
             {% from 'forms.html' import input, verification_code, submit %}
             {{ input(form.card_number, "持卡人必须与注册领队时的身份证所有者一致。") }}
+            {{ input(form.name, "银行卡开户姓名") }}
             <div class="line">
                 <label>所属地区</label>
                 {{ form.province(class="txk small province") }}
@@ -28,7 +29,7 @@
             </div>
             {{ input(form.subbranch_name, "银行卡的开户支行名称") }}
             {{ verification_code(form) }}
-            {{ submit(form.submit, form.verification_code_source.default) }}
+            {{ submit(form.submit, "submit-" + form.verification_code_source.default) }}
         </form>
     </div>
 {% endblock %}

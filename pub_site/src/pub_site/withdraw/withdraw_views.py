@@ -3,7 +3,6 @@ from __future__ import unicode_literals, print_function, division
 from flask.ext.login import current_user
 from flask import render_template, url_for, redirect, g, current_app
 from . import withdraw_mod as mod
-from pytoolbox.util.dbs import from_db
 from . import WITHDRAW_COMMISSION
 from .forms import BindCardForm, WithdrawForm
 from pay_client import PayClient
@@ -11,6 +10,7 @@ from flask import flash
 from pytoolbox.util.log import get_logger
 from pub_site import pay_client
 from pub_site.auth.utils import login_required
+from . import dba
 
 
 logger = get_logger(__name__)
@@ -41,19 +41,21 @@ def set_current_channel():
 @login_required
 def withdraw():
     uid = current_user.user_id
-    bankcards = pay_client.list_user_bankcards(uid)
+    bankcards = pay_client.app_list_user_bankcards(uid)
     if len(bankcards) == 0:
         return redirect(url_for('.bind_card'))
     form = WithdrawForm()
     if form.validate_on_submit():
         if not _do_withdraw(form.amount.data, WITHDRAW_COMMISSION, form.bankcard.data):
             return _withdraw_failed()
-        _update_preferred_card(form.bankcard.data)
+
+        bankcard_id = form.bankcard.data
+        dba.update_user_preferred_card(current_user.user_id, bankcard_id)
 
         actual_amount = form.amount.data - WITHDRAW_COMMISSION
         return _withdraw_succeed(actual_amount)
     bankcard_id = long(form.bankcard.data) if form.bankcard.data else 0
-    return render_template('withdraw/withdraw.html', balance=pay_client.query_user_available_balance(uid),
+    return render_template('withdraw/withdraw.html', balance=pay_client.app_query_user_available_balance(uid),
                            bankcards=bankcards, form=form,
                            selected_card=_find_selected_card(bankcards, bankcard_id))
 
@@ -63,39 +65,26 @@ def withdraw():
 def bind_card():
     form = BindCardForm()
     if form.validate_on_submit():
-        result = _do_bind_card(form)
-        if result['status_code'] != 201:
+        bankcard_id = _do_bind_card(form)
+        if bankcard_id is None:
             flash(u"银行卡绑定失败，请稍后再试。", category="error")
             return redirect(url_for('.bind_card'))
-        _update_preferred_card(result['data']['id'])
+        dba.update_user_preferred_card(current_user.user_id, bankcard_id)
         return redirect(url_for('.withdraw'))
     return render_template('withdraw/bind-card.html', form=form)
 
 
-def _update_preferred_card(card_id):
-    db = from_db()
-    current_user_id = current_user.user_id
-    user_id = db.exists('select user_id from preferred_card where user_id=%(user_id)s', user_id=current_user_id)
-    if user_id == 0:
-        db.insert('preferred_card', {"user_id": current_user_id, "bankcard_id": card_id})
-    else:
-        db.execute('update preferred_card set bankcard_id=%(card_id)s where user_id=%(user_id)s',
-                   card_id=card_id, user_id=current_user_id)
-
-
 def _do_bind_card(form):
-    card_number = form.card_number.data.replace(" ", "")
-    account_name = form.name.data
-    province_code = form.province.data
-    city_code = form.city.data
-    branch_bank_name = form.subbranch_name.data
-    return pay_client.bind_bankcards(
-        card_number=card_number,
-        account_name=account_name,
-        province_code=province_code,
-        city_code=city_code,
-        branch_bank_name=branch_bank_name
-    )
+    user_id = current_user.user_id
+    params = {
+        "card_no": form.card_number.data.replace(" ", ""),
+        "account_name": form.name.data,
+        "is_corporate_account": 0,
+        "province_code": form.province.data,
+        "city_code": form.city.data,
+        "branch_bank_name": form.subbranch_name.data
+    }
+    return pay_client.app_bind_bankcard(user_id, params)
 
 
 def _find_selected_card(bankcards, selected_card_id):

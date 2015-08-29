@@ -5,11 +5,11 @@ from pub_site import pay_client
 
 
 TX_TYPE_MSG = {
-    'PAYMENT:FROM': '支付付款',
-    'PAYMENT:TO': '支付收款',
+    'PAYMENT:FROM': '消费',
+    'PAYMENT:TO': '收款',
     'PAYMENT:GUARANTEE': '支付担保',
-    'REFUND:FROM': '支付退款',
-    'REFUND:TO': '接受退款',
+    'REFUND:FROM': '退款',
+    'REFUND:TO': '退款',
     'REFUND:GUARANTEE': '退款担保',
     'WITHDRAW:FROM': '提现',
     'PREPAID:TO': '充值',
@@ -34,7 +34,7 @@ TX_STATE_MSG = {
 
 
 def query_transactions(uid, role, page_no, page_size, keyword):
-    data = pay_client.query_transactions(uid, role, page_no, page_size, keyword)
+    data = pay_client.list_transactions(uid, role, page_no, page_size, keyword)
     if data is None:
         return 0, []
 

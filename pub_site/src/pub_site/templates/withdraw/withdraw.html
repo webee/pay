@@ -38,13 +38,13 @@
                     <b style="font-weight:normal;">提现银行卡暂不支持解除绑定。<br>如需解除绑定，请联系绿野领队服务客服。</b>
 
                     <p class="pa">
-                        <span><em></em>400-000-1234</span>
-                        <span><em class="phone"></em>1234567890</span>
+                        <span><em class="phone"></em>3212682214</span>
+                        <span><em class=""></em>010-84437828-8044</span>
                     </p>
                 </div>
             </div>
             {% from 'forms.html' import input, verification_code, submit %}
-            {{ input(form.amount, "含手续费2元") }}
+            {{ input(form.amount, "每天除第一笔外含手续费2元") }}
             {{ verification_code(form) }}
             {{ submit(form.submit, form.verification_code_source.default) }}
         </form>

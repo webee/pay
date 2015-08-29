@@ -41,7 +41,7 @@ def list_transactions():
 @login_required
 def available_balance():
     uid = current_user.user_id
-    balance = pay_client.query_user_available_balance(uid)
+    balance = pay_client.app_query_user_available_balance(uid)
 
     return jsonify(available_balance='%.2f' % balance)
 

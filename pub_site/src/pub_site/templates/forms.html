@@ -14,6 +14,7 @@
         <label>{{ form.verification_code.label }}</label>
         {{ form.verification_code(class="txk small" + (' orangetxk' if form.verification_code.errors | length > 0 else '')) }}
         {{ form.verification_code_source() }}
+        {{ form.request_verification_code(value=form.request_verification_code.default, id="request_verification_code-"+form.verification_code_source.default) }}
         {{ form.data_verified() }}
         <input type="button" class="hqyzm" value="获取验证码" data-source="{{ form.verification_code_source.default }}"
                data-verified="{{ form.data_verified.data }}">

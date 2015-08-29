@@ -71,7 +71,7 @@ footer{background:#333;height:60px;}
 .contLeft .listli li.cur{border-left:4px solid #3cb43c;color:#3cb43c;padding-left:16px;background-color: #fff}
 .contRight h2{font-size:28px;font-family:"微软雅黑";font-weight:normal;}
 .contRight p{font-size:14px;line-height:32px;margin-top:38px;}
-.contRight .pa span{display:inline-block;margin-right:25px;width:100px}.contRight .pa span em{display:block;width:50px;height:50px;background:url(../images/icon.png) no-repeat 0 0;margin-left:25px;}
+.contRight .pa span{display:inline-block;margin-right:25px;width:140px}.contRight .pa span em{display:block;width:50px;height:50px;background:url(../images/icon.png) no-repeat 0 0;margin-left:25px;}
 .contRight .pa span em.phone{background-position:-50px 0;}
 .contRight p a{display:inline-block;font-size:18px;color:#fff;width:180px;height:44px;background:#3cb43c;line-height:44px;border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;}
 

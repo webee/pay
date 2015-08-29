@@ -34,7 +34,13 @@ $(document).ready(function () {
                 }
             });
         } else {
-            $("#"+this.dataset["source"]).click();
+            $("#request_verification_code-"+this.dataset["source"]).attr("value", "yes");
+            $("#submit-"+this.dataset["source"]).click();
         }
     });
+
+
+    if ($('.hqyzm')[0].dataset['verified'] === "yes") {
+        $('.hqyzm')[0].click();
+    }
 });

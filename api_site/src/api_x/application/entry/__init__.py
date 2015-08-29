@@ -5,7 +5,7 @@ from flask import Blueprint, render_template
 
 application_mod = Blueprint('application', __name__, template_folder='./templates')
 
-from . import withdraw_views, bankcard_views
+from . import withdraw_views, bankcard_views, account_user_views
 
 
 @application_mod.errorhandler(404)

@@ -11,7 +11,7 @@ from pytoolbox.util.log import get_logger
 logger = get_logger(__name__)
 
 
-@mod.route('/users/<user_id>/bankcards', methods=['POST'])
+@mod.route('/users/<user_id>/balance', methods=['GET'])
 @verify_request('app_query_user_balance')
 def query_user_balance(user_id):
     channel = request.channel

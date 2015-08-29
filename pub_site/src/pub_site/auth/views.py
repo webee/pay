@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function, division
 
-from flask import request, redirect, session, url_for, render_template, jsonify
+from flask import request, redirect, session, url_for, jsonify
 from flask_login import UserMixin, AnonymousUserMixin, login_user, logout_user, login_required, current_user
 
 from . import auth_mod as mod
@@ -14,38 +14,35 @@ logger = get_logger(__name__)
 
 
 class User(UserMixin):
-    def __init__(self, xid, user_domain_name, user_id, user_name, is_leader, phone_no):
+    def __init__(self, xid, user_id, user_name, is_leader, phone_no):
         self.id = xid
-        self.user_domain_name = user_domain_name
         self.user_id = user_id
         self.user_name = user_name
         self.is_leader = is_leader
         self.phone_no = phone_no
 
     def to_dict(self):
-        return dict(id=self.id, user_domain_name=self.user_domain_name, user_id=self.user_id, user_name=self.user_name,
+        return dict(id=self.id, user_id=self.user_id, user_name=self.user_name,
                     is_leader=self.is_leader, phone_no=self.phone_no)
 
     @classmethod
     def from_json(cls, user_json, cookie_id):
         xid = cookie_id
-        user_domain_name = user_json.get('user_domain_name')
         user_id = int(user_json.get('uid'))
         user_name = user_json.get('username')
         is_leader = user_json.get('isleader') == "1"
         phone_no = user_json.get('phone')
 
-        return User(xid, user_domain_name, user_id, user_name, is_leader, phone_no)
+        return User(xid, user_id, user_name, is_leader, phone_no)
 
     @classmethod
     def from_dict(cls, user_dict):
         xid = user_dict.get('id')
-        user_domain_name = user_dict.get('user_domain_name')
         user_id = user_dict.get('user_id')
         user_name = user_dict.get('user_name')
         is_leader = user_dict.get('is_leader')
         phone_no = user_dict.get('phone_no')
-        return User(xid, user_domain_name, user_id, user_name, is_leader, phone_no)
+        return User(xid, user_id, user_name, is_leader, phone_no)
 
     @classmethod
     def get(cls, xid):
@@ -60,7 +57,6 @@ class User(UserMixin):
             txt = urllib2.urlopen(req, timeout=3).read()
             logger.warn('user json: ' + txt)
             user_json = json.loads(txt.strip()[5:-1])
-            user_json['user_domain_name'] = config.LVYE_ACCOUNT_USER_DOMAIN_NAME
             return User.from_json(user_json, xid)
 
         except Exception as _:

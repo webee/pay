@@ -6,7 +6,6 @@ from . import withdraw_mod as mod
 from pytoolbox.util.dbs import from_db
 from . import WITHDRAW_COMMISSION
 from .forms import BindCardForm, WithdrawForm
-from identifying_code_manager import generate_and_send_identifying_code
 from pay_client import PayClient
 from flask import flash
 from pytoolbox.util.log import get_logger
@@ -54,7 +53,7 @@ def withdraw():
         actual_amount = form.amount.data - WITHDRAW_COMMISSION
         return _withdraw_succeed(actual_amount)
     bankcard_id = long(form.bankcard.data) if form.bankcard.data else 0
-    return render_template('withdraw/withdraw.html', balance=pay_client.get_user_available_balance(uid),
+    return render_template('withdraw/withdraw.html', balance=pay_client.query_user_available_balance(uid),
                            bankcards=bankcards, form=form,
                            selected_card=_find_selected_card(bankcards, bankcard_id))
 
@@ -71,13 +70,6 @@ def bind_card():
         _update_preferred_card(result['data']['id'])
         return redirect(url_for('.withdraw'))
     return render_template('withdraw/bind-card.html', form=form)
-
-
-@mod.route('/withdraw/generate-identifying-code', methods=['POST'])
-@login_required
-def generate_identifying_code():
-    resp = generate_and_send_identifying_code()
-    return resp.content, resp.status_code
 
 
 def _update_preferred_card(card_id):
@@ -97,7 +89,7 @@ def _do_bind_card(form):
     province_code = form.province.data
     city_code = form.city.data
     branch_bank_name = form.subbranch_name.data
-    return PayClient().bind_bankcards(
+    return pay_client.bind_bankcards(
         card_number=card_number,
         account_name=account_name,
         province_code=province_code,

@@ -4,7 +4,7 @@
     <link href="{{ url_for('static', filename='css/withdraw.css') }}" rel="stylesheet">
 {% endblock %}
 {% block inline_scripts %}
-    <script src="{{ url_for('static', filename='js/identifying-code.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/verification-code.js') }}"></script>
     <script src="{{ url_for('static', filename='js/withdraw.js') }}"></script>
 {% endblock %}
 
@@ -43,10 +43,10 @@
                     </p>
                 </div>
             </div>
-            {% from 'forms.html' import input, identifying_code, submit %}
+            {% from 'forms.html' import input, verification_code, submit %}
             {{ input(form.amount, "含手续费2元") }}
-            {{ identifying_code(form.identifying_code) }}
-            {{ submit(form.submit) }}
+            {{ verification_code(form) }}
+            {{ submit(form.submit, form.verification_code_source.default) }}
         </form>
     </div>
 {% endblock %}

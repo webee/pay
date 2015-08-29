@@ -19,7 +19,7 @@ def require_leader_and_is_opened(f):
         if config.IS_ALL_OPENED:
             return f(*args, **kwargs)
 
-        if not is_leader_applied(user.user_domain_name, user.user_id):
+        if not is_leader_applied(user.user_id):
             # 没有完全开放
             # 没有申请的，则到申请页面
             return redirect(url_for('frontpage.main') + '#leader-application')

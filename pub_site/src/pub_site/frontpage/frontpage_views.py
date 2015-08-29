@@ -20,10 +20,9 @@ def main():
 def application():
     if not current_user.is_leader:
         return render_template('frontpage/user_is_not_allowed.html')
-    user_domain_name = current_user.user_domain_name
     user_id = current_user.user_id
     user_name = current_user.user_name
-    _ = dba.add_leader_application(user_domain_name, user_id, user_name)
+    _ = dba.add_leader_application(user_id, user_name)
     return redirect(url_for('.application_success'))
 
 

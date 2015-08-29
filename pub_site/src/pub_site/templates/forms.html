@@ -9,20 +9,23 @@
     </div>
 {%- endmacro %}
 
-{% macro identifying_code(field) -%}
+{% macro verification_code(form) -%}
     <div class="line">
-        <label>{{ field.label }}</label>
-        {{ field(class="txk small" + (' orangetxk' if field.errors | length > 0 else '')) }}
-        <input type="button" class="hqyzm" value="获取验证码">
-        <em class="identifying-code warn"></em>
-        {% for error in field.errors %}
+        <label>{{ form.verification_code.label }}</label>
+        {{ form.verification_code(class="txk small" + (' orangetxk' if form.verification_code.errors | length > 0 else '')) }}
+        {{ form.verification_code_source() }}
+        {{ form.data_verified() }}
+        <input type="button" class="hqyzm" value="获取验证码" data-source="{{ form.verification_code_source.default }}"
+               data-verified="{{ form.data_verified.data }}">
+        <em class="verification-code warn"></em>
+        {% for error in form.verification_code.errors %}
             <em class="mistake">{{ error }}</em>
         {% endfor %}
     </div>
 {%- endmacro %}
 
-{% macro submit(field) -%}
+{% macro submit(field, id) -%}
     <div class="line">
-        {{ field(class="tijiao firsttj") }}
+        {{ field(class="tijiao firsttj", id=id) }}
     </div>
 {%- endmacro %}

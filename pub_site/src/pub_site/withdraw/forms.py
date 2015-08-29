@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from datetime import datetime
 import time
@@ -9,7 +10,6 @@ from flask.ext.login import current_user
 from wtforms import StringField, SelectField, SubmitField, HiddenField, FloatField, ValidationError
 from wtforms.compat import text_type
 from wtforms.validators import DataRequired, NumberRange, StopValidation
-import requests
 from pytoolbox.util.dbs import from_db
 from pay_client import PayClient
 import re
@@ -18,20 +18,11 @@ from . import WITHDRAW_COMMISSION
 from pub_site import pay_client
 
 
-def name_and_id_card_should_match(form, field):
-    url = '%s/api/leader?id=%s' % (config.Services.LEADER_SERVER, current_user.user_id)
-    resp = requests.get(url)
-    if resp.status_code != 200:
-        raise ValidationError(u"持卡人信息与领队备案信息不一致")
-    data = resp.json().get('data')
-    if not data:
-        raise ValidationError(u"持卡人信息与领队备案信息不一致")
-    if data['contactsName'] != form.name.data or data['contactsIdcard'] != form.id_card_number.data:
-        raise ValidationError(u"持卡人信息与领队备案信息不一致")
+def verification_code_should_match(form, field):
+    from pub_site.models import VerificationCode
 
-
-def identifying_code_should_match(form, field):
-    now = datetime.fromtimestamp(time.time()).isoformat()
+    now = datetime.utcnow()
+    VerificationCode.query.filter_by(user_id=current_user.user_id)
     sql = 'select code from identifying_code where user_id=%(user_id)s and expire_at>=%(now)s order by expire_at desc limit 1'
     code = from_db().get_scalar(sql, user_id=current_user.user_id, now=now)
     if code != field.data:
@@ -39,8 +30,8 @@ def identifying_code_should_match(form, field):
 
 
 def card_number_should_be_legal(form, field):
-    card_bin = pay_client.get_bin(field.data.replace(" ", ""))
-    if not card_bin['ret']:
+    card_bin = pay_client.query_bin(field.data.replace(" ", ""))
+    if not card_bin:
         raise ValidationError(u"无效的银行卡")
     card_type = card_bin['card_type']
     if card_type != 'DEBIT':
@@ -56,19 +47,36 @@ def card_is_not_in_use(form, field):
             raise ValidationError(u"卡已绑定")
 
 
-class BindCardForm(Form):
+def gen_verification_code_form(source):
+    class VerificationCodeForm(Form):
+        data_verified = HiddenField(u'data_verified', default=u"no")
+        verification_code = StringField(u"验证码")
+        verification_code_source = HiddenField(u'verification_code_source', default=source)
+
+        def data_validate(self):
+            data_verified = self.data_verified.data == 'yes'
+            if self.validate():
+                self.data_verified.data = 'yes'
+            if data_verified:
+                self.verification_code.validators = [DataRequired(u"验证码不能为空"), verification_code_should_match]
+            return self.validate()
+
+        def validate_on_submit(self):
+            return self.is_submitted() and self.data_validate()
+    return VerificationCodeForm
+
+
+class BindCardForm(gen_verification_code_form(u'form-bind_card')):
     card_number = StringField(u"卡号",
                               validators=[DataRequired(u"卡号不能为空"), card_number_should_be_legal, card_is_not_in_use])
-    id_card_number = StringField(u"身份证号", validators=[DataRequired(u"身份证号不能为空"), name_and_id_card_should_match])
-    name = StringField(u"姓名", validators=[DataRequired(u"姓名不能为空"), name_and_id_card_should_match])
     province = SelectField(u"省", coerce=str)
     city = SelectField(u"市", coerce=str)
     subbranch_name = StringField(u"开户支行", validators=[DataRequired(u"开户支行不能为空")])
-    identifying_code = StringField(u"验证码", validators=[DataRequired(u"验证码不能为空"), identifying_code_should_match])
     submit = SubmitField(u"提交")
 
     def __init__(self, *args, **kwargs):
-        Form.__init__(self)
+        super(BindCardForm, self).__init__(*args, **kwargs)
+
         self.province.choices = [(key, value) for key, value in config.Data.PROVINCES.items()]
         if not self.is_submitted():
             self.province.data = self.province.choices[0][0]
@@ -114,17 +122,16 @@ class MyRegexp(object):
             raise StopValidation(message)
 
 
-class WithdrawForm(Form):
+class WithdrawForm(gen_verification_code_form("form-withdraw")):
     bankcard = MyHiddenField()
     amount = FloatField(u"提现金额(元)",
                         validators=[DataRequired(u'请输入数字，小数点后最多2位， 例如"8.88"'), MyRegexp(r'^\d+(.\d{1,2})?$', message=u'请输入数字，小数点后最多2位， 例如"8.88"'),
                                     amount_less_than_balance,
                                     NumberRange(min=WITHDRAW_COMMISSION, message=u"提现金额不能少于2元(含手续费2元)")])
-    identifying_code = StringField(u"验证码", validators=[DataRequired(u"验证码不能为空"), identifying_code_should_match])
     submit = SubmitField(u"提交")
 
     def __init__(self, *args, **kwargs):
-        Form.__init__(self)
+        super(WithdrawForm, self).__init__(*args, **kwargs)
         if not self.is_submitted():
             preferred_bankcard_id = from_db().get_scalar(
                 'select bankcard_id from preferred_card where user_id=%(user_id)s', user_id=current_user.user_id)

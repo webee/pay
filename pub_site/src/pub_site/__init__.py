@@ -48,6 +48,7 @@ def init_errors(app):
 def register_mods(app):
     from pub_site.auth import auth_mod
     from pub_site.main import main_mod
+    from pub_site.sms import sms_mod
     from pub_site.withdraw import withdraw_mod
     from pub_site.data import data_mod
     from pub_site.pay import pay_mod
@@ -55,6 +56,7 @@ def register_mods(app):
 
     app.register_blueprint(auth_mod, url_prefix='/auth')
     app.register_blueprint(main_mod)
+    app.register_blueprint(sms_mod, url_prefix='/sms')
     app.register_blueprint(withdraw_mod)
     app.register_blueprint(data_mod)
     app.register_blueprint(pay_mod)

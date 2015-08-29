@@ -36,12 +36,13 @@ def prepay():
     if payment_type not in [PaymentType.DIRECT, PaymentType.GUARANTEE]:
         return response.fail(msg="payment_type [{0}] not supported.".format(payment_type))
 
-    payer_id = channel.get_add_user_map(payer_user_id)
-    payee_id = channel.get_add_user_map(payee_user_id)
+    payer_user_map = channel.get_add_user_map(payer_user_id)
+    payee_user_map = channel.get_add_user_map(payee_user_id)
 
     try:
-        payment_record = payment.find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
-                                                        product_name, product_category, product_desc, amount,
+        payment_record = payment.find_or_create_payment(channel, payment_type,
+                                                        payer_user_map.account_user_id, payee_user_map.account_user_id,
+                                                        order_id, product_name, product_category, product_desc, amount,
                                                         client_callback_url, client_notify_url)
         pay_url = config.HOST_URL + url_for('biz_entry.cashier_desk', sn=payment_record.sn)
 

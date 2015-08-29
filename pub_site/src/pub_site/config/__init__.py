@@ -20,8 +20,6 @@ class App:
     SQLALCHEMY_MAX_OVERFLOW = 60
     SQLALCHEMY_POOL_RECYCLE = 3600
 
-    URL_PREFIX = ""
-
 
 class UserCenter:
     PASSPORT_LOGIN_URL = 'http://api.passport.lvye.com/oauth/toLogin/'

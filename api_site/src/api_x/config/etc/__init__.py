@@ -31,7 +31,7 @@ class Biz:
 
 
 LVYE_PRI_KEY = read_string('conf/keys/lvye_pri_key.txt')
-LVYE_PUB_KEY = public_key.loads_b64encoded_key(LVYE_PRI_KEY).b64encoded_binary_key_data()
+LVYE_PUB_KEY = public_key.loads_b64encoded_key(LVYE_PRI_KEY).gen_public_key().b64encoded_binary_key_data()
 
 TEST_MD5_KEY = read_string('conf/test/md5_key.txt')
 TEST_CHANNEL_PUB_KEY = read_string('conf/test/channel_pub_key.txt')

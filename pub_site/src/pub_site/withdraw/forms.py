@@ -12,7 +12,6 @@ from . import dba
 from pub_site.sms import verification_code_manager
 import re
 from wtforms.compat import string_types
-from . import WITHDRAW_COMMISSION
 from pub_site import pay_client
 
 
@@ -125,7 +124,7 @@ class WithdrawForm(gen_verification_code_form("form-withdraw")):
     amount = FloatField(u"提现金额(元)",
                         validators=[DataRequired(u'请输入数字，小数点后最多2位， 例如"8.88"'), MyRegexp(r'^\d+(.\d{1,2})?$', message=u'请输入数字，小数点后最多2位， 例如"8.88"'),
                                     amount_less_than_balance,
-                                    NumberRange(min=WITHDRAW_COMMISSION, message=u"提现金额不能少于2元(含手续费2元)")])
+                                    NumberRange(min=1, message=u"提现金额最少为1元")])
     submit = SubmitField(u"提交")
 
     def __init__(self, *args, **kwargs):

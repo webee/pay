@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 
 
 @mod.route('/bankcard/<card_no>/bin', methods=['GET'])
-@verify_request('query_bin')
+@verify_request('app_query_bin')
 def query_bin(card_no):
     try:
         # 缓存bankcard_bin信息
@@ -30,7 +30,7 @@ def query_bin(card_no):
 
 
 @mod.route('/users/<user_id>/bankcards', methods=['POST'])
-@verify_request('add_bankcard')
+@verify_request('app_add_bankcard')
 def add_bankcard(user_id):
     data = request.params
     channel = request.channel
@@ -52,7 +52,7 @@ def add_bankcard(user_id):
 
 
 @mod.route('/users/<user_id>/bankcards', methods=['GET'])
-@verify_request('list_user_bankcards')
+@verify_request('app_list_user_bankcards')
 def list_user_bankcards(user_id):
     channel = request.channel
 

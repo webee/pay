@@ -49,10 +49,3 @@ def app_withdraw(user_id):
     except Exception as e:
         logger.exception(e)
         return response.fail(code=1, msg=e.message)
-
-
-@mod.route('/account_users/<int:account_user_id>/withdraw/notify', methods=['POST'])
-def withdraw_notify(account_user_id):
-    data = request.values
-
-    return "OK"

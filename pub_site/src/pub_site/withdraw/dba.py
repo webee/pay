@@ -19,7 +19,8 @@ def update_user_preferred_card(user_id, bankcard_id):
 
 def get_preferred_card_id(user_id):
     preferred_card = PreferredCard.query.filter_by(user_id=user_id).first()
-    return preferred_card.bankcard_id
+    if preferred_card:
+        return preferred_card.bankcard_id
 
 
 @transactional

@@ -131,4 +131,4 @@ class WithdrawForm(gen_verification_code_form("form-withdraw")):
         super(WithdrawForm, self).__init__(*args, **kwargs)
         if not self.is_submitted():
             preferred_bankcard_id = dba.get_preferred_card_id(current_user.user_id)
-            self.bankcard.data = preferred_bankcard_id
+            self.bankcard.data = preferred_bankcard_id or 0

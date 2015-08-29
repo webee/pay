@@ -59,7 +59,7 @@ def add_system_users():
     add_perm_to_channel(channel.name, 'get_create_account_user')
     add_perm_to_channel(channel.name, 'list_transactions')
     add_perm_to_channel(channel.name, 'app_query_bin')
-    add_perm_to_channel(channel.name, 'app_add_bankcard')
+    add_perm_to_channel(channel.name, 'app_bind_bankcard')
     add_perm_to_channel(channel.name, 'app_list_user_bankcards')
     add_perm_to_channel(channel.name, 'app_withdraw')
     add_perm_to_channel(channel.name, 'app_query_user_balance')

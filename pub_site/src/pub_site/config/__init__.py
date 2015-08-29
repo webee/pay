@@ -45,7 +45,6 @@ IS_ALL_OPENED = False
 # # pay api
 class PayClientConfig:
     MD5_KEY = read_string('conf/test/md5_key.txt')
-    LVYE_PUB_KEY = read_string('conf/test/lvye_pub_key.txt')
     CHANNEL_PRI_KEY = read_string('conf/test/channel_pri_key.txt')
 
     CHANNEL_NAME = 'lvye_pay_site'

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from functools import wraps
+import urlparse
 from flask import request
 from api_x.utils import response
 from pytoolbox.util.log import get_logger
@@ -85,3 +86,19 @@ def verify_request(entry_name):
         return wrapper
 
     return do_verify_request
+
+
+def limit_referrer(netlocs):
+    def do_limit(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            try:
+                referrer = request.referrer
+                parts = urlparse.urldefrag(referrer)
+                if parts.netloc in netlocs:
+                    return f(*args, **kwargs)
+            except Exception as e:
+                logger.exception(e)
+            return response.bad_request()
+        return wrapper
+    return do_limit

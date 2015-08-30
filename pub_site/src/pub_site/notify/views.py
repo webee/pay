@@ -27,7 +27,7 @@ def notify_withdraw():
     if code in [0, '0']:
         # 成功
         withdraw_dba.update_withdraw_state(withdraw_record.sn, withdraw_record.user_id,
-                                  WithdrawState.REQUESTED, WithdrawState.SUCCESS)
+                                           WithdrawState.REQUESTED, WithdrawState.SUCCESS)
         msg = "您的提现请求已处理，请等待到账"
     else:
         # 失败

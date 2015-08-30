@@ -16,6 +16,7 @@ from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.biz.transaction import update_transaction_info
 from api_x.zyt.biz.error import *
+from api_x.config import etc as config
 from pytoolbox.util.dbs import transactional, require_transaction_context
 from pytoolbox.util.log import get_logger
 from api_x.task import tasks
@@ -185,7 +186,9 @@ def _withdraw_to_processing(tx):
 
 
 def _request_pay_to_bankcard(tx, withdraw_record, data):
-    if 'use_test_pay' in data and data['use_test_pay'] == '1':
+    from api_x.zyt.evas import test_pay
+
+    if test_pay.NAME in config.Biz.ACTIVATED_EVAS and 'use_test_pay' in data and data['use_test_pay'] == '1':
         # for test.
         return _withdraw_by_test_pay(tx, withdraw_record, data)
     else:

@@ -18,7 +18,7 @@ $(document).ready(function () {
         if (this.dataset['verified'] === "yes") {
             $(this).attr('disabled', 'disabled').attr('value', '正在获取');
             $('.verification-code.warn').html('');
-            $.ajax('/sms/send_verification_code', {
+            $.ajax(this.dataset['apiUrl'], {
                 type: 'post',
                 data: {source: this.dataset["source"]},
                 success: function (data, textStatus) {

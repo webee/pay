@@ -18,6 +18,9 @@ def fetch_notify_withdraw_result(minutes):
         user_id = withdraw_record.user_id
         sn = withdraw_record.sn
         data = pay_client.query_withdraw(user_id, sn)
+        if data is None:
+            continue
+
         is_success = is_withdraw_result_success(data['code'])
         if is_success is not None:
             notify_user_withdraw_result(is_success, withdraw_record)

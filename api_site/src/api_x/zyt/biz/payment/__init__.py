@@ -15,7 +15,7 @@ from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
 from api_x.zyt.biz.error import NonPositiveAmountError
 from api_x.zyt.biz.error import TransactionNotFoundError
 from api_x.zyt.biz.transaction.error import TransactionStateError
-from api_x.zyt.biz.models import UserRole
+from api_x.zyt.biz.models import UserRole, DuplicatedPaymentRecord
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
 from api_x.task import tasks
@@ -121,6 +121,18 @@ def succeed_payment(vas_name, payment_record):
 
 
 @transactional
+def duplicate_payment_to_balance(vas_name, vas_sn, tx, payment_record):
+    event_id = bookkeeping(EventType.TRANSFER_IN, tx.sn, payment_record.payer_id, vas_name,
+                           payment_record.amount)
+    duplicate_payment_record = DuplicatedPaymentRecord(tx_id=tx.id,
+                                                       sn=tx.sn, event_id=event_id,
+                                                       vas_name=vas_name, vas_sn=vas_sn)
+    db.session.add(duplicate_payment_record)
+    # 不改变状态，只是添加一条关联event
+    transit_transaction_state(payment_record.tx_id, tx.state, tx.state, event_id)
+
+
+@transactional
 def secure_payment(vas_name, payment_record):
     secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
     event_id = bookkeeping(EventType.TRANSFER_IN_FROZEN, payment_record.sn, secure_user_id, vas_name,
@@ -185,9 +197,11 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
 
     if _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
         # 重复支付
-        # TODO, 退款到余额(短信通知)或者原路返回
         logger.warning('duplicated payment: [{0}], [{1}], [{2}, {3}]'.format(payment_record.vas_name,
                                                                              payment_record.vas_sn, vas_name, vas_sn))
+        # FIXME, 暂时退款到余额，然后人工处理
+        duplicate_payment_to_balance(vas_name, vas_sn, tx, payment_record)
+        return
 
     with require_transaction_context():
         tx = update_transaction_info(tx.id, vas_name, vas_sn, PaymentTxState.CREATED)

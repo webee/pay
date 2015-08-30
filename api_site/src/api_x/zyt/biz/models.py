@@ -139,6 +139,23 @@ class PaymentRecord(db.Model):
         return '<Payment %r>' % (self.id,)
 
 
+class DuplicatedPaymentRecord(db.Model):
+    __tablename__ = 'duplicated_payment_record'
+
+    id = db.Column(db.BigInteger, primary_key=True)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False, unique=True)
+    tx = db.relationship('Transaction', backref=db.backref('duplicated_payment_record', lazy='dynamic'), lazy='joined')
+
+    sn = db.Column(db.CHAR(32), nullable=False)
+
+    vas_name = db.Column(db.VARCHAR(32), nullable=False, default='')
+    vas_sn = db.Column(db.VARCHAR(128), nullable=False, default='')
+
+    event_id = db.Column(db.BigInteger, nullable=True, default=0L)
+
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
 class RefundRecord(db.Model):
     __tablename__ = 'refund_record'
 

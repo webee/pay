@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from flask import request, jsonify
 from . import notify_mod as mod
 from pub_site import pay_client
-from pub_site.constant import WithdrawState
 from pub_site.withdraw import dba as withdraw_dba
 from . import task
 
@@ -27,9 +26,6 @@ def notify_withdraw():
     is_success = task.is_withdraw_result_success(code)
     if is_success is None:
         return jsonify(code=1)
-
-    new_state = WithdrawState.SUCCESS if is_success else WithdrawState.FAILED
-    withdraw_record = withdraw_dba.update_withdraw_state(withdraw_record.sn, withdraw_record.user_id, new_state)
 
     if task.notify_user_withdraw_result(is_success, withdraw_record):
         return jsonify(code=0)

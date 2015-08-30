@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
+from pub_site.constant import WithdrawState
 from pub_site.withdraw import dba as withdraw_dba
 from pub_site import pay_client
 from pub_site.sms import sms
@@ -36,9 +37,14 @@ def is_withdraw_result_success(code):
 def notify_user_withdraw_result(is_success, withdraw_record):
     msg = _build_msg(is_success, withdraw_record)
 
-    if not sms.send(withdraw_record.phone_no, msg):
+    notified = sms.send(withdraw_record.phone_no, msg)
+    if not notified:
         # 失败再尝试一次，TODO: 使用celery.
-        return sms.send(withdraw_record.phone_no, msg)
+        notified = sms.send(withdraw_record.phone_no, msg)
+
+    if notified:
+        new_state = WithdrawState.SUCCESS if is_success else WithdrawState.FAILED
+        withdraw_dba.update_withdraw_state(withdraw_record.sn, withdraw_record.user_id, new_state)
     return True
 
 

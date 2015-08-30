@@ -77,6 +77,7 @@ def verify_request(entry_name):
                 logger.exception(e)
                 return response.bad_request(msg=e.message)
 
+            logger.info("[{0}] verify done.".format(entry_name))
             request.__dict__['channel'] = channel
             request.__dict__['params'] = params
             return f(*args, **kwargs)

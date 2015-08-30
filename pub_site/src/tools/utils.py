@@ -22,3 +22,7 @@ def to_float(n, default=0):
 
 def to_decimal(float_price):
     return decimal.Decimal('%.2f' % float_price)
+
+
+def to_bankcard_mask(value):
+    return u"%s **** **** %s" % (value[:4], value[-4:])

@@ -12,7 +12,6 @@ class App:
     DEBUG = True
     LOGIN_DISABLED = False
     WTF_CSRF_SECRET_KEY = 'a random string'
-    APPLICATION_ROOT = None
 
     SQLALCHEMY_DATABASE_URI = 'mysql://lvye_pay:p@55word@127.0.0.1:3306/lvye_pay_pub'
     SQLALCHEMY_ECHO = False
@@ -31,6 +30,7 @@ class UserCenter:
 
 
 HOST_URL = 'http://pay.lvye.com'
+URL_MOUNT_PREFIX = ''
 
 # 自游通渠道，用户域为绿野用户中心
 LVYE_ACCOUNT_USER_DOMAIN_NAME = 'lvye_account'

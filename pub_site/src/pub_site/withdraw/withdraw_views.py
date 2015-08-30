@@ -127,7 +127,7 @@ def _find_selected_card(bankcards, selected_card_id):
 
 
 def _do_withdraw(user_id, bankcard_id, phone_no, amount):
-    notify_url = config.HOST_URL + url_for('.withdraw_notify')
+    notify_url = config.HOST_URL + config.URL_MOUNT_PREFIX + url_for('.withdraw_notify')
     result = pay_client.app_withdraw(user_id, bankcard_id, amount, notify_url)
     if result is not None:
         dba.update_user_preferred_card(user_id, bankcard_id)

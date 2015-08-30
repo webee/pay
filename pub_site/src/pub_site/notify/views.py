@@ -28,12 +28,11 @@ def notify_withdraw():
     if code in [0, '0']:
         # 成功
         withdraw_record = withdraw_dba.update_withdraw_state(withdraw_record.sn, withdraw_record.user_id,
-                                                             WithdrawState.REQUESTED, WithdrawState.SUCCESS)
+                                                             WithdrawState.SUCCESS)
         msg = _build_msg(True, withdraw_record)
     else:
         # 失败
-        withdraw_dba.update_withdraw_state(withdraw_record.sn, withdraw_record.user_id,
-                                           WithdrawState.REQUESTED, WithdrawState.FAILED)
+        withdraw_dba.update_withdraw_state(withdraw_record.sn, withdraw_record.user_id, WithdrawState.FAILED)
         msg = _build_msg(False, withdraw_record)
 
     if sms.send(withdraw_record.phone_no, msg):

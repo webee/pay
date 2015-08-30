@@ -6,9 +6,10 @@ function update_available_balance(callback) {
     }
 
     requestRunning = true;
-    $.getJSON('../available_balance')
+    var available_balance = $("#available_balance")[0];
+    $.getJSON(available_balance.dataset['apiUrl'])
         .done(function (res) {
-            $("#available_balance").html(res.available_balance);
+            available_balance.html(res.available_balance);
         }).complete(function() {
             requestRunning = false;
             if (callback != null) {
@@ -106,9 +107,10 @@ $(document).ready(function () {
         }
 
         requestRunning = true;
-        $.get('../transactions', params)
+        var tx_list = $("#tx_list")[0];
+        $.get(tx_list.dataset['apiUrl'], params)
             .done(function (data) {
-                $("#tx_list").html(data);
+                tx_list.html(data);
                 if (callback != null) {
                     callback();
                 }

@@ -45,9 +45,3 @@ def available_balance():
 
     return jsonify(available_balance='%.2f' % balance)
 
-
-@mod.route('/trade/<int:id>', methods=['GET'])
-@login_required
-def trade_detail(id):
-    trade = {"id": id, "type": TradeType.WITHDRAW}
-    return render_template('main/trade-detail.html', trade=trade)

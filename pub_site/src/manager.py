@@ -52,6 +52,13 @@ def deploy(envx):
     deploy(envx)
 
 
+@manager.option('-m', '--minutes', type=long, dest="minutes", required=True, default=10)
+def fetch_withdraw_result_notify(minutes):
+    from pub_site.notify import task
+
+    task.fetch_notify_withdraw_result(minutes)
+
+
 def main():
     reload(sys)
     sys.setdefaultencoding('utf-8')

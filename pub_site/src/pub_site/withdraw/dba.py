@@ -46,6 +46,9 @@ def update_withdraw_state(sn, user_id, new_state):
     return withdraw_record
 
 
-@transactional
 def get_withdraw_record(sn, user_id):
     return WithdrawRecord.query.filter_by(sn=sn, user_id=user_id).first()
+
+
+def get_requested_withdraw_record_before(t):
+    return WithdrawRecord.query.filter(WithdrawRecord.created_on < t).all()

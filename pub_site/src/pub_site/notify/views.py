@@ -45,22 +45,16 @@ def _build_msg(is_success, withdraw_record):
     bankcard_id = withdraw_record.bankcard_id
     bc = pay_client.app_get_user_bankcard(user_id, bankcard_id)
 
+    params = {
+        'created_on': withdraw_record.created_on,
+        'amount': withdraw_record.amount,
+        'bank_name': bc['bank_name'],
+        'card_no': to_bankcard_mask(bc['card_no'])
+    }
     if is_success:
-        params = {
-            'created_on': withdraw_record.created_on,
-            'amount': withdraw_record.amount,
-            'bank_name': bc['name'],
-            'card_no': to_bankcard_mask(bc['card_no']),
-            'actual_amount': withdraw_record.actual_amount,
-            'fee': withdraw_record.fee
-        }
+        params['actual_amount'] = withdraw_record.actual_amount
+        params['fee'] = withdraw_record.fee
         msg = "您于{created_on}提现{amount}到{bank_name}({card_no})的请求已处理，实际金额: {actual_amount}, 手续费: {fee}; 正等待到账，请留意银行卡到账信息。"
     else:
-        params = {
-            'created_on': withdraw_record.created_on,
-            'amount': withdraw_record.amount,
-            'bank_name': bc['name'],
-            'card_no': to_bankcard_mask(bc['card_no'])
-        }
         msg = "您于{created_on}提现{amount}到{bank_name}({card_no})的请求失败。"
     return msg.format(**params)

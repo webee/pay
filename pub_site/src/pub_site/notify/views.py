@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals
-from flask import request, jsonify
+from flask import request, jsonify, flash, redirect, url_for
 from . import notify_mod as mod
 from pub_site import pay_client
 from pub_site.withdraw import dba as withdraw_dba
@@ -30,3 +30,15 @@ def notify_withdraw():
     if task.notify_user_withdraw_result(is_success, withdraw_record):
         return jsonify(code=0)
     return jsonify(code=1)
+
+
+@mod.route('/pay_result', methods=['POST'])
+@pay_client.verify_request
+def pay_result():
+    data = request.params
+    code = data['code']
+    if code in [0, '0']:
+        flash(u"付款给绿野支付成功！", category="success")
+    else:
+        flash(u"付款给绿野支付失败！", category="error")
+    return redirect(url_for("main.index"))

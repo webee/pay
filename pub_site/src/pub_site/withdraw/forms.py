@@ -4,10 +4,10 @@ from __future__ import unicode_literals
 from pub_site import config
 from flask.ext.wtf import Form
 from flask.ext.login import current_user
+from pub_site.commons import amount_less_than_balance
 from wtforms import StringField, SelectField, SubmitField, HiddenField, FloatField, ValidationError
 from wtforms.compat import text_type
 from wtforms.validators import DataRequired, NumberRange, StopValidation
-from decimal import Decimal
 from . import dba
 from pub_site.sms import verification_code_manager
 import re
@@ -95,12 +95,6 @@ class MyHiddenField(HiddenField):
 
     def _value(self):
         return text_type(self.data) if self.data is not None else ''
-
-
-def amount_less_than_balance(form, field):
-    balance = pay_client.app_query_user_available_balance(current_user.user_id)
-    if Decimal(field.data) > balance:
-        raise StopValidation(u"提现金额不能超过账户余额")
 
 
 class MyRegexp(object):

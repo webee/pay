@@ -31,9 +31,6 @@ class UserCenter:
 
 HOST_URL = 'http://pay.lvye.com'
 
-# 自游通渠道，用户域为绿野用户中心
-LVYE_ACCOUNT_USER_DOMAIN_NAME = 'lvye_account'
-CHANNEL_NAME = 'lvye_pay'
 # 绿野公司域和用户
 LVYE_CORP_DOMAIN_NAME = 'lvye_corp'
 LVYE_USER_NAME = 'lvye'
@@ -79,3 +76,8 @@ class SMSConfig:
     URL = 'http://sdk999ws.eucp.b2m.cn:8080/sdkproxy/sendsms.action'
     CD_KEY = '9SDK-EMY-0999-JBQOO'
     PASSWORD = '506260'
+
+
+class PaymentType:
+    DIRECT = 'DIRECT'
+    GUARANTEE = 'GUARANTEE'

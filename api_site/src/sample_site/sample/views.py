@@ -35,12 +35,15 @@ def pay():
     payer = '96355632'
 
     use_zyt_pay = request.values.get('use_zyt_pay')
-    payee = request.values['payee']
+    payee = request.values.get('other_payee')
+    payee = payee or request.values['payee']
+    payee_domain_name = request.values['payee_domain_name']
     amount = Decimal(request.values['amount'])
     payment_type = request.values['payment_type']
     params = {
         'payer_user_id': payer,
         'payee_user_id': payee,
+        'payee_domain_name': payee_domain_name,
         'order_id': request.values.get('order_id') or generate_order_id(),
         'product_name': '测试{1}支付{0}元'.format(amount, '担保' if payment_type == 'GUARANTEE' else ''),
         'product_category': '测试',

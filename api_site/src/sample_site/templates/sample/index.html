@@ -18,6 +18,8 @@ payee: {{ payee }}, 全部: {{ payee_balance.total }}, 可用: {{ payee_balance.
         <option value="{{ payee }}">payee</option>
         <option value="{{ payer }}">payer</option>
     </select>
+    other: <input type="text" name='other_payee' value=""/>
+    payee_domain_name: <input type="text" name='payee_domain_name' value=""/>
     <select name="payment_type">
         <option value="DIRECT">直接到账</option>
         <option value="GUARANTEE">担保支付</option>

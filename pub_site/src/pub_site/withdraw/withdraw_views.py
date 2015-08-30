@@ -54,7 +54,8 @@ def withdraw():
         fee = result['fee']
         return _withdraw_succeed(actual_amount, fee)
     bankcard_id = long(form.bankcard.data) if form.bankcard.data else 0
-    return render_template('withdraw/withdraw.html', balance=pay_client.app_query_user_available_balance(uid),
+    return render_template('withdraw/withdraw.html',
+                           balance='%0.2f' % pay_client.app_query_user_available_balance(uid),
                            bankcards=bankcards, form=form,
                            selected_card=_find_selected_card(bankcards, bankcard_id))
 

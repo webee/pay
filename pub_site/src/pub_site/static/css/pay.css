@@ -12,15 +12,15 @@
     border: 1px solid #f97700;
 }
 
-.pay-type ul {
+.pay-channel ul {
     display: inline;
 }
 
-.pay-type li {
+.pay-channel li {
     display: inline;
 }
 
-.line.pay-type li label {
+.line.pay-channel li label {
     font-size: 14px;
     display: inline;
     margin-left: 6px;

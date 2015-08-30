@@ -8,7 +8,7 @@ from . import auth_mod as mod
 from pytoolbox.util.log import get_logger
 from pub_site import login_manager
 from pub_site import config
-from tools.urls import build_url
+from pytoolbox.util.urls import build_url
 
 logger = get_logger(__name__)
 

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-
-from flask import g, render_template, redirect, url_for, flash
+from __future__ import unicode_literals
+import os
+from decimal import Decimal
+from flask import g, render_template, redirect, url_for, flash, request
 from flask.ext.login import current_user
 from . import pay_mod as mod
-from ..constant import PayType
-from pub_site.pay.forms import PayForm
-from pub_site.withdraw.pay_client import PayClient
-from pytoolbox.util.dbs import from_db
-from datetime import datetime
+from pub_site.pay.forms import PayToLvyeForm
+from pub_site import pay_client
 from pytoolbox.util.log import get_logger
-import os
+from . import dba
+from pub_site import config
 from pub_site.auth.utils import login_required
 
 _logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
@@ -17,39 +17,22 @@ _logger = get_logger(__name__, level=os.getenv('LOG_LEVEL', 'INFO'))
 
 @mod.before_request
 def set_current_channel():
-    g.current_channel = 'pay'
+    g.current_channel = 'pay_to_lvye'
 
 
-@mod.route('/pay', methods=['GET', 'POST'])
+@mod.route('/pay_to_lvye', methods=['GET', 'POST'])
 @login_required
-def pay():
-    form = PayForm()
+def pay_to_lvye():
+    user_id = current_user.user_id
+    form = PayToLvyeForm()
     if form.validate_on_submit():
-        order = _create_order(form.amount.data, form.pay_type.data, form.comment.data)
-        return _pay(order)
-    return render_template('pay/pay.html', form=form)
-
-
-@mod.route('/pay-success', methods=['GET'])
-@login_required
-def pay_succeed():
-    flash(u"付款给绿野支付成功！", category="success")
-    return redirect(url_for("main.index"))
-
-
-def _create_order(amount, pay_type, comment):
-    order = {
-        "name": u"付款给绿野",
-        "user_id": current_user.user_id,
-        "pay_type": pay_type,
-        "description": (u"付款给绿野：%s" % comment),
-        "amount": amount,
-        "created_on": datetime.now().isoformat()
-
-    }
-    order_id = from_db().insert('zyt_order', order, returns_id=True)
-    order["id"] = order_id
-    return order
+        amount = Decimal(form.amount.data)
+        pay_channel = form.pay_channel.data
+        comment = form.comment.data
+        pay_to_lvye_record = dba.add_pay_to_lvye_record(user_id, amount, "付款给绿野", comment)
+        return _do_pay(pay_to_lvye_record, pay_channel)
+    return render_template('pay/pay.html', form=form,
+                           balance='%.2f' % pay_client.app_query_user_available_balance(user_id))
 
 
 def _handle_result(result, process):
@@ -60,19 +43,27 @@ def _handle_result(result, process):
         return redirect(url_for('.pay'))
 
 
-def _pay(order):
-    if order["pay_type"] == PayType.BY_BALANCE:
-        result = PayClient().transfer_to_lvye(order["amount"], order_id=order["id"], order_info=order["description"])
+def _do_pay(pay_to_lvye_record, pay_channel):
+    params = {
+        'payer_user_id': pay_to_lvye_record.user_id,
+        'payee_domain_name': config.LVYE_CORP_DOMAIN_NAME,
+        'payee_user_id': config.LVYE_USER_NAME,
+        'order_id': pay_to_lvye_record.order_id,
+        'product_name': '%s: %s元'.format(pay_to_lvye_record.name, pay_to_lvye_record.amount),
+        'product_category': pay_to_lvye_record.name,
+        'product_desc': pay_to_lvye_record.comment,
+        'amount': pay_to_lvye_record.amount,
+        'callback_url': config.HOST_URL + url_for('notify.pay_result'),
+        'notify_url': '',
+        'payment_type': config.PaymentType.DIRECT
+    }
 
-        def succeed_handler():
-            flash(u"付款给绿野支付成功！", category="success")
-            return redirect(url_for('main.index'))
+    print("order_id: {0}".format(params['order_id']))
 
-        return _handle_result(result, succeed_handler)
-    if order["pay_type"] == PayType.BY_BANKCARD:
-        result = PayClient().pay_to_lvye(order["amount"], order_id=order["id"], order_name=order["name"],
-                                         order_description=order["description"], create_on=order["created_on"],
-                                         callback_url=url_for('.pay_succeed', _external=True))
-        _logger.info("pay result: %s" % result['data']['pay_url'])
-        succeed_handler = lambda: redirect(result['data']['pay_url'])
-        return _handle_result(result, succeed_handler)
+    if pay_channel == 'ZYT':
+        sn = pay_client.prepay(params, ret_sn=True)
+        return pay_client.zyt_pay(sn)
+    pay_url = pay_client.prepay(params)
+    if pay_url:
+        return redirect(pay_url)
+    return redirect(url_for('.index'))

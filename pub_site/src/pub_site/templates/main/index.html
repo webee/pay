@@ -7,7 +7,7 @@
         <h2 class="first">账户信息</h2>
         <div class="line firstline margin48">
             <label class="widthauto">可用余额</label>
-            <span id="available_balance" class="money" data-api-url="{{ url_for('main.available_balance') }}">0.00</span>&nbsp;元
+            <span id="available_balance" class="money" data-api-url="{{ url_for('main.available_balance') }}">{{ available_balance }}</span>&nbsp;元
         </div>
         <p class="tit margin48">交易记录</p>
 

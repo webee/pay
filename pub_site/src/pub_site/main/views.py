@@ -5,14 +5,15 @@ from flask.ext.login import current_user
 from . import main_mod as mod
 from pub_site import pay_client
 from .transaction import query_transactions
-from ..constant import TradeType
 from pub_site.auth.utils import login_required
 
 
 @mod.route('/main', methods=['GET'])
 @login_required
 def index():
-    return render_template('main/index.html')
+    uid = current_user.user_id
+    balance = pay_client.app_query_user_available_balance(uid)
+    return render_template('main/index.html', available_balance='%.2f' % balance)
 
 
 @mod.route('/transactions', methods=['GET'])

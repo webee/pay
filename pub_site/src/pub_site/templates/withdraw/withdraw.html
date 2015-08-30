@@ -16,7 +16,7 @@
         <div class="line firstline">
             <label>账户余额</label><span class="money">{{ balance }} 元</span>
         </div>
-        <form class="withdraw" method="post" action="{{ url_for('.withdraw') }}">
+        <form class="withdraw" method="post" action="">
             {{ form.csrf_token }}
             <div class="line clearfix">
                 <label>提现银行卡</label>

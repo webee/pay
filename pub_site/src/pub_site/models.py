@@ -1,6 +1,7 @@
 # coding=utf-8
 from pub_site import db
 from datetime import datetime
+from pub_site.constant import WithdrawState
 
 
 class LeaderApplication(db.Model):
@@ -50,7 +51,11 @@ class WithdrawRecord(db.Model):
     actual_amount = db.Column(db.Numeric(12, 2), nullable=False)
     fee = db.Column(db.Numeric(12, 2), nullable=False)
 
+    state = db.Column(db.Enum(WithdrawState.REQUESTED, WithdrawState.FAILED,
+                              WithdrawState.SUCCESS), nullable=False)
+
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # index
     __table_args__ = (db.UniqueConstraint('sn', 'user_id', name='sn_user_id_uniq_idx'),)

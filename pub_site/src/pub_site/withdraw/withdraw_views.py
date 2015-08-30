@@ -10,6 +10,7 @@ from . import withdraw_mod as mod, dba
 from .forms import BindCardForm, WithdrawForm
 from pub_site.sms import sms
 from pub_site import config
+from pub_site.constant import WithdrawState
 
 
 logger = get_logger(__name__)
@@ -43,13 +44,13 @@ def withdraw():
     bankcards = pay_client.app_list_user_bankcards(uid)
     if len(bankcards) == 0:
         return redirect(url_for('.bind_card'))
-    form = WithdrawForm()
+    form = WithdrawForm(bankcards)
     if form.validate_on_submit():
         user_id = current_user.user_id
         phone_no = current_user.phone_no
         amount = Decimal(form.amount.data)
         bankcard_id = long(form.bankcard.data)
-        result = _do_withdraw(user_id, bankcard_id, phone_no, amount)
+        result = _do_withdraw(user_id, bankcard_id, phone_no, amount, use_test_pay=request.args.get('use_test_pay'))
         if result is None:
             return _withdraw_failed()
 
@@ -80,9 +81,13 @@ def withdraw_notify():
 
     if code in [0, '0']:
         # 成功
+        dba.update_withdraw_state(withdraw_record.sn, withdraw_record.user_id,
+                                  WithdrawState.REQUESTED, WithdrawState.SUCCESS)
         msg = "您的提现请求已处理，请等待到账"
     else:
         # 失败
+        dba.update_withdraw_state(withdraw_record.sn, withdraw_record.user_id,
+                                  WithdrawState.REQUESTED, WithdrawState.FAILED)
         msg = "您的提现请求失败"
 
     if sms.send(withdraw_record.phone_no, msg):
@@ -126,9 +131,17 @@ def _find_selected_card(bankcards, selected_card_id):
     return None
 
 
-def _do_withdraw(user_id, bankcard_id, phone_no, amount):
-    notify_url = config.HOST_URL + config.URL_MOUNT_PREFIX + url_for('.withdraw_notify')
-    result = pay_client.app_withdraw(user_id, bankcard_id, amount, notify_url)
+def _do_withdraw(user_id, bankcard_id, phone_no, amount, use_test_pay=None):
+    notify_url = config.HOST_URL + url_for('.withdraw_notify')
+    params = {
+        'bankcard_id': bankcard_id,
+        'amount': amount,
+        'notify_url': notify_url
+    }
+    if use_test_pay:
+        params['use_test_pay'] = 1
+
+    result = pay_client.app_withdraw(user_id, params=params)
     if result is not None:
         dba.update_user_preferred_card(user_id, bankcard_id)
         sn = result['sn']

@@ -16,3 +16,9 @@ class TradeType:
 
     WITHDRAW = 0
     PAY_TO_LVYE = 1
+
+
+class WithdrawState:
+    REQUESTED = "REQUESTED"
+    FAILED = "FAILED"
+    SUCCESS = "SUCCESS"

@@ -49,8 +49,10 @@ def gen_verification_code_form(source):
         request_verification_code = HiddenField(u'request_verification_code', default="no")
 
         def data_validate(self):
+            # 是否为来自请求验证码按钮
             is_request = self.request_verification_code.data == 'yes'
             if not is_request:
+                # 来自提交按钮
                 self.verification_code.validators = [DataRequired(u"验证码不能为空"), verification_code_should_match]
 
             if self.validate():
@@ -127,8 +129,8 @@ class WithdrawForm(gen_verification_code_form("form-withdraw")):
                                     NumberRange(min=1, message=u"提现金额最少为1元")])
     submit = SubmitField(u"提交")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, bankcards, *args, **kwargs):
         super(WithdrawForm, self).__init__(*args, **kwargs)
         if not self.is_submitted():
             preferred_bankcard_id = dba.get_preferred_card_id(current_user.user_id)
-            self.bankcard.data = preferred_bankcard_id or 0
+            self.bankcard.data = preferred_bankcard_id or bankcards[0]['id']

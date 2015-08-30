@@ -8,6 +8,3 @@ class App:
 
 class PayClientConfig:
     ROOT_URL = "http://pay.lvye.com/api/__"
-
-
-HOST_URL = 'http://pay.lvye.com/__'

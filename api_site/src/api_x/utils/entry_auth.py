@@ -69,9 +69,14 @@ def verify_request(entry_name):
                 # verify sign
                 sign_type = params['sign_type']
                 # 这里的主要作用是验签, 只需要channel_pub_key或md5_key
-                signer = Signer('key', 'sign', channel.md5_key, None, channel.public_key)
-                if not signer.verify(params, sign_type):
-                    logger.warn('sign verify error: [{0}]'.format(params))
+                try:
+                    signer = Signer('key', 'sign', channel.md5_key, None, channel.public_key)
+                    if not signer.verify(params, sign_type):
+                        logger.warn('sign verify error: [{0}]'.format(params))
+                        msg = 'sign error.'
+                        return response.refused(msg=msg)
+                except Exception as e:
+                    logger.exception(e)
                     msg = 'sign error.'
                     return response.refused(msg=msg)
             except Exception as e:

@@ -7,6 +7,10 @@ class App:
     SQLALCHEMY_ECHO = False
 
 
+class Biz:
+    VALID_NETLOCS = ['localhost:5100', 'dev_pay.lvye.com:5100']
+
+
 HOST_URL = 'http://localhost:5100'
 
 

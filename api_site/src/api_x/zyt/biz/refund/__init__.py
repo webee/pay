@@ -21,6 +21,7 @@ from api_x.zyt.biz.error import *
 from .dba import get_tx_refund_by_sn
 from pytoolbox.util.log import get_logger
 from api_x.task import tasks
+from api_x.zyt.vas import NAME as ZYT_NAME
 
 
 logger = get_logger(__name__)
@@ -46,6 +47,11 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data):
     refund_record = _create_and_request_refund(channel, tx, payment_record, amount_value, client_notify_url, data)
 
     return refund_record
+
+
+def handle_refund_in(sn):
+    tx, refund_record = get_tx_refund_by_sn(sn)
+    succeed_refund_in(ZYT_NAME, refund_record)
 
 
 def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
@@ -195,17 +201,20 @@ def _create_refund(channel, tx, payment_record, amount, client_notify_url):
 
 def _request_refund(tx, payment_record, refund_record, data):
     from api_x.zyt.evas import test_pay, lianlian_pay
+    from api_x.zyt import vas
 
     vas_name = tx.vas_name
 
     if vas_name == test_pay.NAME:
-        return _refund_by_test_pay(tx, payment_record, refund_record, data)
+        return _refund_by_test_pay(tx, refund_record, data)
     if vas_name == lianlian_pay.NAME:
-        return _refund_by_lianlian_pay(tx, payment_record, refund_record)
+        return _refund_by_lianlian_pay(tx, refund_record)
+    if vas_name == vas.NAME:
+        return vas.refund(TransactionType.REFUND, refund_record.sn)
     raise RefundFailedError('unknown vas {0}'.format(vas_name))
 
 
-def _refund_by_test_pay(tx, payment_record, refund_record, data):
+def _refund_by_test_pay(tx, refund_record, data):
     """测试支付退款"""
     from api_x.zyt.evas.test_pay import refund
     from api_x.zyt.evas.test_pay.commons import is_success_request
@@ -224,7 +233,7 @@ def _refund_by_test_pay(tx, payment_record, refund_record, data):
     return res
 
 
-def _refund_by_lianlian_pay(tx, payment_record, refund_record):
+def _refund_by_lianlian_pay(tx, refund_record):
     """连连退款"""
     from api_x.zyt.evas.lianlian_pay import refund
     from api_x.zyt.evas.lianlian_pay.commons import is_success_request
@@ -293,3 +302,12 @@ def succeed_refund_secured(vas_name, payment_record, refund_record):
 def fail_refund(payment_record, refund_record):
     transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING, refund_record.payment_state)
     transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED, RefundTxState.FAILED)
+
+
+@transactional
+def succeed_refund_in(vas_name, refund_record):
+    refund_amount = refund_record.amount
+    event_id = bookkeeping(EventType.TRANSFER_IN, refund_record.sn, refund_record.payer_id, vas_name, refund_amount)
+
+    # 此处应该已经退款
+    transit_transaction_state(refund_record.tx_id, RefundTxState.SUCCESS, RefundTxState.SUCCESS, event_id)

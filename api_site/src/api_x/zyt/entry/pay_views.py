@@ -10,7 +10,7 @@ from flask import request, render_template, url_for, abort, redirect
 from api_x.config import etc as config
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
-from api_x.utils.entry_auth import verify_request
+from api_x.utils.entry_auth import verify_request, limit_referrer
 from api_x.zyt.biz.models import PaymentType
 
 
@@ -80,26 +80,41 @@ def cashier_desk(sn):
 
 
 @mod.route("/pay/<sn>/<vas_name>", methods=["GET"])
+@limit_referrer(config.Biz.VALID_NETLOCS)
 def pay(sn, vas_name):
     """支付入口"""
+    if vas_name not in config.Biz.ACTIVATED_EVAS:
+        # 不支持此支付方式
+        abort(404)
+
+    return do_pay(sn, vas_name)
+
+
+@mod.route("/zyt_pay/<sn>", methods=["POST"])
+@verify_request('zyt_pay')
+def zyt_pay(sn):
+    """自游通余额支付入口，需要授权"""
+    # TODO: 暂时以授权的方式进行，之后需要单独的支付页面/密码
+    from api_x.zyt import vas
+
+    return do_pay(sn, vas.NAME)
+
+
+def do_pay(sn, vas_name):
     from . import payment
 
     tx = get_tx_by_sn(sn)
     if tx is None:
-        response.not_found(msg='tx sn=[{0}] not fund.'.format(sn))
+        return render_template("info.html", msg="无此订单")
     if tx.state != PaymentTxState.CREATED:
         return render_template("info.html", msg="该订单已支付")
-
-    if vas_name not in config.Biz.ACTIVATED_EVAS:
-        # 不支持此支付方式
-        abort(404)
 
     return payment.pay(vas_name, tx)
 
 
 @mod.route("/pay/result/<sn>/<vas_name>", methods=["GET"])
 def pay_result(sn, vas_name):
-    data = request.data
+    data = request.values
     code = data['code']
     vas_sn = data['vas_sn']
 

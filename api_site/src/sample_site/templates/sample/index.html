@@ -7,16 +7,22 @@
 <body>
 <h2>Pay sample</h2>
 channel: {{ channel }}<br/>
-payer: {{ payer }}<br/>
-payee: {{ payee }}, 全部: {{ balance.total }}, 可用: {{ balance.available }}, 冻结: {{ balance.frozen }}
+payer: {{ payer_user_name }}, 全部: {{ payer_balance.total }}, 可用: {{ payer_balance.available }}, 冻结: {{ payer_balance.frozen }}<br/>
+payee: {{ payee }}, 全部: {{ payee_balance.total }}, 可用: {{ payee_balance.available }}, 冻结: {{ payee_balance.frozen }}
 <hr/>
 <form action="{{ url_for('sample.pay') }}" method="POST">
     <input type="text" name='order_id' value="" placeholder="留空进行新支付"/>
     <input type="text" name='amount' value="0.01"/>
+    支付给:
+    <select name="payee">
+        <option value="{{ payee }}">payee</option>
+        <option value="{{ payer }}">payer</option>
+    </select>
     <select name="payment_type">
         <option value="DIRECT">直接到账</option>
         <option value="GUARANTEE">担保支付</option>
     </select>
+    使用自游通余额支付: <input type="checkbox" name="use_zyt_pay" />
     <input type="submit" value="去支付"/>
 </form>
 <hr/>
@@ -44,7 +50,7 @@ payee: {{ payee }}, 全部: {{ balance.total }}, 可用: {{ balance.available }}
         <option value="SUCCESS">成功</option>
         <option value="FAILED">失败</option>
     </select>
-    use_test_pay: <input type="checkbox" name="use_test_pay" value="1"/>
+    use_test_pay: <input type="checkbox" name="use_test_pay"/>
     <input type="submit" value="提现"/>
 </form>
 </body>

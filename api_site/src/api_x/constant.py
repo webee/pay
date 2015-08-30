@@ -32,6 +32,7 @@ class TransactionType:
 
 class PaymentTxState:
     CREATED = 'CREATED'
+    PAID_OUT = 'PAID_OUT'
     FAILED = 'FAILED'
     SUCCESS = 'SUCCESS'
     SECURED = 'SECURED'

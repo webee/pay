@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function
 
 from decimal import Decimal
-from flask import request, render_template, redirect, url_for
+from flask import request, render_template, redirect, url_for, Response
 from . import sample_mod as mod
 from sample_site import config
 from sample_site.utils import generate_order_id
@@ -17,21 +17,25 @@ logger = get_logger(__name__)
 @mod.route('/', methods=['GET'])
 def index():
     channel_name = config.PayClientConfig.CHANNEL_NAME
-    payer = 'webee'
+    payer_user_name = 'webee'
+    payer = '96355632'
     payee = config.PAYEE
 
-    balance = pay_client.app_query_user_balance(payee)
+    payer_balance = pay_client.app_query_user_balance(payer)
+    payee_balance = pay_client.app_query_user_balance(payee)
     bankcards = pay_client.app_list_user_bankcards(payee)
-    return render_template('sample/index.html', channel=channel_name, payer=payer, payee=payee,
-                           balance=balance, bankcards=bankcards)
+    return render_template('sample/index.html', channel=channel_name, payer_user_name=payer_user_name,
+                           payer=payer, payee=payee, payer_balance=payer_balance, payee_balance=payee_balance,
+                           bankcards=bankcards)
 
 
 @mod.route('/pay', methods=['POST'])
 def pay():
     """支付一分钱"""
     payer = '96355632'
-    payee = config.PAYEE
 
+    use_zyt_pay = request.values.get('use_zyt_pay')
+    payee = request.values['payee']
     amount = Decimal(request.values['amount'])
     payment_type = request.values['payment_type']
     params = {
@@ -48,6 +52,10 @@ def pay():
     }
 
     print("order_id: {0}".format(params['order_id']))
+
+    if use_zyt_pay:
+        sn = pay_client.prepay(params, ret_sn=True)
+        return Response(pay_client.zyt_pay(sn))
 
     pay_url = pay_client.prepay(params)
     if pay_url:

@@ -18,6 +18,7 @@ from api_x.zyt.biz.transaction.error import TransactionStateError
 from api_x.zyt.biz.models import UserRole, DuplicatedPaymentRecord
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
+from pytoolbox.util.urls import build_url
 from api_x.task import tasks
 
 
@@ -114,10 +115,19 @@ def get_tx_payment_by_sn(sn):
 
 
 @transactional
-def succeed_payment(vas_name, payment_record):
-    event_id = bookkeeping(EventType.TRANSFER_IN, payment_record.sn, payment_record.payee_id, vas_name,
+def succeed_paid_out(vas_name, tx, payment_record):
+    event_id = bookkeeping(EventType.TRANSFER_OUT, tx.sn, payment_record.payer_id, vas_name,
                            payment_record.amount)
-    transit_transaction_state(payment_record.tx_id, PaymentTxState.CREATED, PaymentTxState.SUCCESS, event_id)
+    transit_transaction_state(tx.id, PaymentTxState.CREATED, PaymentTxState.PAID_OUT, event_id)
+
+
+@transactional
+def succeed_payment(vas_name, tx, payment_record):
+    if tx.state not in [PaymentTxState.CREATED, PaymentTxState.FAILED, PaymentTxState.PAID_OUT]:
+        raise TransactionStateError()
+    event_id = bookkeeping(EventType.TRANSFER_IN, tx.sn, payment_record.payee_id, vas_name,
+                           payment_record.amount)
+    transit_transaction_state(tx.id, tx.state, PaymentTxState.SUCCESS, event_id)
 
 
 @transactional
@@ -133,11 +143,13 @@ def duplicate_payment_to_balance(vas_name, vas_sn, tx, payment_record):
 
 
 @transactional
-def secure_payment(vas_name, payment_record):
+def secure_payment(vas_name, tx, payment_record):
+    if tx.state not in [PaymentTxState.CREATED, PaymentTxState.FAILED, PaymentTxState.PAID_OUT]:
+        raise TransactionStateError()
     secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-    event_id = bookkeeping(EventType.TRANSFER_IN_FROZEN, payment_record.sn, secure_user_id, vas_name,
+    event_id = bookkeeping(EventType.TRANSFER_IN_FROZEN, tx.sn, secure_user_id, vas_name,
                            payment_record.amount)
-    transit_transaction_state(payment_record.tx_id, PaymentTxState.CREATED, PaymentTxState.SECURED, event_id)
+    transit_transaction_state(tx.id, tx.state, PaymentTxState.SECURED, event_id)
 
 
 @transactional
@@ -155,6 +167,11 @@ def _confirm_payment(payment_record):
 @transactional
 def fail_payment(payment_record):
     transit_transaction_state(payment_record.tx_id, PaymentTxState.CREATED, PaymentTxState.FAILED)
+
+
+def handle_paid_out(sn):
+    tx, payment_record = get_tx_payment_by_sn(sn)
+    succeed_paid_out(ZYT_NAME, tx, payment_record)
 
 
 def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
@@ -178,7 +195,7 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
         return sign_and_return_client_callback(client_callback_url, tx.channel_name, params, method="POST")
     code = 0 if is_success else 1
-    return redirect(url_for('biz_entry.pay_result', sn=sn, vas_name=vas_name, code=code, vas_sn=vas_sn))
+    return redirect(build_url(url_for('biz_entry.pay_result', sn=sn, vas_name=vas_name), code=code, vas_sn=vas_sn))
 
 
 def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
@@ -195,7 +212,7 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
     if is_duplicated_notify(tx, vas_name, vas_sn):
         return
 
-    if _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
+    if _is_duplicated_payment(tx, vas_name, vas_sn):
         # 重复支付
         logger.warning('duplicated payment: [{0}], [{1}], [{2}, {3}]'.format(payment_record.vas_name,
                                                                              payment_record.vas_sn, vas_name, vas_sn))
@@ -204,13 +221,13 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
         return
 
     with require_transaction_context():
-        tx = update_transaction_info(tx.id, vas_name, vas_sn, PaymentTxState.CREATED)
+        tx = update_transaction_info(tx.id, vas_name, vas_sn)
         if is_success:
             # 直付和担保付的不同操作
             if payment_record.type == PaymentType.DIRECT:
-                succeed_payment(vas_name, payment_record)
+                succeed_payment(vas_name, tx, payment_record)
             elif payment_record.type == PaymentType.GUARANTEE:
-                secure_payment(vas_name, payment_record)
+                secure_payment(vas_name, tx, payment_record)
         else:
             fail_payment(payment_record)
 
@@ -241,11 +258,11 @@ def _try_notify_client(tx, payment_record):
     sign_and_notify_client(url, params, tx.channel_name, task=tasks.pay_notify)
 
 
-def _is_duplicated_payment(tx, payment_record, vas_name, vas_sn):
-    if tx.state in [PaymentTxState.CREATED, PaymentTxState.FAILED]:
+def _is_duplicated_payment(tx, vas_name, vas_sn):
+    if tx.state in [PaymentTxState.CREATED, PaymentTxState.FAILED, PaymentTxState.PAID_OUT]:
         return False
 
-    return vas_name != payment_record.vas_name or vas_sn != payment_record.vas_sn
+    return vas_name != tx.vas_name or vas_sn != tx.vas_sn
 
 
 def confirm_payment(channel, order_id):

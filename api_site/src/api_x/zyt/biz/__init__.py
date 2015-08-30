@@ -37,6 +37,23 @@ def init_lianlian_pay_notify_handles():
     register_pay_to_bankcard_notify_handle(TransactionType.WITHDRAW, handle_withdraw_notify)
 
 
+def init_zyt_pay_notify_handles():
+    from .payment import handle_paid_out
+    from .refund import handle_refund_in
+    from api_x.zyt.vas.constant import NotifyType
+    from api_x.zyt.vas.notify import register_pay_notify_handle, register_refund_notify_handle
+
+    # payment
+    register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC, handle_payment_result)
+    register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.ASYNC, handle_payment_notify)
+    register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.PAID_OUT, handle_paid_out)
+
+    # refund
+    register_refund_notify_handle(TransactionType.REFUND, NotifyType.Refund.ASYNC, handle_refund_notify)
+    register_refund_notify_handle(TransactionType.REFUND, NotifyType.Refund.REFUND_IN, handle_refund_in)
+
+
 def init_register_notify_handles():
     init_test_pay_notify_handles()
     init_lianlian_pay_notify_handles()
+    init_zyt_pay_notify_handles()

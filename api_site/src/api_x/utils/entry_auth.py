@@ -94,7 +94,7 @@ def limit_referrer(netlocs):
         def wrapper(*args, **kwargs):
             try:
                 referrer = request.referrer
-                parts = urlparse.urldefrag(referrer)
+                parts = urlparse.urlparse(referrer)
                 if parts.netloc in netlocs:
                     return f(*args, **kwargs)
             except Exception as e:

@@ -76,3 +76,19 @@ def list_user_bankcards(user_id):
     bankcards = dba.query_all_bankcards(account_user_id)
     bankcards = [bc.to_dict() for bc in bankcards]
     return response.success(data=bankcards)
+
+
+@mod.route('/users/<user_id>/bankcards/<int:bankcard_id>', methods=['GET'])
+@verify_request('app_get_user_bankcard')
+def get_user_bankcard(user_id, bankcard_id):
+    channel = request.channel
+
+    user_map = channel.get_user_map(user_id)
+    if user_map is None:
+        return response.bad_request(msg='user not exists: [{0}]'.format(user_id))
+    account_user_id = user_map.account_user_id
+
+    bc = dba.query_bankcard_by_id(bankcard_id)
+    if bc is None or bc.user_id != account_user_id:
+        return response.bad_request(msg='user [{0}] has no bankcard [{1}]'.format(user_id, bankcard_id))
+    return response.success(data=bc.to_dict())

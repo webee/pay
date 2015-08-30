@@ -9,7 +9,7 @@ function update_available_balance(callback) {
     var available_balance = $("#available_balance")[0];
     $.getJSON(available_balance.dataset['apiUrl'])
         .done(function (res) {
-            available_balance.html(res.available_balance);
+            $("#available_balance").html(res.available_balance);
         }).complete(function() {
             requestRunning = false;
             if (callback != null) {
@@ -110,7 +110,7 @@ $(document).ready(function () {
         var tx_list = $("#tx_list")[0];
         $.get(tx_list.dataset['apiUrl'], params)
             .done(function (data) {
-                tx_list.html(data);
+                $("#tx_list").html(data);
                 if (callback != null) {
                     callback();
                 }

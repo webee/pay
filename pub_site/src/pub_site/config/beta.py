@@ -3,6 +3,7 @@
 
 class App:
     TESTING = True
+    APPLICATION_ROOT = '/__/'
 
 
 class PayClientConfig:

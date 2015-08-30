@@ -27,7 +27,8 @@ manager.add_command("runserver", server)
 
 
 @manager.option('-r', '--recreate', action="store_true", dest="recreate", required=False, default=False)
-def init_db(recreate):
+@manager.option('-d', '--drop_all', action="store_true", dest="drop_all", required=False, default=False)
+def init_db(recreate, drop_all):
     from fabric.api import local
     from api_x import db
     from api_x.data import init_data
@@ -41,7 +42,8 @@ def init_db(recreate):
 
     if recreate:
         recreate_db()
-    db.drop_all()
+    if drop_all:
+        db.drop_all()
     db.create_all()
 
     update_api_entries()

@@ -35,8 +35,8 @@ def add_withdraw_record(sn, user_id, bankcard_id, phone_no, amount, actual_amoun
 
 
 @transactional
-def update_withdraw_state(sn, user_id, cur_state, new_state):
-    withdraw_record = WithdrawRecord.query.filter_by(sn=sn, user_id=user_id, state=cur_state).first()
+def update_withdraw_state(sn, user_id, new_state):
+    withdraw_record = WithdrawRecord.query.filter_by(sn=sn, user_id=user_id).first()
     if withdraw_record is None:
         return
 

@@ -53,6 +53,7 @@ def register_mods(app):
     from pub_site.data import data_mod
     from pub_site.pay import pay_mod
     from pub_site.frontpage import frontpage_mod
+    from pub_site.notify import notify_mod
 
     app.register_blueprint(auth_mod, url_prefix='/auth')
     app.register_blueprint(main_mod)
@@ -61,6 +62,10 @@ def register_mods(app):
     app.register_blueprint(data_mod)
     app.register_blueprint(pay_mod)
     app.register_blueprint(frontpage_mod)
+    app.register_blueprint(notify_mod, url_prefix='/notify')
+
+    # exempt api
+    csrf.exempt(notify_mod)
 
 
 def init_config(app, env):

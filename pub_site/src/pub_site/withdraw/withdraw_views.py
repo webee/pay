@@ -8,9 +8,7 @@ from pub_site import pay_client
 from pub_site.auth.utils import login_required
 from . import withdraw_mod as mod, dba
 from .forms import BindCardForm, WithdrawForm
-from pub_site.sms import sms
 from pub_site import config
-from pub_site.constant import WithdrawState
 
 
 logger = get_logger(__name__)
@@ -63,38 +61,6 @@ def withdraw():
                            selected_card=_find_selected_card(bankcards, bankcard_id))
 
 
-@mod.route('/withdraw_notify', methods=['POST'])
-@pay_client.verify_request
-def withdraw_notify():
-    is_verify_pass = request.is_verify_pass
-    if not is_verify_pass:
-        return jsonify(code=1)
-
-    data = request.params
-    code = data['code']
-    sn = data['sn']
-    user_id = data['user_id']
-
-    withdraw_record = dba.get_withdraw_record(sn, user_id)
-    if withdraw_record is None:
-        return jsonify(code=1)
-
-    if code in [0, '0']:
-        # 成功
-        dba.update_withdraw_state(withdraw_record.sn, withdraw_record.user_id,
-                                  WithdrawState.REQUESTED, WithdrawState.SUCCESS)
-        msg = "您的提现请求已处理，请等待到账"
-    else:
-        # 失败
-        dba.update_withdraw_state(withdraw_record.sn, withdraw_record.user_id,
-                                  WithdrawState.REQUESTED, WithdrawState.FAILED)
-        msg = "您的提现请求失败"
-
-    if sms.send(withdraw_record.phone_no, msg):
-        return jsonify(code=0)
-    return jsonify(code=1)
-
-
 @mod.route('/withdraw/bind-card', methods=['GET', 'POST'])
 @login_required
 def bind_card():
@@ -132,7 +98,7 @@ def _find_selected_card(bankcards, selected_card_id):
 
 
 def _do_withdraw(user_id, bankcard_id, phone_no, amount, use_test_pay=None):
-    notify_url = config.HOST_URL + url_for('.withdraw_notify')
+    notify_url = config.HOST_URL + url_for('notify.notify_withdraw')
     params = {
         'bankcard_id': bankcard_id,
         'amount': amount,

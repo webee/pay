@@ -30,7 +30,6 @@ class UserCenter:
 
 
 HOST_URL = 'http://pay.lvye.com'
-URL_MOUNT_PREFIX = ''
 
 # 自游通渠道，用户域为绿野用户中心
 LVYE_ACCOUNT_USER_DOMAIN_NAME = 'lvye_account'

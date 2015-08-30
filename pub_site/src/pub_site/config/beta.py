@@ -7,5 +7,3 @@ class App:
 
 class PayClientConfig:
     ROOT_URL = "http://pay.lvye.com/api/__"
-
-URL_MOUNT_PREFIX = '/__'

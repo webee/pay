@@ -6,7 +6,7 @@ function update_available_balance(callback) {
     }
 
     requestRunning = true;
-    $.getJSON('/available_balance')
+    $.getJSON('../available_balance')
         .done(function (res) {
             $("#available_balance").html(res.available_balance);
         }).complete(function() {
@@ -106,7 +106,7 @@ $(document).ready(function () {
         }
 
         requestRunning = true;
-        $.get('/transactions', params)
+        $.get('../transactions', params)
             .done(function (data) {
                 $("#tx_list").html(data);
                 if (callback != null) {

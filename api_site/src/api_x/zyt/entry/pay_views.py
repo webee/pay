@@ -4,6 +4,7 @@ from api_x.utils import response
 from api_x.zyt.biz import payment
 from api_x.constant import PaymentTxState
 from api_x.zyt.biz.transaction.dba import get_tx_by_sn
+from api_x.zyt.user_mapping import get_user_domain_by_name
 
 from flask import request, render_template, url_for, abort, redirect
 from api_x.config import etc as config
@@ -23,6 +24,7 @@ def prepay():
     channel = request.channel
     payer_user_id = data['payer_user_id']
     payee_user_id = data['payee_user_id']
+    payee_domain_name = data.get('payee_domain_name')
     order_id = data['order_id']
     product_name = data['product_name']
     product_category = data['product_category']
@@ -37,7 +39,16 @@ def prepay():
         return response.fail(msg="payment_type [{0}] not supported.".format(payment_type))
 
     payer_user_map = channel.get_add_user_map(payer_user_id)
-    payee_user_map = channel.get_add_user_map(payee_user_id)
+    if payee_domain_name is None:
+        payee_user_map = channel.get_add_user_map(payee_user_id)
+    else:
+        payee_domain = get_user_domain_by_name(payee_domain_name)
+        if payee_domain is None:
+            return response.fail(msg="domain [{0}] not exists.".format(payee_domain_name))
+        payee_user_map = payee_domain.get_user_map(payee_user_id)
+        if payee_user_map is None:
+            return response.fail(msg="payee with domain [{0}] user [{1}] not exists.".format(payee_domain_name,
+                                                                                             payee_user_id))
 
     try:
         payment_record = payment.find_or_create_payment(channel, payment_type,

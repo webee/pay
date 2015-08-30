@@ -16,10 +16,14 @@ class UserDomain(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     @transactional
+    def get_user_map(self, user_id):
+        return self.user_maps.filter_by(user_id=user_id).first()
+
+    @transactional
     def get_add_user_map(self, user_id, desc=None):
-        account_user = user.create_user()
         user_map = self.user_maps.filter_by(user_id=user_id).first()
         if user_map is None:
+            account_user = user.create_user()
             user_map = UserMapping(user_domain_id=self.id, user_id=user_id, account_user_id=account_user.id,
                                    desc=desc or self.desc)
             db.session.add(user_map)

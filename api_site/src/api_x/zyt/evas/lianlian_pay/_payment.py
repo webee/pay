@@ -12,7 +12,7 @@ def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_de
     req_params = {
         'version': lianlian_pay.Payment.VERSION,
         'oid_partner': lianlian_pay.OID_PARTNER,
-        'user_id': str(user_id),
+        'user_id': user_id[:32],
         'sign_type': SignType.MD5,
         'busi_partner': lianlian_pay.Payment.BusiPartner.VIRTUAL_GOODS,
         'no_order': order_no,

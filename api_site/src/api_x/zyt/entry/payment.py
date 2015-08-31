@@ -29,10 +29,11 @@ def _pay_by_test_pay(tx, payment_record):
 
 def _pay_by_lianlian_pay(tx, payment_record):
     from api_x.zyt.evas.lianlian_pay import pay
-    from api_x.zyt.vas.user import get_account_user
+    from api_x.zyt.user_mapping import get_user_map_by_account_user_id
 
-    payer = get_account_user(payment_record.payer_id)
-    return pay(TransactionType.PAYMENT, payer.id, payer.created_on, req.ip(),
+    user_map = get_user_map_by_account_user_id(payment_record.payer_id)
+    user_id = '%s.%d' % (user_map.user_id, user_map.user_domain_id)
+    return pay(TransactionType.PAYMENT, user_id, user_map.created_on, req.ip(),
                tx.sn, tx.created_on, payment_record.product_name, payment_record.product_desc, payment_record.amount)
 
 

@@ -1,6 +1,5 @@
 # coding=utf-8
 from __future__ import unicode_literals
-from api_x.application.error import BankcardNotFoundError
 from api_x.utils import response
 from api_x.utils.entry_auth import verify_request
 

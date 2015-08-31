@@ -3,6 +3,7 @@ from api_x.config import etc as config
 from api_x.zyt.user_mapping import get_channel_by_name
 from pytoolbox.util.sign import SignType, Signer
 from pytoolbox.util import public_key, aes
+from pytoolbox.util.strings import gen_rand_str
 
 
 def add_sign_for_params(channel_name, params, sign_type=SignType.RSA):
@@ -18,7 +19,9 @@ def add_sign_for_params(channel_name, params, sign_type=SignType.RSA):
     params['channel_name'] = channel_name
     params['sign_type'] = sign_type
     params['sign'] = signer.sign(params, sign_type)
-    params['_lvye_pub_key'] = aes.encrypt_to_base64(config.LVYE_PUB_KEY, config.LVYE_AES_KEY)
-    params['_lvye_aes_key'] = channel_pub_key.encrypt_to_base64(config.LVYE_AES_KEY)
+    # 每次动态生成此密码
+    lvye_aes_key = gen_rand_str(16)
+    params['_lvye_pub_key'] = aes.encrypt_to_base64(config.LVYE_PUB_KEY, lvye_aes_key)
+    params['_lvye_aes_key'] = channel_pub_key.encrypt_to_base64(lvye_aes_key)
 
     return params

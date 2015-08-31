@@ -3,8 +3,13 @@ from __future__ import unicode_literals, print_function, division
 import os
 
 from flask import Flask
+from flask.ext.migrate import Migrate
 from pytoolbox.util import dbs
 from pytoolbox.util.dbs import db
+
+
+# extensions
+migrate = Migrate()
 
 
 def register_mods(app):
@@ -45,6 +50,8 @@ def init_extensions(app):
 
     dbs.init_db(app)
     db.init_app(app)
+
+    migrate.init_app(app, db)
 
 
 def init_tasks(app):

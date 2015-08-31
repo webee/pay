@@ -4,6 +4,7 @@ from __future__ import unicode_literals, print_function
 from decimal import Decimal
 
 from flask.ext.script import Manager, Shell, Server, Command
+from flask.ext.migrate import MigrateCommand
 from api_x import create_app
 
 
@@ -11,13 +12,15 @@ manager = Manager(create_app)
 manager.add_option('-e', '--env', dest='env', default='dev', required=False)
 manager.add_option('-d', '--deploy', action='store_true', dest='deploy', required=False, default=False)
 
+manager.add_command('db', MigrateCommand)
+
 
 def make_shell_context():
     import api_x
     from api_x import config, db
     from api_x.task import tasks
 
-    return dict(api=api_x, app=manager.app, config=config, db=db, tasks=tasks)
+    return dict(api=api_x, app=manager.app, config=config, db=db, tasks=tasks, manager=manager)
 
 
 manager.add_command("shell", Shell(make_context=make_shell_context))

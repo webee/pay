@@ -58,7 +58,7 @@ footer{background:#333;height:60px;}
 
 
 /*提现申请成功页*/
-.main{min-height:860px;overflow-y:auto;}
+.main{min-height:860px;overflow-y:auto;width:100%;}
 .mainCont{width:1170px;overflow:hidden;margin:0 auto;max-width:1200px;}
 .contLeft a {color: inherit; display: block;}
 .mainCont .contLeft,.mainCont .contRight{float:left;color:#595757;}

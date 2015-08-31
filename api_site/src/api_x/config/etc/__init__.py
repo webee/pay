@@ -28,7 +28,7 @@ class Biz:
     TX_SN_PREFIX = '__'
 
     ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY']
-    VALID_NETLOCS = ['pay.lvye.com']
+    VALID_NETLOCS = ['pay.lvye.com', 'myevent.lvye.com']
 
 
 LVYE_AES_KEY = read_string('conf/keys/lvye_aes_key.txt')

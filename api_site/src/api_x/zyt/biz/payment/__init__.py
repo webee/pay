@@ -42,18 +42,18 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
                                          product_name, product_category, product_desc, amount,
                                          client_callback_url, client_notify_url)
     else:
-        payment_record = _restart_payment(payment_record, amount, product_name, product_category, product_desc)
+        payment_record = _restart_payment(channel, payment_record, amount, product_name, product_category, product_desc)
     if payment_record.amount <= 0:
         from api_x.zyt import vas as zyt
 
         tx = update_transaction_info(payment_record.tx_id.id, zyt.NAME, payment_record.sn,
                                      PaymentTxState.CREATED)
-        succeed_payment(zyt.NAME, payment_record)
+        succeed_payment(zyt.NAME, tx, payment_record)
     return payment_record
 
 
 @transactional
-def _restart_payment(payment_record, amount, product_name, product_category, product_desc):
+def _restart_payment(channel, payment_record, amount, product_name, product_category, product_desc):
     from ..utils import generate_sn
 
     tx = payment_record.tx
@@ -63,20 +63,21 @@ def _restart_payment(payment_record, amount, product_name, product_category, pro
         db.session.add(tx)
 
     if tx.state == PaymentTxState.CREATED:
-        PaymentRecord.query.filter_by(id=payment_record.id) \
-            .update({'amount': amount,
-                     'product_name': product_name,
-                     'product_category': product_category,
-                     'product_desc': product_desc})
+        payment_record.amount = amount
+        payment_record.product_name = product_name
+        payment_record.product_category = product_category
+        payment_record.product_desc = product_desc
+        tx.amount = amount
+        tx.comments = "在线支付-{0}:{1}|{2}".format(channel.desc, product_name, payment_record.order_id)
 
-    if payment_record.tried_times >= config.Biz.PAYMENT_MAX_TRIAL_TIMES:
+    if payment_record.tried_times > config.Biz.PAYMENT_MAX_TRIAL_TIMES:
         # new sn.
         tx.sn = generate_sn(payment_record.payer_id)
         payment_record.sn = tx.sn
         payment_record.tried_times = 0
-
-        db.session.add(tx)
-        db.session.add(payment_record)
+    payment_record.tried_times += 1
+    db.session.add(tx)
+    db.session.add(payment_record)
     return payment_record
 
 

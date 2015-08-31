@@ -40,8 +40,10 @@ def prepay():
 
     payer_user_map = channel.get_add_user_map(payer_user_id)
     if payee_domain_name is None:
+        # 默认payee用户域和payer是一致的
         payee_user_map = channel.get_add_user_map(payee_user_id)
     else:
+        # 指定不同的payee用户域
         payee_domain = get_user_domain_by_name(payee_domain_name)
         if payee_domain is None:
             return response.fail(msg="domain [{0}] not exists.".format(payee_domain_name))
@@ -55,8 +57,10 @@ def prepay():
                                                         payer_user_map.account_user_id, payee_user_map.account_user_id,
                                                         order_id, product_name, product_category, product_desc, amount,
                                                         client_callback_url, client_notify_url)
-        pay_url = config.HOST_URL + url_for('biz_entry.cashier_desk', sn=payment_record.sn)
+        if payment_record.tx.state != PaymentTxState.CREATED:
+            return response.fail(msg="order already paid.")
 
+        pay_url = config.HOST_URL + url_for('biz_entry.cashier_desk', sn=payment_record.sn)
         return response.success(sn=payment_record.sn, pay_url=pay_url)
     except Exception as e:
         logger.exception(e)

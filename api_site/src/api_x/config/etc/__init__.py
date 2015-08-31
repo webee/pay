@@ -27,6 +27,7 @@ class Biz:
     IS_ALL_OPENED = False
     TX_SN_PREFIX = '__'
 
+    PAYMENT_MAX_TRIAL_TIMES = 5
     ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY']
     VALID_NETLOCS = ['pay.lvye.com', 'myevent.lvye.com']
 

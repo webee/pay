@@ -130,6 +130,7 @@ class PaymentRecord(db.Model):
     client_notify_url = db.Column(db.VARCHAR(128))
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+    tried_times = db.Column(db.Integer, nullable=False, default=1)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # index

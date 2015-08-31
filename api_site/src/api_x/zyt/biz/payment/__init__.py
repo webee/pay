@@ -19,6 +19,7 @@ from api_x.zyt.biz.models import UserRole, DuplicatedPaymentRecord
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
 from pytoolbox.util.urls import build_url
+from api_x.config import etc as config
 from api_x.task import tasks
 
 
@@ -41,23 +42,41 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
                                          product_name, product_category, product_desc, amount,
                                          client_callback_url, client_notify_url)
     else:
-        # update payment info, if not paid.
-        with require_transaction_context():
-            tx = get_tx_by_sn(payment_record.sn)
-            if tx.state == PaymentTxState.CREATED:
-                PaymentRecord.query.filter_by(id=payment_record.id) \
-                    .update({'amount': amount,
-                             'product_name': product_name,
-                             'product_category': product_category,
-                             'product_desc': product_desc})
-
-            payment_record = PaymentRecord.query.get(payment_record.id)
+        payment_record = _restart_payment(payment_record, amount, product_name, product_category, product_desc)
     if payment_record.amount <= 0:
         from api_x.zyt import vas as zyt
 
         tx = update_transaction_info(payment_record.tx_id.id, zyt.NAME, payment_record.sn,
                                      PaymentTxState.CREATED)
         succeed_payment(zyt.NAME, payment_record)
+    return payment_record
+
+
+@transactional
+def _restart_payment(payment_record, amount, product_name, product_category, product_desc):
+    from ..utils import generate_sn
+
+    tx = payment_record.tx
+    # 如果之前失败了，则从这里重新开始
+    if tx.state == PaymentTxState.FAILED:
+        tx.state = PaymentTxState.CREATED
+        db.session.add(tx)
+
+    if tx.state == PaymentTxState.CREATED:
+        PaymentRecord.query.filter_by(id=payment_record.id) \
+            .update({'amount': amount,
+                     'product_name': product_name,
+                     'product_category': product_category,
+                     'product_desc': product_desc})
+
+    if payment_record.tried_times >= config.Biz.PAYMENT_MAX_TRIAL_TIMES:
+        # new sn.
+        tx.sn = generate_sn(payment_record.payer_id)
+        payment_record.sn = tx.sn
+        payment_record.tried_times = 0
+
+        db.session.add(tx)
+        db.session.add(payment_record)
     return payment_record
 
 

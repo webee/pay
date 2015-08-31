@@ -18,7 +18,8 @@ def sign_and_return_client_callback(url, channel_name, params, sign_type=SignTyp
 
 
 def sign_and_notify_client(url, params, channel_name, methods=['post'], task=None):
-    if not url:
+    if not url or not params:
+        # url和params都不能为空
         return
     try:
         params = add_sign_for_params(channel_name, params)

@@ -39,7 +39,7 @@ def prepay():
         return response.fail(msg="payment_type [{0}] not supported.".format(payment_type))
 
     payer_user_map = channel.get_add_user_map(payer_user_id)
-    if payee_domain_name:
+    if not payee_domain_name:
         # 默认payee用户域和payer是一致的
         payee_user_map = channel.get_add_user_map(payee_user_id)
     else:

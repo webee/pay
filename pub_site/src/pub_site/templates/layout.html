@@ -42,7 +42,8 @@
             <div class="yh">
                 {% if current_user.is_authenticated() %}
                     <span class="userName">当前用户：{{ current_user.user_name }}</span>
-                    |<a class="logout" href="{{ url_for('auth.logout') }}">安全退出</a>
+                    <span style="color:#fff;margin:0 5px">|</span>
+                    <a class="logout" href="{{ url_for('auth.logout') }}">安全退出</a>
                 {% endif %}
             </div>
 

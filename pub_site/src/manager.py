@@ -6,7 +6,7 @@ import sys
 from flask.ext.script import Manager, Server, Shell
 from flask.ext.migrate import MigrateCommand
 from pub_site import create_app
-from ops.deploy import deploy
+from ops.deploy.deploy import deploy
 
 
 manager = Manager(create_app)

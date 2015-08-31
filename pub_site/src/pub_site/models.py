@@ -25,6 +25,8 @@ class VerificationCode(db.Model):
     code = db.Column(db.VARCHAR(32), nullable=False)
     expire_at = db.Column(db.DateTime, nullable=False)
 
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
     # index
     __table_args__ = (db.UniqueConstraint('source', 'user_id', name='user_user_id_uniq_idx'),)
 

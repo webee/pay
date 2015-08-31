@@ -38,6 +38,7 @@ header{height:58px;background:#3cb43c;}
 .loginBtn .emailBtno{background:url(../images/email_no.jpg) no-repeat 0 0;}/*无消息*/
 .loginBtn .sx,.loginBtn .yh{display:inline-block;position:relative;}
 .loginBtn .yh .userName{color:#fff;font-size:12px;}
+.loginBtn .yh .userName em{font-style: normal;font-weight: bold}
 .loginBtn .yh .logout{color:#fff;font-size:12px;}
 .loginBtn .yh .userName em{display:inline-block;width:10px;height:5px;font-size:0;background:url(../images/point.jpg) no-repeat 0 0;margin-left:6px;}
 .loginBtn .sx .sEmail{position:absolute;top:45px;left:-40px;}

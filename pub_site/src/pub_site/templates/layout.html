@@ -41,7 +41,7 @@
         <div class="loginBtn clearfix">
             <div class="yh">
                 {% if current_user.is_authenticated() %}
-                    <span class="userName">当前用户：{{ current_user.user_name }}</span>
+                    <span class="userName">当前用户：<em>{{ current_user.user_name }}</em></span>
                     <span style="color:#fff;margin:0 5px">|</span>
                     <a class="logout" href="{{ url_for('auth.logout') }}">安全退出</a>
                 {% endif %}

@@ -19,7 +19,7 @@
                 2. 只支持提现到银行借记卡，不支持信用卡和存折。提现审核周期为3个工作日。
             </p>
             {% from 'forms.html' import input, verification_code_and_submit, submit %}
-            {{ input(form.card_number, "持卡人必须与注册领队时的身份证所有者一致。") }}
+            {{ input(form.card_number, "借记卡卡号") }}
             {{ input(form.name, "银行卡开户姓名") }}
             <div class="line">
                 <label>所属地区</label>

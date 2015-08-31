@@ -1,31 +1,44 @@
+# -*- coding: utf-8 -*-
 import fabric.api as fab
+from pytoolbox.util import pmc_config
+from ops.config import deploy as config
 
 
-def get_config(env):
+def init_config(env):
     import os
-    from ops.config import deploy as config
-    from pytoolbox.util import pmc_config
 
     env = env or 'dev'
     os.environ['ENV'] = env
     pmc_config.register_config(config, env=env)
-    return config
 
 
-def deploy(env):
-    env = env or 'dev'
-    cfg = get_config(env)
+def deploy(env, name):
+    init_config(env)
+
     fab.use_ssh_config = True
-    fab.env.host_string = cfg.HOST_STRING
-    code_dir = cfg.CODE_DIR
-    toolbox_dir = "{}/../libraries/pytoolbox".format(code_dir)
-    with fab.cd(toolbox_dir):
-        fab.run('git pull --ff-only origin master')
+    fab.env.host_string = config.HOST_STRING
+    code_dir = config.CODE_DIR
+    root_dir = "{}/../".format(code_dir)
+    update_code(code_dir, root_dir)
+
     with fab.cd(code_dir), fab.prefix('source pub_venv/bin/activate'):
+        update_requirements()
+
+        update_deploy_file(name)
+        stop_python_server(name)
+        start_python_server(name)
+
+
+def update_code(code_dir, root_dir):
+    with fab.cd(code_dir):
         fab.run('git pull --ff-only origin master')
-        renew_config_file()
-        stop_python_server('pay_pub_site')
-        start_python_server('pay_pub_site')
+
+    with fab.cd(root_dir):
+        fab.run('git submodule update')
+
+
+def update_requirements():
+    fab.run('pip install -r requirements.txt')
 
 
 def stop_python_server(name):
@@ -35,7 +48,8 @@ def stop_python_server(name):
 def start_python_server(name):
     fab.run('sudo /usr/local/bin/supervisorctl start {}'.format(name))
 
-def renew_config_file():
-    fab.run('sudo cp deploy/pay_pub_site.conf /etc/supervisord.d/')
+
+def update_deploy_file(file_name="pay_pub_site"):
+    fab.run('sudo cp deploy/{}.conf /etc/supervisord.d/'.format(file_name))
     fab.run('sudo /usr/local/bin/supervisorctl reread')
     fab.run('sudo /usr/local/bin/supervisorctl update')

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import fabric.api as fab
 
 from pytoolbox.util import pmc_config
@@ -22,8 +23,9 @@ def deploy(env, name):
     update_code(code_dir, root_dir)
 
     with fab.cd(code_dir), fab.prefix('source api_venv/bin/activate'):
-        update_deploy_file(name)
+        update_requirements()
 
+        update_deploy_file(name)
         stop_python_server(name)
         start_python_server(name)
 
@@ -34,6 +36,10 @@ def update_code(code_dir, root_dir):
 
     with fab.cd(root_dir):
         fab.run('git submodule update')
+
+
+def update_requirements():
+    fab.run('pip install -r requirements.txt')
 
 
 def update_deploy_file(file_name="pay_api_site"):

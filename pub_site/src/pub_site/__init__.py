@@ -4,8 +4,9 @@ from __future__ import unicode_literals, print_function, division
 from datetime import timedelta
 
 import os
-from flask import Flask, render_template, current_app
+from flask import Flask, render_template
 from flask.ext.login import LoginManager
+from flask.ext.migrate import Migrate
 from flask_wtf.csrf import CsrfProtect
 from tools.filters import register_filters, register_global_functions
 from pytoolbox.pay_client import PayClient
@@ -16,6 +17,9 @@ from pub_site import config
 
 
 logger = get_logger(__name__)
+
+# extensions
+migrate = Migrate()
 
 
 def init_template(app):
@@ -87,6 +91,8 @@ def init_extensions(app):
 
     login_manager.init_app(app)
     csrf.init_app(app)
+
+    migrate.init_app(app, db)
 
 
 def custom_flask(app):

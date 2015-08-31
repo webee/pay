@@ -41,7 +41,7 @@ def init_db(recreate, drop_all):
         from pytoolbox.util.console_log import info
 
         info('recreating database ...')
-        local('mysql -u root -p < migration/init_db.sql')
+        local('mysql -u root -p < db/init_db.sql')
 
     if recreate:
         recreate_db()

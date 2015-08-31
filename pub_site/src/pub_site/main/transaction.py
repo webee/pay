@@ -5,7 +5,7 @@ from pub_site import pay_client
 
 
 TX_TYPE_MSG = {
-    'PAYMENT:FROM': '消费',
+    'PAYMENT:FROM': '付款',
     'PAYMENT:TO': '收款',
     'PAYMENT:GUARANTEE': '支付担保',
     'REFUND:FROM': '退款',

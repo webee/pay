@@ -48,7 +48,7 @@ def init_db(recreate, drop_all):
 @manager.option('-e', '--env', type=str, dest="envx", required=True, default='dev')
 def deploy(envx):
     from ops.deploy.deploy import deploy
-    deploy(envx)
+    deploy(envx, 'pay_pub_site')
 
 
 @manager.option('-m', '--minutes', type=long, dest="minutes", required=True, default=10)

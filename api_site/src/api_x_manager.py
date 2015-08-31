@@ -6,6 +6,7 @@ from decimal import Decimal
 from flask.ext.script import Manager, Shell, Server, Command
 from flask.ext.migrate import MigrateCommand
 from api_x import create_app
+from ops.deploy.deploy import deploy
 
 
 manager = Manager(create_app)
@@ -60,17 +61,17 @@ def update_api_entry():
     update_api_entries()
 
 
-@manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')
-def deploy(environ):
-    from ops.deploy.deploy import deploy
+@manager.command
+def deploy_prod():
+    deploy('prod', 'pay_api_site')
 
-    deploy(environ, 'pay_api_site')
+@manager.command
+def deploy_beta():
+    deploy('beta', 'pay_api_site', False)
 
 
 @manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')
 def deploy_celery(environ):
-    from ops.deploy.deploy import deploy
-
     deploy(environ, 'pay_api_celery')
 
 

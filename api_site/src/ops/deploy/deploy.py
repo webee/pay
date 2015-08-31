@@ -13,7 +13,7 @@ def init_config(env):
     pmc_config.register_config(config, env=env)
 
 
-def deploy(env, name):
+def deploy(env, name, do_deploy=True):
     init_config(env)
 
     fab.use_ssh_config = True
@@ -22,12 +22,13 @@ def deploy(env, name):
     root_dir = "{}/../".format(code_dir)
     update_code(code_dir, root_dir)
 
-    with fab.cd(code_dir), fab.prefix('source api_venv/bin/activate'):
+    with fab.cd(code_dir), fab.prefix('source %s/bin/activate' % config.VENV_NAME):
         update_requirements()
 
-        update_deploy_file(name)
-        stop_python_server(name)
-        start_python_server(name)
+        if do_deploy:
+            update_deploy_file(name)
+            stop_python_server(name)
+            start_python_server(name)
 
 
 def update_code(code_dir, root_dir):
@@ -42,7 +43,7 @@ def update_requirements():
     fab.run('pip install -r requirements.txt')
 
 
-def update_deploy_file(file_name="pay_api_site"):
+def update_deploy_file(file_name):
     fab.run('sudo cp deploy/{}.conf /etc/supervisord.d/'.format(file_name))
     fab.run('sudo /usr/local/bin/supervisorctl reread')
     fab.run('sudo /usr/local/bin/supervisorctl update')

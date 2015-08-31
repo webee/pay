@@ -6,6 +6,7 @@ import sys
 from flask.ext.script import Manager, Server, Shell
 from flask.ext.migrate import MigrateCommand
 from pub_site import create_app
+from ops.deploy import deploy
 
 
 manager = Manager(create_app)
@@ -45,10 +46,14 @@ def init_db(recreate, drop_all):
     db.create_all()
 
 
-@manager.option('-e', '--env', type=str, dest="envx", required=True, default='dev')
-def deploy(envx):
-    from ops.deploy.deploy import deploy
-    deploy(envx, 'pay_pub_site')
+@manager.command
+def deploy_prod():
+    deploy('prod', 'pay_pub_site')
+
+
+@manager.command
+def deploy_beta():
+    deploy('beta', 'pay_pub_site', False)
 
 
 @manager.option('-m', '--minutes', type=long, dest="minutes", required=True, default=10)

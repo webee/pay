@@ -23,7 +23,8 @@
 .line.pay-channel li label {
     font-size: 14px;
     display: inline;
-    margin-left: 6px;
+    margin-left: 10px;
+    text-align: left !important;
 }
 
 em.mistake {

@@ -154,9 +154,10 @@ article,aside,details,figcaption,figure,footer,header,menu,nav,section,summary,t
 
 .join{height:913px;background:url(../images/frontpage/join.jpg) no-repeat center top;}
 .join_center{width:1200px;margin:0 auto;position:relative;}
-.join_center a{display:block;width:290px;height:58px;position:absolute;left:50%;top:360px;margin-left:-144px;}
-.join_center p{font-size: 20px;color: #fff;position: absolute;left: 50%;bottom: 50px;line-height: 30px;margin-left: -260px}
 
+.join_center a.tryuse{display:block;width:290px;height:58px;position:absolute;left:50%;top:360px;margin-left:-144px;}
+.join_center p{font-size: 20px;color: #fff;position: absolute;left: 50%;bottom: 50px;line-height: 30px;margin-left: -260px}
+.join_center a.backold{font-size:20px;color:#fff;position:absolute;left:50%;top:50%;margin: -13px 0 0 -55px;}.join_center a.backold:hover{text-decoration:underline;}
 
 /*尾部*/
 .bottom{height:130px;background:#333;text-align:center;color:#fff;padding-top:24px;min-width:1200px;width: 100%;}

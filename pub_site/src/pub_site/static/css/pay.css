@@ -20,7 +20,7 @@
     display: inline;
 }
 
-.line.pay-channel li label {
+.line .pay-channel li label {
     font-size: 14px;
     display: inline;
     margin-left: 10px;

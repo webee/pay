@@ -6,7 +6,7 @@ from decimal import Decimal
 from flask.ext.script import Manager, Shell, Server, Command
 from flask.ext.migrate import MigrateCommand
 from api_x import create_app
-from ops.deploy.deploy import deploy
+from ops.deploy.deploy import deploy, db_migrate
 
 
 manager = Manager(create_app)
@@ -73,6 +73,11 @@ def deploy_beta():
 @manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')
 def deploy_celery(environ):
     deploy(environ, 'pay_api_celery')
+
+
+@manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')
+def migrate_db(environ):
+    db_migrate(environ, 'api_x_manager')
 
 
 class CeleryCommand(Command):

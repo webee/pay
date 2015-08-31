@@ -1,21 +1,39 @@
 # -*- coding: utf-8 -*-
 import fabric.api as fab
-
-from pytoolbox.util import pmc_config
-from ops.config import deploy as config
+from contextlib import contextmanager
 
 
 def init_config(env):
+    from pytoolbox.util import pmc_config
+    from ops.config import deploy as config
     import os
 
     env = env or 'dev'
     os.environ['ENV'] = env
     pmc_config.register_config(config, env=env)
 
+    return config
+
 
 def deploy(env, name, do_deploy=True):
-    init_config(env)
+    config = init_config(env)
 
+    with require_cmd_context(config):
+        if do_deploy:
+            update_deploy_file(name)
+            stop_python_server(name)
+            start_python_server(name)
+
+
+def db_migrate(env, manager_name):
+    config = init_config(env)
+
+    with require_cmd_context(config):
+        fab.run('python src/%s.py -e %s db upgrade' % (manager_name, env))
+
+
+@contextmanager
+def require_cmd_context(config):
     fab.use_ssh_config = True
     fab.env.host_string = config.HOST_STRING
     code_dir = config.CODE_DIR
@@ -25,10 +43,7 @@ def deploy(env, name, do_deploy=True):
     with fab.cd(code_dir), fab.prefix('source %s/bin/activate' % config.VENV_NAME):
         update_requirements()
 
-        if do_deploy:
-            update_deploy_file(name)
-            stop_python_server(name)
-            start_python_server(name)
+        yield
 
 
 def update_code(code_dir, root_dir):

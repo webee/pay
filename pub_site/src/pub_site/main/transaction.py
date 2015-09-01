@@ -24,12 +24,22 @@ TX_STATE_MSG = {
     'PAYMENT:SUCCESS': '交易完成',
     'PAYMENT:REFUNDED': '已退款',
     'PAYMENT:REFUNDING': '退款中',
+    'PREPAID:CREATED': '等待支付',
+    'PREPAID:FAILED': '支付失败',
+    'PREPAID:SUCCESS': '支付完成',
     'REFUND:CREATED': '正在处理',
     'REFUND:FAILED': '退款失败',
     'REFUND:SUCCESS': '交易完成',
     'WITHDRAW:PROCESSING': '正在处理',
     'WITHDRAW:FAILED': '提现失败',
     'WITHDRAW:SUCCESS': '交易完成',
+}
+
+TX_VAS_MSG = {
+    'LIANLIAN_PAY': '快捷支付',
+    'ZYT': '自游通',
+    'TEST_PAY': '测试支付',
+    '': '',
 }
 
 
@@ -48,5 +58,6 @@ def _process_tx(tx):
 
     tx['state'] = TX_STATE_MSG['%s:%s' % (tx['type'], tx['state'])]
     tx['type'] = TX_TYPE_MSG['%s:%s' % (tx['type'], tx['role'])]
+    # tx['vas'] = TX_VAS_MSG[tx['vas_name']]
 
     return tx

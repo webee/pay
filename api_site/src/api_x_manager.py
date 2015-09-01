@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
 from __future__ import unicode_literals, print_function
-from decimal import Decimal
 
 from flask.ext.script import Manager, Shell, Server, Command
 from flask.ext.migrate import MigrateCommand
@@ -63,7 +62,7 @@ def update_api_entry():
 
 @manager.command
 def deploy_prod():
-    deploy('prod', 'pay_api_site')
+    deploy('prod', 'pay_api_site', manager_name='api_x_manager')
 
 @manager.command
 def deploy_beta():

@@ -20,7 +20,7 @@ def deploy(env, name, do_deploy=True):
     fab.env.host_string = config.HOST_STRING
     code_dir = config.CODE_DIR
     root_dir = "{}/../".format(code_dir)
-    update_code(code_dir, root_dir)
+    update_code(env, code_dir, root_dir)
 
     with fab.cd(code_dir), fab.prefix('source %s/bin/activate' % config.VENV_NAME):
         update_requirements()
@@ -31,9 +31,10 @@ def deploy(env, name, do_deploy=True):
             start_python_server(name)
 
 
-def update_code(code_dir, root_dir):
+def update_code(env, code_dir, root_dir):
     with fab.cd(code_dir):
-        fab.run('git pull --ff-only origin master')
+        branch = 'master' if env == 'prod' else env
+        fab.run('git pull --ff-only origin %s' % branch)
 
     with fab.cd(root_dir):
         fab.run('git submodule update')

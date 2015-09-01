@@ -127,9 +127,3 @@ def withdraw():
     result = pay_client.app_withdraw(user_id, params=params, ret_result=True)
     return render_template('sample/info.html', title='提现结果',
                            msg=json.dumps({'status_code': result.status_code, 'data': result.data}))
-
-
-@mod.route('/prepaid', methods=['GET'])
-def prepaid():
-    """充值"""
-    return 'NOT IMPLEMENT.'

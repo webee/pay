@@ -7,8 +7,8 @@
 <body>
 <h2>Pay sample</h2>
 channel: {{ channel }}<br/>
-payer: {{ payer_user_name }}, 全部: {{ payer_balance.total }}, 可用: {{ payer_balance.available }}, 冻结: {{ payer_balance.frozen }}<br/>
-payee: {{ payee }}, 全部: {{ payee_balance.total }}, 可用: {{ payee_balance.available }}, 冻结: {{ payee_balance.frozen }}
+payer: {{ payer_user_name }}({{ payer }}), 全部: {{ payer_balance.total }}, 可用: {{ payer_balance.available }}, 冻结: {{ payer_balance.frozen }}<br/>
+payee: {{ payee }}({{ payee }}), 全部: {{ payee_balance.total }}, 可用: {{ payee_balance.available }}, 冻结: {{ payee_balance.frozen }}
 <hr/>
 <form action="{{ url_for('sample.pay') }}" method="POST">
     <input type="text" name='order_id' value="" placeholder="留空进行新支付"/>
@@ -54,6 +54,13 @@ payee: {{ payee }}, 全部: {{ payee_balance.total }}, 可用: {{ payee_balance.
     </select>
     use_test_pay: <input type="checkbox" name="use_test_pay"/>
     <input type="submit" value="提现"/>
+</form>
+<hr/>
+<form action="{{ url_for('sample.prepaid') }}" method="POST">
+    user_id:<input type="text" name='to_user_id' value=""/>
+    domain_name:<input type="text" name='to_domain_name' value=""/>
+    <input type="text" name='amount' value="1"/>
+    <input type="submit" value="充值"/>
 </form>
 </body>
 </html>

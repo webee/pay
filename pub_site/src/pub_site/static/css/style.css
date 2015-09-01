@@ -171,7 +171,10 @@ footer{background:#333;height:60px;}
 .tablock table tr td a{color:#349cd8;}.tablock table tr td a:hover{text-decoration:underline;}
 .tablock table tr td:nth-child(3){font-size:16px;}
 .tablock table tr.first td{font-size:12px;}
-.tablock table tr td.red{color:#fe0000;}.tablock table tr td.green{color:#25843a;}
+.tablock table tr td.red{color:#fe0000;}
+.tablock table tr td.light_red{color:#7f0000;}
+.tablock table tr td.green{color:#25843a;}
+.tablock table tr td.light_green{color:#12421d;}
 .tablock table tr td.grey{color:grey;}
 .page{text-align:right;}
 .page .suml,.page .pageNum{display:inline-block;}

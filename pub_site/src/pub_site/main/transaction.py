@@ -55,6 +55,7 @@ def query_transactions(uid, role, page_no, page_size, keyword):
 
 def _process_tx(tx):
     tx['is_failed'] = tx['state'] == 'FAILED'
+    tx['is_created'] = tx['state'] == 'CREATED'
 
     tx['state'] = TX_STATE_MSG['%s:%s' % (tx['type'], tx['state'])]
     tx['type'] = TX_TYPE_MSG['%s:%s' % (tx['type'], tx['role'])]

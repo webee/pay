@@ -16,9 +16,17 @@
                     {% if tx.is_failed %}
                         <td class="grey">{{ "+%.2f"|format(tx.amount) }}</td>
                     {% elif tx.role == 'TO' %}
-                        <td class="red">{{ "+%.2f"|format(tx.amount) }}</td>
+                        {% if tx.is_created %}
+                            <td class="light_red">{{ "+%.2f"|format(tx.amount) }}</td>
+                        {% else %}
+                            <td class="red">{{ "+%.2f"|format(tx.amount) }}</td>
+                        {% endif %}
                     {% elif tx.role == 'FROM' %}
-                        <td class="green">{{ "-%.2f"|format(tx.amount) }}</td>
+                        {% if tx.is_created %}
+                            <td class="light_green">{{ "-%.2f"|format(tx.amount) }}</td>
+                        {% else %}
+                            <td class="green">{{ "-%.2f"|format(tx.amount) }}</td>
+                        {% endif %}
                     {% else %}
                         <td>{{ "%.2f"|format(tx.amount) }}</td>
                     {% endif %}

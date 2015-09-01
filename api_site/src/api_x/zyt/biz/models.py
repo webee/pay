@@ -116,7 +116,6 @@ class PaymentRecord(db.Model):
     sn = db.Column(db.CHAR(32), nullable=False)
 
     type = db.Column(db.Enum(PaymentType.DIRECT, PaymentType.GUARANTEE), nullable=False)
-    secured = db.Column(db.BOOLEAN, nullable=False, default=False)
 
     payer_id = db.Column(db.Integer, nullable=False)
     payee_id = db.Column(db.Integer, nullable=False)

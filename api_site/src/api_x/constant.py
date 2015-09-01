@@ -40,6 +40,12 @@ class PaymentTxState:
     REFUNDING = 'REFUNDING'
 
 
+class PrepaidTxState:
+    CREATED = 'CREATED'
+    FAILED = 'FAILED'
+    SUCCESS = 'SUCCESS'
+
+
 class RefundTxState:
     CREATED = 'CREATED'
     FAILED = 'FAILED'

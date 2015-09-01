@@ -1,6 +1,7 @@
 # coding=utf-8
 from api_x.constant import TransactionType
 from .payment import handle_payment_result, handle_payment_notify
+from .prepaid import handle_prepaid_result, handle_prepaid_notify
 from .refund import handle_refund_notify
 from .withdraw import handle_withdraw_notify
 from .models import VirtualAccountSystem
@@ -13,6 +14,10 @@ def init_test_pay_notify_handles():
     # payment
     register_notify_handle(TransactionType.PAYMENT, BizType.PAY, NotifyType.Pay.SYNC, handle_payment_result)
     register_notify_handle(TransactionType.PAYMENT, BizType.PAY, NotifyType.Pay.ASYNC, handle_payment_notify)
+
+    # prepaid
+    register_notify_handle(TransactionType.PREPAID, BizType.PAY, NotifyType.Pay.SYNC, handle_prepaid_result)
+    register_notify_handle(TransactionType.PREPAID, BizType.PAY, NotifyType.Pay.ASYNC, handle_prepaid_notify)
 
     # refund
     register_notify_handle(TransactionType.REFUND, BizType.REFUND, NotifyType.Refund.ASYNC, handle_refund_notify)
@@ -29,6 +34,10 @@ def init_lianlian_pay_notify_handles():
     # payment
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC, handle_payment_result)
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.ASYNC, handle_payment_notify)
+
+    # prepaid
+    register_pay_notify_handle(TransactionType.PREPAID, NotifyType.Pay.SYNC, handle_prepaid_result)
+    register_pay_notify_handle(TransactionType.PREPAID, NotifyType.Pay.ASYNC, handle_prepaid_notify)
 
     # refund
     register_refund_notify_handle(TransactionType.REFUND, handle_refund_notify)

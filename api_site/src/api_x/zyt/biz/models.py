@@ -148,13 +148,16 @@ class DuplicatedPaymentRecord(db.Model):
     tx = db.relationship('Transaction', backref=db.backref('duplicated_payment_record', lazy='dynamic'), lazy='joined')
 
     sn = db.Column(db.CHAR(32), nullable=False)
+    source = db.Column(db.Enum(TransactionType.PAYMENT, TransactionType.PREPAID), nullable=False)
 
     vas_name = db.Column(db.VARCHAR(32), nullable=False, default='')
     vas_sn = db.Column(db.VARCHAR(128), nullable=False, default='')
 
-    event_id = db.Column(db.BigInteger, nullable=True, default=0L)
+    event_id = db.Column(db.BigInteger, nullable=False, default=0L)
 
+    status = db.Column(db.SmallInteger, nullable=False, default=0)
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class RefundRecord(db.Model):
@@ -191,7 +194,7 @@ class PrepaidRecord(db.Model):
 
     sn = db.Column(db.CHAR(32), nullable=False)
 
-    to_user_id = db.Column(db.Integer, nullable=False)
+    to_id = db.Column(db.Integer, nullable=False)
     amount = db.Column(db.Numeric(12, 2), nullable=False)
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

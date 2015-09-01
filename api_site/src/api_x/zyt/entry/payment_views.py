@@ -27,7 +27,8 @@ def cashier_desk(source, sn):
         # 只有一种支付方式，则直接跳转到支付页面
         vas_name = config.Biz.ACTIVATED_EVAS[0]
         return redirect(config.HOST_URL + url_for('.pay', source=source, sn=sn, vas_name=vas_name))
-    return render_template("cashier_desk.html", root_url=config.HOST_URL, tx=tx, vases=config.Biz.ACTIVATED_EVAS)
+    return render_template("cashier_desk.html", root_url=config.HOST_URL, source=source, tx=tx,
+                           vases=config.Biz.ACTIVATED_EVAS)
 
 
 @mod.route("/pay/<source>/<sn>/<vas_name>", methods=["GET"])
@@ -41,14 +42,14 @@ def pay(source, sn, vas_name):
     return do_pay(source, sn, vas_name)
 
 
-@mod.route("/zyt_pay/<source>/<sn>", methods=["POST"])
+@mod.route("/zyt_pay/<sn>", methods=["POST"])
 @verify_request('zyt_pay')
-def zyt_pay(source, sn):
+def zyt_pay(sn):
     """自游通余额支付入口，需要授权"""
     # TODO: 暂时以授权的方式进行，之后需要单独的支付页面/密码
     from api_x.zyt import vas
 
-    return do_pay(source, sn, vas.NAME)
+    return do_pay(TransactionType.PAYMENT, sn, vas.NAME)
 
 
 def do_pay(source, sn, vas_name):

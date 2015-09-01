@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x.utils import response
-from api_x.zyt.biz import prepaid
+from api_x.zyt.biz.prepaid import create_prepaid
 from api_x.constant import TransactionType
 from api_x.zyt.user_mapping import get_user_domain_by_name
 
@@ -27,7 +27,7 @@ def prepaid():
     client_notify_url = data['notify_url']
 
     if not to_domain_name:
-        to_user_map = channel.get_user_map(to_domain_name)
+        to_user_map = channel.get_user_map(to_user_id)
     else:
         # 指定不同的to用户域
         to_domain = get_user_domain_by_name(to_domain_name)
@@ -39,9 +39,9 @@ def prepaid():
                                                                                           to_user_id))
 
     try:
-        prepaid_record = prepaid.create_prepaid(channel, to_user_map.account_user_id, amount,
-                                                client_callback_url, client_notify_url)
-        pay_url = config.HOST_URL + url_for('biz_entry.prepaid_cashier_desk',
+        prepaid_record = create_prepaid(channel, to_user_map.account_user_id, amount,
+                                        client_callback_url, client_notify_url)
+        pay_url = config.HOST_URL + url_for('biz_entry.cashier_desk',
                                             source=TransactionType.PREPAID, sn=prepaid_record.sn)
         return redirect(pay_url)
     except Exception as e:

@@ -188,18 +188,19 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
     tx, payment_record = get_tx_payment_by_sn(sn)
     client_callback_url = payment_record.client_callback_url
 
-    if client_callback_url and is_success:
+    code = 0 if is_success else 1
+    if client_callback_url:
         from api_x.utils.notify import sign_and_return_client_callback
         user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
         user_id = user_mapping.user_id
-        params = {'code': 0, 'user_id': user_id, 'sn': payment_record.sn,
+        params = {'code': code, 'user_id': user_id, 'sn': payment_record.sn,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
         return sign_and_return_client_callback(client_callback_url, tx.channel_name, params, method="POST")
 
     from flask import url_for
-    code = 0 if is_success else 1
-    return redirect(build_url(url_for('biz_entry.pay_result', source=TransactionType.PAYMENT, sn=sn, vas_name=vas_name),
-                              code=code, vas_sn=vas_sn))
+    return redirect(config.HOST_URL + build_url(url_for('biz_entry.pay_result',
+                                                        source=TransactionType.PAYMENT, sn=sn, vas_name=vas_name),
+                                                code=code, vas_sn=vas_sn))
 
 
 def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):

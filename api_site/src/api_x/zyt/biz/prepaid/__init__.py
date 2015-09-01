@@ -15,6 +15,7 @@ from api_x.zyt.biz.error import NonPositiveAmountError
 from api_x.zyt.biz.models import UserRole, DuplicatedPaymentRecord
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
+from api_x.config import etc as config
 from pytoolbox.util.urls import build_url
 from api_x.task import tasks
 
@@ -90,17 +91,18 @@ def handle_prepaid_result(is_success, sn, vas_name, vas_sn, data):
 
     client_callback_url = prepaid_record.client_callback_url
 
-    if client_callback_url and is_success:
+    code = 0 if is_success else 1
+    if client_callback_url:
         from api_x.utils.notify import sign_and_return_client_callback
         user_mapping = get_user_map_by_account_user_id(prepaid_record.to_id)
         user_id = user_mapping.user_id
-        params = {'code': 0, 'user_id': user_id, 'sn': sn, 'amount': prepaid_record.amount}
+        params = {'code': code, 'user_id': user_id, 'sn': sn, 'amount': prepaid_record.amount}
         return sign_and_return_client_callback(client_callback_url, tx.channel_name, params, method="POST")
 
     from flask import url_for
-    code = 0 if is_success else 1
-    return redirect(build_url(url_for('biz_entry.pay_result', source=TransactionType.PREPAID, sn=sn, vas_name=vas_name),
-                              code=code, vas_sn=vas_sn))
+    return redirect(config.HOST_URL + build_url(url_for('biz_entry.pay_result',
+                                                        source=TransactionType.PREPAID, sn=sn, vas_name=vas_name),
+                                                code=code, vas_sn=vas_sn))
 
 
 def handle_prepaid_notify(is_success, sn, vas_name, vas_sn, data):
@@ -130,7 +132,7 @@ def handle_prepaid_notify(is_success, sn, vas_name, vas_sn, data):
         if is_success:
             succeed_prepaid(vas_name, tx, prepaid_record)
         else:
-            fail_prepaid(prepaid_record)
+            fail_prepaid(tx)
 
     # notify client.
     tx = get_tx_by_id(tx.id)

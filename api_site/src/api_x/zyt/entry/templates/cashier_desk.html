@@ -13,6 +13,9 @@
 <body>
 <h2>商品信息</h2>
 <p>{{ tx.comments }}</p>
+{% if tx.order_id %}
+<p>{{ tx.order_id }}</p>
+{% endif %}
 <h2>金额: {{ tx.amount }}</h2>
 <p>
     <h1>请选择支付方式</h1>

@@ -15,10 +15,11 @@ def init_config(env):
     return config
 
 
-def deploy(env, name, do_deploy=True):
+def deploy(env, name, manager_name="manager", do_deploy=True):
     config = init_config(env)
 
     with require_cmd_context(config):
+        upgrade_db(manager_name, env)
         if do_deploy:
             update_deploy_file(name)
             stop_python_server(name)
@@ -29,7 +30,11 @@ def db_migrate(env, manager_name):
     config = init_config(env)
 
     with require_cmd_context(config):
-        fab.run('python src/%s.py -e %s db upgrade' % (manager_name, env))
+        upgrade_db(manager_name, env)
+
+
+def upgrade_db(manager_name, env):
+    fab.run('python src/%s.py -e %s db upgrade' % (manager_name, env))
 
 
 @contextmanager

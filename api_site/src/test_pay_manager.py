@@ -11,9 +11,9 @@ manager.add_option('-e', '--env', dest='env', default='dev', required=False)
 
 
 def make_shell_context():
-    import sample_site
-    from sample_site import config
-    return dict(website=sample_site, app=manager.app, config=config)
+    import test_pay_site
+    from test_pay_site import config
+    return dict(website=test_pay_site, app=manager.app, config=config)
 
 
 manager.add_command("shell", Shell(make_context=make_shell_context))

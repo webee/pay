@@ -1,4 +1,5 @@
 # coding=utf-8
+from pytoolbox.util.pmc_config import read_string
 
 
 HOST_URL = "http://prod_sample_pay.lvye.com:8189"

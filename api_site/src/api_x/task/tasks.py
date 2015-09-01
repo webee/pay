@@ -35,6 +35,11 @@ def pay_notify(url, params, count=1, max_times=30, interval=30):
     do_notify_client(pay_notify, url, params, count, max_times, interval)
 
 
+@app.task(ignore_result=True, queue='prepaid_notify', routing_key='prepaid_notify')
+def prepaid_notify(url, params, count=1, max_times=30, interval=30):
+    do_notify_client(prepaid_notify, url, params, count, max_times, interval)
+
+
 @app.task(ignore_result=True, queue='withdraw_notify', routing_key='withdraw_notify')
 def withdraw_notify(url, params, count=1, max_times=30, interval=120):
     do_notify_client(withdraw_notify, url, params, count, max_times, interval)

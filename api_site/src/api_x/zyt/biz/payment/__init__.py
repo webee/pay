@@ -86,7 +86,7 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
 def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url):
-    comments = "在线支付-{1}".format(product_name)
+    comments = "在线支付-{0}".format(product_name)
     user_ids = [(payer_id, UserRole.FROM), (payee_id, UserRole.TO)]
     if payment_type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)

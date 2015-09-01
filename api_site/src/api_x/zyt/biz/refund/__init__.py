@@ -167,7 +167,7 @@ def _create_refund(channel, tx, payment_record, amount, client_notify_url):
     if amount + payment_record.refunded_amount > payment_record.amount:
         raise RefundAmountError(payment_record.amount, payment_record.refunded_amount, amount)
 
-    comments = "退款-{1}".format(payment_record.product_name)
+    comments = "退款-{0}".format(payment_record.product_name)
 
     user_ids = [(payment_record.payer_id, UserRole.TO), (payment_record.payee_id, UserRole.FROM)]
     if payment_record.type == PaymentType.GUARANTEE:

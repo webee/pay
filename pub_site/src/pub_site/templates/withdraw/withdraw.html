@@ -11,11 +11,12 @@
 {% block content %}
     <div class="contRight payoffRight firstRight txRight">
         {% include 'message.html' %}
-        <h2 class="withdraw">提现</h2>
-
-        <div class="line firstline">
-            <label>账户余额</label><span class="money">{{ balance }} 元</span>
+        <h2 class="first">提现</h2>
+        <div class="line firstline margin48">
+            <label class="widthauto">可用余额</label>
+            <span id="available_balance" class="money" >{{ balance }}</span>&nbsp;元
         </div>
+
         <form class="withdraw" method="post" action="">
             {{ form.csrf_token }}
             <div class="line clearfix">

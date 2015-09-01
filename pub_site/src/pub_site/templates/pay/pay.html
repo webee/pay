@@ -10,11 +10,13 @@
 {% block content %}
     <div class="contRight payoffRight">
         {% include 'message.html' %}
-        <h2>付款给绿野</h2>
-
-        <div class="line firstline">
-            <label>账户余额</label><span class="money">{{ balance }} 元</span>
+         <h2 class="first">付款给绿野</h2>
+        <div class="line firstline margin48">
+            <label class="widthauto">可用余额</label>
+            <span id="available_balance" class="money" >{{ balance }}</span>&nbsp;元
         </div>
+
+
         <form id="form-pay_to_lvye" action="{{ url_for('.pay_to_lvye') }}" method="post">
             {% from 'forms.html' import input, verification_code_and_submit, radio, submit %}
             {{ form.csrf_token }}

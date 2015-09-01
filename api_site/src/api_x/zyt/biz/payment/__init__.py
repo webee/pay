@@ -69,7 +69,7 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
         payment_record.product_category = product_category
         payment_record.product_desc = product_desc
         tx.amount = amount
-        tx.comments = "在线支付-{1}|{2}".format(product_name, payment_record.order_id)
+        tx.comments = "在线支付-{0}".format(product_name)
 
     if payment_record.tried_times >= config.Biz.PAYMENT_MAX_TRIAL_TIMES:
         # new sn.

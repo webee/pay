@@ -19,7 +19,7 @@
 
         <form id="form-pay_to_lvye" action="{{ url_for('.pay_to_lvye') }}" method="post">
             {% from 'forms.html' import input, verification_code_and_submit, radio, submit %}
-            {{ form.csrf_token }}
+            {{ form.csrf_tokeren }}
             {{ input(form.amount, "") }}
             <div class="line">
                 <div class="pay-channel">

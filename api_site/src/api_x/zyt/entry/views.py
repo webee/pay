@@ -37,6 +37,7 @@ def _get_tx(utx):
         'amount': tx.amount,
         'type': tx.type,
         'vas_name': tx.vas_name,
+        'channel_name': tx.channel_name,
         'state': tx.state,
         'comments': tx.comments,
         'created_on': tx.created_on,

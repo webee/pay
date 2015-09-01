@@ -20,6 +20,7 @@ logger = get_logger(__name__)
 def prepaid():
     data = request.values
     channel = request.channel
+    order_id = data.get('order_id')
     to_user_id = data['to_user_id']
     to_domain_name = data.get('to_domain_name')
     amount = data['amount']
@@ -39,7 +40,7 @@ def prepaid():
                                                                                           to_user_id))
 
     try:
-        prepaid_record = create_prepaid(channel, to_user_map.account_user_id, amount,
+        prepaid_record = create_prepaid(channel, order_id, to_user_map.account_user_id, amount,
                                         client_callback_url, client_notify_url)
         pay_url = config.HOST_URL + url_for('biz_entry.cashier_desk',
                                             source=TransactionType.PREPAID, sn=prepaid_record.sn)

@@ -69,7 +69,7 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
         payment_record.product_category = product_category
         payment_record.product_desc = product_desc
         tx.amount = amount
-        tx.comments = "在线支付-{0}:{1}|{2}".format(channel.desc, product_name, payment_record.order_id)
+        tx.comments = "在线支付-{1}|{2}".format(product_name, payment_record.order_id)
 
     if payment_record.tried_times >= config.Biz.PAYMENT_MAX_TRIAL_TIMES:
         # new sn.
@@ -86,12 +86,12 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
 def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url):
-    comments = "在线支付-{0}:{1}|{2}".format(channel.desc, product_name, order_id)
+    comments = "在线支付-{1}".format(product_name)
     user_ids = [(payer_id, UserRole.FROM), (payee_id, UserRole.TO)]
     if payment_type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
         user_ids.append((secure_user_id, UserRole.GUARANTOR))
-    tx_record = create_transaction(channel.name, TransactionType.PAYMENT, amount, comments, user_ids)
+    tx_record = create_transaction(channel.name, TransactionType.PAYMENT, amount, comments, user_ids, order_id=order_id)
 
     fields = {
         'tx_id': tx_record.id,

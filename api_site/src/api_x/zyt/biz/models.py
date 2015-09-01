@@ -35,8 +35,9 @@ class Transaction(db.Model):
                              TransactionType.TRANSFER, TransactionType.PREPAID), nullable=False)
 
     channel_name = db.Column(db.VARCHAR(32), nullable=False)
+    order_id = db.Column(db.VARCHAR(64))
     # 涉及到的总金额
-    # 支付金额，退款金额，提现金额(+手续费)
+    # 支付金额，退款金额，提现金额(+手续费), 充值金额
     amount = db.Column(db.Numeric(12, 2), nullable=False)
     comments = db.Column(db.VARCHAR(128), default='')
     state = db.Column(db.VARCHAR(32), nullable=False)

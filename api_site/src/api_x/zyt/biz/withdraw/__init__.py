@@ -25,7 +25,7 @@ from api_x.task import tasks
 logger = get_logger(__name__)
 
 
-def apply_to_withdraw(channel, from_user_id,
+def apply_to_withdraw(channel, order_id, from_user_id,
                       flag_card, card_type, card_no, acct_name, bank_code, province_code,
                       city_code, bank_name, brabank_name, prcptcd,
                       amount, fee, client_notify_url, data):
@@ -34,7 +34,7 @@ def apply_to_withdraw(channel, from_user_id,
     if fee < 0:
         raise AmountValueError('fee must be non-negative value.')
 
-    withdraw_record = _create_and_request_withdraw(channel, from_user_id,
+    withdraw_record = _create_and_request_withdraw(channel, order_id, from_user_id,
                                                    flag_card, card_type, card_no, acct_name, bank_code, province_code,
                                                    city_code, bank_name, brabank_name, prcptcd,
                                                    amount, fee, client_notify_url, data)
@@ -42,11 +42,11 @@ def apply_to_withdraw(channel, from_user_id,
 
 
 @transactional
-def _create_and_request_withdraw(channel, from_user_id,
+def _create_and_request_withdraw(channel, order_id, from_user_id,
                                  flag_card, card_type, card_no, acct_name, bank_code, province_code,
                                  city_code, bank_name, brabank_name, prcptcd,
                                  amount, fee, client_notify_url, data):
-    tx, withdraw_record = _create_withdraw(channel, from_user_id,
+    tx, withdraw_record = _create_withdraw(channel, order_id, from_user_id,
                                            flag_card, card_type, card_no, acct_name, bank_code, province_code,
                                            city_code, bank_name, brabank_name, prcptcd,
                                            amount, fee, client_notify_url, data)
@@ -62,7 +62,7 @@ def _create_and_request_withdraw(channel, from_user_id,
 
 
 @transactional
-def _create_withdraw(channel, from_user_id,
+def _create_withdraw(channel, order_id, from_user_id,
                      flag_card, card_type, card_no, acct_name, bank_code, province_code,
                      city_code, bank_name, brabank_name, prcptcd,
                      amount, fee, client_notify_url, data):
@@ -78,9 +78,10 @@ def _create_withdraw(channel, from_user_id,
     else:
         actual_amount = ac - fee
 
-    mask_name = acct_name[1:]
-    comments = "提现至 {0}({1}) *{2} 金额: {3}, 手续费: {4}".format(bank_name, card_no[-4:], mask_name, actual_amount, fee)
-    tx = create_transaction(channel.name, TransactionType.WITHDRAW, actual_amount + fee, comments, [(from_user_id, UserRole.FROM)])
+    mask_name = '*' + acct_name[1:]
+    comments = "提现至 {0}({1}) {2} 金额: {3}, 手续费: {4}".format(bank_name, card_no[-4:], mask_name, actual_amount, fee)
+    tx = create_transaction(channel.name, TransactionType.WITHDRAW, actual_amount + fee, comments, order_id=order_id,
+                            [(from_user_id, UserRole.FROM)])
 
     fields = {
         'tx_id': tx.id,

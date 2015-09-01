@@ -19,6 +19,7 @@ logger = get_logger(__name__)
 def app_withdraw(user_id):
     data = request.values
     channel = request.channel
+    order_id = data.get('order_id')
     bankcard_id = data['bankcard_id']
     amount = data['amount']
     client_notify_url = data.get('notify_url', '')
@@ -43,7 +44,7 @@ def app_withdraw(user_id):
         if bankcard.user_id != from_user_id:
             return response.fail(msg='bankcard [{0}] is not bound to user [{1}]'.format(bankcard_id, from_user_id))
 
-        withdraw_record = apply_to_withdraw(channel, from_user_id, bankcard, amount_value, fee, client_notify_url, data)
+        withdraw_record = apply_to_withdraw(channel, order_id, from_user_id, bankcard, amount_value, fee, client_notify_url, data)
         log_user_withdraw(from_user_id, withdraw_record.sn, bankcard_id, amount, fee)
         return response.success(sn=withdraw_record.sn,
                                 actual_amount=withdraw_record.actual_amount, fee=withdraw_record.fee)

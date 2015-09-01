@@ -167,7 +167,7 @@ def _create_refund(channel, tx, payment_record, amount, client_notify_url):
     if amount + payment_record.refunded_amount > payment_record.amount:
         raise RefundAmountError(payment_record.amount, payment_record.refunded_amount, amount)
 
-    comments = "退款-{0}:{1}|{2}".format(channel.name, payment_record.product_name, payment_record.order_id)
+    comments = "退款-{1}".format(payment_record.product_name)
 
     user_ids = [(payment_record.payer_id, UserRole.TO), (payment_record.payee_id, UserRole.FROM)]
     if payment_record.type == PaymentType.GUARANTEE:
@@ -179,7 +179,8 @@ def _create_refund(channel, tx, payment_record, amount, client_notify_url):
         balance = get_user_cash_balance(payment_record.payee_id)
         if amount > balance.available:
             raise RefundBalanceError(amount, balance.available)
-    tx_record = create_transaction(channel.name, TransactionType.REFUND, amount, comments, user_ids)
+    tx_record = create_transaction(channel.name, TransactionType.REFUND, amount, comments, user_ids,
+                                   order_id=payment_record.order_id)
 
     fields = {
         'tx_id': tx_record.id,

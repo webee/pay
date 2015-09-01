@@ -19,6 +19,7 @@ logger = get_logger(__name__)
 def apply_to_withdraw(user_id):
     data = request.values
     channel = request.channel
+    order_id = data.get('order_id')
     # bankcard info
     flag_card = data['flag_card']
     card_type = data['card_type']

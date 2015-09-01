@@ -24,13 +24,13 @@ logger = get_logger(__name__)
 
 
 @transactional
-def create_prepaid(channel, to_id, amount, client_callback_url, client_notify_url):
+def create_prepaid(channel, order_id, to_id, amount, client_callback_url, client_notify_url):
     if amount <= 0:
         raise NonPositiveAmountError(amount)
 
     comments = "充值"
     user_ids = [(to_id, UserRole.TO)]
-    tx = create_transaction(channel.name, TransactionType.PREPAID, amount, comments, user_ids)
+    tx = create_transaction(channel.name, TransactionType.PREPAID, amount, comments, user_ids, order_id=order_id)
 
     fields = {
         'tx_id': tx.id,

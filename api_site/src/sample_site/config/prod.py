@@ -8,8 +8,8 @@ PAYEE = '169658002'
 
 
 class PayClientConfig:
-    MD5_KEY = read_string('conf/md5_key.txt')
-    CHANNEL_PRI_KEY = read_string('conf/channel_pri_key.txt')
+    MD5_KEY = read_string('conf/sample/md5_key.txt')
+    CHANNEL_PRI_KEY = read_string('conf/sample/channel_pri_key.txt')
 
     CHANNEL_NAME = 'lvye_pay_test'
 

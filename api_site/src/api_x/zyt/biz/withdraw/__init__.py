@@ -51,7 +51,7 @@ def _create_and_request_withdraw(channel, from_user_id,
                                            city_code, bank_name, brabank_name, prcptcd,
                                            amount, fee, client_notify_url, data)
     try:
-        _request_pay_to_bankcard(tx, withdraw_record, data)
+        res = _request_pay_to_bankcard(tx, withdraw_record, data)
         _withdraw_to_processing(tx)
     except Exception as e:
         # FIXME: because this is in a transaction, below is useless.

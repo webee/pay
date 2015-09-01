@@ -15,28 +15,35 @@ from pytoolbox.util.log import get_logger
 logger = get_logger(__name__)
 
 
-@mod.route("/pay/result/<source>", methods=["POST"])
+@mod.route("/pay/result/<source>/<order_no>", methods=["POST", "GET"])
 @parse_and_verify
-def pay_result(source):
+def pay_result(source, order_no):
     """支付页面回调, 更多操作可由notify完成，这里只是返回callback"""
-    data = request.verified_data
-    partner_oid = data['oid_partner']
-    order_no = data['no_order']
-    result = data['result_pay']
-    paybill_oid = data['oid_paybill']
-    # 这里一定是成功的
+    if request.method == "POST":
+        data = request.verified_data
+        partner_oid = data['oid_partner']
+        order_no = data['no_order']
+        result = data['result_pay']
+        paybill_oid = data['oid_paybill']
+        # 这里一定是成功的
 
-    if not is_sending_to_me(partner_oid):
-        return render_template('info.html', title='支付结果', msg='支付异常-订单号:{0}'.format(order_no))
+        if not is_sending_to_me(partner_oid):
+            return render_template('info.html', title='支付结果', msg='支付异常-订单号:{0}'.format(order_no))
+
+        is_success = is_success_result(result)
+    elif request.method == "GET":
+        is_success = False
+        paybill_oid = ""
+        data = None
 
     handle = get_pay_notify_handle(source, NotifyType.Pay.SYNC)
     if handle:
         # 是否成功，订单号，来源系统，来源系统订单号，数据
-        return handle(is_success_result(result), order_no, NAME, paybill_oid, data)
+        return handle(is_success, order_no, NAME, paybill_oid, data)
 
-    if is_success_result(result):
-        return render_template('info.html', title='支付结果', msg='支付成功(来源未知)-订单号:{0}'.format(order_no))
-    return render_template('info.html', title='支付结果', msg='支付失败(来源未知)-订单号:{0}'.format(order_no))
+    if is_success:
+        return render_template('info.html', title='支付结果', msg='支付成功({0})-订单号:{1}'.format(source, order_no))
+    return render_template('info.html', title='支付结果', msg='支付失败({0})-订单号:{1}'.format(source, order_no))
 
 
 @mod.route("/pay/notify/<source>", methods=["POST"])

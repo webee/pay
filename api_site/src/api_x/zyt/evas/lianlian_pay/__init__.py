@@ -14,7 +14,7 @@ signer = Signer('key', 'sign')
 def pay(source, user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount):
     from ._payment import pay as _pay
 
-    return_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_result', source=source))
+    return_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_result', source=source, order_no=order_no))
     notify_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_notify', source=source))
 
     return Response(_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,

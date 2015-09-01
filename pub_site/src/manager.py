@@ -53,7 +53,7 @@ def deploy_prod():
 
 @manager.command
 def deploy_beta():
-    deploy('beta', 'pay_pub_site', False)
+    deploy('beta', 'pay_pub_site', do_deploy=False)
 
 
 @manager.option('-m', '--minutes', type=long, dest="minutes", required=True, default=10)

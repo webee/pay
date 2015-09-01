@@ -3,14 +3,14 @@ from __future__ import unicode_literals
 from api_x.utils import response
 from api_x.zyt.biz import payment
 from api_x.constant import PaymentTxState
-from api_x.zyt.biz.transaction.dba import get_tx_by_sn
+from api_x.zyt.biz.models import TransactionType
 from api_x.zyt.user_mapping import get_user_domain_by_name
 
-from flask import request, render_template, url_for, abort, redirect
+from flask import request, url_for
 from api_x.config import etc as config
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
-from api_x.utils.entry_auth import verify_request, limit_referrer
+from api_x.utils.entry_auth import verify_request
 from api_x.zyt.biz.models import PaymentType
 
 
@@ -60,70 +60,11 @@ def prepay():
         if payment_record.tx.state != PaymentTxState.CREATED:
             return response.fail(msg="order already paid.")
 
-        pay_url = config.HOST_URL + url_for('biz_entry.cashier_desk', sn=payment_record.sn)
+        pay_url = config.HOST_URL + url_for('biz_entry.cashier_desk', source=TransactionType.PAYMENT, sn=payment_record.sn)
         return response.success(sn=payment_record.sn, pay_url=pay_url)
     except Exception as e:
         logger.exception(e)
         return response.fail(code=1, msg=e.message)
-
-
-@mod.route('/cashier_desk/<sn>', methods=['GET'])
-def cashier_desk(sn):
-    """支付收银台入口"""
-    tx = get_tx_by_sn(sn)
-    if tx is None:
-        abort(404)
-    if tx.state != PaymentTxState.CREATED:
-        return render_template("info.html", msg="该订单已支付")
-
-    if len(config.Biz.ACTIVATED_EVAS) == 1:
-        # 只有一种支付方式，则直接跳转到支付页面
-        vas_name = config.Biz.ACTIVATED_EVAS[0]
-        return redirect(config.HOST_URL + url_for('.pay', sn=sn, vas_name=vas_name))
-    return render_template("cashier_desk.html", root_url=config.HOST_URL, tx=tx, vases=config.Biz.ACTIVATED_EVAS)
-
-
-@mod.route("/pay/<sn>/<vas_name>", methods=["GET"])
-@limit_referrer(config.Biz.VALID_NETLOCS)
-def pay(sn, vas_name):
-    """支付入口"""
-    if vas_name not in config.Biz.ACTIVATED_EVAS:
-        # 不支持此支付方式
-        abort(404)
-
-    return do_pay(sn, vas_name)
-
-
-@mod.route("/zyt_pay/<sn>", methods=["POST"])
-@verify_request('zyt_pay')
-def zyt_pay(sn):
-    """自游通余额支付入口，需要授权"""
-    # TODO: 暂时以授权的方式进行，之后需要单独的支付页面/密码
-    from api_x.zyt import vas
-
-    return do_pay(sn, vas.NAME)
-
-
-def do_pay(sn, vas_name):
-    from . import payment
-
-    tx = get_tx_by_sn(sn)
-    if tx is None:
-        return render_template("info.html", msg="无此订单")
-    if tx.state != PaymentTxState.CREATED:
-        return render_template("info.html", msg="该订单已支付")
-
-    return payment.pay(vas_name, tx)
-
-
-@mod.route("/pay/result/<sn>/<vas_name>", methods=["GET"])
-def pay_result(sn, vas_name):
-    data = request.values
-    code = data['code']
-    vas_sn = data['vas_sn']
-
-    msg = "支付成功" if code == 0 else "支付失败"
-    return render_template('pay_result.html', title='支付结果', sn=sn, vas_name=vas_name, vas_sn=vas_sn, msg=msg)
 
 
 @mod.route('/pay/guarantee_payment/confirm', methods=['POST'])

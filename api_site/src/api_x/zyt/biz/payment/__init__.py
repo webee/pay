@@ -1,7 +1,8 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x.zyt.biz.commons import is_duplicated_notify
-from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
+from api_x.zyt.biz.payment.dba import get_payment_by_channel_order_id, get_payment_by_sn, get_tx_payment_by_sn
+from api_x.zyt.biz.transaction.dba import get_tx_by_id
 
 from flask import redirect
 from api_x import db
@@ -114,26 +115,6 @@ def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
     return payment_record
 
 
-def get_payment_by_channel_order_id(channel_id, order_id):
-    return PaymentRecord.query.filter_by(channel_id=channel_id, order_id=order_id).first()
-
-
-def get_payment_by_tx_id(tx_id):
-    return PaymentRecord.query.filter_by(tx_id=tx_id).first()
-
-
-def get_payment_by_sn(sn):
-    return PaymentRecord.query.filter_by(sn=sn).first()
-
-
-def get_payment_by_id(id):
-    return PaymentRecord.query.get(id)
-
-
-def get_tx_payment_by_sn(sn):
-    return get_tx_by_sn(sn), get_payment_by_sn(sn)
-
-
 @transactional
 def succeed_paid_out(vas_name, tx, payment_record):
     event_id = bookkeeping(EventType.TRANSFER_OUT, tx.sn, payment_record.payer_id, vas_name,
@@ -154,12 +135,13 @@ def succeed_payment(vas_name, tx, payment_record):
 def duplicate_payment_to_balance(vas_name, vas_sn, tx, payment_record):
     event_id = bookkeeping(EventType.TRANSFER_IN, tx.sn, payment_record.payer_id, vas_name,
                            payment_record.amount)
-    duplicate_payment_record = DuplicatedPaymentRecord(tx_id=tx.id,
-                                                       sn=tx.sn, event_id=event_id,
-                                                       vas_name=vas_name, vas_sn=vas_sn)
-    db.session.add(duplicate_payment_record)
     # 不改变状态，只是添加一条关联event
-    transit_transaction_state(payment_record.tx_id, tx.state, tx.state, event_id)
+    transit_transaction_state(tx.id, tx.state, tx.state, event_id)
+
+    duplicate_payment_record = DuplicatedPaymentRecord(tx_id=tx.id,
+                                                       sn=tx.sn, event_id=event_id, vas_name=vas_name, vas_sn=vas_sn,
+                                                       source=TransactionType.PAYMENT)
+    db.session.add(duplicate_payment_record)
 
 
 @transactional
@@ -203,7 +185,6 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
-    from flask import url_for
     tx, payment_record = get_tx_payment_by_sn(sn)
     client_callback_url = payment_record.client_callback_url
 
@@ -214,8 +195,11 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
         params = {'code': 0, 'user_id': user_id, 'sn': payment_record.sn,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
         return sign_and_return_client_callback(client_callback_url, tx.channel_name, params, method="POST")
+
+    from flask import url_for
     code = 0 if is_success else 1
-    return redirect(build_url(url_for('biz_entry.pay_result', sn=sn, vas_name=vas_name), code=code, vas_sn=vas_sn))
+    return redirect(build_url(url_for('biz_entry.pay_result', source=TransactionType.PAYMENT, sn=sn, vas_name=vas_name),
+                              code=code, vas_sn=vas_sn))
 
 
 def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
@@ -267,11 +251,9 @@ def _try_notify_client(tx, payment_record):
     params = None
     if tx.state in [PaymentTxState.SECURED, PaymentTxState.SUCCESS]:
         params = {'code': 0, 'user_id': user_id, 'sn': payment_record.sn,
-                  'channel_name': tx.channel_name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
     elif tx.state == PaymentTxState.FAILED:
         params = {'code': 1, 'user_id': user_id, 'sn': payment_record.sn,
-                  'channel_name': tx.channel_name,
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
 
     # notify

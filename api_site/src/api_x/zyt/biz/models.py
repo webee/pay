@@ -54,7 +54,7 @@ class Transaction(db.Model):
 
     @property
     def record(self):
-        if self.__record:
+        if hasattr(self, '__record') and self.__record:
             return self.__record
         if self.type == TransactionType.PAYMENT:
             self.__record = self.payment_record.one()
@@ -197,6 +197,8 @@ class PrepaidRecord(db.Model):
     to_id = db.Column(db.Integer, nullable=False)
     amount = db.Column(db.Numeric(12, 2), nullable=False)
 
+    client_callback_url = db.Column(db.VARCHAR(128))
+    client_notify_url = db.Column(db.VARCHAR(128))
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):

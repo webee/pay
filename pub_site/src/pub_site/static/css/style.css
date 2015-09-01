@@ -117,7 +117,7 @@ footer{background:#333;height:60px;}
 /*首次进入需绑定页*/
 .mainCont .payoffRight h2.first{margin-bottom:20px;}
 .contRight p.zhuyi{margin:0 0 50px 30px;line-height:20px;font-size:12px;}
-.firstRight .line label{width:114px;float:left;}
+.firstRight .line label{float:left;}
 .firstRight .line .greentxk{border:1px solid #3cb43c;}
 .firstRight .line .orangetxk{border:1px solid #f97700;}/*填写错误*/
 .firstRight .line em.warn{margin-left:30px;}.firstRight .line em.mistake{display:block;color:#f97700;margin:6px 0 0 145px;background:url(../images/warn_bg.png) no-repeat left center;padding-left:20px;height: 17px;line-height: 18px;}/*填写错误*/

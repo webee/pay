@@ -5,7 +5,7 @@ from api_x.zyt.biz import prepaid
 from api_x.constant import TransactionType
 from api_x.zyt.user_mapping import get_user_domain_by_name
 
-from flask import request, url_for
+from flask import request, url_for, redirect, render_template
 from api_x.config import etc as config
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
@@ -43,7 +43,7 @@ def prepaid():
                                                 client_callback_url, client_notify_url)
         pay_url = config.HOST_URL + url_for('biz_entry.prepaid_cashier_desk',
                                             source=TransactionType.PREPAID, sn=prepaid_record.sn)
-        return response.success(sn=prepaid_record.sn, pay_url=pay_url)
+        return redirect(pay_url)
     except Exception as e:
         logger.exception(e)
-        return response.fail(code=1, msg=e.message)
+        return render_template('info.html', msg="充值失败")

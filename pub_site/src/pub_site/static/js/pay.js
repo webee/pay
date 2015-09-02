@@ -20,8 +20,11 @@ $(function () {
     function validate() {
         var errors = {};
         var amount = $('#amount').val();
-        if (!amount || !amount.match(amountPattern) || amount <= 0) {
+        if (!amount || !amount.match(amountPattern)) {
             errors['amount'] = '请输入数字，小数点后最多2位， 例如"8.88"';
+        }
+        if (amount <= 0) {
+            errors['amount'] = '金额必须大于0';
         }
         var comment = $('#comment').val();
         if (!comment) {

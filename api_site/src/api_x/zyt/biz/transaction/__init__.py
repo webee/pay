@@ -65,8 +65,9 @@ def update_transaction_info(tx_id, vas_sn, vas_name=None, state=None):
     if tx is None:
         raise TransactionNotFoundError(tx_id)
 
-    tx.vas_name = vas_name
     tx.vas_sn = vas_sn
+    if vas_name is not None:
+        tx.vas_name = vas_name
     if state is not None:
         tx.state = state
 

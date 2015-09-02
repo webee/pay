@@ -5,6 +5,7 @@ from .prepaid import handle_prepaid_result, handle_prepaid_notify
 from .refund import handle_refund_notify
 from .withdraw import handle_withdraw_notify
 from .models import VirtualAccountSystem
+from .query_notify import register_query_notify_handle
 
 
 def init_test_pay_notify_handles():
@@ -27,9 +28,11 @@ def init_test_pay_notify_handles():
 
 
 def init_lianlian_pay_notify_handles():
+    from api_x.zyt.evas.lianlian_pay import NAME
     from api_x.zyt.evas.lianlian_pay.constant import NotifyType
     from api_x.zyt.evas.lianlian_pay.notify import register_pay_notify_handle, register_refund_notify_handle
     from api_x.zyt.evas.lianlian_pay.notify import register_pay_to_bankcard_notify_handle
+    from api_x.zyt.evas.lianlian_pay import query_refund_notify
 
     # payment
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC, handle_payment_result)
@@ -44,6 +47,10 @@ def init_lianlian_pay_notify_handles():
 
     # pay_to_bankcard
     register_pay_to_bankcard_notify_handle(TransactionType.WITHDRAW, handle_withdraw_notify)
+
+    # query_notify
+    # notify(source, sn, sn_created_on[, vas_sn])
+    register_query_notify_handle(TransactionType.REFUND, NAME, query_refund_notify)
 
 
 def init_zyt_pay_notify_handles():

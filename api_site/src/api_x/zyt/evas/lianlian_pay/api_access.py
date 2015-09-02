@@ -5,6 +5,10 @@ import json
 import requests
 from .error import *
 from . import signer
+from pytoolbox.util.log import get_logger
+
+
+logger = get_logger(__name__)
 
 
 def sign_params(params):
@@ -17,6 +21,7 @@ def sign_params(params):
 def request(api_url, params):
     data = json.dumps(sign_params(params))
 
+    logger.info("request {0}: {1}".format(api_url, data))
     resp = requests.post(api_url, data)
     if resp.status_code == 200:
         return _parse_and_verify_response_data(resp.content)

@@ -4,6 +4,10 @@ from __future__ import unicode_literals
 from flask import url_for, Response
 from .commons import generate_absolute_url
 from pytoolbox.util.sign import Signer
+from pytoolbox.util.log import get_logger
+
+
+logger = get_logger(__name__)
 
 
 NAME = 'LIANLIAN_PAY'
@@ -49,3 +53,13 @@ def query_bin(card_no):
     from .bankcard import query_bin as _query_bin
 
     return _query_bin(card_no)
+
+
+def query_refund_notify(source, refund_no, refunded_on, oid_refundno=''):
+    from ._refund import refund_query, is_success_or_fail
+    from .notify import notify_refund
+    from api_x.zyt.evas.lianlian_pay.notify import get_refund_notify_handle
+
+    data = refund_query(refund_no, refunded_on, oid_refundno)
+
+    return notify_refund(source, data)

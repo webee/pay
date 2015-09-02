@@ -8,7 +8,7 @@ from api_x.zyt.evas.lianlian_pay.constant import NotifyType
 from api_x.zyt.evas.lianlian_pay.notify import get_pay_notify_handle
 from api_x.zyt.evas.lianlian_pay import NAME
 from .commons import parse_and_verify
-from . import notification
+from . import notify_response
 from pytoolbox.util.log import get_logger
 
 
@@ -57,22 +57,22 @@ def pay_notify(source):
 
     logger.info('pay notify {0}: {1}'.format(source, data))
     if not is_sending_to_me(partner_oid):
-        return notification.is_invalid()
+        return notify_response.is_invalid()
 
     handle = get_pay_notify_handle(source, NotifyType.Pay.ASYNC)
     if handle is None:
-        return notification.miss()
+        return notify_response.miss()
 
     try:
         # 此通知的调用协议
         # 是否成功，订单号，来源系统，来源系统订单号，数据
         # TODO: 提出接口
         handle(is_success_result(result), order_no, NAME, paybill_oid, data)
-        return notification.succeed()
+        return notify_response.succeed()
     except Exception as e:
         logger.exception(e)
         logger.warning('pay notify error: {0}'.format(e.message))
-        return notification.failed()
+        return notify_response.failed()
 
 
 def is_success_result(result):

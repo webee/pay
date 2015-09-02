@@ -7,7 +7,7 @@ from . import lianlian_pay_entry_mod as mod
 from api_x.zyt.evas.lianlian_pay.notify import get_pay_to_bankcard_notify_handle
 from api_x.zyt.evas.test_pay import NAME
 from .commons import parse_and_verify
-from . import notification
+from . import notify_response
 from .._pay_to_bankcard import is_success_result, is_failed_result
 from pytoolbox.util.log import get_logger
 
@@ -26,25 +26,25 @@ def pay_to_bankcard_notify(source):
 
     logger.info('pay_to_bankcard notify {0}: {1}'.format(source, data))
     if not is_sending_to_me(partner_oid):
-        return notification.bad()
+        return notify_response.bad()
 
     handle = get_pay_to_bankcard_notify_handle(source)
     if handle is None:
-        return notification.miss()
+        return notify_response.miss()
 
     if is_success_result(result):
         is_success = True
     elif is_failed_result(result):
         is_success = False
     else:
-        return notification.retry()
+        return notify_response.retry()
 
     try:
         # 是否成功，订单号，来源系统，来源系统订单号，数据
         handle(is_success, order_no, NAME, paybill_id, data)
         logger.info('pay_to_bankcard notify success: {0}, {1}'.format(source, order_no))
-        return notification.succeed()
+        return notify_response.succeed()
     except Exception as e:
         logger.exception(e)
         logger.warning('pay_to_bankcard notify error: {0}'.format(e.message))
-        return notification.failed()
+        return notify_response.failed()

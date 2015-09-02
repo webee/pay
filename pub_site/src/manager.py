@@ -46,9 +46,9 @@ def init_db(recreate, drop_all):
     db.create_all()
 
 
-@manager.command
-def deploy_prod():
-    deploy('prod', 'pay_pub_site')
+@manager.option('-u', '--update_only', action="store_true", dest="update_only", required=False, default=False)
+def deploy_prod(update_only):
+    deploy('prod', 'pay_pub_site', do_deploy=not update_only)
 
 
 @manager.command

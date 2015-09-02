@@ -12,8 +12,8 @@ from ..error import *
 def parse_and_verify(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
+        # TODO: 应该所有的回调都是POST, GET是在『支付失败』的情况出现
         if request.method != "GET":
-            # TODO: 应该所有的回调都是POST, GET是在支付失败的情况出现
             try:
                 verified_data = parse_and_verify_request_data(request.values, request.data)
             except (DictParsingError, InvalidSignError):

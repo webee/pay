@@ -231,12 +231,13 @@ def _refund_by_test_pay(tx, refund_record, data):
     if not is_success_request(res):
         logger.error('request refund failed: {0}'.format(res))
         raise RefundFailedError(res['ret_msg'])
+
     return res
 
 
 def _refund_by_lianlian_pay(tx, refund_record):
     """连连退款"""
-    from api_x.zyt.evas.lianlian_pay import refund
+    from api_x.zyt.evas.lianlian_pay import refund, query_refund
     from api_x.zyt.evas.lianlian_pay.commons import is_success_request
 
     vas_sn = tx.vas_sn
@@ -250,6 +251,9 @@ def _refund_by_lianlian_pay(tx, refund_record):
     if not is_success_request(res):
         logger.error('request refund failed: {0}'.format(res))
         raise RefundFailedError(res['ret_msg'])
+
+    # try to query refund notify.
+    # TODO: start query refund notify task.
     return res
 
 

@@ -28,14 +28,14 @@ logger = get_logger(__name__)
 
 
 def apply_to_refund(channel, order_id, amount, client_notify_url, data):
-    tx, payment_record = _get_tx_payment_to_refund(channel.id, order_id)
+    payment_tx, payment_record = _get_tx_payment_to_refund(channel.id, order_id)
 
     # FIXME:
     # 以下事实上是拒绝所有成功的交易进行退款
     # 因为金额可能被提现出去。
-    if tx.state == PaymentTxState.SUCCESS:
+    if payment_tx.state == PaymentTxState.SUCCESS:
         # disable success finished pay refund.
-        raise RefundSuccessPayError(tx.sn)
+        raise RefundSuccessPayError(payment_tx.sn)
 
     try:
         amount_value = Decimal(amount)
@@ -44,7 +44,7 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data):
     if amount_value <= 0:
         raise NonPositiveAmountError(amount_value)
 
-    refund_record = _create_and_request_refund(channel, tx, payment_record, amount_value, client_notify_url, data)
+    refund_record = _create_and_request_refund(channel, payment_tx, payment_record, amount_value, client_notify_url, data)
 
     return refund_record
 
@@ -66,7 +66,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
     tx, refund_record = get_tx_refund_by_sn(sn)
     payment_tx, payment_record = get_tx_payment_by_sn(refund_record.payment_sn)
 
-    logger.info('refund notify: {0}'.format(data))
+    logger.info('refund notify: {0}, {1}, {2}, {3}, {4}'.format(is_success, sn, vas_name, vas_sn, data))
     if tx is None or refund_record is None:
         # 不存在
         logger.warning('refund [{0}] not exits.'.format(sn))
@@ -81,7 +81,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         return
 
     with require_transaction_context():
-        tx = update_transaction_info(refund_record.tx_id, vas_name, vas_sn)
+        tx = update_transaction_info(refund_record.tx_id, vas_sn)
         if is_success:
             # 直付和担保付的不同操作
             if payment_record.type == PaymentType.DIRECT:
@@ -138,11 +138,11 @@ def _is_refundable(tx, payment_record):
 
 
 @transactional
-def _create_and_request_refund(channel, tx, payment_record, amount, client_notify_url, data):
-    payment_record, refund_record = _create_refund(channel, tx, payment_record, amount, client_notify_url)
+def _create_and_request_refund(channel, payment_tx, payment_record, amount, client_notify_url, data):
+    payment_record, refund_record = _create_refund(channel, payment_tx, payment_record, amount, client_notify_url)
 
     try:
-        _request_refund(tx, payment_record, refund_record, data)
+        _request_refund(payment_tx, payment_record, refund_record, data)
     except Exception as e:
         logger.exception(e)
         # FIXME: because this is in a transaction, below is useless.
@@ -153,15 +153,15 @@ def _create_and_request_refund(channel, tx, payment_record, amount, client_notif
 
 
 @transactional
-def _create_refund(channel, tx, payment_record, amount, client_notify_url):
-    cur_payment_state = tx.state
+def _create_refund(channel, payment_tx, payment_record, amount, client_notify_url):
+    cur_payment_state = payment_tx.state
 
     # start refunding.
-    transit_transaction_state(tx.id, tx.state, PaymentTxState.REFUNDING)
+    transit_transaction_state(payment_tx.id, payment_tx.state, PaymentTxState.REFUNDING)
 
-    tx = get_tx_by_id(tx.id)
+    payment_tx = get_tx_by_id(payment_tx.id)
     payment_record = get_payment_by_id(payment_record.id)
-    if tx.state != PaymentTxState.REFUNDING:
+    if payment_tx.state != PaymentTxState.REFUNDING:
         raise PaymentNotRefundableError()
 
     if amount + payment_record.refunded_amount > payment_record.amount:
@@ -180,7 +180,7 @@ def _create_refund(channel, tx, payment_record, amount, client_notify_url):
         if amount > balance.available:
             raise RefundBalanceError(amount, balance.available)
     tx_record = create_transaction(channel.name, TransactionType.REFUND, amount, comments, user_ids,
-                                   order_id=payment_record.order_id)
+                                   vas_name=payment_tx.vas_name, order_id=payment_record.order_id)
 
     fields = {
         'tx_id': tx_record.id,
@@ -200,16 +200,16 @@ def _create_refund(channel, tx, payment_record, amount, client_notify_url):
     return payment_record, refund_record
 
 
-def _request_refund(tx, payment_record, refund_record, data):
+def _request_refund(payment_tx, payment_record, refund_record, data):
     from api_x.zyt.evas import test_pay, lianlian_pay
     from api_x.zyt import vas
 
-    vas_name = tx.vas_name
+    vas_name = payment_tx.vas_name
 
     if vas_name == test_pay.NAME:
-        return _refund_by_test_pay(tx, refund_record, data)
+        return _refund_by_test_pay(payment_tx, refund_record, data)
     if vas_name == lianlian_pay.NAME:
-        return _refund_by_lianlian_pay(tx, refund_record)
+        return _refund_by_lianlian_pay(payment_tx, refund_record)
     if vas_name == vas.NAME:
         return vas.refund(TransactionType.REFUND, refund_record.sn)
     raise RefundFailedError('unknown vas {0}'.format(vas_name))
@@ -237,7 +237,7 @@ def _refund_by_test_pay(tx, refund_record, data):
 
 def _refund_by_lianlian_pay(tx, refund_record):
     """连连退款"""
-    from api_x.zyt.evas.lianlian_pay import refund, query_refund
+    from api_x.zyt.evas.lianlian_pay import refund
     from api_x.zyt.evas.lianlian_pay.commons import is_success_request
 
     vas_sn = tx.vas_sn

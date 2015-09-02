@@ -243,7 +243,7 @@ def handle_withdraw_notify(is_success, sn, vas_name, vas_sn, data):
 
     _record_withdraw_extra_info(withdraw_record, data)
     with require_transaction_context():
-        tx = update_transaction_info(tx.id, vas_name, vas_sn)
+        tx = update_transaction_info(tx.id, vas_sn, vas_name=vas_name)
         if is_success:
             _success_withdraw(tx, withdraw_record)
         else:

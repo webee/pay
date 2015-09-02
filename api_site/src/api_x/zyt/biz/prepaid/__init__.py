@@ -128,7 +128,7 @@ def handle_prepaid_notify(is_success, sn, vas_name, vas_sn, data):
         return
 
     with require_transaction_context():
-        tx = update_transaction_info(tx.id, vas_name, vas_sn)
+        tx = update_transaction_info(tx.id, vas_sn, vas_name=vas_name)
         if is_success:
             succeed_prepaid(vas_name, tx, prepaid_record)
         else:

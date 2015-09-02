@@ -47,8 +47,8 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
     if payment_record.amount <= 0:
         from api_x.zyt import vas as zyt
 
-        tx = update_transaction_info(payment_record.tx_id.id, zyt.NAME, payment_record.sn,
-                                     PaymentTxState.CREATED)
+        tx = update_transaction_info(payment_record.tx_id.id, payment_record.sn,
+                                     vas_name=zyt.NAME, state=PaymentTxState.CREATED)
         succeed_payment(zyt.NAME, tx, payment_record)
     return payment_record
 
@@ -226,7 +226,7 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
         return
 
     with require_transaction_context():
-        tx = update_transaction_info(tx.id, vas_name, vas_sn)
+        tx = update_transaction_info(tx.id, vas_sn, vas_name=vas_name)
         if is_success:
             # 直付和担保付的不同操作
             if payment_record.type == PaymentType.DIRECT:

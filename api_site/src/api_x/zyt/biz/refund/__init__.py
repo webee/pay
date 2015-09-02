@@ -69,6 +69,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         # 这里的解决办法就是重试
         tx, refund_record = get_tx_refund_by_sn(sn)
         if tx is None:
+            logger.warn('apply refund [{0}] is not finish, sleep then retry.')
             time.sleep(0.5)
             continue
         break

@@ -144,7 +144,7 @@ def _try_notify_client(tx, prepaid_record):
 
     url = prepaid_record.client_notify_url
 
-    user_mapping = get_user_map_by_account_user_id(prepaid_record.payer_id)
+    user_mapping = get_user_map_by_account_user_id(prepaid_record.to_id)
     user_id = user_mapping.user_id
 
     params = None

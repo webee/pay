@@ -34,6 +34,7 @@ def _get_tx(utx):
     return {
         'role': utx.role,
         'sn': tx.sn,
+        'order_id': tx.order_id if tx.order_id else '',
         'amount': tx.amount,
         'type': tx.type,
         'vas_name': tx.vas_name,

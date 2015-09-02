@@ -10,6 +10,7 @@ from wtforms.validators import DataRequired, NumberRange
 from . import dba
 from pub_site.sms import verification_code_manager
 from pub_site import pay_client
+from decimal import Decimal
 
 
 def card_number_should_be_legal(form, field):
@@ -88,7 +89,7 @@ class WithdrawForm(gen_verification_code_form("form-withdraw")):
     amount = FloatField(u"提现金额(元)",
                         validators=[DataRequired(u'请输入数字，小数点后最多2位， 例如"8.88"'), MyRegexp(r'^\d+(.\d{1,2})?$', message=u'请输入数字，小数点后最多2位， 例如"8.88"'),
                                     amount_less_than_balance,
-                                    NumberRange(min=1, message=u"提现金额最少为1元")])
+                                    NumberRange(min=Decimal(1), message=u"提现金额最少为1元")])
     submit = SubmitField(u"提交")
 
     def __init__(self, bankcards, *args, **kwargs):

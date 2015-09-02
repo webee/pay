@@ -4,7 +4,7 @@ from celery import Celery
 
 celery = Celery('pay_api')
 
-from . import tasks
+from . import tasks, lianlian_tasks
 
 
 def init_celery_app(app, config, flask_app=None):

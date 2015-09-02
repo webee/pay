@@ -66,7 +66,7 @@ def do_pay(source, sn, vas_name):
     elif source == TransactionType.PREPAID:
         payment_entity = payment.gen_payment_entity_by_prepaid_tx(tx)
     else:
-        return render_template("info.html", msg="不支付该来源")
+        return render_template("info.html", msg="不支持该来源")
     return payment.pay(vas_name, payment_entity)
 
 

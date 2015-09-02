@@ -8,8 +8,7 @@ _all_handles = {}
 def register_query_notify_handle(tx_type, vas_name, handle):
     tx_handles = _all_handles.setdefault(tx_type, {})
 
-    handles = tx_handles.setdefault(vas_name, {})
-    handles[vas_name] = handle
+    tx_handles[vas_name] = handle
 
 
 def get_query_notify_handle(tx_type, vas_name):

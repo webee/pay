@@ -29,3 +29,7 @@ def miss():
 def wrong():
     """返回数据有问题"""
     return failed()
+
+
+def retry():
+    return failed()

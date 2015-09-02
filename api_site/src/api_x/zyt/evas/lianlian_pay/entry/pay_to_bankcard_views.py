@@ -37,7 +37,7 @@ def pay_to_bankcard_notify(source):
     elif is_failed_result(result):
         is_success = False
     else:
-        return notification.wrong()
+        return notification.retry()
 
     try:
         # 是否成功，订单号，来源系统，来源系统订单号，数据

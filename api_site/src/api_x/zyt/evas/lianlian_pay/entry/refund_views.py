@@ -8,7 +8,7 @@ from api_x.zyt.evas.lianlian_pay.notify import get_refund_notify_handle
 from api_x.zyt.evas.test_pay import NAME
 from .commons import parse_and_verify
 from . import notification
-from .._refund import is_success_status
+from .._refund import is_success_or_fail
 from pytoolbox.util.log import get_logger
 
 
@@ -32,9 +32,13 @@ def refund_notify(source):
     if handle is None:
         return notification.miss()
 
+    result = is_success_or_fail(status)
+    if result is None:
+        return notification.retry()
+
     try:
         # 是否成功，订单号，来源系统，来源系统订单号，数据
-        handle(is_success_status(status), refund_no, NAME, refundno_oid, data)
+        handle(result, refund_no, NAME, refundno_oid, data)
         logger.info('refund notify success: {0}, {1}'.format(source, refund_no))
         return notification.succeed()
     except Exception as e:

@@ -63,7 +63,16 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
-    tx, refund_record = get_tx_refund_by_sn(sn)
+    import time
+    for i in range(10):
+        # 这是因为apply_refund在一个事务中，notify到这儿的时候，事务没有结束，导致tx获取不到。
+        # 这里的解决办法就是重试
+        tx, refund_record = get_tx_refund_by_sn(sn)
+        if tx is None:
+            time.sleep(0.5)
+            continue
+        break
+
     payment_tx, payment_record = get_tx_payment_by_sn(refund_record.payment_sn)
 
     logger.info('refund notify: {0}, {1}, {2}, {3}, {4}'.format(is_success, sn, vas_name, vas_sn, data))

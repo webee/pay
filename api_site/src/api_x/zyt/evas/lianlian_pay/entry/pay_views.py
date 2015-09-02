@@ -4,7 +4,7 @@ from api_x.zyt.evas.lianlian_pay.commons import is_sending_to_me
 
 from flask import request, render_template
 from . import lianlian_pay_entry_mod as mod
-from api_x.zyt.evas.lianlian_pay.constant import BizType, NotifyType
+from api_x.zyt.evas.lianlian_pay.constant import NotifyType
 from api_x.zyt.evas.lianlian_pay.notify import get_pay_notify_handle
 from api_x.zyt.evas.lianlian_pay import NAME
 from .commons import parse_and_verify

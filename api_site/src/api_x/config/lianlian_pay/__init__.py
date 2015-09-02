@@ -28,6 +28,7 @@ class Payment:
 
 class Refund:
     URL = 'https://yintong.com.cn/traderapi/refund.htm'
+    QUERY_URL = 'https://yintong.com.cn/traderapi/refundquery.htm'
 
     class Status:
         APPLY = '0'

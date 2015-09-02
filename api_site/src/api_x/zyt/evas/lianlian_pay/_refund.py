@@ -18,5 +18,25 @@ def refund(refund_no, refunded_on, amount, paybill_id, notify_url):
     return request(lianlian_pay.Refund.URL, params)
 
 
-def is_success_status(status):
-    return status == lianlian_pay.Refund.Status.SUCCESS
+def is_success_or_fail(status):
+    if status == lianlian_pay.Refund.Status.SUCCESS:
+        return True
+    if status == lianlian_pay.Refund.Status.FAILED:
+        return False
+    return None
+
+
+def refund_query(refund_no, refunded_on, oid_refundno=''):
+    dt_refund = refunded_on
+    if not isinstance(refunded_on, str):
+        dt_refund = datetime_to_str(refunded_on)
+
+    params = {
+        'oid_partner': lianlian_pay.OID_PARTNER,
+        'sign_type': SignType.RSA,
+        'no_refund': str(refund_no),
+        'dt_refund': dt_refund,
+        'oid_refundno': oid_refundno
+    }
+
+    return request(lianlian_pay.Refund.QUERY_URL, params)

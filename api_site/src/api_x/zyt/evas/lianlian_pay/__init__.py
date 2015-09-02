@@ -28,6 +28,11 @@ def refund(source, refund_no, refunded_on, amount, paybill_id):
     return _refund(refund_no, refunded_on, amount, paybill_id, notify_url)
 
 
+def query_refund(refund_no, refunded_on, oid_refundno=''):
+    from ._refund import refund_query
+    return refund_query(refund_no, refunded_on, oid_refundno)
+
+
 def pay_to_bankcard(source, no_order, money_order, info_order,
                     flag_card, card_type, card_no, acct_name,
                     bank_code='', province_code='', city_code='', brabank_name='',

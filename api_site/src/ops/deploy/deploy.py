@@ -25,7 +25,7 @@ def deploy(env, name, manager_name="manager", do_deploy=True):
             dc.start_python_server(name)
 
 
-def db_migrate(env, manager_name):
+def db_migrate(env, manager_name="manager"):
     config = init_config(env)
 
     with dc.require_cmd_context(config):

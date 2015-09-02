@@ -42,6 +42,13 @@ TX_VAS_MSG = {
     '': '',
 }
 
+TX_CHANNEL_MSG = {
+    'lvye_huodong': '绿野活动',
+    'lvye_pay_test': '自游通测试',
+    'lvye_pay_site': '自游通网站',
+    'zyt_sample': '自游通sample系统',
+    }
+
 
 def query_transactions(uid, role, page_no, page_size, keyword):
     data = pay_client.list_transactions(uid, role, page_no, page_size, keyword)
@@ -60,5 +67,6 @@ def _process_tx(tx):
     tx['state'] = TX_STATE_MSG['%s:%s' % (tx['type'], tx['state'])]
     tx['type'] = TX_TYPE_MSG['%s:%s' % (tx['type'], tx['role'])]
     # tx['vas'] = TX_VAS_MSG[tx['vas_name']]
+    tx['channel'] = TX_CHANNEL_MSG[tx['channel_name']]
 
     return tx

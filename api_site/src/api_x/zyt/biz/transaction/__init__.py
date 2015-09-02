@@ -77,6 +77,7 @@ def update_transaction_info(tx_id, vas_name, vas_sn, state=None):
 
 def query_user_transactions(account_user_id, role, page, per_page, q):
     from sqlalchemy.orm import lazyload
+    from sqlalchemy import or_
 
     query = UserTransaction.query.options(lazyload('tx')). \
         outerjoin(Transaction). \
@@ -84,7 +85,7 @@ def query_user_transactions(account_user_id, role, page, per_page, q):
     if role:
         query = query.filter(UserTransaction.role == role)
     if q:
-        query = query.filter(Transaction.comments.contains(q))
+        query = query.filter(or_(Transaction.comments.contains(q), Transaction.order_id.contais(q)))
     query = query.order_by(Transaction.created_on.desc())
     paginator = query.paginate(page, per_page, error_out=False)
 

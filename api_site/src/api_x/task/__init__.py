@@ -1,5 +1,10 @@
 # coding=utf-8
 import os
+from celery import Celery
+
+celery = Celery('pay_api')
+
+from . import tasks
 
 
 def init_celery_app(app, config, flask_app=None):

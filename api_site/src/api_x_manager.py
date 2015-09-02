@@ -86,9 +86,9 @@ class CeleryCommand(Command):
         self.capture_all_args = True
 
     def run(self, *args, **kwargs):
-        from api_x.task import tasks
+        from api_x.task import celery
 
-        tasks.app.start(argv=['celery'] + args[0])
+        celery.start(argv=['celery'] + args[0])
 
 manager.add_command('celery', CeleryCommand())
 

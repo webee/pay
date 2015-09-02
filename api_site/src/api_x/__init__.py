@@ -55,7 +55,7 @@ def init_extensions(app):
 
 
 def init_tasks(app):
-    from api_x.task.tasks import app as celery
+    from api_x.task import celery
     from api_x.task import init_celery_app
     from api_x.config import api_celery_task as celery_config
 

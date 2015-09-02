@@ -125,7 +125,7 @@ def query_notify_refund():
 
     txs = get_tx_list(TransactionType.REFUND, RefundTxState.CREATED)
     for tx in txs:
-        handle = get_query_notify_handle(tx.type, tx.va)
+        handle = get_query_notify_handle(tx.type, tx.vas_name)
         res = handle(TransactionType.REFUND, tx.sn, tx.created_on)
         print('{0}: {1}'.format(tx.order_id, res))
 

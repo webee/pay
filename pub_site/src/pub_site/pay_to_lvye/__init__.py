@@ -7,7 +7,7 @@ class PayType:
     BY_BANKCARD = 1
 
 
-pay_mod = Blueprint('pay', __name__, static_folder='static')
+pay_to_lvye_mod = Blueprint('pay_to_lvye', __name__, static_folder='static')
 
 from . import pay_views
 

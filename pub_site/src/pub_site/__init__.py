@@ -55,7 +55,7 @@ def register_mods(app):
     from pub_site.sms import sms_mod
     from pub_site.withdraw import withdraw_mod
     from pub_site.data import data_mod
-    from pub_site.pay import pay_mod
+    from pub_site.pay_to_lvye import pay_to_lvye_mod
     from pub_site.frontpage import frontpage_mod
     from pub_site.notify import notify_mod
 
@@ -64,7 +64,7 @@ def register_mods(app):
     app.register_blueprint(sms_mod, url_prefix='/sms')
     app.register_blueprint(withdraw_mod)
     app.register_blueprint(data_mod)
-    app.register_blueprint(pay_mod)
+    app.register_blueprint(pay_to_lvye_mod)
     app.register_blueprint(frontpage_mod)
     app.register_blueprint(notify_mod, url_prefix='/notify')
 

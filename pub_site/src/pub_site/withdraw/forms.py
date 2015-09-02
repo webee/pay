@@ -4,14 +4,11 @@ from __future__ import unicode_literals
 from pub_site import config
 from flask.ext.wtf import Form
 from flask.ext.login import current_user
-from pub_site.commons import amount_less_than_balance
+from pub_site.commons import amount_less_than_balance, MyRegexp, MyHiddenField
 from wtforms import StringField, SelectField, SubmitField, HiddenField, FloatField, ValidationError
-from wtforms.compat import text_type
-from wtforms.validators import DataRequired, NumberRange, StopValidation
+from wtforms.validators import DataRequired, NumberRange
 from . import dba
 from pub_site.sms import verification_code_manager
-import re
-from wtforms.compat import string_types
 from pub_site import pay_client
 
 
@@ -84,35 +81,6 @@ class BindCardForm(gen_verification_code_form(u'form-bind_card')):
         self.city.choices = [(key, value) for key, value in config.Data.CITIES[self.province.data].items()]
         if not self.is_submitted():
             self.city.data = self.city.choices[0][0]
-
-
-class MyHiddenField(HiddenField):
-    def process_formdata(self, valuelist):
-        if valuelist:
-            self.data = valuelist[0]
-        else:
-            self.data = ''
-
-    def _value(self):
-        return text_type(self.data) if self.data is not None else ''
-
-
-class MyRegexp(object):
-    def __init__(self, regex, flags=0, message=None):
-        if isinstance(regex, string_types):
-            regex = re.compile(regex, flags)
-        self.regex = regex
-        self.message = message
-
-    def __call__(self, form, field, message=None):
-        match = self.regex.match(str(field.data) or '')
-        if not match:
-            if message is None:
-                if self.message is None:
-                    message = field.gettext('Invalid input.')
-                else:
-                    message = self.message
-            raise StopValidation(message)
 
 
 class WithdrawForm(gen_verification_code_form("form-withdraw")):

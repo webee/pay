@@ -4,8 +4,8 @@ import os
 from decimal import Decimal
 from flask import g, render_template, redirect, url_for, flash, request
 from flask.ext.login import current_user
-from . import pay_mod as mod
-from pub_site.pay.forms import PayToLvyeForm
+from . import pay_to_lvye_mod as mod
+from pub_site.pay_to_lvye.forms import PayToLvyeForm
 from pub_site import pay_client
 from pytoolbox.util.log import get_logger
 from . import dba

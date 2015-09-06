@@ -7,7 +7,7 @@ function update_available_balance(callback) {
 
     requestRunning = true;
     var available_balance = $("#available_balance")[0];
-    $.getJSON(available_balance.dataset['apiUrl'])
+    $.getJSON(available_balance.data['apiUrl'])
         .done(function (res) {
             $("#available_balance").html(res.available_balance);
         }).complete(function() {
@@ -29,7 +29,7 @@ $(document).ready(function () {
     }
 
     function get_cur_tab() {
-        return $("#tx_type_tabs")[0].dataset["cur"];
+        return $("#tx_type_tabs")[0].data["cur"];
     }
 
     function gen_activate_tab_cb(t) {
@@ -40,7 +40,7 @@ $(document).ready(function () {
                     ts.push(tabs[i]);
                 }
             }
-            $("#tx_type_tabs")[0].dataset["cur"] = t;
+            $("#tx_type_tabs")[0].data["cur"] = t;
             $(t).attr('class', 'cur');
             clear_class(ts);
 
@@ -64,8 +64,8 @@ $(document).ready(function () {
             return;
         }
 
-        var page_no = Number(pager.dataset["pageNo"]);
-        var page_count = Number(pager.dataset["pageCount"]);
+        var page_no = Number(pager.data["pageNo"]);
+        var page_count = Number(pager.data["pageCount"]);
         var prev_page_no = page_no - 1;
         var next_page_no = page_no + 1;
         if (prev_page_no < 1) {
@@ -108,7 +108,7 @@ $(document).ready(function () {
 
         requestRunning = true;
         var tx_list = $("#tx_list")[0];
-        $.get(tx_list.dataset['apiUrl'], params)
+        $.get(tx_list.data['apiUrl'], params)
             .done(function (data) {
                 $("#tx_list").html(data);
                 if (callback != null) {

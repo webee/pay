@@ -15,12 +15,12 @@ $(document).ready(function () {
     }
 
     $('.hqyzm').click(function () {
-        if (this.dataset['verified'] === "yes") {
+        if (this.data['verified'] === "yes") {
             $(this).attr('disabled', 'disabled').attr('value', '正在获取');
             $('.verification-code.warn').html('');
-            $.ajax(this.dataset['apiUrl'], {
+            $.ajax(this.data['apiUrl'], {
                 type: 'post',
-                data: {source: this.dataset["source"]},
+                data: {source: this.data["source"]},
                 success: function (data, textStatus) {
                     timing($('.hqyzm'));
                     var message = textStatus === 'success'
@@ -34,13 +34,13 @@ $(document).ready(function () {
                 }
             });
         } else {
-            $("#request_verification_code-"+this.dataset["source"]).attr("value", "yes");
-            $("#submit-"+this.dataset["source"]).click();
+            $("#request_verification_code-"+this.data["source"]).attr("value", "yes");
+            $("#submit-"+this.data["source"]).click();
         }
     });
 
 
-    if ($('.hqyzm')[0].dataset['verified'] === "yes") {
+    if ($('.hqyzm')[0].data['verified'] === "yes") {
         $('.hqyzm')[0].click();
     }
 });

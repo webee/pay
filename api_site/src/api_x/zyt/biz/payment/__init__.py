@@ -274,7 +274,7 @@ def confirm_payment(channel, order_id):
         raise TransactionNotFoundError('guarantee payment tx channel={0}, order_id={1} not found.'.format(channel.name, order_id))
 
     tx = get_tx_by_id(payment_record.tx_id)
-    if tx.state != PaymentTxState.SECURED:
-        raise TransactionStateError('payment state must be SECURED.')
-
-    _confirm_payment(payment_record)
+    if tx.state == PaymentTxState.SECURED:
+        _confirm_payment(payment_record)
+    else:
+        logger.warn('payment state should be SECURED.')

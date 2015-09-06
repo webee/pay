@@ -11,7 +11,6 @@ from . import signer
 def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url):
     req_params = {
         'version': lianlian_pay.Payment.VERSION,
-        'charset_name': 'UTF-8',
         'oid_partner': lianlian_pay.OID_PARTNER,
         'user_id': user_id[:32],
         'sign_type': SignType.MD5,
@@ -33,8 +32,7 @@ def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_de
 
 
 def _generate_submit_form(req_params):
-    submit_page = '<meta http-equiv="content-type" content="text/html; charset=UTF-8">'
-    submit_page += '<form id="payBillForm" action="{0}" method="POST">'.format(lianlian_pay.Payment.URL)
+    submit_page = '<form id="payBillForm" action="{0}" method="POST">'.format(lianlian_pay.Payment.URL)
     for key in req_params:
         submit_page += '''<input type="hidden" name="{0}" value='{1}' />'''.format(key, req_params[key])
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'

@@ -15,12 +15,12 @@ $(document).ready(function () {
     }
 
     $('.hqyzm').click(function () {
-        if (this.data['verified'] === "yes") {
+        if (this.getAttribute('data-verified') === "yes") {
             $(this).attr('disabled', 'disabled').attr('value', '正在获取');
             $('.verification-code.warn').html('');
-            $.ajax(this.data['apiUrl'], {
+            $.ajax(this.getAttribute('data-api-url'), {
                 type: 'post',
-                data: {source: this.data["source"]},
+                data: {source: this.getAttribute("data-source")},
                 success: function (data, textStatus) {
                     timing($('.hqyzm'));
                     var message = textStatus === 'success'
@@ -34,13 +34,13 @@ $(document).ready(function () {
                 }
             });
         } else {
-            $("#request_verification_code-"+this.data["source"]).attr("value", "yes");
-            $("#submit-"+this.data["source"]).click();
+            $("#request_verification_code-"+this.getAttribute("data-source")).attr("value", "yes");
+            $("#submit-"+this.getAttribute("data-source")).click();
         }
     });
 
 
-    if ($('.hqyzm')[0].data['verified'] === "yes") {
+    if ($('.hqyzm')[0].getAttribute('data-verified') === "yes") {
         $('.hqyzm')[0].click();
     }
 });

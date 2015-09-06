@@ -18,7 +18,7 @@ def amount_less_than_balance(form, field):
 
 
 def generate_order_id(user_id):
-    return datetime.now().strftime("%Y%m%d%H%M%S%f") + str(user_id)[:7] + '%0.5d' % random.randint(0, 99999)
+    return datetime.now().strftime("%y%m%d%H%M%S%f") + str(user_id)[:10] + '%0.4d' % random.randint(0, 9999)
 
 
 class MyRegexp(object):

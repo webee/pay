@@ -14,12 +14,12 @@ def init_config(env):
     return config
 
 
-def deploy(env, name, manager_name="manager", do_deploy=True):
+def deploy(env, name=None, manager_name="manager", do_deploy=True):
     config = init_config(env)
 
     with dc.require_cmd_context(env, config):
         dc.upgrade_db(manager_name, env)
-        if do_deploy:
+        if do_deploy and name:
             dc.update_deploy_file(name)
             dc.stop_python_server(name)
             dc.start_python_server(name)

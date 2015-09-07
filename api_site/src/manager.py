@@ -66,11 +66,11 @@ def deploy_prod():
 
 @manager.command
 def deploy_beta():
-    deploy('beta', 'pay_api_site', do_deploy=False)
+    deploy('beta')
 
 
 @manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')
-def deploy_celery(environ):
+def deploy_celery_prod(environ):
     deploy(environ, 'pay_api_celery')
 
 

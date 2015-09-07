@@ -21,5 +21,5 @@ def ip():
     x_forwarded_for = request.headers.environ.get('X-Forwarded-For')
 
     return jsonify(remote_addr=request.remote_addr,
-                   headers=x_real_ip,
+                   x_real_ip=x_real_ip,
                    x_forwarded_for=x_forwarded_for)

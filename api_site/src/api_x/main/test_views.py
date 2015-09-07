@@ -13,3 +13,13 @@ def client_type():
     return jsonify(user_agent=user_agent,
                    client_type=req.client_type(),
                    t=time.time())
+
+
+@mod.route('/test/ip', methods=['GET'])
+def ip():
+    x_real_ip = request.headers.environ.get('X-Real-IP')
+    x_forwarded_for = request.headers.environ.get('X-Forwarded-For')
+
+    return jsonify(remote_addr=request.remote_addr,
+                   x_real_ip=x_real_ip,
+                   x_forwarded_for=x_forwarded_for)

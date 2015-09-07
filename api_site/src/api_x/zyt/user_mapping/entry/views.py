@@ -36,7 +36,7 @@ def query_user_is_opened(user_id):
 
     user_map = channel.get_user_map(user_id)
     if user_map is None:
-        return response.bad_request(msg='user not exists: [{0}]'.format(user_id))
+        return response.not_found(msg='user not exists: [{0}]'.format(user_id))
 
     is_opened = config.Biz.IS_ALL_OPENED or user_map.is_opened
     return response.success(is_opened=is_opened)

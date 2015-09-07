@@ -29,4 +29,5 @@ exec gunicorn main:app -b ${host}:${port} \
   -k gevent \
   -w $NUM_WORKERS \
   --access-logfile - \
+  --access-logformat '%(h)s/%({X-Real-IP}i)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"' \
   --log-level=info \

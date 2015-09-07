@@ -28,7 +28,7 @@ class UserCenter:
     LOGIN_URL = 'http://account.lvye.cn/accounts/login/'
     LOGOUT_URL = 'http://account.lvye.cn/accounts/logout/'
 
-
+IS_PROD = False
 HOST_URL = 'http://pay.lvye.com'
 
 # 绿野公司域和用户

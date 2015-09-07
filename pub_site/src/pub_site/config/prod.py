@@ -12,6 +12,7 @@ class App:
     SQLALCHEMY_ECHO = False
 
 
+IS_PROD = True
 HOST_URL = 'http://pay.lvye.com'
 
 

@@ -18,4 +18,4 @@ def client_type():
 @mod.route('/test/ip', methods=['GET'])
 def ip():
     return jsonify(remote_addr=request.remote_addr,
-                   headers=request.headers)
+                   headers=request.headers.environ)

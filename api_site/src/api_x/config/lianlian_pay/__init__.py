@@ -11,6 +11,12 @@ YT_PUB_KEY = read_string('conf/keys/yt_pub_key.txt')
 LVYE_PRI_KEY = read_string('conf/keys/lvye_pri_key.txt')
 
 
+class AppRequest:
+    ANDROID = '1'
+    IOS = '2'
+    WAP = '3'
+
+
 class Payment:
     VERSION = '1.0'
     URL = 'https://yintong.com.cn/payment/bankgateway.htm'
@@ -21,9 +27,9 @@ class Payment:
 
     DEFAULT_ORDER_EXPIRATION = '10080'
 
-    REDIRECT_URL = '/pay/{uuid}'
-    NOTIFY_URL = '/pay/{uuid}/notify'
-    RETURN_URL = '/pay/{uuid}/result'
+    class Wap:
+        VERSION = '1.1'
+        URL = 'https://yintong.com.cn/llpayh5/payment.htm'
 
 
 class Refund:

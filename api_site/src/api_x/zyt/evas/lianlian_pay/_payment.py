@@ -11,6 +11,7 @@ from . import signer
 def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url):
     req_params = {
         'version': lianlian_pay.Payment.VERSION,
+        'charset_name': 'UTF-8',
         'oid_partner': lianlian_pay.OID_PARTNER,
         'user_id': user_id[:32],
         'sign_type': SignType.MD5,
@@ -31,8 +32,38 @@ def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_de
     return _generate_submit_form(req_params)
 
 
-def _generate_submit_form(req_params):
-    submit_page = '<form id="payBillForm" action="{0}" method="POST">'.format(lianlian_pay.Payment.URL)
+def wap_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url,
+            app_request=lianlian_pay.AppRequest.WAP):
+    params = {
+        'version': lianlian_pay.Payment.Wap.VERSION,
+        'oid_partner': lianlian_pay.OID_PARTNER,
+        'app_request': app_request,
+        'user_id': user_id[:32],
+        'sign_type': SignType.MD5,
+        'busi_partner': lianlian_pay.Payment.BusiPartner.VIRTUAL_GOODS,
+        'no_order': order_no,
+        'dt_order': datetime_to_str(ordered_on),
+        'name_goods': order_name[:40],
+        'info_order': order_desc[:255],
+        'money_order': str(amount),
+        'notify_url': notify_url,
+        'url_return': return_url,
+        'userreq_ip': _encode_ip(ip),
+        'valid_order': lianlian_pay.Payment.DEFAULT_ORDER_EXPIRATION,
+        'timestamp': now_to_str(),
+        'risk_item': _get_risk_item(user_id, user_created_on),
+        }
+    params = _append_md5_sign(params)
+
+    req_params = {
+        'req_data': json.dumps(params)
+    }
+    return _generate_submit_form(req_params, lianlian_pay.Payment.Wap.URL)
+
+
+def _generate_submit_form(req_params, url=lianlian_pay.Payment.URL):
+    submit_page = '<meta http-equiv="content-type" content="text/html; charset=UTF-8">'
+    submit_page += '<form id="payBillForm" action="{0}" method="POST">'.format(url)
     for key in req_params:
         submit_page += '''<input type="hidden" name="{0}" value='{1}' />'''.format(key, req_params[key])
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'

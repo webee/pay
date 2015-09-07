@@ -9,6 +9,8 @@ from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
 from api_x.zyt.biz.models import TransactionType
 from api_x.utils.entry_auth import verify_request, limit_referrer
+from api_x.constant import RequestClientType
+from api_x.utils import req
 
 
 logger = get_logger(__name__)
@@ -27,8 +29,9 @@ def cashier_desk(source, sn):
         # 只有一种支付方式，则直接跳转到支付页面
         vas_name = config.Biz.ACTIVATED_EVAS[0]
         return redirect(config.HOST_URL + url_for('.pay', source=source, sn=sn, vas_name=vas_name))
+    request_client_type = req.client_type()
     return render_template("cashier_desk.html", root_url=config.HOST_URL, source=source, tx=tx,
-                           vases=config.Biz.ACTIVATED_EVAS)
+                           vases=config.Biz.ACTIVATED_EVAS, request_client_type=request_client_type)
 
 
 @mod.route("/pay/<source>/<sn>/<vas_name>", methods=["GET"])
@@ -39,7 +42,8 @@ def pay(source, sn, vas_name):
         # 不支持此支付方式
         abort(404)
 
-    return do_pay(source, sn, vas_name)
+    request_client_type = req.client_type()
+    return do_pay(source, sn, vas_name, request_client_type)
 
 
 @mod.route("/zyt_pay/<sn>", methods=["POST"])
@@ -49,10 +53,11 @@ def zyt_pay(sn):
     # TODO: 暂时以授权的方式进行，之后需要单独的支付页面/密码
     from api_x.zyt import vas
 
-    return do_pay(TransactionType.PAYMENT, sn, vas.NAME)
+    request_client_type = req.client_type()
+    return do_pay(TransactionType.PAYMENT, sn, vas.NAME, request_client_type)
 
 
-def do_pay(source, sn, vas_name):
+def do_pay(source, sn, vas_name, request_client_type=RequestClientType.WEB):
     from . import payment
 
     tx = get_tx_by_sn(sn)
@@ -67,7 +72,7 @@ def do_pay(source, sn, vas_name):
         payment_entity = payment.gen_payment_entity_by_prepaid_tx(tx)
     else:
         return render_template("info.html", msg="不支持该来源")
-    return payment.pay(vas_name, payment_entity)
+    return payment.pay(vas_name, payment_entity, request_client_type)
 
 
 @mod.route("/pay/result/<source>/<sn>/<vas_name>", methods=["GET"])

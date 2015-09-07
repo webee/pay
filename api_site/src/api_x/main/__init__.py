@@ -6,4 +6,4 @@ from flask import Blueprint
 main_mod = Blueprint('main', __name__)
 
 
-from . import views
+from . import views, test_views

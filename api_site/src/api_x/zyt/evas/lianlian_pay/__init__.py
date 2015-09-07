@@ -5,6 +5,7 @@ from flask import url_for, Response
 from .commons import generate_absolute_url
 from pytoolbox.util.sign import Signer
 from pytoolbox.util.log import get_logger
+from api_x.config import lianlian_pay as config
 
 
 logger = get_logger(__name__)
@@ -15,14 +16,19 @@ NAME = 'LIANLIAN_PAY'
 signer = Signer('key', 'sign')
 
 
-def pay(source, user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount):
-    from ._payment import pay as _pay
+def pay(source, user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, app_request=None):
+    from ._payment import pay as _pay, wap_pay as _wap_pay
 
     return_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_result', source=source, order_no=order_no))
     notify_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_notify', source=source))
 
-    return Response(_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,
-                         return_url, notify_url))
+    if app_request is None:
+        return Response(_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,
+                             return_url, notify_url))
+
+    # wap支付
+    return Response(_wap_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,
+                             return_url, notify_url, app_request=app_request))
 
 
 def refund(source, refund_no, refunded_on, amount, paybill_id):
@@ -56,6 +62,13 @@ def query_bin(card_no):
 
 
 def query_refund_notify(source, refund_no, refunded_on, oid_refundno=''):
+    """ 通过主动查询订单结果来完成结果通知
+    :param source: refund来源
+    :param refund_no: 退款订单号
+    :param refunded_on: 退款订单时间
+    :param oid_refundno: 连连流水号
+    :return:
+    """
     from ._refund import refund_query, is_success_or_fail
     from .notify import notify_refund
     from api_x.zyt.evas.lianlian_pay.notify import get_refund_notify_handle

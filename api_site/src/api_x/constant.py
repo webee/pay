@@ -75,3 +75,10 @@ class BankcardType:
 class BankAccountType:
     PRIVATE = '0'
     CORPORATE = '1'
+
+
+class RequestClientType:
+    WEB = 'WEB'
+    WAP = 'WAP'
+    IOS = 'IOS'
+    ANDROID = 'ANDROID'

@@ -15,7 +15,11 @@ def parse_and_verify(f):
         # TODO: 应该所有的回调都是POST, GET是在『支付失败』的情况出现
         if request.method != "GET":
             try:
-                verified_data = parse_and_verify_request_data(request.values, request.data)
+                if request.values.get('res_data'):
+                    data = request.values.get('res_data')
+                    verified_data = parse_and_verify_request_data(None, data)
+                else:
+                    verified_data = parse_and_verify_request_data(request.values, request.data)
             except (DictParsingError, InvalidSignError):
                 return notify_response.wrong()
             request.__dict__['verified_data'] = verified_data

@@ -34,4 +34,4 @@ def send(phone_no, msg):
 def _build_message(msg):
     if config.IS_PROD:
         return "【绿野】%s" % msg
-    return "【绿野】[测试] %s" % msg
+    return "【绿野】%s[测试]" % msg

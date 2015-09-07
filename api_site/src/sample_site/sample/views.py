@@ -109,16 +109,12 @@ def refund():
 def withdraw():
     user_id = config.PAYEE
 
-    use_test_pay = request.values.get('use_test_pay')
     suggest_result = request.values['suggest_result']
     params = {
         'bankcard_id': request.values['bankcard_id'],
         'amount': Decimal(request.values['amount']),
         'notify_url': ''
     }
-    if use_test_pay:
-        # for test.
-        params['use_test_pay'] = '1'
 
     if suggest_result:
         # for test.

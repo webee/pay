@@ -15,5 +15,6 @@ HOST_URL = 'http://pay.lvye.com/api'
 
 class Biz:
     TX_SN_PREFIX = ''
+    IS_PROD = True
 
     ACTIVATED_EVAS = ['LIANLIAN_PAY']

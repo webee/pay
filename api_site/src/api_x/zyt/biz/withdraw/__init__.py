@@ -189,11 +189,12 @@ def _withdraw_to_processing(tx):
 def _request_pay_to_bankcard(tx, withdraw_record, data):
     from api_x.zyt.evas import test_pay
 
-    if test_pay.NAME in config.Biz.ACTIVATED_EVAS and 'use_test_pay' in data and data['use_test_pay'] == '1':
+    if test_pay.NAME in config.Biz.ACTIVATED_EVAS:
         # for test.
         return _withdraw_by_test_pay(tx, withdraw_record, data)
-    else:
+    elif config.Biz.IS_PROD:
         return _withdraw_by_lianlian_pay(tx, withdraw_record)
+    raise WithdrawFailedError('test pay not activated in non-prod env.')
 
 
 def _withdraw_by_test_pay(tx, withdraw_record, data):

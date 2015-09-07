@@ -26,6 +26,7 @@ class Biz:
     # 是否全面开放
     IS_ALL_OPENED = False
     TX_SN_PREFIX = '__'
+    IS_PROD = False
 
     PAYMENT_MAX_TRIAL_TIMES = 5
     ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY']

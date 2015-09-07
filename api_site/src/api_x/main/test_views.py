@@ -17,5 +17,9 @@ def client_type():
 
 @mod.route('/test/ip', methods=['GET'])
 def ip():
+    x_real_ip = request.headers.environ.get('X-Real-IP')
+    x_forwarded_for = request.headers.environ.get('X-Forwarded-For')
+
     return jsonify(remote_addr=request.remote_addr,
-                   headers=request.headers.environ)
+                   headers=x_real_ip,
+                   x_forwarded_for=x_forwarded_for)

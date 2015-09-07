@@ -130,5 +130,33 @@ def query_notify_refund():
         print('{0}: {1}'.format(tx.order_id, res))
 
 
+@manager.option('-d', '--domain', type=str, dest="user_domain_name", required=True)
+@manager.option('-u', '--user', type=str, dest="user_id", required=True)
+def test_add_user(user_domain_name, user_id):
+    from api_x.zyt.user_mapping import create_domain_account_user
+
+    account_user_id = create_domain_account_user(user_domain_name, user_id)
+
+    print('account_user_id: {0}'.format(account_user_id))
+
+
+@manager.option('-d', '--domain', type=str, dest="user_domain_name", required=True)
+@manager.option('-u', '--user', type=str, dest="user_id", required=True)
+def test_get_user_balance(user_domain_name, user_id):
+    from api_x.zyt.vas.user import get_user_cash_balance
+    from api_x.zyt.user_mapping import get_user_domain_by_name
+
+    user_domain = get_user_domain_by_name(user_domain_name)
+    user_map = user_domain.get_user_map(user_id)
+
+    account_user_id = user_map.account_user_id
+
+    cash_balance = get_user_cash_balance(account_user_id)
+    print('#{0}: total: {1}, available: {2}, frozen: {3}'.format(user_id,
+                                                                 cash_balance.total,
+                                                                 cash_balance.available,
+                                                                 cash_balance.frozen))
+
+
 if __name__ == '__main__':
     manager.run()

@@ -25,7 +25,10 @@ migrate = Migrate()
 def init_template(app):
     @app.context_processor
     def register_context():
-        return dict()
+        from pub_site import config
+        return dict(
+            CONFIG=config
+        )
 
     app.jinja_options['extensions'].append('jinja2.ext.loopcontrols')
     register_filters(app)

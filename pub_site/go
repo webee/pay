@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-pub_venv/bin/python src/manager.py "$@"

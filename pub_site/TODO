@@ -1,4 +1,6 @@
 TODO:
+*** utc时间显示问题
+    - 使用Flask-Moment解决http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xiii-dates-and-times
 ** 添加绿野报名按照活动来分组统计的功能
     - 使用api的对应hook client.
 ** 交易列表中添加操作列

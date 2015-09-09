@@ -1,4 +1,7 @@
 TODO:
+* 改进日志
+** 改进异常处理，邮件通知等
+* add query_pay_to_bankcard_notify
 * add query_pay_notify
 ** 为api添加hook功能
     - 在调用api时执行指定的任务

@@ -1,0 +1,12 @@
+TODO:
+* add query_pay_notify
+** 为api添加hook功能
+    - 在调用api时执行指定的任务
+    - 在通知时通知hook
+    - 定义client与api对于hook的协议(通过query参数)
+    - 实现为一种Client
+    - 定义hook的配置(name, params, url, notifies(url, params)等)
+** 添加支持绿野活动支付按活动分组统计的hook client.
+
+
+DONE:

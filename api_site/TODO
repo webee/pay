@@ -1,4 +1,5 @@
 TODO:
+** 在目前连续5次支付之后修改sn的基础上，判断交易是否到了过期时间, 修改sn。
 * 改进日志
 ** 改进异常处理，邮件通知等
 * add query_pay_to_bankcard_notify

@@ -72,9 +72,9 @@ def deploy_beta():
     deploy('beta')
 
 
-@manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')
-def deploy_celery_prod(environ):
-    deploy(environ, 'pay_api_celery')
+@manager.command
+def deploy_celery_prod():
+    deploy('prod', 'pay_api_celery')
 
 
 @manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')

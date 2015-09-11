@@ -21,7 +21,6 @@ from api_x.zyt.biz.error import *
 from .dba import get_tx_refund_by_sn
 from pytoolbox.util.log import get_logger
 from api_x.task import tasks
-from api_x.zyt.vas import NAME as ZYT_NAME
 
 
 logger = get_logger(__name__)
@@ -49,9 +48,10 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data):
     return refund_record
 
 
-def handle_refund_in(sn):
+def handle_refund_in(vas_name, sn):
     tx, refund_record = get_tx_refund_by_sn(sn)
-    succeed_refund_in(ZYT_NAME, refund_record)
+    payment_tx, payment_record = get_tx_payment_by_sn(refund_record.payment_sn)
+    succeed_refund_in(vas_name, payment_record, refund_record)
 
 
 def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
@@ -272,7 +272,7 @@ def succeed_refund(vas_name, payment_record, refund_record):
     payment_amount = payment_record.amount
     refunded_amount = payment_record.refunded_amount
     refund_amount = refund_record.amount
-    event_id = bookkeeping(EventType.TRANSFER_OUT, refund_record.sn, refund_record.payee_id, vas_name, refund_amount)
+    event_id = bookkeeping(EventType.TRANSFER_OUT, payment_record.sn, refund_record.payee_id, vas_name, refund_amount)
 
     # 全部金额都退款，则状态为已退款
     is_refunded = payment_amount == refunded_amount + refund_amount
@@ -320,9 +320,12 @@ def fail_refund(payment_record, refund_record):
 
 
 @transactional
-def succeed_refund_in(vas_name, refund_record):
+def succeed_refund_in(vas_name, payment_record, refund_record):
+    """处理被退款人的事务"""
     refund_amount = refund_record.amount
-    event_id = bookkeeping(EventType.TRANSFER_IN, refund_record.sn, refund_record.payer_id, vas_name, refund_amount)
+    event_id = bookkeeping(EventType.TRANSFER_IN, payment_record.sn, refund_record.payer_id, vas_name, refund_amount)
 
+    payment_tx = payment_record.tx
+    transit_transaction_state(payment_record.tx_id, payment_tx.state, payment_tx.state, event_id)
     # 此处应该已经退款
     transit_transaction_state(refund_record.tx_id, RefundTxState.SUCCESS, RefundTxState.SUCCESS, event_id)

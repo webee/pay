@@ -33,8 +33,8 @@ def refund(source, sn):
     async_handle = get_refund_notify_handle(source, NotifyType.Refund.ASYNC)
     async_handle(True, sn, NAME, sn, None)
 
-    # 通知payee加钱
+    # 通知payer加钱
     refund_in_handle = get_refund_notify_handle(source, NotifyType.Refund.REFUND_IN)
-    refund_in_handle(sn)
+    refund_in_handle(NAME, sn)
 
     return True

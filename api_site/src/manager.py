@@ -2,7 +2,8 @@
 # coding=utf-8
 from __future__ import unicode_literals, print_function
 
-from flask.ext.script import Manager, Shell, Server, Command
+from flask.ext.script import Manager, Shell, Server
+from flask.ext.script_extras import Celery
 from flask.ext.migrate import MigrateCommand
 from api_x import create_app
 from ops.deploy.deploy import deploy, db_migrate
@@ -13,6 +14,7 @@ manager.add_option('-e', '--env', dest='env', default='dev', required=False)
 manager.add_option('-d', '--deploy', action='store_true', dest='deploy', required=False, default=False)
 
 manager.add_command('db', MigrateCommand)
+manager.add_command('celery', Celery('api_x.task:celery'))
 
 
 def make_shell_context():
@@ -78,20 +80,6 @@ def deploy_celery_prod(environ):
 @manager.option('-e', '--env', type=str, dest="environ", required=False, default='dev')
 def migrate_db(environ):
     db_migrate(environ)
-
-
-class CeleryCommand(Command):
-    """execute celery"""
-
-    def __init__(self):
-        self.capture_all_args = True
-
-    def run(self, *args, **kwargs):
-        from api_x.task import celery
-
-        celery.start(argv=['celery'] + args[0])
-
-manager.add_command('celery', CeleryCommand())
 
 
 @manager.option('-c', '--channel', type=str, dest="channel_name", required=True)

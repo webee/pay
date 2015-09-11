@@ -7,9 +7,9 @@ from api_x.zyt.biz.transaction.dba import get_tx_by_id
 from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
+from api_x.zyt.vas.pattern import zyt_bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id, get_user_map_by_account_user_id
 from api_x.constant import SECURE_USER_NAME, PaymentTxState
-from api_x.zyt.vas import NAME as ZYT_NAME
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
@@ -159,8 +159,8 @@ def _confirm_payment(payment_record):
     secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
     # 确认金额为订单金额 - 已退款金额
     amount = payment_record.amount - payment_record.refunded_amount
-    event_id1 = bookkeeping(EventType.TRANSFER_OUT_FROZEN, payment_record.sn, secure_user_id, ZYT_NAME, amount)
-    event_id2 = bookkeeping(EventType.TRANSFER_IN, payment_record.sn, payment_record.payee_id, ZYT_NAME, amount)
+    event_id1 = zyt_bookkeeping(EventType.TRANSFER_OUT_FROZEN, payment_record.sn, secure_user_id, amount)
+    event_id2 = zyt_bookkeeping(EventType.TRANSFER_IN, payment_record.sn, payment_record.payee_id, amount)
 
     transit_transaction_state(payment_record.tx_id, PaymentTxState.SECURED, PaymentTxState.SUCCESS,
                               [event_id1, event_id2])
@@ -171,9 +171,9 @@ def fail_payment(payment_record):
     transit_transaction_state(payment_record.tx_id, PaymentTxState.CREATED, PaymentTxState.FAILED)
 
 
-def handle_paid_out(sn):
+def handle_paid_out(vas_name, sn):
     tx, payment_record = get_tx_payment_by_sn(sn)
-    succeed_paid_out(ZYT_NAME, tx, payment_record)
+    succeed_paid_out(vas_name, tx, payment_record)
 
 
 def handle_payment_result(is_success, sn, vas_name, vas_sn, data):

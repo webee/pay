@@ -13,7 +13,7 @@ from api_x.zyt.vas.user import get_user_cash_balance
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.models import UserRole
 from api_x.zyt.vas.bookkeep import bookkeeping
-from api_x.zyt.vas import NAME as ZYT_NAME
+from api_x.zyt.vas.pattern import zyt_bookkeeping
 from api_x.zyt.biz.transaction import update_transaction_info
 from api_x.zyt.biz.error import *
 from api_x.config import etc as config
@@ -121,10 +121,10 @@ def _freeze_withdraw(tx, withdraw_record):
     # 冻结相关资金
     if fee > 0:
         # 手续费
-        event_id = bookkeeping(EventType.FREEZE, tx.sn, from_user_id, ZYT_NAME, fee)
+        event_id = zyt_bookkeeping(EventType.FREEZE, tx.sn, from_user_id, fee)
         event_ids.append(event_id)
     # 提现金额
-    event_id = bookkeeping(EventType.FREEZE, tx.sn, from_user_id, ZYT_NAME, actual_amount)
+    event_id = zyt_bookkeeping(EventType.FREEZE, tx.sn, from_user_id, actual_amount)
     event_ids.append(event_id)
 
     transit_transaction_state(tx.id, WithdrawTxState.CREATED, WithdrawTxState.FROZEN, event_ids)
@@ -151,10 +151,10 @@ def _unfreeze_withdraw_amount(tx, withdraw_record):
     # 冻结相关资金
     if fee > 0:
         # 手续费
-        event_id = bookkeeping(EventType.UNFREEZE, tx.sn, from_user_id, ZYT_NAME, fee)
+        event_id = zyt_bookkeeping(EventType.UNFREEZE, tx.sn, from_user_id, fee)
         event_ids.append(event_id)
     # 提现金额
-    event_id = bookkeeping(EventType.UNFREEZE, tx.sn, from_user_id, ZYT_NAME, actual_amount)
+    event_id = zyt_bookkeeping(EventType.UNFREEZE, tx.sn, from_user_id, actual_amount)
     event_ids.append(event_id)
 
     return event_ids

@@ -14,7 +14,7 @@ def pay(source, sn):
     # 通知payer扣钱
     try:
         paid_out_handle = get_pay_notify_handle(source, NotifyType.Pay.PAID_OUT)
-        paid_out_handle(sn)
+        paid_out_handle(NAME, sn)
         is_success = True
     except Exception as e:
         logger.exception(e)

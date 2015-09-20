@@ -5,9 +5,8 @@ from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 
 from flask import request, render_template, url_for, abort, redirect
 from api_x.config import etc as config
-from . import biz_entry_mod as mod
+from . import web_checkout_entry_mod as mod
 from pytoolbox.util.log import get_logger
-from api_x.zyt.biz.models import TransactionType
 from api_x.utils.entry_auth import verify_request, limit_referrer
 from api_x.constant import RequestClientType
 from api_x.utils import req
@@ -16,8 +15,8 @@ from api_x.utils import req
 logger = get_logger(__name__)
 
 
-@mod.route('/cashier_desk/<source>/<sn>', methods=['GET'])
-def cashier_desk(source, sn):
+@mod.route('/<source>/<sn>', methods=['GET'])
+def checkout(source, sn):
     """支付收银台入口"""
     tx = get_tx_by_sn(sn)
     if tx is None:
@@ -37,7 +36,7 @@ def cashier_desk(source, sn):
 @mod.route("/pay/<source>/<sn>/<vas_name>", methods=["GET"])
 @limit_referrer(config.Biz.VALID_NETLOCS)
 def pay(source, sn, vas_name):
-    """支付入口"""
+    """支付入口, 限制只能从checkout过来"""
     if vas_name not in config.Biz.ACTIVATED_EVAS:
         # 不支持此支付方式
         abort(404)
@@ -51,6 +50,7 @@ def pay(source, sn, vas_name):
 def zyt_pay(sn):
     """自游通余额支付入口，需要授权"""
     # TODO: 暂时以授权的方式进行，之后需要单独的支付页面/密码
+    from api_x.zyt.biz.models import TransactionType
     from api_x.zyt import vas
 
     request_client_type = req.client_type()
@@ -58,6 +58,7 @@ def zyt_pay(sn):
 
 
 def do_pay(source, sn, vas_name, request_client_type=RequestClientType.WEB):
+    from api_x.zyt.biz.models import TransactionType
     from . import payment
 
     tx = get_tx_by_sn(sn)

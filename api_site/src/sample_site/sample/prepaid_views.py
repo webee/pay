@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function
 
 from decimal import Decimal
-from flask import request, render_template, url_for, Response
+from flask import request, render_template, url_for, redirect
 from . import sample_mod as mod
 from sample_site import config
 from sample_site import pay_client
@@ -20,8 +20,9 @@ def prepaid():
     amount = Decimal(request.values['amount'])
     callback_url = config.HOST_URL + url_for('.prepaid_result')
 
-    return Response(pay_client.prepaid(to_user_id=to_user_id, amount=amount, to_domain_name=to_domain_name,
-                                       callback_url=callback_url, notify_url=""))
+    return redirect(pay_client.prepaid_web_checkout_url(to_user_id=to_user_id,
+                                                        amount=amount, to_domain_name=to_domain_name,
+                                                        callback_url=callback_url, notify_url=""))
 
 
 @mod.route('/prepaid_result', methods=['POST'])

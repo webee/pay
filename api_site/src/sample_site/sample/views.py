@@ -56,14 +56,14 @@ def pay():
 
     print("order_id: {0}".format(params['order_id']))
 
-    if use_zyt_pay:
-        sn = pay_client.prepay(params, ret_sn=True)
-        return Response(pay_client.zyt_pay(sn))
+    sn = pay_client.prepay(params, ret_sn=True)
+    if sn is None:
+        return redirect(url_for('.index'))
 
-    pay_url = pay_client.prepay(params)
-    if pay_url:
-        return redirect(pay_url)
-    return redirect(url_for('.index'))
+    if use_zyt_pay:
+        return Response(pay_client.web_zyt_pay(sn))
+
+    return redirect(pay_client.web_checkout_url(sn))
 
 
 @mod.route('/pay_result', methods=['POST'])

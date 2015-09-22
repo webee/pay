@@ -15,3 +15,15 @@ def add_pay_to_lvye_record(user_id, amount, name, comment):
     db.session.add(pay_to_lvye_record)
 
     return pay_to_lvye_record
+
+
+@transactional
+def update_record_state(sn, user_id, new_state):
+    record = PayToLvyeRecord.query.filter_by(sn=sn, user_id=user_id).first()
+    if record is None:
+        return
+
+    record.state = new_state
+    db.session.add(record)
+
+    return record

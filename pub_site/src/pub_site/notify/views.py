@@ -4,6 +4,8 @@ from flask import request, jsonify, flash, redirect, url_for
 from . import notify_mod as mod
 from pub_site import pay_client
 from pub_site.withdraw import dba as withdraw_dba
+from pub_site.pay_to_lvye import dba as pay_to_lvye_dba
+from pub_site import constant
 from . import task
 
 
@@ -37,8 +39,12 @@ def notify_withdraw():
 def pay_result():
     data = request.params
     code = data['code']
+    sn = data['sn']
+    user_id = data['user_id']
     if code in [0, '0']:
+        pay_to_lvye_dba.update_record_state(sn, user_id, constant.PayToLvyeState.SUCCESS)
         flash(u"付款给绿野支付成功！", category="success")
     else:
+        pay_to_lvye_dba.update_record_state(sn, user_id, constant.PayToLvyeState.FAILED)
         flash(u"付款给绿野支付失败！", category="error")
     return redirect(url_for("main.index"))

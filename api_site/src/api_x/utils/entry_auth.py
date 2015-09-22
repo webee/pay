@@ -16,7 +16,14 @@ _func_idx_api_entries = {}
 _name_idx_api_entries = {}
 
 
-def _register_api_entry(f, name):
+def _register_api_entry(f, name, multi_entries=False):
+    """
+    注册api入口
+    :param f: 入口函数
+    :param name: entry名称
+    :param multi_entries: 是否有多个入口函数
+    :return:
+    """
     if f in _func_idx_api_entries:
         logger.error('func [{0}] already registered'.format(f))
         raise RuntimeError('duplicated api entries.')
@@ -25,10 +32,15 @@ def _register_api_entry(f, name):
     if name in _name_idx_api_entries:
         logger.warn('name [{0}] already registered'.format(name))
         if f != _name_idx_api_entries[name]:
-            msg = 'name [{0}] already registered by [{1}]'.format(name, _name_idx_api_entries[name])
-            logger.error(msg)
-            raise ValueError(msg)
-    _name_idx_api_entries[name] = f
+            if not multi_entries:
+                msg = 'name [{0}] already registered by [{1}]'.format(name, _name_idx_api_entries[name])
+                logger.error(msg)
+                raise ValueError(msg)
+    if multi_entries:
+        entries = _name_idx_api_entries.setdefault(name, [])
+        entries.append(f)
+    else:
+        _name_idx_api_entries[name] = f
 
 
 def get_api_entry_name_list():
@@ -39,10 +51,10 @@ def get_api_entry_by_name(name):
     return _name_idx_api_entries.get(name)
 
 
-def verify_request(entry_name):
+def verify_request(entry_name, multi_entries=False):
     def do_verify_request(f):
         # register api entry.
-        _register_api_entry(f, entry_name)
+        _register_api_entry(f, entry_name, multi_entries)
 
         @wraps(f)
         def wrapper(*args, **kwargs):

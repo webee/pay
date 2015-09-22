@@ -61,7 +61,7 @@ def prepay():
             return response.fail(msg="order already paid.")
 
         # FIXME: 不直接返回pay_url, 修改pay_client, pay_url作为web支付方式在客户端确定
-        pay_url = config.HOST_URL + url_for('web_checkout_entry.cashier_desk', source=TransactionType.PAYMENT, sn=payment_record.sn)
+        pay_url = config.HOST_URL + url_for('web_checkout_entry.checkout', source=TransactionType.PAYMENT, sn=payment_record.sn)
         return response.success(sn=payment_record.sn, pay_url=pay_url)
     except Exception as e:
         logger.exception(e)

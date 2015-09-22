@@ -10,6 +10,7 @@ from pytoolbox.util.log import get_logger
 from api_x.utils.entry_auth import verify_request, limit_referrer
 from api_x.constant import RequestClientType
 from api_x.utils import req
+from .. import gen_payment_entity_by_pay_tx, gen_payment_entity_by_prepaid_tx
 
 
 logger = get_logger(__name__)
@@ -45,8 +46,8 @@ def pay(source, sn, vas_name):
     return do_pay(source, sn, vas_name, request_client_type)
 
 
-@mod.route("/zyt_pay/<sn>", methods=["POST"])
-@verify_request('zyt_pay')
+@mod.route("/pay/zyt/<sn>", methods=["POST"])
+@verify_request('zyt_pay.web')
 def zyt_pay(sn):
     """自游通余额支付入口，需要授权"""
     # TODO: 暂时以授权的方式进行，之后需要单独的支付页面/密码
@@ -59,7 +60,7 @@ def zyt_pay(sn):
 
 def do_pay(source, sn, vas_name, request_client_type=RequestClientType.WEB):
     from api_x.zyt.biz.models import TransactionType
-    from . import payment
+    from api_x.zyt.checkout.web_entry import payment
 
     tx = get_tx_by_sn(sn)
     if tx is None:
@@ -68,9 +69,9 @@ def do_pay(source, sn, vas_name, request_client_type=RequestClientType.WEB):
         return render_template("info.html", msg="该订单已支付")
 
     if source == TransactionType.PAYMENT:
-        payment_entity = payment.gen_payment_entity_by_pay_tx(tx)
+        payment_entity = gen_payment_entity_by_pay_tx(tx)
     elif source == TransactionType.PREPAID:
-        payment_entity = payment.gen_payment_entity_by_prepaid_tx(tx)
+        payment_entity = gen_payment_entity_by_prepaid_tx(tx)
     else:
         return render_template("info.html", msg="不支持该来源")
     return payment.pay(vas_name, payment_entity, request_client_type)

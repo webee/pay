@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from api_x.zyt.vas.notify import get_pay_notify_handle, NotifyType, get_refund_notify_handle
 from .bookkeep import bookkeeping, EventType
 from pytoolbox.util.log import get_logger
-from api_x.zyt.biz.models import TransactionType
 from api_x.config import etc as config
 
 NAME = 'ZYT'
@@ -13,6 +12,7 @@ logger = get_logger(__name__)
 
 
 def pay(source, sn, channel=None):
+    from api_x.zyt.biz.models import TransactionType
     if source != TransactionType.PAYMENT:
         # 自游通支付只支持支付，不支持充值等方式
         raise Exception("自游通支付暂只支持支付")

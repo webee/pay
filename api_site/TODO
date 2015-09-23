@@ -11,6 +11,7 @@ TODO:
     - 实现为一种Client
     - 定义hook的配置(name, params, url, notifies(url, params)等)
 ** 添加支持绿野活动支付按活动分组统计的hook client.
+* 提现余额不足报警
 
 
 DONE:

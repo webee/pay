@@ -32,6 +32,12 @@ class Biz:
     ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY']
     VALID_NETLOCS = ['pay.lvye.com', 'myevent.lvye.com']
 
+    class Channel:
+        APP = "APP"
+        WEB = "WEB"
+        API = "API"
+        WAP = "WAP"
+
 
 LVYE_PRI_KEY = read_string('conf/keys/lvye_pri_key.txt')
 LVYE_PUB_KEY = public_key.loads_b64encoded_key(LVYE_PRI_KEY).gen_public_key().b64encoded_binary_key_data()

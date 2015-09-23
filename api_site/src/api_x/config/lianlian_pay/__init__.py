@@ -31,6 +31,12 @@ class Payment:
         VERSION = '1.1'
         URL = 'https://yintong.com.cn/llpayh5/payment.htm'
 
+    class CHANNEL:
+        APP = "10"
+        WEB = "13"
+        API = "15"
+        WAP = "16"
+
 
 class Refund:
     URL = 'https://yintong.com.cn/traderapi/refund.htm'

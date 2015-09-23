@@ -5,12 +5,25 @@ from flask import url_for, Response
 from api_x.config import test_pay
 import requests
 from .commons import generate_absolute_url
+from api_x.config import test_pay as config
 
 NAME = 'TEST_PAY'
 
 
-def pay(source, user_id, order_no, product_name, amount):
+def pay(source, user_id, order_no, product_name, amount, channel=None):
+    if channel in [config.Payment.CHANNEL.APP, config.Payment.CHANNEL.API]:
+        # app请求参数
+        return _get_common_params(source, user_id, order_no, product_name, amount)
+
     return_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_result', source=source)
+    params = {
+        'return_url': return_url
+    }
+    params.update(_get_common_params(source, user_id, order_no, product_name, amount))
+    return Response(generate_submit_form(test_pay.Pay.URL, params))
+
+
+def _get_common_params(source, user_id, order_no, product_name, amount):
     notify_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_notify', source=source)
     params = {
         'merchant_id': test_pay.MERCHANT_ID,
@@ -18,11 +31,10 @@ def pay(source, user_id, order_no, product_name, amount):
         'order_no': order_no,
         'product_name': product_name,
         'amount': amount,
-        'return_url': return_url,
         'notify_url': notify_url
     }
 
-    return Response(generate_submit_form(test_pay.Pay.URL, params))
+    return params
 
 
 def generate_submit_form(url, req_params):

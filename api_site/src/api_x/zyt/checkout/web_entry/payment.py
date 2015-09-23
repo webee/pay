@@ -6,7 +6,6 @@ from api_x.zyt.biz.models import TransactionType
 from api_x.utils import req
 from api_x.zyt.evas import test_pay, lianlian_pay
 from api_x.zyt import vas
-from api_x.utils.entry_auth import verify_request
 
 
 def pay(vas_name, payment_entity, request_client_type):

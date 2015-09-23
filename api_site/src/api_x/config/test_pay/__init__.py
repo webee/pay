@@ -7,6 +7,12 @@ ROOT_URL = 'http://pay.lvye.com/api'
 class Pay:
     URL = "http://dev_pay.lvye.com:8090/pay"
 
+    class CHANNEL:
+        APP = "APP"
+        WEB = "WEB"
+        API = "API"
+        WAP = "WAP"
+
 
 class Refund:
     URL = "http://dev_pay.lvye.com:8090/refund"

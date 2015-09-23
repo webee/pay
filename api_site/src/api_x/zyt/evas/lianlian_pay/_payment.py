@@ -8,36 +8,10 @@ from pytoolbox.util.sign import SignType
 from . import signer
 
 
-def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url):
-    req_params = {
-        'version': lianlian_pay.Payment.VERSION,
-        'charset_name': 'UTF-8',
+def _get_common_params(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, notify_url):
+    return {
         'oid_partner': lianlian_pay.OID_PARTNER,
-        'user_id': user_id[:32],
-        'sign_type': SignType.MD5,
-        'busi_partner': lianlian_pay.Payment.BusiPartner.VIRTUAL_GOODS,
-        'no_order': order_no,
-        'dt_order': datetime_to_str(ordered_on),
-        'name_goods': order_name[:50],
-        'info_order': order_desc[:50],
-        'money_order': str(amount),
-        'notify_url': notify_url,
-        'url_return': return_url,
-        'userreq_ip': _encode_ip(ip),
-        'valid_order': lianlian_pay.Payment.DEFAULT_ORDER_EXPIRATION,
-        'timestamp': now_to_str(),
-        'risk_item': _get_risk_item(user_id, user_created_on),
-    }
-    req_params = _append_md5_sign(req_params)
-    return _generate_submit_form(req_params)
-
-
-def wap_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url,
-            app_request=lianlian_pay.AppRequest.WAP):
-    params = {
-        'version': lianlian_pay.Payment.Wap.VERSION,
-        'oid_partner': lianlian_pay.OID_PARTNER,
-        'app_request': app_request,
+        'platform': lianlian_pay.PLATFORM,
         'user_id': user_id[:32],
         'sign_type': SignType.MD5,
         'busi_partner': lianlian_pay.Payment.BusiPartner.VIRTUAL_GOODS,
@@ -47,18 +21,50 @@ def wap_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, orde
         'info_order': order_desc[:255],
         'money_order': str(amount),
         'notify_url': notify_url,
-        'url_return': return_url,
         'userreq_ip': _encode_ip(ip),
         'valid_order': lianlian_pay.Payment.DEFAULT_ORDER_EXPIRATION,
         'timestamp': now_to_str(),
         'risk_item': _get_risk_item(user_id, user_created_on),
         }
+
+
+def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url):
+    params = {
+        'version': lianlian_pay.Payment.VERSION,
+        'charset_name': 'UTF-8',
+        'url_return': return_url,
+    }
+    params.update(_get_common_params(user_id, user_created_on, ip, order_no, ordered_on,
+                                     order_name, order_desc, amount, notify_url))
+    params = _append_md5_sign(params)
+    return _generate_submit_form(params)
+
+
+def wap_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url,
+            app_request=lianlian_pay.AppRequest.WAP):
+    params = {
+        'version': lianlian_pay.Payment.Wap.VERSION,
+        'app_request': app_request,
+        'url_return': return_url,
+        }
+    params.update(_get_common_params(user_id, user_created_on, ip, order_no, ordered_on,
+                                     order_name, order_desc, amount, notify_url))
+
     params = _append_md5_sign(params)
 
     req_params = {
         'req_data': json.dumps(params)
     }
     return _generate_submit_form(req_params, lianlian_pay.Payment.Wap.URL)
+
+
+def app_params(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, notify_url):
+    keys = ["busi_partner", "dt_order", "info_order", "money_order",
+            "name_goods", "no_order", "notify_url", "oid_partner", "risk_item", "sign_type", "valid_order"]
+    params = {}
+    params.update(_get_common_params(user_id, user_created_on, ip, order_no, ordered_on,
+                                     order_name, order_desc, amount, notify_url))
+    return _append_md5_sign(params, keys)
 
 
 def _generate_submit_form(req_params, url=lianlian_pay.Payment.URL):
@@ -71,10 +77,13 @@ def _generate_submit_form(req_params, url=lianlian_pay.Payment.URL):
     return submit_page
 
 
-def _append_md5_sign(req_params):
-    digest = signer.md5_sign(req_params)
-    req_params['sign'] = digest
-    return req_params
+def _append_md5_sign(params, keys=None):
+    sign_params = params
+    if keys is not None:
+        sign_params = {k: params[k] for k in keys}
+    digest = signer.md5_sign(sign_params)
+    params['sign'] = digest
+    return params
 
 
 def _get_risk_item(user_id, user_created_on):

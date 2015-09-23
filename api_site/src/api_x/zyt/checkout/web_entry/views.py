@@ -62,6 +62,7 @@ def do_pay(source, sn, vas_name, request_client_type=RequestClientType.WEB):
     from api_x.zyt.biz.models import TransactionType
     from api_x.zyt.checkout.web_entry import payment
 
+    logger.info("[PAY] {3}, {0}, {1}, {2}".format(source, sn, vas_name, request_client_type))
     tx = get_tx_by_sn(sn)
     if tx is None:
         return render_template("info.html", msg="无此订单")

@@ -23,7 +23,7 @@ def pay(source, user_id, user_created_on, ip, order_no, ordered_on, order_name, 
     return_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_result', source=source, order_no=order_no))
     notify_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_notify', source=source))
 
-    if channel in [config.Payment.CHANNEL.APP, config.Payment.CHANNEL.API]:
+    if channel in [config.Payment.Channel.APP, config.Payment.Channel.API]:
         # app请求参数
         return _app_params(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,
                            notify_url)

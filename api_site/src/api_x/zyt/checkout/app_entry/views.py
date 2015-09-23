@@ -33,7 +33,7 @@ def prepare_params(source, sn, vas_name):
     if tx is None:
         return response.not_found()
     if tx.state != PaymentTxState.CREATED:
-        return response.bad_request()
+        return response.processed()
 
     if source == TransactionType.PAYMENT:
         payment_entity = gen_payment_entity_by_pay_tx(tx)
@@ -41,7 +41,9 @@ def prepare_params(source, sn, vas_name):
         payment_entity = gen_payment_entity_by_prepaid_tx(tx)
     else:
         return response.bad_request()
-    return params.prepare(vas_name, payment_entity)
+
+    prepared_params = params.prepare(vas_name, payment_entity)
+    return response.success(params=prepared_params)
 
 
 @mod.route("/pay/zyt/<sn>", methods=["POST"])

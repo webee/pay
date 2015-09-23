@@ -16,6 +16,10 @@ def bad_request(code=400, msg='bad request', **kwargs):
     return fail(code, msg, **kwargs), 400
 
 
+def processed(code=202, msg='processed', **kwargs):
+    return fail(code, msg, **kwargs), 202
+
+
 def not_found(code=404, msg='not found.', **kwargs):
     return fail(code, msg, **kwargs), 404
 

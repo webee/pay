@@ -11,7 +11,7 @@ NAME = 'TEST_PAY'
 
 
 def pay(source, user_id, order_no, product_name, amount, channel=None):
-    if channel in [config.Payment.CHANNEL.APP, config.Payment.CHANNEL.API]:
+    if channel in [config.Pay.Channel.APP, config.Pay.Channel.API]:
         # app请求参数
         return _get_common_params(source, user_id, order_no, product_name, amount)
 

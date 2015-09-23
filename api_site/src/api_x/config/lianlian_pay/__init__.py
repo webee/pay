@@ -31,7 +31,7 @@ class Payment:
         VERSION = '1.1'
         URL = 'https://yintong.com.cn/llpayh5/payment.htm'
 
-    class CHANNEL:
+    class Channel:
         APP = "10"
         WEB = "13"
         API = "15"

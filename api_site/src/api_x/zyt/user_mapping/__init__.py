@@ -70,21 +70,26 @@ def get_user_map_by_account_user_id(account_user_id):
 
 
 @transactional
+def create_domain_account_user(user_domain, user_id, desc=None):
+    account_user = create_user()
+    user_map = UserMapping(user_domain_id=user_domain.id, user_id=user_id, account_user_id=account_user.id,
+                           desc=desc or user_domain.desc)
+    db.session.add(user_map)
+
+    return account_user.id
+
+
 def create_account_user(user_domain_id, user_id, desc=None):
     user_domain = get_user_domain(user_domain_id)
     if user_domain is not None:
-        account_user = create_user()
-        user_map = UserMapping(user_domain_id=user_domain_id, user_id=user_id, account_user_id=account_user.id,
-                               desc=desc or user_domain.desc)
-        db.session.add(user_map)
-
-        return account_user.id
+        return create_domain_account_user(user_domain, user_id, desc)
 
 
 @transactional
-def create_domain_account_user(user_domain_name, user_id, desc=None):
+def create_account_user_by_domain_name(user_domain_name, user_id, desc=None):
     user_domain = get_user_domain_by_name(user_domain_name)
-    return create_account_user(user_domain.id, user_id, desc)
+    if user_domain is not None:
+        return create_domain_account_user(user_domain, user_id, desc)
 
 
 def get_channel(id):
@@ -135,7 +140,7 @@ def set_user_is_opened(user_domain_name, user_id, status=True):
     """status=True: 开通, False: 关闭"""
     user_map = get_user_map_by_domain_name_and_user_id(user_domain_name, user_id)
     if user_map is None:
-        create_domain_account_user(user_domain_name, user_id)
+        create_account_user_by_domain_name(user_domain_name, user_id)
         user_map = get_user_map_by_domain_name_and_user_id(user_domain_name, user_id)
 
     user_map.is_opened = status

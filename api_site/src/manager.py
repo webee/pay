@@ -88,8 +88,17 @@ def migrate_db(environ):
 def add_default_channel(channel_name, user_domain_name, info):
     from api_x.data import default_create_channel
 
-    info = info.decode('UTF-8')
     default_create_channel(user_domain_name, channel_name, info)
+
+
+@manager.option('-d', '--domain', type=str, dest="domain_name", required=True)
+@manager.option('-u', '--user_id', type=str, dest="user_id", required=True)
+@manager.option('-i', '--info', type=str, dest="info", required=True)
+def add_domain_user(domain_name, user_id, info):
+    from api_x.zyt.user_mapping import create_account_user_by_domain_name
+
+    account_user_id = create_account_user_by_domain_name(domain_name, user_id, info)
+    print('account_user_id: {0}'.format(account_user_id))
 
 
 @manager.option('-c', '--channel', type=str, dest="channel_name", required=True)
@@ -127,16 +136,6 @@ def query_notify_refund():
         handle = get_query_notify_handle(tx.type, tx.vas_name)
         res = handle(TransactionType.REFUND, tx.sn, tx.created_on)
         print('{0}: {1}'.format(tx.order_id, res))
-
-
-@manager.option('-d', '--domain', type=str, dest="user_domain_name", required=True)
-@manager.option('-u', '--user', type=str, dest="user_id", required=True)
-def test_add_user(user_domain_name, user_id):
-    from api_x.zyt.user_mapping import create_domain_account_user
-
-    account_user_id = create_domain_account_user(user_domain_name, user_id)
-
-    print('account_user_id: {0}'.format(account_user_id))
 
 
 @manager.option('-d', '--domain', type=str, dest="user_domain_name", required=True)

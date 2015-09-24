@@ -6,4 +6,4 @@ from flask import Blueprint
 
 app_server_mod = Blueprint('app_server', __name__)
 
-from . import views, prepaid_views
+from . import views

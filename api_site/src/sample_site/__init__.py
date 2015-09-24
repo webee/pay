@@ -9,8 +9,10 @@ from pytoolbox.pay_client import PayClient
 
 def register_mods(app):
     from sample_site.sample import sample_mod
+    from sample_site.app_server import app_server_mod
 
     app.register_blueprint(sample_mod)
+    app.register_blueprint(app_server_mod, url_prefix="/app")
 
 
 pay_client = PayClient()

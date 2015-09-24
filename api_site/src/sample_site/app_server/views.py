@@ -17,6 +17,7 @@ logger = get_logger(__name__)
 def prepay():
     data = request.values
 
+    logger.info("app prepay: {0}".format(data))
     payer = data['payer']
     payee = data['payee']
     payee_domain_name = request.values['payee_domain_name']
@@ -31,7 +32,7 @@ def prepay():
         'product_category': '测试',
         'product_desc': '用于测试的商品',
         'amount': amount,
-        'callback_url': config.HOST_URL + url_for('.pay_result'),
+        'callback_url': config.HOST_URL + url_for('sample.pay_result'),
         'notify_url': '',
         'payment_type': payment_type
     }

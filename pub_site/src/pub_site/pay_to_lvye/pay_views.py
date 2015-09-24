@@ -55,7 +55,7 @@ def _do_pay(pay_to_lvye_record, pay_channel):
         'amount': pay_to_lvye_record.amount,
         'callback_url': config.HOST_URL + url_for('notify.pay_result'),
         'notify_url': '',
-        'payment_type': config.PaymentType.DIRECT
+        'payment_type': pay_client.constant.PaymentType.DIRECT
     }
 
     print("order_id: {0}".format(params['order_id']))

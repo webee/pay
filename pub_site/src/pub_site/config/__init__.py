@@ -76,8 +76,3 @@ class SMSConfig:
     URL = 'http://sdk999ws.eucp.b2m.cn:8080/sdkproxy/sendsms.action'
     CD_KEY = '9SDK-EMY-0999-JBQOO'
     PASSWORD = '506260'
-
-
-class PaymentType:
-    DIRECT = 'DIRECT'
-    GUARANTEE = 'GUARANTEE'

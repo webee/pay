@@ -83,6 +83,16 @@ def migrate_db(environ):
 
 
 @manager.option('-c', '--channel', type=str, dest="channel_name", required=True)
+@manager.option('-d', '--user_domain', type=str, dest="user_domain_name", required=True)
+@manager.option('-i', '--info', type=str, dest="info", required=True)
+def add_default_channel(channel_name, user_domain_name, info):
+    from api_x.data import default_create_channel
+
+    info = info.decode('UTF-8')
+    default_create_channel(user_domain_name, channel_name, info)
+
+
+@manager.option('-c', '--channel', type=str, dest="channel_name", required=True)
 @manager.option('-e', '--entry', type=str, dest="entry_name", required=True)
 def add_channel_perm(channel_name, entry_name):
     from api_x.zyt.user_mapping import add_perm_to_channel

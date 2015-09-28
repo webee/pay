@@ -30,8 +30,12 @@ def checkout(source, sn):
                            vases=config.Biz.ACTIVATED_EVAS, request_client_type=request_client_type)
 
 
+def pay_ex_callback(*arg, **kwargs):
+    return render_template("info.html", msg="非法请求")
+
+
 @mod.route("/pay/<source>/<sn>/<vas_name>", methods=["GET"])
-@limit_referrer(config.Biz.VALID_NETLOCS)
+@limit_referrer(config.Biz.VALID_NETLOCS, ex_callback=pay_ex_callback)
 def pay(source, sn, vas_name):
     """支付入口, 限制只能从checkout过来"""
     if vas_name not in config.Biz.ACTIVATED_EVAS:

@@ -105,7 +105,7 @@ def verify_request(entry_name, multi_entries=False):
     return do_verify_request
 
 
-def limit_referrer(netlocs):
+def limit_referrer(netlocs, ex_callback=None):
     def do_limit(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -116,6 +116,8 @@ def limit_referrer(netlocs):
                     return f(*args, **kwargs)
             except Exception as e:
                 logger.exception(e)
+            if ex_callback:
+                return ex_callback(*args, **kwargs)
             return response.bad_request()
         return wrapper
     return do_limit

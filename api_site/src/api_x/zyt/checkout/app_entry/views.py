@@ -15,6 +15,12 @@ from api_x.utils.entry_auth import verify_request
 logger = get_logger(__name__)
 
 
+@mod.route("/<source>/<sn>/info", methods=["GET"])
+def info(source, sn):
+    request_client_type = req.client_type()
+    return query_info(source, sn, request_client_type)
+
+
 @mod.route("/<source>/<sn>/<vas_name>/params", methods=["GET"])
 def params(source, sn, vas_name):
     if vas_name not in config.Biz.ACTIVATED_EVAS:
@@ -37,11 +43,40 @@ def zyt_pay(sn):
     return prepare_params(TransactionType.PAYMENT, sn, vas.NAME, request_client_type)
 
 
+def query_info(source, sn, request_client_type=RequestClientType.WEB):
+    from api_x.zyt.biz.models import TransactionType
+
+    logger.info("[PAY INFO] {2}, {0}, {1}".format(source, sn, request_client_type))
+
+    tx = get_tx_by_sn(sn)
+    if tx is None:
+        return response.not_found()
+
+    if source == TransactionType.PAYMENT:
+        payment_entity = gen_payment_entity_by_pay_tx(tx)
+    elif source == TransactionType.PREPAID:
+        payment_entity = gen_payment_entity_by_prepaid_tx(tx)
+    else:
+        return response.bad_request()
+
+    data = {
+        'state': tx.state,
+        'source': payment_entity.source,
+        'sn': payment_entity.tx_sn,
+        'created_on': payment_entity.tx_created_on,
+        'name': payment_entity.product_name,
+        'desc': payment_entity.product_desc,
+        'amount': payment_entity.amount
+    }
+
+    return response.success(info=data)
+
+
 def prepare_params(source, sn, vas_name, request_client_type=RequestClientType.WEB):
     from api_x.zyt.biz.models import TransactionType
     from api_x.zyt.checkout.app_entry import params
 
-    logger.info("[PAY] {3}, {0}, {1}, {2}".format(source, sn, vas_name, request_client_type))
+    logger.info("[PAY PARAMS] {3}, {0}, {1}, {2}".format(source, sn, vas_name, request_client_type))
 
     tx = get_tx_by_sn(sn)
     if tx is None:

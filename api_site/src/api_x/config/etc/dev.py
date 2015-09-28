@@ -8,10 +8,11 @@ class App:
 
 
 class Biz:
-    VALID_NETLOCS = ['localhost:5100', 'dev_pay.lvye.com:5100']
+    ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY']
+    VALID_NETLOCS = ['dev_pay.lvye.com:5100']
 
 
-HOST_URL = 'http://localhost:5100'
+HOST_URL = 'http://dev_pay.lvye.com:5100'
 
 
 TEST_CHANNELS = {'zyt_sample', 'lvye_pay_test'}

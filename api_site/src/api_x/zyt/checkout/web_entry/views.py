@@ -25,12 +25,8 @@ def checkout(source, sn):
     if tx.state != PaymentTxState.CREATED:
         return render_template("info.html", msg="该订单已支付")
 
-    if len(config.Biz.ACTIVATED_EVAS) == 1:
-        # 只有一种支付方式，则直接跳转到支付页面
-        vas_name = config.Biz.ACTIVATED_EVAS[0]
-        return redirect(config.HOST_URL + url_for('.pay', source=source, sn=sn, vas_name=vas_name))
     request_client_type = req.client_type()
-    return render_template("cashier_desk.html", root_url=config.HOST_URL, source=source, tx=tx,
+    return render_template("checkout.html", root_url=config.HOST_URL, source=source, tx=tx,
                            vases=config.Biz.ACTIVATED_EVAS, request_client_type=request_client_type)
 
 

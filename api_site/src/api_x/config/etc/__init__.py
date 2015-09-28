@@ -30,7 +30,7 @@ class Biz:
 
     PAYMENT_MAX_TRIAL_TIMES = 5
     ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY']
-    VALID_NETLOCS = ['pay.lvye.com', 'myevent.lvye.com']
+    VALID_NETLOCS = ['pay.lvye.com']
 
     class Channel:
         APP = "APP"

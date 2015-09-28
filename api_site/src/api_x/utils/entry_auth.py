@@ -112,8 +112,7 @@ def limit_referrer(netlocs):
             try:
                 referrer = request.referrer
                 parts = urlparse.urlparse(referrer)
-                # FIXME: auto redirect, referrer.
-                if True or parts.netloc in netlocs:
+                if parts.netloc in netlocs:
                     return f(*args, **kwargs)
             except Exception as e:
                 logger.exception(e)

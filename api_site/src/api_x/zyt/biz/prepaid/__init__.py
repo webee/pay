@@ -1,12 +1,13 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x.zyt.biz.commons import is_duplicated_notify
-from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
+from api_x.zyt.biz.transaction.dba import get_tx_by_id
 
 from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_user_map_by_account_user_id
+from api_x.zyt.biz.prepaid.dba import get_tx_prepaid_by_sn
 from api_x.constant import PrepaidTxState
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
@@ -62,7 +63,7 @@ def fail_prepaid(tx):
 @transactional
 def handle_duplicate_pay(vas_name, vas_sn, tx, prepaid_record):
     """处理充值时的重复支付"""
-    event_id = bookkeeping(EventType.TRANSFER_IN, tx.sn, prepaid_record.to_id, vas_name,
+    event_id = bookkeeping(EventType.TRANSFER_IN, tx.source_sn, prepaid_record.to_id, vas_name,
                            prepaid_record.amount)
     # 交易总金额增加
     tx.amount += prepaid_record.amount
@@ -87,8 +88,7 @@ def handle_prepaid_result(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
-    tx = get_tx_by_sn(sn)
-    prepaid_record = tx.record
+    tx, prepaid_record = get_tx_prepaid_by_sn(sn)
 
     client_callback_url = prepaid_record.client_callback_url
 
@@ -115,17 +115,17 @@ def handle_prepaid_notify(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
-    tx = get_tx_by_sn(sn)
-    prepaid_record = tx.record
+    tx, prepaid_record = get_tx_prepaid_by_sn(sn)
 
     if is_duplicated_notify(tx, vas_name, vas_sn):
         return
 
     if _is_duplicated_prepaid(tx, vas_name, vas_sn):
         # 重复支付
-        logger.warning('duplicated prepaid: [{0}], [{1}], [{2}, {3}]'.format(prepaid_record.vas_name,
-                                                                             prepaid_record.vas_sn, vas_name, vas_sn))
-        handle_duplicate_pay(vas_name, vas_sn, tx, prepaid_record)
+        logger.warning('duplicated prepaid: [{0}, {1}], [{2}, {3}]'.format(tx.vas_name, tx.vas_sn, vas_name, vas_sn))
+        if is_success:
+            # 成功支付, 充值到余额
+            handle_duplicate_pay(vas_name, vas_sn, tx, prepaid_record)
         return
 
     with require_transaction_context():

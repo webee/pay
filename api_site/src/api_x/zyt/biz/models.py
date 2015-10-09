@@ -30,7 +30,7 @@ class Transaction(db.Model):
     __tablename__ = 'transaction'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    sn = db.Column(db.CHAR(32))
+    sn = db.Column(db.CHAR(32), unique=True)
     type = db.Column(db.Enum(TransactionType.PAYMENT, TransactionType.REFUND, TransactionType.WITHDRAW,
                              TransactionType.TRANSFER, TransactionType.PREPAID), nullable=False)
 

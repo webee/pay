@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from api_x.constant import TransactionState
 from pytoolbox.util.dbs import transactional
 from api_x import db
+from . import dba
 from ..models import Transaction, TransactionStateLog
 from ..models import UserTransaction
 from ..utils import generate_sn
@@ -16,7 +17,10 @@ def create_transaction(channel_name, tp, amount, comments, role_users, vas_name=
         state = TransactionState.CREATED
 
     # [(user_id, role), ...]
-    sn = generate_sn(role_users[0].user_id)
+    user_id = role_users[0].user_id
+    sn = generate_sn(user_id)
+    while dba.get_tx_by_sn(sn) is not None:
+        sn = generate_sn(user_id)
     tx = Transaction(sn=sn, channel_name=channel_name, order_id=order_id,
                      amount=amount, state=state, type=tp, comments=comments)
     if vas_name is not None:

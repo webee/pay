@@ -83,7 +83,7 @@ class TransactionSnStack(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
     tx = db.relationship('Transaction', backref=db.backref('sns', lazy='dynamic'))
-    sn = db.Column(db.CHAR(32))
+    sn = db.Column(db.CHAR(32), index=True)
     generated_on = db.Column(db.DateTime, nullable=False)
     state = db.Column(db.VARCHAR(32), nullable=False)
 

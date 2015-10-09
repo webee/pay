@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 from api_x.utils import response
 from api_x.zyt.biz import payment
-from api_x.constant import PaymentTxState
 from api_x.zyt.biz.models import TransactionType
 from api_x.zyt.user_mapping import get_user_domain_by_name
 
@@ -12,6 +11,7 @@ from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
 from api_x.utils.entry_auth import verify_request
 from api_x.zyt.biz.models import PaymentType
+from api_x.zyt.biz.payment.error import AlreadyPaidError
 
 
 logger = get_logger(__name__)
@@ -57,12 +57,11 @@ def prepay():
                                                         payer_user_map.account_user_id, payee_user_map.account_user_id,
                                                         order_id, product_name, product_category, product_desc, amount,
                                                         client_callback_url, client_notify_url)
-        if payment_record.tx.state != PaymentTxState.CREATED:
-            return response.fail(msg="order already paid.")
-
         # FIXME: 不直接返回pay_url, 修改pay_client, pay_url作为web支付方式在客户端确定
         pay_url = config.HOST_URL + url_for('web_checkout_entry.checkout', source=TransactionType.PAYMENT, sn=payment_record.sn)
         return response.success(sn=payment_record.sn, pay_url=pay_url)
+    except AlreadyPaidError as e:
+        return response.fail(msg=e.message)
     except Exception as e:
         logger.exception(e)
         return response.fail(code=1, msg=e.message)

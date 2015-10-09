@@ -11,6 +11,9 @@ class Biz:
     ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY']
     VALID_NETLOCS = ['dev_pay.lvye.com:5100']
 
+    PAYMENT_MAX_TRIAL_TIMES = 3
+    PAYMENT_MAX_VALID_SECONDS = 25
+
 
 HOST_URL = 'http://dev_pay.lvye.com:5100'
 

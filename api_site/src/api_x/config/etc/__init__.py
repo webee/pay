@@ -29,6 +29,7 @@ class Biz:
     IS_PROD = False
 
     PAYMENT_MAX_TRIAL_TIMES = 5
+    PAYMENT_MAX_VALID_SECONDS = 6 * 24 * 60 * 60
     ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY']
     VALID_NETLOCS = ['pay.lvye.com']
 

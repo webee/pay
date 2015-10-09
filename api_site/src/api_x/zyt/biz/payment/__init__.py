@@ -12,7 +12,7 @@ from api_x.zyt.user_mapping import get_system_account_user_id, get_user_map_by_a
 from api_x.constant import SECURE_USER_NAME, PaymentTxState
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
-from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
+from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType, TransactionSnStack
 from api_x.zyt.biz.error import NonPositiveAmountError
 from api_x.zyt.biz.error import TransactionNotFoundError
 from api_x.zyt.biz.transaction.error import TransactionStateError
@@ -23,6 +23,7 @@ from pytoolbox.util.log import get_logger
 from pytoolbox.util.urls import build_url
 from api_x.config import etc as config
 from api_x.task import tasks
+from .error import AlreadyPaidError
 
 
 logger = get_logger(__name__)
@@ -54,16 +55,27 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
     return payment_record
 
 
+def is_payment_expired(record):
+    from datetime import datetime
+
+    if record.tried_times >= config.Biz.PAYMENT_MAX_TRIAL_TIMES:
+        return True
+
+    d = datetime.utcnow() - record.updated_on
+    s = d.total_seconds()
+    return s >= config.Biz.PAYMENT_MAX_VALID_SECONDS
+
+
 @transactional
 def _restart_payment(channel, payment_record, amount, product_name, product_category, product_desc):
     from ..utils import generate_sn
 
     tx = payment_record.tx
-    # 如果之前失败了，则从这里重新开始
-    if tx.state == PaymentTxState.FAILED:
-        tx.state = PaymentTxState.CREATED
+    if not in_to_pay_state(tx.state, exclude=[PaymentTxState.PAID_OUT]):
+        raise AlreadyPaidError(payment_record.order_id)
 
-    if tx.state == PaymentTxState.CREATED:
+    # 更新订单相关信息
+    if tx.state in [PaymentTxState.CREATED, PaymentTxState.FAILED]:
         payment_record.amount = amount
         payment_record.product_name = product_name
         payment_record.product_category = product_category
@@ -71,11 +83,20 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
         tx.amount = amount
         tx.comments = "在线支付-{0}".format(product_name)
 
-    if payment_record.tried_times >= config.Biz.PAYMENT_MAX_TRIAL_TIMES:
+    if is_payment_expired(payment_record):
+        # push old sn to stack.
+        tx_sn_stack = TransactionSnStack(tx_id=tx.id, sn=tx.sn, generated_on=tx.updated_on, state=tx.state)
+        db.session.add(tx_sn_stack)
+
         # new sn.
         tx.sn = generate_sn(payment_record.payer_id)
         payment_record.sn = tx.sn
         payment_record.tried_times = 0
+
+    # 如果之前失败了，则从这里重新开始
+    if tx.state == PaymentTxState.FAILED:
+        tx.state = PaymentTxState.CREATED
+
     payment_record.tried_times += 1
     db.session.add(tx)
     db.session.add(payment_record)
@@ -122,8 +143,11 @@ def succeed_paid_out(vas_name, tx, payment_record):
     transit_transaction_state(tx.id, PaymentTxState.CREATED, PaymentTxState.PAID_OUT, event_id)
 
 
-def in_to_pay_state(state):
+def in_to_pay_state(state, exclude=None):
     # 等待支付状态
+    if exclude and state in exclude:
+        return False
+
     return state in [PaymentTxState.CREATED, PaymentTxState.FAILED, PaymentTxState.PAID_OUT]
 
 

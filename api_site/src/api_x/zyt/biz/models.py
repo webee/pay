@@ -52,10 +52,11 @@ class Transaction(db.Model):
     def __init__(self, *args, **kwargs):
         super(Transaction, self).__init__(*args, **kwargs)
         self.__record = None
+        self.__source_sn = None
 
     @property
     def record(self):
-        if hasattr(self, '__record') and self.__record:
+        if hasattr(self, '_Transaction__record') and self.__record:
             return self.__record
         if self.type == TransactionType.PAYMENT:
             self.__record = self.payment_record.one()
@@ -70,6 +71,16 @@ class Transaction(db.Model):
 
         return self.__record
 
+    @property
+    def source_sn(self):
+        if hasattr(self, '_Transaction__source_sn') and self.__source_sn:
+            return self.__source_sn
+        return self.sn
+
+    @source_sn.setter
+    def source_sn(self, sn):
+        self.__source_sn = sn
+
     def __repr__(self):
         return '<Transaction %s, %s, %s, %s>' % (self.type, str(self.amount), self.state, str(self.created_on))
 
@@ -82,7 +93,7 @@ class TransactionSnStack(db.Model):
 
     id = db.Column(db.BigInteger, primary_key=True)
     tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
-    tx = db.relationship('Transaction', backref=db.backref('sns', lazy='dynamic'))
+    tx = db.relationship('Transaction', backref=db.backref('sns', lazy='dynamic'), lazy='joined')
     sn = db.Column(db.CHAR(32), index=True)
     generated_on = db.Column(db.DateTime, nullable=False)
     state = db.Column(db.VARCHAR(32), nullable=False)

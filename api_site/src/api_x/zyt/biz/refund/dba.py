@@ -21,7 +21,8 @@ def get_refund_by_id(id):
 
 
 def get_tx_refund_by_sn(sn):
-    return get_tx_by_sn(sn), get_refund_by_sn(sn)
+    tx = get_tx_by_sn(sn)
+    return tx, tx.record
 
 
 @transactional

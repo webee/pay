@@ -162,7 +162,7 @@ def succeed_payment(vas_name, tx, payment_record):
 
 @transactional
 def duplicate_payment_to_balance(vas_name, vas_sn, tx, payment_record):
-    event_id = bookkeeping(EventType.TRANSFER_IN, tx.sn, payment_record.payer_id, vas_name,
+    event_id = bookkeeping(EventType.TRANSFER_IN, tx.source_sn, payment_record.payer_id, vas_name,
                            payment_record.amount)
     # 不改变状态，只是添加一条关联event
     transit_transaction_state(tx.id, tx.state, tx.state, event_id)
@@ -252,10 +252,11 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
 
     if _is_duplicated_payment(tx, vas_name, vas_sn):
         # 重复支付
-        logger.warning('duplicated payment: [{0}], [{1}], [{2}, {3}]'.format(payment_record.vas_name,
-                                                                             payment_record.vas_sn, vas_name, vas_sn))
-        # FIXME, 暂时退款到余额，然后人工处理
-        duplicate_payment_to_balance(vas_name, vas_sn, tx, payment_record)
+        logger.warning('duplicated payment: [{0}, {1}], [{2}, {3}]'.format(tx.vas_name, tx.vas_sn, vas_name, vas_sn))
+        if is_success:
+            # 成功支付
+            # FIXME, 暂时退款到余额，然后人工处理
+            duplicate_payment_to_balance(vas_name, vas_sn, tx, payment_record)
         return
 
     with require_transaction_context():

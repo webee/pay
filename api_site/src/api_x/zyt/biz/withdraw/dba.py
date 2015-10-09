@@ -10,4 +10,5 @@ def get_withdraw_by_sn(sn):
 
 
 def get_tx_withdraw_by_sn(sn):
-    return get_tx_by_sn(sn), get_withdraw_by_sn(sn)
+    tx = get_tx_by_sn(sn)
+    return tx, tx.record

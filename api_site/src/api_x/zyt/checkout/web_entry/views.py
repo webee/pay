@@ -40,7 +40,7 @@ def pay(source, sn, vas_name):
     """支付入口, 限制只能从checkout过来"""
     if vas_name not in config.Biz.ACTIVATED_EVAS:
         # 不支持此支付方式
-        abort(404)
+        return render_template("info.html", msg="不支付此支付方式")
 
     request_client_type = req.client_type()
     return do_pay(source, sn, vas_name, request_client_type)

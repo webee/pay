@@ -129,7 +129,7 @@ def _get_tx_payment_to_refund(channel_id, order_id):
     if not payment_record:
         raise NoPaymentFoundError(channel_id, order_id)
 
-    tx = get_tx_by_sn(payment_record.sn)
+    tx = payment_record.tx
     if tx.state == PaymentTxState.REFUNDING:
         raise PaymentIsRefundingError()
     if not _is_refundable(tx, payment_record):

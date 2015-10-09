@@ -28,20 +28,20 @@ def pay(source, sn, channel=None):
 
 
 def _do_pay(source, sn):
+    def notify_payee(is_success):
+        # 通知payee到账
+        async_handle = get_pay_notify_handle(source, NotifyType.Pay.ASYNC)
+        async_handle(is_success, sn, NAME, sn, None)
+        # TODO: 在失败的情况下，添加异步任务
+
     # 通知payer扣钱
     try:
         paid_out_handle = get_pay_notify_handle(source, NotifyType.Pay.PAID_OUT)
-        paid_out_handle(NAME, sn)
-        is_success = True
+        paid_out_handle(NAME, sn, notify_handle=notify_payee)
+        return True
     except Exception as e:
         logger.exception(e)
-        is_success = False
-
-    # 通知payee到账
-    async_handle = get_pay_notify_handle(source, NotifyType.Pay.ASYNC)
-    async_handle(is_success, sn, NAME, sn, None)
-
-    return is_success
+        return False
 
 
 def refund(source, sn):

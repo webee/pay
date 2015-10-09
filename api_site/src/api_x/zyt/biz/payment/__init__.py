@@ -32,7 +32,7 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
                            product_name, product_category, product_desc, amount,
                            client_callback_url, client_notify_url):
     """
-    如果金额为0, 新建订单则直接失败
+    如果金额为0, 则本次新建订单操作失败
     如果已经有对应订单，则直接支付成功
     """
     payment_record = PaymentRecord.query.filter_by(channel_id=channel.id, order_id=order_id).first()
@@ -62,7 +62,6 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
     # 如果之前失败了，则从这里重新开始
     if tx.state == PaymentTxState.FAILED:
         tx.state = PaymentTxState.CREATED
-        db.session.add(tx)
 
     if tx.state == PaymentTxState.CREATED:
         payment_record.amount = amount
@@ -172,9 +171,13 @@ def fail_payment(payment_record):
     transit_transaction_state(payment_record.tx_id, PaymentTxState.CREATED, PaymentTxState.FAILED)
 
 
-def handle_paid_out(vas_name, sn):
+@transactional
+def handle_paid_out(vas_name, sn, notify_handle=None):
     tx, payment_record = get_tx_payment_by_sn(sn)
     succeed_paid_out(vas_name, tx, payment_record)
+
+    if notify_handle is not None:
+        notify_handle(True)
 
 
 def handle_payment_result(is_success, sn, vas_name, vas_sn, data):

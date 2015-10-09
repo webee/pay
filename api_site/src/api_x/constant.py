@@ -32,8 +32,10 @@ class TransactionType:
 
 class PaymentTxState:
     CREATED = 'CREATED'
+    # 已付钱，未收钱
     PAID_OUT = 'PAID_OUT'
     FAILED = 'FAILED'
+    # 已付钱，已收钱
     SUCCESS = 'SUCCESS'
     SECURED = 'SECURED'
     REFUNDED = 'REFUNDED'

@@ -20,9 +20,9 @@ def prepay():
     logger.info("app prepay: {0}".format(data))
     payer = data['payer']
     payee = data['payee']
-    payee_domain_name = request.values['payee_domain_name']
-    amount = Decimal(request.values['amount'])
-    payment_type = request.values['payment_type']
+    payee_domain_name = data['payee_domain_name']
+    amount = Decimal(data['amount'])
+    payment_type = data['payment_type']
     params = {
         'payer_user_id': payer,
         'payee_user_id': payee,

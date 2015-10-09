@@ -74,6 +74,25 @@ class Transaction(db.Model):
         return '<Transaction %s, %s, %s, %s>' % (self.type, str(self.amount), self.state, str(self.created_on))
 
 
+class TransactionSnStack(db.Model):
+    """ 用于记录tx的sn变化，比如支付时为防止evas异常，会定次定时变化sn,
+    在回调中可以根据sn的记录来确定是否是同一笔交易。
+    """
+    __tablename__ = 'transaction_sn_stack'
+
+    id = db.Column(db.BigInteger, primary_key=True)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
+    tx = db.relationship('Transaction', backref=db.backref('sns', lazy='dynamic'))
+    sn = db.Column(db.CHAR(32))
+    generated_on = db.Column(db.DateTime, nullable=False)
+    state = db.Column(db.VARCHAR(32), nullable=False)
+
+    pushed_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<TransactionSnStack %s, %s>' % (self.tx_id, self.sn)
+
+
 class UserTransaction(db.Model):
     __tablename__ = 'user_transaction'
 

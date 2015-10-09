@@ -10,7 +10,7 @@ from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id
 from api_x.constant import SECURE_USER_NAME, PaymentTxState, RefundTxState
 from api_x.zyt.vas.user import get_user_cash_balance
-from api_x.zyt.biz.models import UserRole
+from api_x.zyt.biz import user_roles
 from pytoolbox.util.dbs import transactional, require_transaction_context
 from ...vas.models import EventType
 from ..transaction import create_transaction, transit_transaction_state, update_transaction_info
@@ -179,10 +179,10 @@ def _create_refund(channel, payment_tx, payment_record, amount, client_notify_ur
 
     comments = "退款-{0}".format(payment_record.product_name)
 
-    user_ids = [(payment_record.payer_id, UserRole.TO), (payment_record.payee_id, UserRole.FROM)]
+    user_ids = [user_roles.to_user(payment_record.payer_id), user_roles.from_user(payment_record.payee_id)]
     if payment_record.type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-        user_ids.append((secure_user_id, UserRole.GUARANTOR))
+        user_ids.append(user_roles.guaranteed_by(secure_user_id))
     elif payment_record.type == PaymentType.DIRECT:
         # check balance.
         # 直付退款时收款方余额必须足够

@@ -11,7 +11,7 @@ from api_x.zyt.biz.withdraw.error import WithdrawFailedError
 from api_x.zyt.user_mapping import get_user_map_by_account_user_id
 from api_x.zyt.vas.user import get_user_cash_balance
 from api_x.zyt.vas.models import EventType
-from api_x.zyt.biz.models import UserRole
+from api_x.zyt.biz import user_roles
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.vas.pattern import zyt_bookkeeping
 from api_x.zyt.biz.transaction import update_transaction_info
@@ -81,7 +81,7 @@ def _create_withdraw(channel, order_id, from_user_id,
     mask_name = '*' + acct_name[1:]
     comments = "提现至 {0}({1}) {2} 金额: {3}, 手续费: {4}".format(bank_name, card_no[-4:], mask_name, actual_amount, fee)
     tx = create_transaction(channel.name, TransactionType.WITHDRAW, actual_amount + fee, comments,
-                            [(from_user_id, UserRole.FROM)], order_id=order_id)
+                            [user_roles.from_user(from_user_id)], order_id=order_id)
 
     fields = {
         'tx_id': tx.id,

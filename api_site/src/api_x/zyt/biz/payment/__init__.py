@@ -16,7 +16,8 @@ from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType
 from api_x.zyt.biz.error import NonPositiveAmountError
 from api_x.zyt.biz.error import TransactionNotFoundError
 from api_x.zyt.biz.transaction.error import TransactionStateError
-from api_x.zyt.biz.models import UserRole, DuplicatedPaymentRecord
+from api_x.zyt.biz.models import DuplicatedPaymentRecord
+from api_x.zyt.biz import user_roles
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
 from pytoolbox.util.urls import build_url
@@ -87,15 +88,15 @@ def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url):
     comments = "在线支付-{0}".format(product_name)
-    user_ids = [(payer_id, UserRole.FROM), (payee_id, UserRole.TO)]
+    user_ids = [user_roles.from_user(payer_id), user_roles.to_user(payee_id)]
     if payment_type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-        user_ids.append((secure_user_id, UserRole.GUARANTOR))
-    tx_record = create_transaction(channel.name, TransactionType.PAYMENT, amount, comments, user_ids, order_id=order_id)
+        user_ids.append(user_roles.guaranteed_by(secure_user_id))
+    tx = create_transaction(channel.name, TransactionType.PAYMENT, amount, comments, user_ids, order_id=order_id)
 
     fields = {
-        'tx_id': tx_record.id,
-        'sn': tx_record.sn,
+        'tx_id': tx.id,
+        'sn': tx.sn,
         'payer_id': payer_id,
         'payee_id': payee_id,
         'channel_id': channel.id,

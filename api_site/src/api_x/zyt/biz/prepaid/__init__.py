@@ -12,7 +12,8 @@ from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
 from api_x.zyt.biz.models import TransactionType, PrepaidRecord
 from api_x.zyt.biz.error import NonPositiveAmountError
-from api_x.zyt.biz.models import UserRole, DuplicatedPaymentRecord
+from api_x.zyt.biz.models import DuplicatedPaymentRecord
+from api_x.zyt.biz import user_roles
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
 from api_x.config import etc as config
@@ -29,7 +30,7 @@ def create_prepaid(channel, order_id, to_id, amount, client_callback_url, client
         raise NonPositiveAmountError(amount)
 
     comments = "充值"
-    user_ids = [(to_id, UserRole.TO)]
+    user_ids = [user_roles.to_user(to_id)]
     tx = create_transaction(channel.name, TransactionType.PREPAID, amount, comments, user_ids, order_id=order_id)
 
     fields = {

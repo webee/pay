@@ -122,9 +122,14 @@ def succeed_paid_out(vas_name, tx, payment_record):
     transit_transaction_state(tx.id, PaymentTxState.CREATED, PaymentTxState.PAID_OUT, event_id)
 
 
+def in_to_pay_state(state):
+    # 等待支付状态
+    return state in [PaymentTxState.CREATED, PaymentTxState.FAILED, PaymentTxState.PAID_OUT]
+
+
 @transactional
 def succeed_payment(vas_name, tx, payment_record):
-    if tx.state not in [PaymentTxState.CREATED, PaymentTxState.FAILED, PaymentTxState.PAID_OUT]:
+    if not in_to_pay_state(tx.state):
         raise TransactionStateError()
     event_id = bookkeeping(EventType.TRANSFER_IN, tx.sn, payment_record.payee_id, vas_name,
                            payment_record.amount)
@@ -146,7 +151,7 @@ def duplicate_payment_to_balance(vas_name, vas_sn, tx, payment_record):
 
 @transactional
 def secure_payment(vas_name, tx, payment_record):
-    if tx.state not in [PaymentTxState.CREATED, PaymentTxState.FAILED, PaymentTxState.PAID_OUT]:
+    if not in_to_pay_state(tx.state):
         raise TransactionStateError()
     secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
     event_id = bookkeeping(EventType.TRANSFER_IN_FROZEN, tx.sn, secure_user_id, vas_name,
@@ -266,7 +271,7 @@ def _try_notify_client(tx, payment_record):
 
 
 def _is_duplicated_payment(tx, vas_name, vas_sn):
-    if tx.state in [PaymentTxState.CREATED, PaymentTxState.FAILED, PaymentTxState.PAID_OUT]:
+    if in_to_pay_state(tx.state):
         return False
 
     return vas_name != tx.vas_name or vas_sn != tx.vas_sn

@@ -308,7 +308,13 @@ def confirm_payment(channel, order_id):
         raise TransactionNotFoundError('guarantee payment tx channel={0}, order_id={1} not found.'.format(channel.name, order_id))
 
     tx = get_tx_by_id(payment_record.tx_id)
+    # 只有担保才能确认
+    # 另外，担保可能发生退款的情况，则需要退款完成之后再次确认。
     if tx.state == PaymentTxState.SECURED:
         _confirm_payment(payment_record)
+    elif tx.state == PaymentTxState.REFUNDING:
+        msg = 'payment is REFUNDING, try again later.'
+        logger.warn(msg)
+        raise TransactionStateError(msg)
     else:
         logger.warn('payment state should be SECURED.')

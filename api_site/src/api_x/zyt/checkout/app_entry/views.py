@@ -66,7 +66,8 @@ def query_info(source, sn, request_client_type=RequestClientType.WEB):
         'created_on': payment_entity.tx_created_on,
         'name': payment_entity.product_name,
         'desc': payment_entity.product_desc,
-        'amount': payment_entity.amount
+        'amount': payment_entity.amount,
+        'order_id': payment_entity.order_id
     }
 
     return response.success(info=data)

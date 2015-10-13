@@ -8,7 +8,7 @@ from api_x.zyt.user_mapping import get_user_map_by_account_user_id
 
 class PaymentEntity(object):
     def __init__(self, source, user_id, user_created_on, tx_sn, tx_created_on,
-                 product_name, product_desc, amount):
+                 product_name, product_desc, amount, order_id=None):
         self.source = source
         self.user_id = user_id
         self.user_created_on = user_created_on
@@ -17,6 +17,7 @@ class PaymentEntity(object):
         self.product_name = product_name
         self.product_desc = product_desc
         self.amount = amount
+        self.order_id = order_id
 
 
 def gen_payment_entity_by_pay_tx(tx):
@@ -27,7 +28,7 @@ def gen_payment_entity_by_pay_tx(tx):
 
     return PaymentEntity(TransactionType.PAYMENT, user_id, user_map.created_on, tx.sn, tx.created_on,
                          payment_record.product_name, payment_record.product_desc,
-                         payment_record.amount)
+                         payment_record.amount, order_id=payment_record.order_id)
 
 
 def gen_payment_entity_by_prepaid_tx(tx):

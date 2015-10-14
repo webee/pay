@@ -40,4 +40,4 @@ def prepay():
     print("order_id: {0}".format(params['order_id']))
     sn = pay_client.prepay(params, ret_sn=True)
 
-    return jsonify(ret=True, sn=sn)
+    return jsonify(ret=sn is not None, sn=sn)

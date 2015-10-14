@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 
 def send(phone_no, msg):
     msg = _build_message(msg)
-    logger.info("send msg [] to []".format(msg, phone_no))
+    logger.info("send msg {0} to {1}".format(msg, phone_no))
     req = requests.post(config.SMSConfig.URL, data={
         'cdkey': config.SMSConfig.CD_KEY,
         'password': config.SMSConfig.PASSWORD,

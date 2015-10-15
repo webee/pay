@@ -13,7 +13,7 @@ from api_x.constant import SECURE_USER_NAME, PaymentTxState
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType, TransactionSnStack
-from api_x.zyt.biz.error import NonPositiveAmountError
+from api_x.zyt.biz.error import NonPositiveAmountError, NegativeAmountError
 from api_x.zyt.biz.error import TransactionNotFoundError
 from api_x.zyt.biz.transaction.error import TransactionStateError
 from api_x.zyt.biz.models import DuplicatedPaymentRecord
@@ -46,7 +46,12 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
                                          client_callback_url, client_notify_url)
     else:
         payment_record = _restart_payment(channel, payment_record, amount, product_name, product_category, product_desc)
-    if payment_record.amount <= 0:
+
+    if payment_record.amount < 0:
+        raise NegativeAmountError(payment_record.amount)
+
+    if payment_record.amount == 0:
+        # 直接成功
         from api_x.zyt import vas as zyt
 
         tx = update_transaction_info(payment_record.tx_id, payment_record.sn,
@@ -155,8 +160,12 @@ def in_to_pay_state(state, exclude=None):
 def succeed_payment(vas_name, tx, payment_record):
     if not in_to_pay_state(tx.state):
         raise TransactionStateError()
-    event_id = bookkeeping(EventType.TRANSFER_IN, tx.sn, payment_record.payee_id, vas_name,
-                           payment_record.amount)
+    if payment_record.amount == 0:
+        # 不用记账
+        event_id = None
+    else:
+        event_id = bookkeeping(EventType.TRANSFER_IN, tx.sn, payment_record.payee_id, vas_name,
+                               payment_record.amount)
     transit_transaction_state(tx.id, tx.state, PaymentTxState.SUCCESS, event_id)
 
 

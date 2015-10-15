@@ -25,6 +25,12 @@ class NonPositiveAmountError(AmountError):
         super(NonPositiveAmountError, self).__init__(message)
 
 
+class NegativeAmountError(AmountError):
+    def __init__(self, amount):
+        message = "amount must not be negative: [{0}]".format(amount)
+        super(NonPositiveAmountError, self).__init__(message)
+
+
 class InsufficientAvailableBalanceError(BizError):
     def __init__(self):
         message = "insufficient available balance error."

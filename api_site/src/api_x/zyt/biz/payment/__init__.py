@@ -49,7 +49,7 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
     if payment_record.amount <= 0:
         from api_x.zyt import vas as zyt
 
-        tx = update_transaction_info(payment_record.tx_id.id, payment_record.sn,
+        tx = update_transaction_info(payment_record.tx_id, payment_record.sn,
                                      vas_name=zyt.NAME, state=PaymentTxState.CREATED)
         succeed_payment(zyt.NAME, tx, payment_record)
     return payment_record

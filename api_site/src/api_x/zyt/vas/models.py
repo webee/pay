@@ -106,7 +106,7 @@ class UserCashBalance(db.Model):
     available = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     frozen = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
-    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return '<UserCashBalance %r: [%r, %r]>' % (self.user_id, self.total, self.available)
@@ -127,7 +127,7 @@ class UserCashBalanceLog(db.Model):
     available = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     frozen = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
-    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return '<UserCashBalanceLog %r: [%r, %r]>' % (self.user_id, self.total, self.available)

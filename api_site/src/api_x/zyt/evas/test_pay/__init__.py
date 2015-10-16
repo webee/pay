@@ -30,7 +30,7 @@ def _get_common_params(source, user_id, order_no, product_name, amount):
         'user_id': user_id,
         'order_no': order_no,
         'product_name': product_name,
-        'amount': amount,
+        'amount': str(amount),
         'notify_url': notify_url
     }
 

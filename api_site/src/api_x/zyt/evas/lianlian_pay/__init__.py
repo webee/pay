@@ -77,9 +77,8 @@ def query_refund_notify(source, refund_no, refunded_on, oid_refundno=''):
     :param oid_refundno: 连连流水号
     :return:
     """
-    from ._refund import refund_query, is_success_or_fail
+    from ._refund import refund_query
     from .notify import notify_refund
-    from api_x.zyt.evas.lianlian_pay.notify import get_refund_notify_handle
 
     data = refund_query(refund_no, refunded_on, oid_refundno)
 

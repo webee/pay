@@ -45,12 +45,16 @@ def _do_pay(source, sn):
 
 
 def refund(source, sn):
-    # 通知payee扣钱
-    async_handle = get_refund_notify_handle(source, NotifyType.Refund.ASYNC)
-    async_handle(True, sn, NAME, sn, None)
+    def notify_payee(is_success):
+        # 通知payee扣钱
+        async_handle = get_refund_notify_handle(source, NotifyType.Refund.ASYNC)
+        async_handle(is_success, sn, NAME, sn, None)
 
     # 通知payer加钱
-    refund_in_handle = get_refund_notify_handle(source, NotifyType.Refund.REFUND_IN)
-    refund_in_handle(NAME, sn)
-
-    return True
+    try:
+        refund_in_handle = get_refund_notify_handle(source, NotifyType.Refund.REFUND_IN)
+        refund_in_handle(NAME, sn, notify_handle=notify_payee)
+        return True
+    except Exception as e:
+        logger.exception(e)
+        return False

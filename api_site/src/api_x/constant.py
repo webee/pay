@@ -50,6 +50,8 @@ class PrepaidTxState:
 
 class RefundTxState:
     CREATED = 'CREATED'
+    # payer已收到退款，payee未扣钱
+    REFUNDED_IN = 'REFUNDED_IN'
     FAILED = 'FAILED'
     SUCCESS = 'SUCCESS'
 

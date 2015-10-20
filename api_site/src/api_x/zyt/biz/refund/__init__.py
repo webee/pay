@@ -48,10 +48,12 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data):
     return refund_record
 
 
-def handle_refund_in(vas_name, sn):
+def handle_refund_in(vas_name, sn, notify_handle=None):
     tx, refund_record = get_tx_refund_by_sn(sn)
-    payment_tx, payment_record = get_tx_payment_by_sn(refund_record.payment_sn)
-    succeed_refund_in(vas_name, payment_record, refund_record)
+    succeed_refund_in(vas_name, refund_record)
+
+    if notify_handle is not None:
+        notify_handle(True)
 
 
 def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
@@ -86,7 +88,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         logger.warning('refund notify duplicated: [{0}, {1}]'.format(vas_name, vas_sn))
         return
 
-    if payment_tx.state != PaymentTxState.REFUNDING and tx.state != RefundTxState.CREATED:
+    if payment_tx.state != PaymentTxState.REFUNDING and tx.state not in [RefundTxState.CREATED, RefundTxState.REFUNDED_IN]:
         logger.warning('bad refund notify: [sn: {0}]'.format(sn))
         return
 
@@ -284,7 +286,8 @@ def succeed_refund(vas_name, payment_record, refund_record):
         transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING,
                                   refund_record.payment_state, event_id)
 
-    transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED,
+    refund_tx = refund_record.tx
+    transit_transaction_state(refund_tx.id, refund_tx.state,
                               RefundTxState.SUCCESS, event_id)
 
     update_payment_refunded_amount(payment_record.id, refund_amount)
@@ -307,8 +310,8 @@ def succeed_refund_secured(vas_name, payment_record, refund_record):
     else:
         transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING,
                                   refund_record.payment_state, event_id)
-    transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED,
-                              RefundTxState.SUCCESS, event_id)
+    refund_tx = refund_record.tx
+    transit_transaction_state(refund_tx.id, refund_tx.state, RefundTxState.SUCCESS, event_id)
 
     update_payment_refunded_amount(payment_record.id, refund_amount)
 
@@ -320,12 +323,8 @@ def fail_refund(payment_record, refund_record):
 
 
 @transactional
-def succeed_refund_in(vas_name, payment_record, refund_record):
+def succeed_refund_in(vas_name, refund_record):
     """处理被退款人的事务"""
     refund_amount = refund_record.amount
-    event_id = bookkeeping(EventType.TRANSFER_IN, payment_record.sn, refund_record.payer_id, vas_name, refund_amount)
-
-    payment_tx = payment_record.tx
-    transit_transaction_state(payment_record.tx_id, payment_tx.state, payment_tx.state, event_id)
-    # 此处应该已经退款
-    transit_transaction_state(refund_record.tx_id, RefundTxState.SUCCESS, RefundTxState.SUCCESS, event_id)
+    event_id = bookkeeping(EventType.TRANSFER_IN, refund_record.sn, refund_record.payer_id, vas_name, refund_amount)
+    transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED, RefundTxState.REFUNDED_IN, event_id)

@@ -20,9 +20,13 @@ def prepaid():
     amount = Decimal(request.values['amount'])
     callback_url = config.HOST_URL + url_for('.prepaid_result')
 
-    return redirect(pay_client.prepaid_web_checkout_url(to_user_id=to_user_id,
-                                                        amount=amount, to_domain_name=to_domain_name,
-                                                        callback_url=callback_url, notify_url=""))
+    checkout_url = pay_client.prepaid_web_checkout_url(to_user_id=to_user_id, amount=amount,
+                                                       to_domain_name=to_domain_name,
+                                                       callback_url=callback_url, notify_url="")
+
+    if checkout_url is None:
+        return render_template('sample/info.html', title='充值结果', msg="请求支付失败")
+    return redirect(checkout_url)
 
 
 @mod.route('/prepaid_result', methods=['POST'])

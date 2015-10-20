@@ -264,7 +264,7 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
         logger.warning('duplicated payment: [{0}, {1}], [{2}, {3}]'.format(tx.vas_name, tx.vas_sn, vas_name, vas_sn))
         if is_success:
             # 成功支付
-            # FIXME, 暂时退款到余额，然后人工处理
+            # FIXME, 暂时退款到余额，然后人工处理, 之后可能改成自动原路返回
             duplicate_payment_to_balance(vas_name, vas_sn, tx, payment_record)
         return
 
@@ -306,6 +306,9 @@ def _try_notify_client(tx, payment_record):
 
 def _is_duplicated_payment(tx, vas_name, vas_sn):
     if in_to_pay_state(tx.state):
+        return False
+
+    if tx.vas_name is None or tx.vas_sn is None:
         return False
 
     return vas_name != tx.vas_name or vas_sn != tx.vas_sn

@@ -73,6 +73,9 @@ class Transaction(db.Model):
 
     @property
     def source_sn(self):
+        """ 表示当前使用的sn，参考 TransactionSnStack
+        """
+        # NOTE: Model类的属性名前面都添加了_<ClassName>前缀
         if hasattr(self, '_Transaction__source_sn') and self.__source_sn:
             return self.__source_sn
         return self.sn

@@ -18,9 +18,7 @@ logger = get_logger(__name__)
 @mod.route("/<source>/<sn>/info", methods=["GET"])
 def info(source, sn):
     request_client_type = req.client_type()
-    data = query_info(source, sn, request_client_type)
-
-    return response.success(info=data, activated_evas=config.Biz.ACTIVATED_EVAS)
+    return query_info(source, sn, request_client_type)
 
 
 @mod.route("/<source>/<sn>/<vas_name>/params", methods=["GET"])
@@ -61,7 +59,7 @@ def query_info(source, sn, request_client_type=RequestClientType.WEB):
     else:
         return response.bad_request()
 
-    return {
+    data = {
         'state': tx.state,
         'source': payment_entity.source,
         'sn': payment_entity.tx_sn,
@@ -71,6 +69,8 @@ def query_info(source, sn, request_client_type=RequestClientType.WEB):
         'amount': payment_entity.amount,
         'order_id': payment_entity.order_id
     }
+
+    return response.success(info=data, activated_evas=config.Biz.ACTIVATED_EVAS)
 
 
 def prepare_params(source, sn, vas_name, request_client_type=RequestClientType.WEB):

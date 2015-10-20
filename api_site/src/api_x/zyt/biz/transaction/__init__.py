@@ -50,9 +50,10 @@ def transit_transaction_state(tx_id, cur_state, new_state, event_id=None):
 
 
 def _log_state_transit(tx_id, prev_state, state, event_id=None):
+    tx_state_logs = []
     if event_id is None:
         tx_state_log = TransactionStateLog(tx_id=tx_id, prev_state=prev_state, state=state)
-        db.session.add(tx_state_log)
+        tx_state_logs.append(tx_state_log)
     else:
         event_ids = [event_id]
         if isinstance(event_id, list):
@@ -60,7 +61,15 @@ def _log_state_transit(tx_id, prev_state, state, event_id=None):
 
         for event_id in event_ids:
             tx_state_log = TransactionStateLog(tx_id=tx_id, prev_state=prev_state, state=state, event_id=event_id)
-            db.session.add(tx_state_log)
+            tx_state_logs.append(tx_state_log)
+    group_id = None
+    for tx_state_log in tx_state_logs:
+        db.session.add(tx_state_log)
+        if group_id is None:
+            db.session.flush()
+            group_id = tx_state_log.id
+        tx_state_log.group_id = group_id
+        db.session.add(tx_state_log)
 
 
 @transactional

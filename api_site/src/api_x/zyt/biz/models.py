@@ -125,6 +125,7 @@ class TransactionStateLog(db.Model):
     __tablename__ = 'transaction_state_log'
 
     id = db.Column(db.BigInteger, primary_key=True)
+    group_id = db.Column(db.BigInteger, nullable=False, default=0L)
     tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
     tx = db.relationship('Transaction', backref=db.backref('state_logs', lazy='dynamic'), lazy='joined')
 

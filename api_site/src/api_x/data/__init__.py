@@ -68,6 +68,7 @@ def add_system_users():
     add_perm_to_channel(channel.name, 'app_withdraw')
     add_perm_to_channel(channel.name, 'app_query_user_balance')
     add_perm_to_channel(channel.name, 'query_withdraw')
+    add_perm_to_channel(channel.name, 'zyt_pay.web')
 
     # 添加测试用户iyinbo
     user_id = '169658002'

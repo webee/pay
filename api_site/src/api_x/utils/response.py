@@ -2,6 +2,9 @@
 from __future__ import unicode_literals
 
 from flask import Response, jsonify
+from pytoolbox.util.log import get_logger
+
+logger = get_logger(__name__)
 
 
 def success(**kwargs):
@@ -9,7 +12,8 @@ def success(**kwargs):
 
 
 def fail(code=1, msg='fail', **kwargs):
-    return jsonify(ret=False, code=code, msg=msg, **kwargs)
+    logger.info(msg)
+    return jsonify(ret=False, code=code, msg=msg, **kwargs), 499
 
 
 def bad_request(code=400, msg='bad request', **kwargs):

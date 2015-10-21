@@ -37,7 +37,7 @@ def default_create_channel(user_domain_name, channel_name, channel_desc):
 def add_system_users():
     # user mapping
     # 系统用户
-    from api_x.constant import DefaultUserDomain, SECURE_USER_NAME, LVYE_CORP_USER_NAME
+    from api_x.constant import DefaultUserDomain, SECURE_USER_NAME, LVYE_CORP_USER_NAME, LVYE_SKIING_USER_NAME
     from api_x.zyt.user_mapping import set_user_is_opened
 
     system_user_domain = create_user_domain(DefaultUserDomain.SYSTEM_USER_DOMAIN_NAME, '系统用户')
@@ -48,10 +48,13 @@ def add_system_users():
     _ = create_account_user(system_user_domain.id, SECURE_USER_NAME, '担保用户')
     # 绿野公司
     _ = create_account_user(lvye_corp_user_domain.id, LVYE_CORP_USER_NAME, '绿野公司')
+    # 绿野滑雪
+    _ = create_account_user(lvye_corp_user_domain.id, LVYE_SKIING_USER_NAME, '绿野滑雪')
 
     # 添加渠道: 绿野活动
     default_create_channel(lvye_account_user_domain.name, 'lvye_huodong', '绿野活动')
     default_create_channel(lvye_account_user_domain.name, 'lvye_pay_test', '绿野自游通测试渠道')
+    default_create_channel(lvye_account_user_domain.name, 'lvye_skiing', '绿野滑雪')
 
     # 添加渠道: 绿野自游通
     channel = default_create_channel(lvye_account_user_domain.name, 'lvye_pay_site', '绿野自游通网站')

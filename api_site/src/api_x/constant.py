@@ -12,6 +12,8 @@ class DefaultUserDomain:
 SECURE_USER_NAME = 'secure'
 # 绿野公司
 LVYE_CORP_USER_NAME = 'lvye'
+# 绿野滑雪
+LVYE_SKIING_USER_NAME = 'lvye_skiing'
 
 
 class VirtualAccountSystemType:

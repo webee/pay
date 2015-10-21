@@ -7,15 +7,12 @@ from api_x.constant import BankcardType
 
 def query_bin(card_no):
     from api_x.zyt.evas.lianlian_pay import query_bin as _query_bin
-    from api_x.zyt.evas.lianlian_pay.commons import is_success_request
 
     try:
         res = _query_bin(card_no)
     except Exception as e:
         raise RequestAPIError(e.message)
 
-    if not is_success_request(res):
-        raise RequestAPIError(res['ret_msg'])
     bank_code = res['bank_code']
     bank_name = res['bank_name']
     card_type = _parse_card_type(res['card_type'])

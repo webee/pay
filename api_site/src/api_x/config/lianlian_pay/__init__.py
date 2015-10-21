@@ -62,6 +62,7 @@ class PayToBankcard:
 
 
 class Bankcard:
+    USER_BANKCARD_URL = 'https://yintong.com.cn/traderapi/userbankcard.htm'
     BIN_QUERY_URL = 'https://yintong.com.cn/traderapi/bankcardquery.htm'
 
 

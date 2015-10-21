@@ -61,6 +61,7 @@ def prepay():
         pay_url = config.HOST_URL + url_for('web_checkout_entry.checkout', source=TransactionType.PAYMENT, sn=payment_record.sn)
         return response.success(sn=payment_record.sn, pay_url=pay_url)
     except AlreadyPaidError as e:
+        logger.exception(e)
         return response.fail(msg=e.message)
     except Exception as e:
         logger.exception(e)

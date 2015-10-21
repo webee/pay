@@ -71,7 +71,9 @@ def verify_request(entry_name, multi_entries=False):
 
                 channel = get_channel_by_name(channel_name)
                 if channel is None:
-                    return response.fail(msg='channel not exits: [{0}]'.format(channel_name))
+                    msg = 'channel not exits: [{0}]'.format(channel_name)
+                    logger.info(msg)
+                    return response.fail(msg=msg)
 
                 if channel_name not in config.TEST_CHANNELS and not channel.has_entry_perm(entry_name):
                     msg = 'channel [{0}] has no perm for entry [{1}]'.format(channel_name, entry_name)

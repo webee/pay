@@ -11,21 +11,25 @@ def success(**kwargs):
     return jsonify(ret=True, **kwargs)
 
 
-def fail(code=1, msg='fail', **kwargs):
+def _fail(code=1, msg='fail', **kwargs):
     logger.info(msg)
-    return jsonify(ret=False, code=code, msg=msg, **kwargs), 499
+    return jsonify(ret=False, code=code, msg=msg, **kwargs)
+
+
+def fail(code=1, msg='fail', **kwargs):
+    return _fail(code, msg, **kwargs), 499
 
 
 def bad_request(code=400, msg='bad request', **kwargs):
-    return fail(code, msg, **kwargs), 400
+    return _fail(code, msg, **kwargs), 400
 
 
 def processed(code=202, msg='processed', **kwargs):
-    return fail(code, msg, **kwargs), 202
+    return _fail(code, msg, **kwargs), 202
 
 
 def not_found(code=404, msg='not found.', **kwargs):
-    return fail(code, msg, **kwargs), 404
+    return _fail(code, msg, **kwargs), 404
 
 
 def accepted(**kwargs):
@@ -33,7 +37,7 @@ def accepted(**kwargs):
 
 
 def refused(code=403, msg='refused', **kwargs):
-    return fail(code, msg, **kwargs), 403
+    return _fail(code, msg, **kwargs), 403
 
 
 def submit_form(url, req_params, method='POST'):

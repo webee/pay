@@ -175,7 +175,7 @@ class PaymentRecord(db.Model):
     __table_args__ = (db.UniqueConstraint('channel_id', 'order_id', name='channel_order_id_uniq_idx'),)
 
     def __repr__(self):
-        return '<Payment %r>' % (self.id,)
+        return '<Payment %r, %r->%r$%r/%r, >' % (self.id, self.payer_id, self.payee_id, self.amount, self.refunded_amount)
 
 
 class DuplicatedPaymentRecord(db.Model):
@@ -220,7 +220,7 @@ class RefundRecord(db.Model):
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
-        return '<Refund %r>' % (self.id,)
+        return '<Refund %r, %r<-%r$%r>' % (self.id, self.payer_id, self.payee_id, self.amount)
 
 
 class PrepaidRecord(db.Model):

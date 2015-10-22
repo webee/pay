@@ -67,7 +67,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
     """
     import time
     for i in range(10):
-        # 这是因为apply_refund在一个事务中，notify到这儿的时候，事务没有结束，导致tx获取不到。
+        # 这是因为_create_and_request_refund在一个事务中，notify到这儿的时候，事务没有结束，导致tx获取不到。
         # 这里的解决办法就是重试
         tx, refund_record = get_tx_refund_by_sn(sn)
         if tx is None:
@@ -140,6 +140,8 @@ def _get_tx_payment_to_refund(channel_id, order_id):
 
 
 def _is_refundable(tx, payment_record):
+    if tx.state == PaymentTxState.CREATED:
+        raise PaymentNotPaidError()
     pay_type = payment_record.type
     if pay_type == PaymentType.DIRECT:
         raise RefundDirectPayError(tx.sn)
@@ -192,6 +194,7 @@ def _create_refund(channel, payment_tx, payment_record, amount, client_notify_ur
         if amount > balance.available:
             raise RefundBalanceError(amount, balance.available)
     tx_record = create_transaction(channel.name, TransactionType.REFUND, amount, comments, user_ids,
+                                   super_id=payment_tx.id,
                                    vas_name=payment_tx.vas_name, order_id=payment_record.order_id)
 
     fields = {
@@ -274,7 +277,7 @@ def succeed_refund(vas_name, payment_record, refund_record):
     payment_amount = payment_record.amount
     refunded_amount = payment_record.refunded_amount
     refund_amount = refund_record.amount
-    event_id = bookkeeping(EventType.TRANSFER_OUT, payment_record.sn, refund_record.payee_id, vas_name, refund_amount)
+    event_id = bookkeeping(EventType.TRANSFER_OUT, refund_record.sn, refund_record.payee_id, vas_name, refund_amount)
 
     # 全部金额都退款，则状态为已退款
     is_refunded = payment_amount == refunded_amount + refund_amount
@@ -299,7 +302,7 @@ def succeed_refund_secured(vas_name, payment_record, refund_record):
     refunded_amount = payment_record.refunded_amount
     refund_amount = refund_record.amount
     secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-    event_id = bookkeeping(EventType.TRANSFER_OUT_FROZEN, payment_record.sn, secure_user_id, vas_name, refund_amount)
+    event_id = bookkeeping(EventType.TRANSFER_OUT_FROZEN, refund_record.sn, secure_user_id, vas_name, refund_amount)
 
     # 全部金额都退款，则状态为已退款
     is_refunded = payment_amount == refunded_amount + refund_amount

@@ -26,6 +26,12 @@ class RefundFailedError(RefundError):
         super(RefundFailedError, self).__init__(message)
 
 
+class PaymentNotPaidError(RefundError):
+    def __init__(self, message=None):
+        message = message or "payment has not paid."
+        super(PaymentNotPaidError, self).__init__(message)
+
+
 class PaymentNotRefundableError(RefundError):
     def __init__(self, message=None):
         message = message or "payment not refundable."

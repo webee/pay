@@ -12,7 +12,9 @@ from .error import TransactionError, TransactionNotFoundError, TransactionStateE
 
 
 @transactional
-def create_transaction(channel_name, tp, amount, comments, role_users, vas_name=None, order_id=None, state=None):
+def create_transaction(channel_name, tp, amount, comments, role_users, vas_name=None,
+                       order_id=None,
+                       state=None, super_id=None):
     if state is None:
         state = TransactionState.CREATED
 
@@ -22,7 +24,7 @@ def create_transaction(channel_name, tp, amount, comments, role_users, vas_name=
     while dba.get_tx_by_sn(sn) is not None:
         sn = generate_sn(user_id)
     tx = Transaction(sn=sn, channel_name=channel_name, order_id=order_id,
-                     amount=amount, state=state, type=tp, comments=comments)
+                     amount=amount, state=state, type=tp, comments=comments, super_id=super_id)
     if vas_name is not None:
         tx.vas_name = vas_name
     for role_user in role_users:

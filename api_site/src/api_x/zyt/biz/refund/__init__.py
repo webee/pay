@@ -156,6 +156,7 @@ def _create_and_request_refund(channel, payment_tx, payment_record, amount, clie
     payment_record, refund_record = _create_refund(channel, payment_tx, payment_record, amount, client_notify_url)
 
     try:
+        # FIXME: 暂时忽略返回结果，无异常表明执行正常
         _request_refund(payment_tx, payment_record, refund_record, data)
     except Exception as e:
         logger.exception(e)

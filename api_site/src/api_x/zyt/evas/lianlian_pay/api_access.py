@@ -56,6 +56,6 @@ def _parse_and_verify_response_data(raw_data):
         raise ApiError(str(e))
 
     if 'sign_type' not in parsed_data or not signer.verify(parsed_data, parsed_data['sign_type']):
-        InvalidSignError(parsed_data.get('sign_type'), parsed_data)
+        raise InvalidSignError(parsed_data.get('sign_type'), parsed_data)
 
     return parsed_data

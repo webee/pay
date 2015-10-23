@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .api_access import request
-from .util import datetime_to_str
+from api_x.zyt.evas.util import datetime_to_str
 from api_x.config import lianlian_pay
 from pytoolbox.util.sign import SignType
 

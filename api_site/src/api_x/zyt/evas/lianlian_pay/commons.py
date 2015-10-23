@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from api_x.config import lianlian_pay
-from .error import ApiError
+from api_x.zyt.evas.error import ApiError
 
 
 def generate_absolute_url(path):

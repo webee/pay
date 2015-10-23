@@ -6,7 +6,7 @@ from functools import wraps
 from flask import request
 from . import notify_response
 from ..api_access import parse_and_verify_request_data
-from ..error import *
+from ...error import *
 
 
 def parse_and_verify(f):

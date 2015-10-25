@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from decimal import Decimal
 from . import dba
-from api_x.utils import date_and_time as dat
+import api_x.utils.times
 from .models import WithdrawState
 
 
@@ -27,7 +27,7 @@ def log_user_withdraw(user_id, tx_sn, bankcard_id, amount, fee):
 
 def calc_user_withdraw_fee(user_id, amount):
     """手续费策略"""
-    withdraw_logs = dba.query_user_withdraw_logs(user_id, dat.utctoday())
+    withdraw_logs = dba.query_user_withdraw_logs(user_id, api_x.utils.times.utctoday())
 
     if len(withdraw_logs) > 0:
         return Decimal('2.00')

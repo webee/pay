@@ -10,6 +10,11 @@ def now_to_str():
     return datetime_to_str(datetime.now())
 
 
+def time_offset(t, offset=0):
+    d = timedelta(seconds=offset)
+    return t + d
+
+
 class TzName:
     GMT = 'GMT'
     EST = 'EST'

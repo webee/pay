@@ -15,4 +15,11 @@ def _lianlian_pay_init():
 
 
 def _weixin_pay_init():
-    pass
+    from pytoolbox.util.sign import Signer
+    from weixin_pay import signers
+    from api_x.config import weixin_pay
+
+    for name in weixin_pay.AppConfig.CONFIGS.keys():
+        app_config = weixin_pay.AppConfig(name)
+        signer = Signer('key', 'sign', ignore_case=False, use_uppercase=True, md5_key=app_config.API_KEY)
+        signers[name] = signer

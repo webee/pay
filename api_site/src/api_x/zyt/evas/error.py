@@ -4,8 +4,6 @@ from __future__ import unicode_literals
 
 class EvasError(Exception):
     def __init__(self, message):
-        if isinstance(message, unicode):
-            message = message.encode('utf-8')
         super(EvasError, self).__init__(message)
 
 
@@ -29,4 +27,16 @@ class UnExpectedResponseError(ApiError):
 class DictParsingError(ApiError):
     def __init__(self, raw_data):
         message = "Data [{0}] must be a dict.".format(raw_data)
+        super(ApiError, self).__init__(message)
+
+
+class ResponseEncodingError(ApiError):
+    def __init__(self, message=None):
+        message = message or "encoding error."
+        super(ApiError, self).__init__(message)
+
+
+class RequestFaieldError(ApiError):
+    def __init__(self, message=None):
+        message = message or "request failed."
         super(ApiError, self).__init__(message)

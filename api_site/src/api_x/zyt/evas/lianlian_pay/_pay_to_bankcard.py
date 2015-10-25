@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from .api_access import request
-from api_x.zyt.evas.util import now_to_str
+from api_x.utils.times import now_to_str
 from api_x.config import lianlian_pay
 from ..error import EvasError
 from api_x.constant import BankcardType

@@ -49,3 +49,13 @@ def utc2gmt8(t):
 def utc2local(t, offset=8):
     t = t.replace(tzinfo=UTC)
     return t.astimezone(Zone(offset, False, TzName.GMT))
+
+
+def today():
+    td = datetime.today()
+    return datetime(td.year, td.month, td.day)
+
+
+def utctoday():
+    td, n, un = datetime.today(), datetime.now(), datetime.utcnow()
+    return datetime(td.year, td.month, td.day) - (n - un)

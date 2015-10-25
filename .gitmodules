@@ -1,3 +1,6 @@
 [submodule "pytoolbox"]
 	path = libraries/pytoolbox
 	url = git@gitlab.lvye.info:lvye-common/pytoolbox.git
+[submodule "libraries/pay-configs"]
+	path = libraries/pay-configs
+	url = git@gitlab.lvye.info:lvye-pay/pay-configs.git

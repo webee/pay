@@ -10,7 +10,7 @@ from pytoolbox.util.log import get_logger
 from api_x.utils.entry_auth import verify_request, limit_referrer
 from api_x.constant import RequestClientType
 from api_x.utils import req
-from .. import gen_payment_entity_by_pay_tx, gen_payment_entity_by_prepaid_tx
+from .. import gen_payment_entity_by_pay_tx, gen_payment_entity_by_prepaid_tx, get_activated_evases
 
 
 logger = get_logger(__name__)
@@ -26,8 +26,10 @@ def checkout(source, sn):
         return render_template("info.html", msg="该订单已支付")
 
     request_client_type = req.client_type()
+    vases = get_activated_evases(tx)
+
     return render_template("checkout.html", root_url=config.HOST_URL, source=source, tx=tx,
-                           vases=config.Biz.ACTIVATED_EVAS, request_client_type=request_client_type)
+                           vases=vases, request_client_type=request_client_type)
 
 
 def pay_ex_callback(*arg, **kwargs):
@@ -38,10 +40,6 @@ def pay_ex_callback(*arg, **kwargs):
 @limit_referrer(config.Biz.VALID_NETLOCS, ex_callback=pay_ex_callback)
 def pay(source, sn, vas_name):
     """支付入口, 限制只能从checkout过来"""
-    if vas_name not in config.Biz.ACTIVATED_EVAS:
-        # 不支持此支付方式
-        return render_template("info.html", msg="不支付此支付方式")
-
     request_client_type = req.client_type()
     return do_pay(source, sn, vas_name, request_client_type)
 
@@ -68,6 +66,9 @@ def do_pay(source, sn, vas_name, request_client_type=RequestClientType.WEB):
         return render_template("info.html", msg="无此订单")
     if tx.state != PaymentTxState.CREATED:
         return render_template("info.html", msg="该订单已支付")
+    if vas_name not in get_activated_evases(tx, with_vas=True):
+        # 不支持此支付方式
+        return render_template("info.html", msg="不支付此支付方式")
 
     if source == TransactionType.PAYMENT:
         payment_entity = gen_payment_entity_by_pay_tx(tx)

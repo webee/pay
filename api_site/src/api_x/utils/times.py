@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, tzinfo, timedelta
+import time
 
 
 def datetime_to_str(timestamp):
@@ -8,6 +9,10 @@ def datetime_to_str(timestamp):
 
 def now_to_str():
     return datetime_to_str(datetime.now())
+
+
+def timestamp():
+    return time.time()
 
 
 def time_offset(t, offset=0):

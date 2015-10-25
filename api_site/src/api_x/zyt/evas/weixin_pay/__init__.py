@@ -3,12 +3,12 @@ from __future__ import unicode_literals
 
 from flask import url_for
 from pytoolbox.util.log import get_logger
-from pytoolbox.util import strings
 from api_x.config import weixin_pay as config
 from .commons import generate_absolute_url
 from api_x.utils import times
+from pytoolbox.util import strings
 from .api_access import request
-from .commons import is_success_request
+from .commons import is_success_request, append_md5_sign
 
 
 NAME = 'WEIXIN_PAY'
@@ -47,4 +47,21 @@ def prepay(source, trade_type, out_trade_no, total_fee, ip, body, time_start,
         'limit_pay': limit_pay,  # no_credit--指定不能使用信用卡支付
         'openid': openid,  # trade_type=JSAPI, 此参数必传，用户在商户appid下的唯一标识
     }
-    return request(config.UNIFIED_ORDER_URL, params, app=app_config.APP_NAME)
+    data = request(config.UNIFIED_ORDER_URL, params, app=app_config.APP_NAME)
+
+    if is_success_request(data):
+        if trade_type == config.TradeType.APP:
+            # prepare params
+            params = {
+                'appid': app_config.APPID,
+                'partnerid': app_config.MCH_ID,
+                'prepayid': data['prepay_id'],
+                'package': 'Sign=WXPay',
+                'noncestr': strings.gen_rand_str(32),
+                'timestamp': int(times.timestamp()),
+            }
+            params = append_md5_sign(app_config.APP_NAME, params)
+            return params
+        elif trade_type == config.TradeType.NATIVE:
+            return data['code_url']
+        return data

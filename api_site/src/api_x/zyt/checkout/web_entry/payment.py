@@ -3,8 +3,11 @@ from __future__ import unicode_literals
 
 from flask import render_template
 from api_x.utils import req
-from api_x.zyt.evas import test_pay, lianlian_pay
+from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay
 from api_x.zyt import vas
+from pytoolbox.util.log import get_logger
+
+logger = get_logger(__name__)
 
 
 def pay(vas_name, payment_entity, request_client_type):
@@ -15,9 +18,12 @@ def pay(vas_name, payment_entity, request_client_type):
             return _pay_by_test_pay(payment_entity, request_client_type)
         elif vas_name == lianlian_pay.NAME:
             return _pay_by_lianlian_pay(payment_entity, request_client_type)
+        elif vas_name == weixin_pay.NAME:
+            return _pay_by_weixin_pay(payment_entity, request_client_type)
         elif vas_name == vas.NAME:
             return _pay_by_zyt_pay(payment_entity, request_client_type)
     except Exception as e:
+        logger.exception(e)
         msg = e.message
     return render_template('info.html', title='错误', msg=msg)
 
@@ -45,6 +51,24 @@ def _pay_by_lianlian_pay(payment_entity, request_client_type):
     return pay(payment_entity.source, payment_entity.user_id, payment_entity.user_created_on, req.ip(),
                payment_entity.tx_sn, payment_entity.tx_created_on, payment_entity.product_name,
                payment_entity.product_desc, payment_entity.amount, app_request=app_request)
+
+
+def _pay_by_weixin_pay(payment_entity, request_client_type):
+    """
+    微信扫码支付(NATIVE)
+    """
+    from api_x.config import weixin_pay
+    from api_x.zyt.evas.weixin_pay import prepay
+    from api_x.zyt.user_mapping import get_channel_by_name
+
+    channel = get_channel_by_name(payment_entity.channel_name)
+    app_config = weixin_pay.AppConfig(channel.wx_main)
+    code_url = prepay(payment_entity.source, weixin_pay.TradeType.NATIVE, payment_entity.tx_sn,
+                      int(100 * payment_entity.amount), req.ip(), payment_entity.product_name,
+                      payment_entity.tx_created_on,
+                      detail=payment_entity.product_desc, product_id=payment_entity.tx_sn,
+                      app_config=app_config)
+    return render_template('weixin_pay.html', code_url=code_url, payment_entity=payment_entity)
 
 
 def _pay_by_zyt_pay(payment_entity, request_client_type):

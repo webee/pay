@@ -1,12 +1,11 @@
 # coding=utf-8
 from __future__ import unicode_literals
+
 from api_x.constant import PaymentTxState
 from api_x.zyt.biz.transaction.dba import get_tx_by_sn
-
-from api_x.config import etc as config
 from . import app_checkout_entry_mod as mod
 from api_x.utils import req, response
-from .. import gen_payment_entity_by_pay_tx, gen_payment_entity_by_prepaid_tx
+from .. import gen_payment_entity_by_pay_tx, gen_payment_entity_by_prepaid_tx, get_activated_evases
 from api_x.constant import RequestClientType
 from pytoolbox.util.log import get_logger
 from api_x.utils.entry_auth import verify_request
@@ -23,9 +22,6 @@ def info(source, sn):
 
 @mod.route("/<source>/<sn>/<vas_name>/params", methods=["GET"])
 def params(source, sn, vas_name):
-    if vas_name not in config.Biz.ACTIVATED_EVAS:
-        return response.not_found()
-
     request_client_type = req.client_type()
     return prepare_params(source, sn, vas_name, request_client_type)
 
@@ -46,6 +42,7 @@ def zyt_pay(sn):
 def query_info(source, sn, request_client_type=RequestClientType.WEB):
     from api_x.zyt.biz.models import TransactionType
 
+    # TODO: log to db.
     logger.info("[PAY INFO] {2}, {0}, {1}".format(source, sn, request_client_type))
 
     tx = get_tx_by_sn(sn)
@@ -70,13 +67,15 @@ def query_info(source, sn, request_client_type=RequestClientType.WEB):
         'order_id': payment_entity.order_id
     }
 
-    return response.success(info=data, activated_evas=config.Biz.ACTIVATED_EVAS)
+    evases = get_activated_evases(tx, is_wx_app=True)
+    return response.success(info=data, activated_evas=evases)
 
 
 def prepare_params(source, sn, vas_name, request_client_type=RequestClientType.WEB):
     from api_x.zyt.biz.models import TransactionType
     from api_x.zyt.checkout.app_entry import params
 
+    # TODO: log to db.
     logger.info("[PAY PARAMS] {3}, {0}, {1}, {2}".format(source, sn, vas_name, request_client_type))
 
     tx = get_tx_by_sn(sn)
@@ -84,6 +83,8 @@ def prepare_params(source, sn, vas_name, request_client_type=RequestClientType.W
         return response.not_found()
     if tx.state != PaymentTxState.CREATED:
         return response.processed()
+    if vas_name not in get_activated_evases(tx, is_wx_app=True, with_vas=True):
+        return response.refused()
 
     if source == TransactionType.PAYMENT:
         payment_entity = gen_payment_entity_by_pay_tx(tx)

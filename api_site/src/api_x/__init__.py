@@ -4,12 +4,14 @@ import os
 
 from flask import Flask
 from flask.ext.migrate import Migrate
+from flask.ext.qrcode import QRcode
 from pytoolbox.util import dbs
 from pytoolbox.util.dbs import db
 
 
 # extensions
 migrate = Migrate()
+qrcode = QRcode()
 
 
 def register_mods(app):
@@ -19,6 +21,7 @@ def register_mods(app):
     from api_x.zyt.vas.entry import vas_entry_mod
     from api_x.zyt.evas.test_pay.entry import test_pay_entry_mod
     from api_x.zyt.evas.lianlian_pay.entry import lianlian_pay_entry_mod
+    from api_x.zyt.evas.weixin_pay.entry import weixin_pay_entry_mod
 
     app.register_blueprint(main_mod)
     app.register_blueprint(biz_entry_mod, url_prefix='/biz')
@@ -26,6 +29,7 @@ def register_mods(app):
     app.register_blueprint(vas_entry_mod, url_prefix='/vas/zyt')
     app.register_blueprint(test_pay_entry_mod, url_prefix="/vas/test_pay")
     app.register_blueprint(lianlian_pay_entry_mod, url_prefix="/vas/lianlian_pay")
+    app.register_blueprint(weixin_pay_entry_mod, url_prefix="/vas/weixin_pay")
 
     from api_x.zyt.checkout.web_entry import web_checkout_entry_mod
     from api_x.zyt.checkout.app_entry import app_checkout_entry_mod
@@ -57,6 +61,8 @@ def init_extensions(app):
     db.init_app(app)
 
     migrate.init_app(app, db)
+
+    qrcode.init_app(app)
 
 
 def init_tasks(app):
@@ -100,4 +106,28 @@ def create_app(env='dev', deploy=False):
 
     init_tasks(app)
 
+    init_template(app)
+
     return app
+
+
+def init_template(app):
+    @app.context_processor
+    def register_context():
+        from api_x import config
+        return dict(
+            CONFIG=config
+        )
+
+    app.jinja_options['extensions'].append('jinja2.ext.loopcontrols')
+    register_filters(app)
+    register_global_functions(app)
+
+
+def register_filters(app):
+    from api_x.utils import times
+    app.jinja_env.filters['utc2gmt8'] = times.utc2gmt8
+
+
+def register_global_functions(app):
+    pass

@@ -8,6 +8,7 @@ class App:
 
 
 class Biz:
+    ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY', 'WEIXIN_PAY']
     VALID_NETLOCS = ['dev_pay.lvye.com:5100']
 
     PAYMENT_MAX_TRIAL_TIMES = 4

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>微信扫码支付</title>
+<style>
+    .content {
+        width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 2px;
+    }
+</style>
+</head>
+<body>
+<div class="content">
+    <h2><img src="{{ url_for('web_checkout_entry.static', filename='img/wxpay_logo.png') }}" height="30" title="微信支付" alt="微信支付">微信支付</h2>
+    <h3>订单名称: {{ payment_entity.product_name }}</h3>
+    <h3>订单时间: {{ payment_entity.tx_created_on|utc2gmt8 }}</h3>
+    <h3>订单金额: ¥{{ payment_entity.amount }}</h3>
+    <hr>
+    <img class="center" src="{{ qrcode(code_url) }}" width="260" height="260" alt="二维码">
+    <img class="center" src="{{ url_for('web_checkout_entry.static', filename='img/wxpay_desc.png') }}" title="操作指示" alt="操作指示">
+</div>
+</body>
+</html>

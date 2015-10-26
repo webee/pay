@@ -24,7 +24,7 @@ def pay(vas_name, payment_entity, request_client_type):
             return _pay_by_zyt_pay(payment_entity, request_client_type)
     except Exception as e:
         logger.exception(e)
-        msg = e.message
+        msg = e.message or "请求异常"
     return render_template('info.html', title='错误', msg=msg)
 
 

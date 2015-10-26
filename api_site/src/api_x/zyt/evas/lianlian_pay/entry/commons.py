@@ -16,6 +16,7 @@ def parse_and_verify(f):
         if request.method != "GET":
             try:
                 if request.values.get('res_data'):
+                    # 此res_data为wap支付的同步返回参数
                     data = request.values.get('res_data')
                     verified_data = parse_and_verify_request_data(None, data)
                 else:

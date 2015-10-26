@@ -11,6 +11,7 @@ payer: {{ payer_user_name }}({{ payer }}), 全部: {{ payer_balance.total }}, �
 payee: {{ payee }}({{ payee }}), 全部: {{ payee_balance.total }}, 可用: {{ payee_balance.available }}, 冻结: {{ payee_balance.frozen }}
 <hr/>
 <form action="{{ url_for('sample.pay') }}" method="POST">
+    <input type="text" name='memo' value="" placeholder="说明"/><br/>
     <input type="text" name='order_id' value="" placeholder="留空进行新支付"/>
     <input type="text" name='amount' value="0.01"/>
     支付给:

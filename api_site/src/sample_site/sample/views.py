@@ -34,6 +34,7 @@ def pay():
     """支付一分钱"""
     payer = '96355632'
 
+    memo = request.values.get('memo', '')
     use_zyt_pay = request.values.get('use_zyt_pay')
     payee = request.values.get('other_payee')
     payee = payee or request.values['payee']
@@ -45,7 +46,7 @@ def pay():
         'payee_user_id': payee,
         'payee_domain_name': payee_domain_name,
         'order_id': request.values.get('order_id') or generate_order_id(),
-        'product_name': '测试{1}支付{0}元'.format(amount, '担保' if payment_type == 'GUARANTEE' else ''),
+        'product_name': '测试{1}支付{0}元_{2}'.format(amount, '担保' if payment_type == 'GUARANTEE' else '', memo),
         'product_category': '测试',
         'product_desc': '用于测试的商品',
         'amount': amount,

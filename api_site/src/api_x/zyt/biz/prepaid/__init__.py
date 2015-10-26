@@ -142,6 +142,8 @@ def _try_notify_client(tx, prepaid_record):
     from api_x.utils.notify import sign_and_notify_client
 
     url = prepaid_record.client_notify_url
+    if not url:
+        return
 
     user_mapping = get_user_map_by_account_user_id(prepaid_record.to_id)
     user_id = user_mapping.user_id

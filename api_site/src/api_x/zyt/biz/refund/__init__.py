@@ -113,6 +113,8 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
 def _try_notify_client(tx, refund_record):
     from api_x.utils.notify import sign_and_notify_client
     url = refund_record.client_notify_url
+    if not url:
+        return
 
     params = None
     if tx.state == RefundTxState.SUCCESS:

@@ -258,6 +258,8 @@ def handle_withdraw_notify(is_success, sn, vas_name, vas_sn, data):
 def _try_notify_client(tx, withdraw_record):
     from api_x.utils.notify import sign_and_notify_client
     url = withdraw_record.client_notify_url
+    if not url:
+        return
 
     user_mapping = get_user_map_by_account_user_id(withdraw_record.from_user_id)
     user_id = user_mapping.user_id

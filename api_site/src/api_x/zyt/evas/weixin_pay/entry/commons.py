@@ -15,7 +15,7 @@ def parse_and_verify(f):
         try:
             params = request.view_args
             app = params['app']
-            verified_data = parse_and_verify_request_data(app, request.data)
+            verified_data = parse_and_verify_request_data(request.data, app)
         except ApiError as _:
             return notify_response.wrong()
         request.__dict__['verified_data'] = verified_data

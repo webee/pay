@@ -1,7 +1,7 @@
 # coding=utf-8
 from pytoolbox.util.pmc_config import read_string
-PLATFORM = 'lvye.com'
 OID_PARTNER = '201507021000395502'
+PLATFORM = OID_PARTNER #'lvye.com'
 
 ROOT_URL = "http://pay.lvye.com/api"
 

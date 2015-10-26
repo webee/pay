@@ -57,7 +57,7 @@ def pay_notify(source):
 
     logger.info('pay notify {0}: {1}'.format(source, data))
     if not is_sending_to_me(partner_oid):
-        return notify_response.is_invalid()
+        return notify_response.bad()
 
     handle = get_pay_notify_handle(source, NotifyType.Pay.ASYNC)
     if handle is None:

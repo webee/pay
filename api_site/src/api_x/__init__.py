@@ -130,4 +130,10 @@ def register_filters(app):
 
 
 def register_global_functions(app):
-    pass
+    from api_x.config import etc
+    from flask import url_for
+
+    def abs_url_for(*args, **kwargs):
+        return etc.HOST_URL + url_for(*args, **kwargs)
+
+    app.jinja_env.globals['abs_url_for'] = abs_url_for

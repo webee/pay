@@ -37,14 +37,16 @@ def request(api_url, params):
 def parse_and_verify_request_data(values, raw_data):
     parsed_data = values if values else _parse_data(raw_data)
 
-    if _verify_sign(parsed_data):
+    if _verify_sign(parsed_data, do_raise=True):
         return parsed_data
-    else:
-        raise InvalidSignError(parsed_data.get('sign_type'), parsed_data)
 
 
-def _verify_sign(data):
-    return 'sign_type' in data and signer.verify(data, data['sign_type'])
+def _verify_sign(data, do_raise=False):
+    if 'sign_type' in data and signer.verify(data, data['sign_type']):
+        return True
+    if do_raise:
+        raise InvalidSignError(data.get('sign_type'), data)
+    return False
 
 
 def _parse_data(raw_data):

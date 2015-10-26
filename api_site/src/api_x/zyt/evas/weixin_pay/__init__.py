@@ -17,6 +17,13 @@ logger = get_logger(__name__)
 signers = {}
 
 
+def get_vas_id(app):
+    # 此vas_id作为微信支付商户号的唯一id, 记录在各数据库中
+    # WEIXIN_PAY为微信支付的总称
+    app_config = config.AppConfig(app)
+    return 'WX{0}'.format(app_config.MCH_ID)
+
+
 def prepay(source, trade_type, out_trade_no, total_fee, ip, body, time_start,
            detail='', fee_type='CNY', device_info='WEB',
            attach='', goods_tag='', product_id='', limit_pay='', openid='', app_config=None):
@@ -49,7 +56,7 @@ def prepay(source, trade_type, out_trade_no, total_fee, ip, body, time_start,
     }
     data = request(config.UNIFIED_ORDER_URL, params, app=app_config.APP_NAME)
 
-    if is_success_request(data):
+    if is_success_request(data, do_raise=True):
         if trade_type == config.TradeType.APP:
             # prepare params
             params = {
@@ -65,3 +72,19 @@ def prepay(source, trade_type, out_trade_no, total_fee, ip, body, time_start,
         elif trade_type == config.TradeType.NATIVE:
             return data['code_url']
         return data
+
+
+def query_refund_notify(source, refund_no, refunded_on, oid_refundno=''):
+    """ 通过主动查询订单结果来完成结果通知
+    :param source: refund来源
+    :param refund_no: 退款订单号
+    :param refunded_on: 退款订单时间
+    :param oid_refundno: 连连流水号
+    :return:
+    """
+    from ._refund import refund_query
+    from .notify import notify_refund
+
+    data = refund_query(refund_no, refunded_on, oid_refundno)
+
+    return notify_refund(source, data)

@@ -53,7 +53,7 @@ def _pay_by_lianlian_pay(payment_entity, request_client_type):
                payment_entity.product_desc, payment_entity.amount, app_request=app_request)
 
 
-def _pay_by_weixin_pay(payment_entity, request_client_type):
+def _pay_by_weixin_pay(pe, request_client_type):
     """
     微信扫码支付(NATIVE)
     """
@@ -61,14 +61,13 @@ def _pay_by_weixin_pay(payment_entity, request_client_type):
     from api_x.zyt.evas.weixin_pay import prepay
     from api_x.zyt.user_mapping import get_channel_by_name
 
-    channel = get_channel_by_name(payment_entity.channel_name)
+    channel = get_channel_by_name(pe.channel_name)
     app_config = weixin_pay.AppConfig(channel.wx_main)
-    code_url = prepay(payment_entity.source, weixin_pay.TradeType.NATIVE, payment_entity.tx_sn,
-                      int(100 * payment_entity.amount), req.ip(), payment_entity.product_name,
-                      payment_entity.tx_created_on,
-                      detail=payment_entity.product_desc, product_id=payment_entity.tx_sn,
+    code_url = prepay(pe.source, weixin_pay.TradeType.NATIVE, pe.tx_sn, int(100 * pe.amount),
+                      req.ip(), pe.product_name, pe.tx_created_on,
+                      detail=pe.product_desc, product_id=pe.tx_sn,
                       app_config=app_config)
-    return render_template('weixin_pay.html', code_url=code_url, payment_entity=payment_entity)
+    return render_template('weixin_pay.html', code_url=code_url, payment_entity=pe)
 
 
 def _pay_by_zyt_pay(payment_entity, request_client_type):

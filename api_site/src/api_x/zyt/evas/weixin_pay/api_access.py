@@ -26,35 +26,34 @@ def request(api_url, params, app='main'):
         except Exception as e:
             raise ResponseEncodingError(e.message)
         logger.info("response : {0}: {1}".format(api_url, raw_data))
-        return _parse_and_verify_response_data(raw_data, app=app)
+        return _parse_and_verify_response_data(raw_data, app)
     return UnExpectedResponseError(resp.status_code, resp.content)
 
 
-def parse_and_verify_request_data(raw_data, app='main'):
+def parse_and_verify_request_data(raw_data, app):
     parsed_data = _parse_data(raw_data)
 
-    return verify_sign(app, parsed_data) and parsed_data
+    if verify_sign(app, parsed_data, do_raise=True):
+        return parsed_data
 
 
 def _parse_data(raw_data):
-    data = xmltodict.parse(raw_data, encoding='utf-8')
-    if not isinstance(data, dict) or 'xml' not in data:
+    res = xmltodict.parse(raw_data, encoding='utf-8')
+    if not isinstance(res, dict) or 'xml' not in res:
         raise DictParsingError(raw_data)
-    return data['xml']
+    data = res['xml']
+
+    if data.get('return_code') != 'SUCCESS':
+        raise ApiError(data.get('return_msg', '接口请求异常'))
+
+    return data
 
 
-def _parse_and_verify_response_data(raw_data, app='main'):
-    try:
-        parsed_data = _parse_data(raw_data)
-    except Exception as e:
-        raise ApiError(e.message)
+def _parse_and_verify_response_data(raw_data, app):
+    parsed_data = _parse_data(raw_data)
 
-    if parsed_data.get('return_code') != 'SUCCESS':
-        raise ApiError(parsed_data.get('return_msg', '接口请求异常'))
-
-    verify_sign(app, parsed_data)
-
-    return parsed_data
+    if verify_sign(app, parsed_data, do_raise=True):
+        return parsed_data
 
 
 def _params_to_xml(params):
@@ -65,3 +64,5 @@ def _params_to_xml(params):
     return xmltodict.unparse(d, full_document=False, pretty=pretty)
 
 
+def response_xml(params):
+    return _params_to_xml(params)

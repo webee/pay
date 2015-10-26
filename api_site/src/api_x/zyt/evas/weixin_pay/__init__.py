@@ -27,7 +27,7 @@ def get_vas_id(app):
 def prepay(source, trade_type, out_trade_no, total_fee, ip, body, time_start,
            detail='', fee_type='CNY', device_info='WEB',
            attach='', goods_tag='', product_id='', limit_pay='', openid='', app_config=None):
-    notify_url = generate_absolute_url(url_for('weixin_pay_entry.pay_notify', source=source))
+    notify_url = generate_absolute_url(url_for('weixin_pay_entry.pay_notify', source=source, app=app_config.APP_NAME))
 
     time_start = times.utc2gmt8(time_start)
     time_expire = times.time_offset(time_start, offset=config.DEFAULT_ORDER_EXPIRATION_SECONDS)

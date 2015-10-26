@@ -28,7 +28,7 @@ def request(api_url, params):
         try:
             raw_data = resp.content.decode('utf-8')
         except Exception as e:
-            raise ResponseEncodingError(e.message)
+            raise DataEncodingError(e.message)
         logger.info("response {0}: {1}".format(api_url, raw_data))
         return _parse_and_verify_response_data(raw_data)
     return UnExpectedResponseError(resp.status_code, resp.content)

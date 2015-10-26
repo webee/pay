@@ -30,13 +30,13 @@ class DictParsingError(ApiError):
         super(ApiError, self).__init__(message)
 
 
-class ResponseEncodingError(ApiError):
+class DataEncodingError(ApiError):
     def __init__(self, message=None):
         message = message or "encoding error."
         super(ApiError, self).__init__(message)
 
 
-class RequestFaieldError(ApiError):
+class RequestFailedError(ApiError):
     def __init__(self, message=None):
         message = message or "request failed."
         super(ApiError, self).__init__(message)

@@ -21,16 +21,14 @@ def request(api_url, params, app='main'):
     logger.info("request {0}: {1}".format(api_url, data))
     resp = requests.post(api_url, data.encode('utf-8'), headers=headers)
     if resp.status_code == 200:
-        try:
-            raw_data = resp.content.decode('utf-8')
-        except Exception as e:
-            raise ResponseEncodingError(e.message)
-        logger.info("response : {0}: {1}".format(api_url, raw_data))
+        raw_data = resp.content
+        logger.info("response : %s: %s" % (api_url, raw_data))
         return _parse_and_verify_response_data(raw_data, app)
     return UnExpectedResponseError(resp.status_code, resp.content)
 
 
 def parse_and_verify_request_data(raw_data, app):
+    logger.info("requested : %s" % (raw_data,))
     parsed_data = _parse_data(raw_data)
 
     if verify_sign(app, parsed_data, do_raise=True):
@@ -38,6 +36,11 @@ def parse_and_verify_request_data(raw_data, app):
 
 
 def _parse_data(raw_data):
+    try:
+        raw_data = raw_data.decode('utf-8')
+    except Exception as e:
+        raise DataEncodingError(e.message)
+
     res = xmltodict.parse(raw_data, encoding='utf-8')
     if not isinstance(res, dict) or 'xml' not in res:
         raise DictParsingError(raw_data)

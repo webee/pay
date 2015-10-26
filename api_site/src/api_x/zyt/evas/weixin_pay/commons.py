@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from api_x.config import weixin_pay as config
 from api_x.zyt.evas.error import InvalidSignError
 from pytoolbox.util.log import get_logger
-from ..error import RequestFaieldError
+from ..error import RequestFailedError
 from pytoolbox.util.sign import SignType
 
 logger = get_logger(__name__)
@@ -25,7 +25,7 @@ def is_success_request(data, do_raise=False):
         msg = "request error: [{0}, {1}]".format(data.get('err_code'), data.get('err_code_des'))
         logger.error(msg)
         if do_raise:
-            raise RequestFaieldError(msg)
+            raise RequestFailedError(msg)
         return False
     return ret
 

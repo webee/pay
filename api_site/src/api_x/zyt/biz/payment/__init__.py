@@ -239,10 +239,8 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
                   'order_id': payment_record.order_id, 'amount': payment_record.amount}
         return sign_and_return_client_callback(client_callback_url, tx.channel_name, params, method="POST")
 
-    from flask import url_for
-    return redirect(config.HOST_URL + build_url(url_for('biz_entry.pay_result',
-                                                        source=TransactionType.PAYMENT, sn=sn, vas_name=vas_name),
-                                                code=code, vas_sn=vas_sn))
+    from flask import jsonify
+    return jsonify(code=code, source=TransactionType.PAYMENT, sn=sn, vas_name=vas_name)
 
 
 def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):

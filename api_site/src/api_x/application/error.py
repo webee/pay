@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 class BankcardError(Exception):
     def __init__(self, message):
+        message = message.encode('utf-8') if isinstance(message, unicode) else message
         super(BankcardError, self).__init__(message)
 
 

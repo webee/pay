@@ -2,22 +2,23 @@
 from __future__ import unicode_literals
 
 
-class NoPaymentFoundError(Exception):
+class RefundError(Exception):
+    def __init__(self, message):
+        message = message.encode('utf-8') if isinstance(message, unicode) else message
+        super(RefundError, self).__init__(message)
+
+
+class NoPaymentFoundError(RefundError):
     def __init__(self, channel_id, order_id):
         message = "Cannot find any valid payment record with [channel_id={0}, order_id={1}]." \
             .format(channel_id, order_id)
         super(NoPaymentFoundError, self).__init__(message)
 
 
-class NoRefundFoundError(Exception):
+class NoRefundFoundError(RefundError):
     def __init__(self, client_id, refund_id):
         message = "refund not found: [client_id={0}, refund_id: {1}].".format(client_id, refund_id)
         super(NoRefundFoundError, self).__init__(message)
-
-
-class RefundError(Exception):
-    def __init__(self, message):
-        super(RefundError, self).__init__(message)
 
 
 class RefundFailedError(RefundError):

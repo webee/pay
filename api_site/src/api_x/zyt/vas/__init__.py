@@ -15,7 +15,7 @@ def pay(source, sn, channel=None):
     from api_x.zyt.biz.models import TransactionType
     if source != TransactionType.PAYMENT:
         # 自游通支付只支持支付，不支持充值等方式
-        raise Exception("自游通支付暂只支持支付")
+        raise Exception("自游通支付暂只支持支付".encode('utf-8'))
 
     is_success = _do_pay(source, sn)
 

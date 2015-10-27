@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 class TransactionError(Exception):
     def __init__(self, msg):
+        msg = msg.encode('utf-8') if isinstance(msg, unicode) else msg
         super(TransactionError, self).__init__(msg)
 
 

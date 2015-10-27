@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 class BizError(Exception):
     def __init__(self, message=None):
         message = message or 'biz error.'
+        message = message.encode('utf-8') if isinstance(message, unicode) else message
         super(BizError, self).__init__(message)
 
 

@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 class VASError(Exception):
     def __init__(self, message=None):
         message = message or "Virtual Account System error."
+        message = message.encode('utf-8') if isinstance(message, unicode) else message
         super(VASError, self).__init__(message)
 
 

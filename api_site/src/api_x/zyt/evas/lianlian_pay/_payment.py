@@ -5,7 +5,11 @@ import json
 from api_x.config import lianlian_pay
 from api_x.utils.times import datetime_to_str, now_to_str
 from pytoolbox.util.sign import SignType
+from pytoolbox.util.log import get_logger
 from . import signer
+
+
+logger = get_logger(__name__)
 
 
 def _get_common_params(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, notify_url):
@@ -37,6 +41,7 @@ def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_de
     params.update(_get_common_params(user_id, user_created_on, ip, order_no, ordered_on,
                                      order_name, order_desc, amount, notify_url))
     params = _append_md5_sign(params)
+    logger.info("request lianlian pay WEB: {0}".format(params))
     return _generate_submit_form(params)
 
 
@@ -55,6 +60,7 @@ def wap_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, orde
     req_params = {
         'req_data': json.dumps(params)
     }
+    logger.info("request lianlian pay WAP {0}".format(params))
     return _generate_submit_form(req_params, lianlian_pay.Payment.Wap.URL)
 
 
@@ -64,7 +70,9 @@ def app_params(user_id, user_created_on, ip, order_no, ordered_on, order_name, o
     params = {}
     params.update(_get_common_params(user_id, user_created_on, ip, order_no, ordered_on,
                                      order_name, order_desc, amount, notify_url))
-    return _append_md5_sign(params, keys)
+    params = _append_md5_sign(params, keys)
+    logger.info("request lianlian pay APP: {0}".format(params))
+    return params
 
 
 def _generate_submit_form(req_params, url=lianlian_pay.Payment.URL):

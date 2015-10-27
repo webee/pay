@@ -31,11 +31,11 @@ def request(api_url, params, app='main'):
 
 
 def parse_and_verify_request_data(raw_data, app):
-    logger.info("requested : %s" % (raw_data,))
     try:
         raw_data = raw_data.decode('utf-8')
     except Exception as e:
         raise DataEncodingError(e.message)
+    logger.info("requested : %s" % (raw_data,))
 
     parsed_data = _parse_data(raw_data)
 

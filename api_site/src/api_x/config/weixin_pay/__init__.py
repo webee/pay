@@ -39,6 +39,7 @@ class AppConfig:
 
 
 # init
+WX_MAIN = 'ilvyewang'
 AppConfig.init_config('public_account', 'ilvyewang', is_main=True)
 AppConfig.init_config('app', 'lvye_skiing')
 

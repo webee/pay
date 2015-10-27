@@ -289,8 +289,8 @@ def _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record):
     transaction_id = payment_tx.vas_sn
     out_trade_no = payment_tx.sn
     out_refund_no = refund_record.sn
-    total_fee = payment_record.amount
-    refund_fee = refund_record.amount
+    total_fee = int(100 * payment_record.amount)
+    refund_fee = int(100 * refund_record.amount)
     app_config = get_app_config_by_vas_id(refund_tx.vas_name)
 
     try:

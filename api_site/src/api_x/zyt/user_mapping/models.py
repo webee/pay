@@ -55,7 +55,7 @@ class UserMapping(db.Model):
     __table_args__ = (db.UniqueConstraint('user_domain_id', 'user_id', name='domain_user_id_uniq_idx'),)
 
     def __repr__(self):
-        return 'UserMapping<%r, %r>' % (self.user_id, self.account_user_id)
+        return 'UserMapping<%r: %r, %r>' % (self.user_id, self.account_user_id, self.desc)
 
 
 class Channel(db.Model):

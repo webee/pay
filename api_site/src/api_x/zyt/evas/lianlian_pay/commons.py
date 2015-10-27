@@ -13,11 +13,5 @@ def is_sending_to_me(partner_id):
     return partner_id == lianlian_pay.OID_PARTNER
 
 
-def is_success_request(data):
-    return 'ret_code' in data and data['ret_code'] == '0000'
-
-
 def get_pure_result(res):
-    if not is_success_request(res):
-        raise ApiError(res['ret_msg'])
     return {k: v for k, v in res.items() if k not in {'ret_code', 'ret_msg', 'sign_type', 'sign'}}

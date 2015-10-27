@@ -1,9 +1,9 @@
 # coding=utf-8
 """收银台"""
 from __future__ import unicode_literals
-from api_x.config import etc as config
 from api_x.constant import TransactionType
 from api_x.zyt.user_mapping import get_user_map_by_account_user_id
+from api_x.zyt.user_mapping.biz import gen_payment_user_id
 
 
 class PaymentEntity(object):
@@ -21,16 +21,11 @@ class PaymentEntity(object):
         self.channel_name = channel_name
 
 
-def gen_payment_user_id(account_user_id):
-    user_map = get_user_map_by_account_user_id(account_user_id)
-    return '%s%s.%d' % (config.Biz.TX_SN_PREFIX, user_map.user_id, user_map.user_domain_id)
-
-
 def gen_payment_entity_by_pay_tx(tx):
     payment_record = tx.record
 
-    user_id = gen_payment_user_id(payment_record.payer_id)
     user_map = get_user_map_by_account_user_id(payment_record.payer_id)
+    user_id = gen_payment_user_id(user_map.user_id, user_map.user_domain_id)
 
     return PaymentEntity(TransactionType.PAYMENT, user_id, user_map.created_on, tx.sn, tx.created_on,
                          payment_record.product_name, payment_record.product_desc,
@@ -41,7 +36,7 @@ def gen_payment_entity_by_prepaid_tx(tx):
     prepaid_record = tx.record
 
     user_map = get_user_map_by_account_user_id(prepaid_record.to_id)
-    user_id = '%s%s.%d' % (config.Biz.TX_SN_PREFIX, user_map.user_id, user_map.user_domain_id)
+    user_id = gen_payment_user_id(user_map.user_id, user_map.user_domain_id)
 
     return PaymentEntity(TransactionType.PREPAID, user_id, user_map.created_on, tx.sn, tx.created_on,
                          "充值", tx.comments,

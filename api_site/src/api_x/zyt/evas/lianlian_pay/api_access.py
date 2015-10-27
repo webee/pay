@@ -62,6 +62,9 @@ def _parse_and_verify_response_data(raw_data):
     except Exception, e:
         raise ApiError(str(e))
 
+    if not ('ret_code' in parsed_data and parsed_data['ret_code'] == '0000'):
+        raise ApiError('ret_code: [{0}], ret_msg: [{1}]'.format(parsed_data.get('ret_code'), parsed_data.get('ret_msg')))
+
     if 'sign_type' not in parsed_data or not signer.verify(parsed_data, parsed_data['sign_type']):
         raise InvalidSignError(parsed_data.get('sign_type'), parsed_data)
 

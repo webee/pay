@@ -213,14 +213,13 @@ def _withdraw_by_test_pay(tx, withdraw_record, data):
 def _withdraw_by_lianlian_pay(tx, withdraw_record):
     """连连代付"""
     from api_x.zyt.evas.lianlian_pay import pay_to_bankcard
-    from api_x.zyt.evas.lianlian_pay.commons import is_success_request
 
-    res = pay_to_bankcard(TransactionType.WITHDRAW, tx.sn, withdraw_record.actual_amount, '提现到银行卡',
-                          withdraw_record.flag_card, withdraw_record.card_type, withdraw_record.card_no,
-                          withdraw_record.acct_name, withdraw_record.bank_code, withdraw_record.province_code,
-                          withdraw_record.city_code, withdraw_record.brabank_name, withdraw_record.prcptcd)
-
-    if not is_success_request(res):
+    try:
+        res = pay_to_bankcard(TransactionType.WITHDRAW, tx.sn, withdraw_record.actual_amount, '提现到银行卡',
+                              withdraw_record.flag_card, withdraw_record.card_type, withdraw_record.card_no,
+                              withdraw_record.acct_name, withdraw_record.bank_code, withdraw_record.province_code,
+                              withdraw_record.city_code, withdraw_record.brabank_name, withdraw_record.prcptcd)
+    except Exception as _:
         raise WithdrawFailedError(res['ret_msg'])
     return res
 

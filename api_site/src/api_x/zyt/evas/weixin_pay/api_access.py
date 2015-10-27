@@ -27,11 +27,11 @@ def request(api_url, params, app_config=None, need_cert=False):
         resp = requests.post(api_url, data.encode('utf-8'), headers=headers)
 
     if resp.status_code == 200:
-        logger.info("response : %s: %s" % (api_url, resp.content))
         try:
             raw_data = resp.content.decode('utf-8')
         except Exception as e:
             raise DataEncodingError(e.message)
+        logger.info("response : %s: %s" % (api_url, resp.content))
         return _parse_and_verify_response_data(raw_data, app_config.APP_NAME)
     return UnExpectedResponseError(resp.status_code, resp.content)
 

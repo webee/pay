@@ -23,7 +23,7 @@ def refund(out_refund_no, transaction_id, total_fee, refund_fee,
         'op_user_id': app_config.MCH_ID,
     }
 
-    data = request(config.REFUND_URL, params, app_config=app_config)
+    data = request(config.REFUND_URL, params, app_config=app_config, need_cert=True)
 
     if is_success_request(data, do_raise=True):
         return data

@@ -169,7 +169,7 @@ def _create_and_request_refund(channel, payment_tx, payment_record, amount, clie
         logger.exception(e)
         # FIXME: because this is in a transaction, below is useless.
         fail_refund(payment_record, refund_record)
-        raise RefundFailedError(e.message)
+        raise RefundFailedError()
 
     return refund_record
 
@@ -301,7 +301,8 @@ def _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record):
             refund_tx.vas_sn = refund_id
             db.session.add(refund_tx)
     except Exception as e:
-        raise RefundFailedError(e.message)
+        logger.exception(e)
+        raise RefundFailedError()
 
     # try to query refund notify.
     # TODO: start query refund notify task.

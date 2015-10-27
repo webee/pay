@@ -28,8 +28,8 @@ class AppConfig:
         self.APP_SECRET = _main['AppSecret']
         self.MCH_ID = _pay_main['MchID']
         self.API_KEY = pmc_config.read_string('conf/weixin/%s/%s/pay/api_key.txt' % (app_type, name))
-        self.CERT_PATH = pmc_config.abstract_path('conf/weixin/%s/%s/pay/appclient_cert.pem' % (app_type, name))
-        self.CERT_KEY_PATH = pmc_config.abstract_path('conf/weixin/%s/%s/pay/appclient_key.pem' % (app_type, name))
+        self.CERT_PATH = pmc_config.abstract_path('conf/weixin/%s/%s/pay/apiclient_cert.pem' % (app_type, name))
+        self.CERT_KEY_PATH = pmc_config.abstract_path('conf/weixin/%s/%s/pay/apiclient_key.pem' % (app_type, name))
 
     @staticmethod
     def init_config(app_type, name, is_main=False):

@@ -66,6 +66,6 @@ def query_order(transaction_id='', out_trade_no='', app_config=None):
         'out_trade_no': out_trade_no,
         'nonce_str': strings.gen_rand_str(32),
     }
-    data = request(config.UNIFIED_ORDER_URL, params, app_config=app_config)
+    data = request(config.QUERY_ORDER_URL, params, app_config=app_config)
     if is_success_request(data, do_raise=True):
         return data

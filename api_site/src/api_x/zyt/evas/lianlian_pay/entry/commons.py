@@ -17,7 +17,7 @@ def parse_and_verify(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         # TODO: 应该所有的回调都是POST, GET是在『支付失败』的情况出现
-        logger.info("requested {0}: {1}, {2}, {3}".format(request.url, request.values, request.data))
+        logger.info("requested {0}: {1}, {2}".format(request.url, request.values, request.data))
         if request.method != "GET":
             try:
                 if request.values.get('res_data'):

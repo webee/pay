@@ -92,6 +92,11 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         logger.warning('bad refund notify: [sn: {0}]'.format(sn))
         return
 
+    if tx.vas_sn is not None and tx.vas_sn != vas_sn:
+        # 像微信这种是请求退款就得到refund_id的, notify的时候判断是否一致
+        logger.warning('refund vas_sn mismatch: [{0}] vs [{1}]'.format(tx.vas_sn, vas_sn))
+        return
+
     with require_transaction_context():
         tx = update_transaction_info(refund_record.tx_id, vas_sn)
         if is_success:
@@ -155,11 +160,11 @@ def _is_refundable(tx, payment_record):
 
 @transactional
 def _create_and_request_refund(channel, payment_tx, payment_record, amount, client_notify_url, data):
-    payment_record, refund_record = _create_refund(channel, payment_tx, payment_record, amount, client_notify_url)
+    payment_record, refund_tx, refund_record = _create_refund(channel, payment_tx, payment_record, amount, client_notify_url)
 
     try:
         # FIXME: 暂时忽略返回结果，无异常表明执行正常
-        _request_refund(payment_tx, payment_record, refund_record, data)
+        _request_refund(payment_tx, payment_record, refund_tx, refund_record, data)
     except Exception as e:
         logger.exception(e)
         # FIXME: because this is in a transaction, below is useless.
@@ -196,13 +201,13 @@ def _create_refund(channel, payment_tx, payment_record, amount, client_notify_ur
         balance = get_user_cash_balance(payment_record.payee_id)
         if amount > balance.available:
             raise RefundBalanceError(amount, balance.available)
-    tx_record = create_transaction(channel.name, TransactionType.REFUND, amount, comments, user_ids,
-                                   super_id=payment_tx.id,
-                                   vas_name=payment_tx.vas_name, order_id=payment_record.order_id)
+    tx = create_transaction(channel.name, TransactionType.REFUND, amount, comments, user_ids,
+                            super_id=payment_tx.id,
+                            vas_name=payment_tx.vas_name, order_id=payment_record.order_id)
 
     fields = {
-        'tx_id': tx_record.id,
-        'sn': tx_record.sn,
+        'tx_id': tx.id,
+        'sn': tx.sn,
         'payment_sn': payment_record.sn,
         'payment_state': cur_payment_state,
         'payer_id': payment_record.payer_id,
@@ -215,10 +220,10 @@ def _create_refund(channel, payment_tx, payment_record, amount, client_notify_ur
     refund_record = RefundRecord(**fields)
     db.session.add(refund_record)
 
-    return payment_record, refund_record
+    return payment_record, tx, refund_record
 
 
-def _request_refund(payment_tx, payment_record, refund_record, data):
+def _request_refund(payment_tx, payment_record, refund_tx, refund_record, data):
     from api_x.zyt.evas import test_pay, lianlian_pay
     from api_x.zyt import vas
 
@@ -226,9 +231,11 @@ def _request_refund(payment_tx, payment_record, refund_record, data):
 
     if vas_name == test_pay.NAME:
         return _refund_by_test_pay(payment_tx, refund_record, data)
-    if vas_name == lianlian_pay.NAME:
+    elif vas_name == lianlian_pay.NAME:
         return _refund_by_lianlian_pay(payment_tx, refund_record)
-    if vas_name == vas.NAME:
+    elif vas_name.startswith('WX'):
+        return _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record)
+    elif vas_name == vas.NAME:
         return vas.refund(TransactionType.REFUND, refund_record.sn)
     raise RefundFailedError('unknown vas {0}'.format(vas_name))
 
@@ -268,6 +275,33 @@ def _refund_by_lianlian_pay(tx, refund_record):
     except Exception as e:
         logger.exception(e)
         raise RefundFailedError(res['ret_msg'])
+
+    # try to query refund notify.
+    # TODO: start query refund notify task.
+    return res
+
+
+def _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record):
+    """微信退款"""
+    from api_x.zyt.evas.weixin_pay import get_app_config_by_vas_id
+    from api_x.zyt.evas.weixin_pay.refund import refund
+
+    transaction_id = payment_tx.vas_sn
+    out_trade_no = payment_tx.sn
+    out_refund_no = refund_record.sn
+    total_fee = payment_record.amount
+    refund_fee = refund_record.amount
+    app_config = get_app_config_by_vas_id(refund_tx.vas_name)
+
+    try:
+        res = refund(out_refund_no, transaction_id, total_fee, refund_fee,
+                     out_trade_no=out_trade_no, app_config=app_config)
+        refund_id = res['refund_id']
+        with require_transaction_context():
+            refund_tx.vas_sn = refund_id
+            db.session.add(refund_tx)
+    except Exception as e:
+        raise RefundFailedError(e.message)
 
     # try to query refund notify.
     # TODO: start query refund notify task.

@@ -41,7 +41,7 @@ def _weixin_pay_params(payment_entity):
     APP支付
     """
     from api_x.config import weixin_pay
-    from api_x.zyt.evas.weixin_pay import prepay
+    from api_x.zyt.evas.weixin_pay.payment import prepay
     from api_x.zyt.user_mapping import get_channel_by_name
 
     channel = get_channel_by_name(payment_entity.channel_name)

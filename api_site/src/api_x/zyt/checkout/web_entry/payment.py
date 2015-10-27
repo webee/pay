@@ -58,7 +58,7 @@ def _pay_by_weixin_pay(pe, request_client_type):
     微信扫码支付(NATIVE)
     """
     from api_x.config import weixin_pay
-    from api_x.zyt.evas.weixin_pay import prepay
+    from api_x.zyt.evas.weixin_pay.payment import prepay
     from api_x.zyt.user_mapping import get_channel_by_name
 
     channel = get_channel_by_name(pe.channel_name)

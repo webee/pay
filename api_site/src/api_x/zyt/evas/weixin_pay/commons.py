@@ -19,6 +19,22 @@ def is_sending_to_me(app, appid, mch_id):
     return app_config.APPID == appid and app_config.MCH_ID == mch_id
 
 
+def is_trade_success_or_fail(state):
+    if state == config.TradeState.SUCCESS:
+        return True
+    if state == config.TradeState.PAYERROR:
+        return False
+    return None
+
+
+def is_refund_success_or_fail(status):
+    if status == config.RefundStatus.SUCCESS:
+        return True
+    if status == config.RefundStatus.FAIL:
+        return False
+    return None
+
+
 def is_success_request(data, do_raise=False):
     ret = 'result_code' in data and data['result_code'] == 'SUCCESS'
     if not ret:

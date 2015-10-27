@@ -57,7 +57,7 @@ def init_weixin_pay_notify_handles():
     from api_x.zyt.evas.weixin_pay import NAME
     from api_x.zyt.evas.weixin_pay.constant import NotifyType
     from api_x.zyt.evas.weixin_pay.notify import register_pay_notify_handle, register_refund_notify_handle
-    from api_x.zyt.evas.weixin_pay import query_refund_notify
+    from api_x.zyt.evas.weixin_pay import query_pay_notify, query_refund_notify
 
     # payment
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC, handle_payment_result)
@@ -72,6 +72,7 @@ def init_weixin_pay_notify_handles():
 
     # query_notify
     # notify(source, sn, sn_created_on[, vas_sn])
+    register_query_notify_handle(TransactionType.PAYMENT, NAME, query_pay_notify)
     register_query_notify_handle(TransactionType.REFUND, NAME, query_refund_notify)
 
 

@@ -37,7 +37,6 @@ class AppConfig:
         if is_main:
             AppConfig.CONFIGS['main'] = AppConfig.CONFIGS[name]
 
-
 # init
 WX_MAIN = 'ilvyewang'
 AppConfig.init_config('public_account', 'ilvyewang', is_main=True)
@@ -60,3 +59,21 @@ class TradeType:
 
     # 刷卡支付接口
     MICROPAY = 'MICROPAY'  # 刷卡支付
+
+
+class TradeState:
+    SUCCESS = 'SUCCESS' #支付成功
+    REFUND = 'REFUND' #转入退款
+    NOTPAY = 'NOTPAY' #未支付
+    CLOSED = 'CLOSED' #已关闭
+    REVOKED = 'REVOKED' #已撤销
+    USERPAYING = 'USERPAYING' #用户支付中
+    PAYERROR = 'PAYERROR' #支付失败(其他原因，如银行返回失败)
+
+
+class RefundStatus:
+    SUCCESS = 'SUCCESS' #退款成功
+    FAIL = 'FAIL' #退款失败
+    PROCESSING = 'PROCESSING' #退款处理中
+    NOTSURE = 'NOTSURE' #未确定，需要商户原退款单号重新发起
+    CHANGE = 'CHANGE' #转入代发，退款到银行发现用户的卡作废或者冻结了，导致原路退款银行卡失败，资金回流到商户的现金帐号，需要商户人工干预，通过线下或者财付通转账的方式进行退款。

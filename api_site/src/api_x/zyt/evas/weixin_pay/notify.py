@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from .constant import BizType, NotifyType
 from api_x.zyt.evas.lianlian_pay.commons import is_sending_to_me
+from api_x.zyt.evas.weixin_pay import get_vas_id
+from .commons import is_trade_success_or_fail, is_refund_success_or_fail
 from pytoolbox.util.log import get_logger
 
 logger = get_logger(__name__)
@@ -54,31 +56,62 @@ def get_refund_notify_handle(refund_source):
     return _get_notify_handle(refund_source, BizType.REFUND, NotifyType.Refund.ASYNC)
 
 
-# refund
-def notify_refund(source, data):
-    from . import NAME
-    from ._refund import is_success_or_fail
-    partner_oid = data['oid_partner']
-    refund_no = data['no_refund']
-    status = data['sta_refund']
-    refundno_oid = data['oid_refundno']
+# pay
+def notify_pay(source, app, data):
+    appid = data['appid']
+    mch_id = data['mch_id']
+    out_trade_no = data['out_trade_no']
+    transaction_id = data['transaction_id']
+    trade_state = data['trade_state']
 
-    logger.info('refund notify {0}: {1}'.format(source, data))
-    if not is_sending_to_me(partner_oid):
+    logger.info('pay notify {0}@{1}: {2}'.format(source, app, data))
+    if not is_sending_to_me(app, appid, mch_id):
         return NotifyRespTypes.BAD
+
+    result = is_trade_success_or_fail(trade_state)
+    if result is None:
+        return NotifyRespTypes.RETRY
+
+    handle = get_pay_notify_handle(source, NotifyType.Pay.ASYNC)
+    if handle is None:
+        return NotifyRespTypes.MISS
+
+    try:
+        # 是否成功，订单号，来源系统，来源系统订单号，数据
+        handle(result, out_trade_no, get_vas_id(app), transaction_id, data)
+        return NotifyRespTypes.SUCCEED
+    except Exception as e:
+        logger.exception(e)
+        logger.warning('pay notify error: {0}'.format(e.message))
+        return NotifyRespTypes.FAILED
+
+
+# refund
+def notify_refund(source, app, data):
+    appid = data['appid']
+    mch_id = data['mch_id']
+    refund_id = data['refund_id']
+    refund_count = int(data['refund_count'])
+    idx = refund_count - 1
+    out_refund_no = data['out_refund_no_%d' % idx]
+    refund_status = data['refund_status_%d' % idx]
+
+    logger.info('refund notify {0}@{1}: {2}'.format(source, app, data))
+    if not is_sending_to_me(app, appid, mch_id):
+        return NotifyRespTypes.BAD
+
+    result = is_refund_success_or_fail(refund_status)
+    if result is None:
+        return NotifyRespTypes.RETRY
 
     handle = get_refund_notify_handle(source)
     if handle is None:
         return NotifyRespTypes.MISS
 
-    result = is_success_or_fail(status)
-    if result is None:
-        return NotifyRespTypes.RETRY
-
     try:
         # 是否成功，订单号，来源系统，来源系统订单号，数据
-        handle(result, refund_no, NAME, refundno_oid, data)
-        logger.info('refund notify success: {0}, {1}'.format(source, refund_no))
+        handle(result, out_refund_no, get_vas_id(app), refund_id, data)
+        logger.info('refund notify success: {0}, {1}'.format(source, out_refund_no))
         return NotifyRespTypes.SUCCEED
     except Exception as e:
         logger.exception(e)

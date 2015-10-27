@@ -12,21 +12,27 @@ from pytoolbox.util.log import get_logger
 logger = get_logger(__name__)
 
 
-def request(api_url, params, app='main'):
-    params = append_md5_sign(app, params)
+def request(api_url, params, app_config=None, need_cert=False):
+    app_config = app_config or config.AppConfig()
+    params = append_md5_sign(app_config.APP_NAME, params)
 
     data = _params_to_xml(params)
     headers = {'Content-Type': 'application/xml'}
 
     logger.info("request {0}: {1}".format(api_url, data))
-    resp = requests.post(api_url, data.encode('utf-8'), headers=headers)
+    if need_cert:
+        cert = (app_config.CERT_PATH, app_config.CERT_KEY_PATH)
+        resp = requests.post(api_url, data.encode('utf-8'), headers=headers, cert=cert)
+    else:
+        resp = requests.post(api_url, data.encode('utf-8'), headers=headers)
+
     if resp.status_code == 200:
         logger.info("response : %s: %s" % (api_url, resp.content))
         try:
             raw_data = resp.content.decode('utf-8')
         except Exception as e:
             raise DataEncodingError(e.message)
-        return _parse_and_verify_response_data(raw_data, app)
+        return _parse_and_verify_response_data(raw_data, app_config.APP_NAME)
     return UnExpectedResponseError(resp.status_code, resp.content)
 
 

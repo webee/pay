@@ -6,9 +6,9 @@ PLATFORM = OID_PARTNER #'lvye.com'
 ROOT_URL = "http://pay.lvye.com/api"
 
 
-MD5_KEY = read_string('conf/keys/md5_key.txt')
-YT_PUB_KEY = read_string('conf/keys/yt_pub_key.txt')
-LVYE_PRI_KEY = read_string('conf/keys/lvye_pri_key.txt')
+MD5_KEY = read_string('conf/lianlian/md5_key.txt')
+YT_PUB_KEY = read_string('conf/lianlian/yt_pub_key.txt')
+LVYE_PRI_KEY = read_string('conf/lvye/lvye_pri_key.txt')
 
 
 class AppRequest:

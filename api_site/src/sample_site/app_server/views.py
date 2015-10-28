@@ -23,12 +23,13 @@ def prepay():
     payee_domain_name = data['payee_domain_name']
     amount = Decimal(data['amount'])
     payment_type = data['payment_type']
+    order_id = request.values.get('order_id') or generate_order_id()
     params = {
         'payer_user_id': payer,
         'payee_user_id': payee,
         'payee_domain_name': payee_domain_name,
         'order_id': request.values.get('order_id') or generate_order_id(),
-        'product_name': '测试{1}支付{0}元'.format(amount, '担保' if payment_type == 'GUARANTEE' else ''),
+        'product_name': 'APP测试{1}支付{0}元'.format(amount, '担保' if payment_type == 'GUARANTEE' else ''),
         'product_category': '测试',
         'product_desc': '用于测试的商品',
         'amount': amount,
@@ -37,7 +38,7 @@ def prepay():
         'payment_type': payment_type
     }
 
-    print("order_id: {0}".format(params['order_id']))
+    print("order_id: {0}".format(order_id))
     sn = pay_client.prepay(params, ret_sn=True)
 
-    return jsonify(ret=sn is not None, sn=sn)
+    return jsonify(ret=sn is not None, sn=sn, order_id=order_id)

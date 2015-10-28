@@ -44,6 +44,7 @@ class Zone(tzinfo):
 
 UTC = Zone(0, False, TzName.GMT)
 GMT8 = Zone(8, False, TzName.GMT)
+_EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
 
 
 def utc2gmt8(t):
@@ -54,6 +55,12 @@ def utc2gmt8(t):
 def utc2local(t, offset=8):
     t = t.replace(tzinfo=UTC)
     return t.astimezone(Zone(offset, False, TzName.GMT))
+
+
+def utc2timestamp(t):
+    if t.tzinfo is None:
+        t = datetime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.microsecond, UTC)
+    return (t - _EPOCH).total_seconds()
 
 
 def today():

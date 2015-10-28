@@ -5,11 +5,10 @@ from api_x.zyt.biz import payment
 from api_x.zyt.biz.models import TransactionType
 from api_x.zyt.user_mapping import get_user_domain_by_name
 
-from flask import request, url_for
-from api_x.config import etc as config
+from flask import request
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
-from api_x.utils.entry_auth import verify_request
+from api_x.utils.entry_auth import verify_request, prepay_entry
 from api_x.zyt.biz.models import PaymentType
 from api_x.zyt.biz.payment.error import AlreadyPaidError
 
@@ -19,6 +18,7 @@ logger = get_logger(__name__)
 
 @mod.route('/prepay', methods=['POST'])
 @verify_request('prepay')
+@prepay_entry(TransactionType.PAYMENT)
 def prepay():
     data = request.values
     channel = request.channel
@@ -57,11 +57,7 @@ def prepay():
                                                         payer_user_map.account_user_id, payee_user_map.account_user_id,
                                                         order_id, product_name, product_category, product_desc, amount,
                                                         client_callback_url, client_notify_url)
-        tx = payment_record.tx
-        hashed_sn = tx.sn_with_expire_hash
-        # FIXME: 不直接返回pay_url, 修改pay_client, pay_url作为web支付方式在客户端确定
-        pay_url = config.HOST_URL + url_for('web_checkout_entry.checkout', source=TransactionType.PAYMENT, sn=hashed_sn)
-        return response.success(sn=hashed_sn, pay_url=pay_url)
+        return payment_record.tx
     except AlreadyPaidError as e:
         logger.exception(e)
         return response.fail(msg=e.message)

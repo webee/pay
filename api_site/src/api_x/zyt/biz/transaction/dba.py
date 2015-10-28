@@ -7,7 +7,6 @@ def get_tx_by_id(transaction_id):
 
 
 def get_tx_by_sn(sn, search_stack=False):
-    sn = Transaction.get_hash_stripped_sn(sn)
     tx = Transaction.query.filter_by(sn=sn).first()
     if tx is None and search_stack:
         sn_item = TransactionSnStack.query.filter_by(sn=sn).first()

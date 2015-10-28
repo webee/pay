@@ -121,3 +121,56 @@ def limit_referrer(netlocs, ex_callback=None):
             return response.bad_request()
         return wrapper
     return do_limit
+
+
+def prepay_entry(source):
+    from flask import url_for
+    from api_x.zyt.biz.models import Transaction
+
+    def entry(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            res = f(*args, **kwargs)
+            if isinstance(res, Transaction):
+                tx = res
+                hashed_sn = tx.sn_with_expire_hash
+                # FIXME: 不直接返回pay_url, 修改pay_client, pay_url作为web支付方式在客户端确定
+                pay_url = config.HOST_URL + url_for('web_checkout_entry.checkout', source=source, sn=hashed_sn)
+                return response.success(sn=hashed_sn, pay_url=pay_url)
+            return res
+        return wrapper
+    return entry
+
+
+def checkout_entry(on_not_found=None, on_expired=None, on_error=None):
+    from api_x.zyt.biz.transaction.dba import get_tx_by_sn
+    from api_x.zyt.biz.models import Transaction
+
+    def do_check(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            try:
+                params = request.view_args
+                hashed_sn = params.get('sn')
+                sn = Transaction.get_hash_stripped_sn(hashed_sn)
+                tx = get_tx_by_sn(sn)
+                if tx is None:
+                    # 没找到
+                    if on_not_found:
+                        return on_not_found()
+                    return response.not_found()
+                if not tx.check_expire_hashed_sn(hashed_sn):
+                    # 过期
+                    if on_expired:
+                        return on_expired()
+                    return response.expired(msg='expired, please retry request pay.')
+
+                return f(tx, *args, **kwargs)
+            except Exception as e:
+                logger.exception(e)
+            # 异常
+            if on_error:
+                return on_error()
+            return response.bad_request()
+        return wrapper
+    return do_check

@@ -7,7 +7,8 @@ from api_x.zyt.user_mapping import get_user_domain_by_name
 from flask import request
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
-from api_x.utils.entry_auth import verify_request
+from api_x.zyt.biz.models import TransactionType
+from api_x.utils.entry_auth import verify_request, prepay_entry
 
 
 logger = get_logger(__name__)
@@ -15,6 +16,7 @@ logger = get_logger(__name__)
 
 @mod.route('/preprepaid', methods=['POST'])
 @verify_request('preprepaid')
+@prepay_entry(TransactionType.PREPAID)
 def preprepaid():
     data = request.values
     channel = request.channel
@@ -40,9 +42,7 @@ def preprepaid():
     try:
         prepaid_record = create_prepaid(channel, order_id, to_user_map.account_user_id, amount,
                                         client_callback_url, client_notify_url)
-        tx = prepaid_record.tx
-        hashed_sn = tx.sn_with_expire_hash
-        return response.success(sn=hashed_sn)
+        return prepaid_record.tx
     except Exception as e:
         logger.exception(e)
         return response.fail(code=1, msg=e.message)

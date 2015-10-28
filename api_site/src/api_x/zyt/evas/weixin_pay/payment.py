@@ -47,7 +47,7 @@ def prepay(source, trade_type, out_trade_no, total_fee, ip, body, time_start,
                 'prepayid': data['prepay_id'],
                 'package': 'Sign=WXPay',
                 'noncestr': strings.gen_rand_str(32),
-                'timestamp': int(times.timestamp()),
+                'timestamp': str(int(times.timestamp())),
             }
             params = append_md5_sign(app_config.APP_NAME, params)
             return params

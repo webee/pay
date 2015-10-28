@@ -21,15 +21,15 @@ def fail(code=1, msg='fail', **kwargs):
 
 
 def bad_request(code=400, msg='bad request', **kwargs):
-    return _fail(code, msg, **kwargs), 400
+    return _fail(code, msg, **kwargs), code
 
 
 def processed(code=202, msg='processed', **kwargs):
-    return _fail(code, msg, **kwargs), 202
+    return _fail(code, msg, **kwargs), code
 
 
 def not_found(code=404, msg='not found.', **kwargs):
-    return _fail(code, msg, **kwargs), 404
+    return _fail(code, msg, **kwargs), code
 
 
 def accepted(**kwargs):
@@ -37,7 +37,11 @@ def accepted(**kwargs):
 
 
 def refused(code=403, msg='refused', **kwargs):
-    return _fail(code, msg, **kwargs), 403
+    return _fail(code, msg, **kwargs), code
+
+
+def expired(code=413, msg='expired', **kwargs):
+    return _fail(code, msg, **kwargs), code
 
 
 def submit_form(url, req_params, method='POST'):

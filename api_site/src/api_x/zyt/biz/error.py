@@ -48,3 +48,9 @@ class TransactionNotFoundError(BizError):
     def __init__(self, message=None):
         message = message or 'transaction not found.'
         super(BizError, self).__init__(message)
+
+
+class CheckoutExpiredError(BizError):
+    def __init__(self, message=None):
+        message = message or 'checkout expired.'
+        super(BizError, self).__init__(message)

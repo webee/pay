@@ -22,6 +22,9 @@ def checkout(source, sn):
     tx = get_tx_by_sn(sn)
     if tx is None:
         abort(404)
+    if not tx.check_expire_hashed_sn(sn):
+        return render_template("info.html", msg="该次支付过期，请重新请求支付")
+
     if tx.state != PaymentTxState.CREATED:
         return render_template("info.html", msg="该订单已支付")
 
@@ -64,6 +67,8 @@ def do_pay(source, sn, vas_name, request_client_type=RequestClientType.WEB):
     tx = get_tx_by_sn(sn)
     if tx is None:
         return render_template("info.html", msg="无此订单")
+    if not tx.check_expire_hashed_sn(sn):
+        return render_template("info.html", msg="该次支付过期，请重新请求支付")
     if tx.state != PaymentTxState.CREATED:
         return render_template("info.html", msg="该订单已支付")
     if vas_name not in get_activated_evases(tx, with_vas=True):

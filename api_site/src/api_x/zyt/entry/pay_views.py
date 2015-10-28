@@ -57,9 +57,11 @@ def prepay():
                                                         payer_user_map.account_user_id, payee_user_map.account_user_id,
                                                         order_id, product_name, product_category, product_desc, amount,
                                                         client_callback_url, client_notify_url)
+        tx = payment_record.tx
+        hashed_sn = tx.sn_with_expire_hash
         # FIXME: 不直接返回pay_url, 修改pay_client, pay_url作为web支付方式在客户端确定
-        pay_url = config.HOST_URL + url_for('web_checkout_entry.checkout', source=TransactionType.PAYMENT, sn=payment_record.sn)
-        return response.success(sn=payment_record.sn, pay_url=pay_url)
+        pay_url = config.HOST_URL + url_for('web_checkout_entry.checkout', source=TransactionType.PAYMENT, sn=hashed_sn)
+        return response.success(sn=hashed_sn, pay_url=pay_url)
     except AlreadyPaidError as e:
         logger.exception(e)
         return response.fail(msg=e.message)

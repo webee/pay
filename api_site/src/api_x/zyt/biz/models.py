@@ -2,6 +2,13 @@
 from api_x import db
 from datetime import datetime
 from api_x.constant import TransactionType
+from api_x.config import etc
+from api_x.utils import times
+from pytoolbox.util import aes
+from pytoolbox.util.log import get_logger
+
+
+logger = get_logger(__name__)
 
 
 class PaymentType:
@@ -57,6 +64,43 @@ class Transaction(db.Model):
         super(Transaction, self).__init__(*args, **kwargs)
         self.__record = None
         self.__source_sn = None
+
+    @staticmethod
+    def get_hash_stripped_sn(sn):
+        return sn.split('$', 1)[0]
+
+    @property
+    def sn_with_expire_hash(self):
+        updated = times.utc2timestamp(self.updated_on)
+        expired = updated + etc.Biz.PAYMENT_CHECKOUT_VALID_SECONDS
+
+        key = str(int(updated)) + etc.KEY
+        data = str(int(expired))
+
+        logger.info('hash sn: [%s], updated: [%s], expired: [%s]' % (self.sn, updated, expired))
+        _hash = aes.encrypt_to_urlsafe_base64(data, key).rstrip('=')
+
+        return '%s$%s' % (self.sn, _hash)
+
+    def check_expire_hashed_sn(self, hashed_sn):
+        sn = Transaction.get_hash_stripped_sn(hashed_sn)
+        if self.sn != sn:
+            return False
+
+        _hash = str(hashed_sn[len(sn)+1:])
+
+        updated = times.utc2timestamp(self.updated_on)
+        key = str(int(updated)) + etc.KEY
+        try:
+            _hash += '=' * ((4 - (len(_hash) % 4)) % 4)
+            logger.info('try check sn: [%s], updated: [%s], _hash: [%s]' % (self.sn, updated, _hash))
+            expired = int(aes.decrypt_from_urlsafe_base64(_hash, key))
+        except Exception as _:
+            return False
+
+        timestamp = times.timestamp()
+        logger.info('done check sn: [%s], timestamp: [%s], expired: [%s]' % (self.sn, timestamp, expired))
+        return timestamp < expired
 
     @property
     def record(self):

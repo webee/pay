@@ -40,7 +40,9 @@ def preprepaid():
     try:
         prepaid_record = create_prepaid(channel, order_id, to_user_map.account_user_id, amount,
                                         client_callback_url, client_notify_url)
-        return response.success(sn=prepaid_record.sn)
+        tx = prepaid_record.tx
+        hashed_sn = tx.sn_with_expire_hash
+        return response.success(sn=hashed_sn)
     except Exception as e:
         logger.exception(e)
         return response.fail(code=1, msg=e.message)

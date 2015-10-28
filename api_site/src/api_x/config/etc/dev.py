@@ -13,6 +13,7 @@ class Biz:
 
     PAYMENT_MAX_TRIAL_TIMES = 4
     PAYMENT_MAX_VALID_SECONDS = 300
+    PAYMENT_CHECKOUT_VALID_SECONDS = 120
 
 
 HOST_URL = 'http://dev_pay.lvye.com:5100'

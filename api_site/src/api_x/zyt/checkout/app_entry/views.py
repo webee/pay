@@ -48,6 +48,8 @@ def query_info(source, sn, request_client_type=RequestClientType.WEB):
     tx = get_tx_by_sn(sn)
     if tx is None:
         return response.not_found()
+    if not tx.check_expire_hashed_sn(sn):
+        return response.expired()
 
     if source == TransactionType.PAYMENT:
         payment_entity = gen_payment_entity_by_pay_tx(tx)
@@ -81,6 +83,8 @@ def prepare_params(source, sn, vas_name, request_client_type=RequestClientType.W
     tx = get_tx_by_sn(sn)
     if tx is None:
         return response.not_found()
+    if not tx.check_expire_hashed_sn(sn):
+        return response.expired()
     if tx.state != PaymentTxState.CREATED:
         return response.processed()
     if vas_name not in get_activated_evases(tx, is_wx_app=True, with_vas=True):

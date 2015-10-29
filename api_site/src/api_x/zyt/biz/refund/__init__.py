@@ -92,7 +92,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         logger.warning('bad refund notify: [sn: {0}]'.format(sn))
         return
 
-    if tx.vas_sn is not None and tx.vas_sn != vas_sn:
+    if tx.vas_sn and tx.vas_sn != vas_sn:
         # 像微信这种是请求退款就得到refund_id的, notify的时候判断是否一致
         logger.warning('refund vas_sn mismatch: [{0}] vs [{1}]'.format(tx.vas_sn, vas_sn))
         return

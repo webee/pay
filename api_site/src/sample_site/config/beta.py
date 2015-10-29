@@ -5,7 +5,7 @@ class App:
     TESTING = True
 
 
-HOST_URL = "http://localhost:8099"
+HOST_URL = "http://dev_pay.lvye.com:8099"
 
 PAYEE = '169658002'
 

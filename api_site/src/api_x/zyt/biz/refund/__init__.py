@@ -16,9 +16,9 @@ from ...vas.models import EventType
 from ..transaction import create_transaction, transit_transaction_state, update_transaction_info
 from ..models import TransactionType, RefundRecord, PaymentType
 from .error import *
-from api_x.zyt.biz.payment.dba import get_payment_by_id, get_tx_payment_by_sn
+from api_x.zyt.biz.payment.dba import get_payment_by_id, get_payment_tx_by_sn
 from api_x.zyt.biz.error import *
-from .dba import get_tx_refund_by_sn
+from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 from pytoolbox.util.log import get_logger
 from api_x.task import tasks
 
@@ -49,7 +49,8 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data):
 
 
 def handle_refund_in(vas_name, sn, notify_handle=None):
-    tx, refund_record = get_tx_refund_by_sn(sn)
+    tx = get_tx_by_sn(sn)
+    refund_record = tx.record
     succeed_refund_in(vas_name, refund_record)
 
     if notify_handle is not None:
@@ -69,14 +70,16 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
     for i in range(10):
         # 这是因为_create_and_request_refund在一个事务中，notify到这儿的时候，事务没有结束，导致tx获取不到。
         # 这里的解决办法就是重试
-        tx, refund_record = get_tx_refund_by_sn(sn)
+        tx = get_tx_by_sn(sn)
         if tx is None:
             logger.warn('apply refund [{0}] is not finish, sleep then retry.')
             time.sleep(0.5)
             continue
+        refund_record = tx.record
         break
 
-    payment_tx, payment_record = get_tx_payment_by_sn(refund_record.payment_sn)
+    payment_tx = get_payment_tx_by_sn(refund_record.payment_sn)
+    payment_record = payment_tx.record
 
     logger.info('refund notify: {0}, {1}, {2}, {3}, {4}'.format(is_success, sn, vas_name, vas_sn, data))
     if tx is None or refund_record is None:

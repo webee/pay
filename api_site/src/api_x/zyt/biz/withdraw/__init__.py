@@ -6,7 +6,7 @@ from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.models import TransactionType, WithdrawRecord
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
-from api_x.zyt.biz.withdraw.dba import get_tx_withdraw_by_sn
+from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 from api_x.zyt.biz.withdraw.error import WithdrawFailedError
 from api_x.zyt.user_mapping import get_user_map_by_account_user_id
 from api_x.zyt.vas.user import get_user_cash_balance
@@ -225,7 +225,8 @@ def _withdraw_by_lianlian_pay(tx, withdraw_record):
 
 
 def handle_withdraw_notify(is_success, sn, vas_name, vas_sn, data):
-    tx, withdraw_record = get_tx_withdraw_by_sn(sn)
+    tx = get_tx_by_sn(sn)
+    withdraw_record = tx.record
 
     logger.info('withdraw notify: {0}'.format(data))
     if tx is None or withdraw_record is None:

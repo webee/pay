@@ -3,11 +3,10 @@ from __future__ import unicode_literals
 from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
 
-from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_user_map_by_account_user_id
-from api_x.zyt.biz.prepaid.dba import get_tx_prepaid_by_sn
+from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 from api_x.constant import PrepaidTxState
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
@@ -88,7 +87,8 @@ def handle_prepaid_result(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
-    tx, prepaid_record = get_tx_prepaid_by_sn(sn)
+    tx = get_tx_by_sn(sn)
+    prepaid_record = tx.record
 
     client_callback_url = prepaid_record.client_callback_url
 
@@ -113,7 +113,8 @@ def handle_prepaid_notify(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
-    tx, prepaid_record = get_tx_prepaid_by_sn(sn)
+    tx = get_tx_by_sn(sn)
+    prepaid_record = tx.record
 
     if is_duplicated_notify(tx, vas_name, vas_sn):
         return

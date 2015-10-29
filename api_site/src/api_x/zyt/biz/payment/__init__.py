@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x.zyt.biz.commons import is_duplicated_notify
-from api_x.zyt.biz.payment.dba import get_payment_by_channel_order_id, get_payment_by_sn, get_tx_payment_by_sn
+from api_x.zyt.biz.payment.dba import get_payment_by_channel_order_id, get_payment_by_sn, get_payment_tx_by_sn
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
 
 from flask import redirect
@@ -211,8 +211,8 @@ def fail_payment(payment_record):
 
 @transactional
 def handle_paid_out(vas_name, sn, notify_handle=None):
-    tx, payment_record = get_tx_payment_by_sn(sn)
-    succeed_paid_out(vas_name, tx, payment_record)
+    tx = get_payment_tx_by_sn(sn)
+    succeed_paid_out(vas_name, tx, tx.record)
 
     if notify_handle is not None:
         notify_handle(True)
@@ -227,7 +227,8 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
-    tx, payment_record = get_tx_payment_by_sn(sn)
+    tx = get_payment_tx_by_sn(sn)
+    payment_record = tx.record
     client_callback_url = payment_record.client_callback_url
 
     code = 0 if is_success else 1
@@ -252,7 +253,8 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
     :param data: 数据
     :return:
     """
-    tx, payment_record = get_tx_payment_by_sn(sn)
+    tx = get_payment_tx_by_sn(sn)
+    payment_record = tx.record
 
     if is_duplicated_notify(tx, vas_name, vas_sn):
         return

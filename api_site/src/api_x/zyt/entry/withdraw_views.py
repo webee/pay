@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from decimal import Decimal
 
 from api_x.utils import response
-from api_x.zyt.biz.withdraw import get_tx_withdraw_by_sn
+from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 from flask import request
 from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
@@ -71,9 +71,10 @@ def query_withdraw(user_id, sn):
         return response.bad_request(msg='user not exists: [{0}]'.format(user_id))
     from_user_id = user_map.account_user_id
 
-    tx, withdraw_record = get_tx_withdraw_by_sn(sn)
+    tx = get_tx_by_sn(sn)
     if tx is None:
         return response.not_found(msg="withdraw tx not exits: [sn: {0}]".format(sn))
+    withdraw_record = tx.record
 
     if withdraw_record.from_user_id != from_user_id:
         return response.bad_request('user [{0}] has no withdraw [{1}]'.format(user_id, sn))

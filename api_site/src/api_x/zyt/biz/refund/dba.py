@@ -20,11 +20,6 @@ def get_refund_by_id(id):
     return RefundRecord.query.get(id)
 
 
-def get_tx_refund_by_sn(sn):
-    tx = get_tx_by_sn(sn)
-    return tx, tx.record
-
-
 @transactional
 def update_payment_refunded_amount(payment_id, refund_amount):
     payment_record = get_payment_by_id(payment_id)

@@ -20,6 +20,6 @@ def get_payment_by_id(id):
     return PaymentRecord.query.get(id)
 
 
-def get_tx_payment_by_sn(sn):
+def get_payment_tx_by_sn(sn):
     tx = get_tx_by_sn(sn, search_stack=True)
-    return tx, tx.record
+    return tx

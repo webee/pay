@@ -23,7 +23,7 @@
         <h1>请选择支付方式</h1>
             {% for vas_name in vases %}
                 {# TODO: 重新设计此页面 #}
-                <p><a id="pay_{{ loop.index0 }}" href="{{ root_url + url_for('web_checkout_entry.pay', source=source, sn=tx.sn, vas_name=vas_name) }}">{{ vas_name }}</a></p>
+                <p><a id="pay_{{ loop.index0 }}" href="{{ root_url + url_for('web_checkout_entry.pay', source=source, sn=sn, vas_name=vas_name) }}">{{ vas_name }}</a></p>
             {% endfor %}
     </p>
 </body>
@@ -53,7 +53,7 @@
         f.submit();
     }
 
-    var url = "{{ root_url + url_for('web_checkout_entry.pay', source=source, sn=tx.sn, vas_name=vases[0]) }}";
+    var url = "{{ root_url + url_for('web_checkout_entry.pay', source=source, sn=sn, vas_name=vases[0]) }}";
     navigateToUrl(url);
 </script>
 {% endif %}

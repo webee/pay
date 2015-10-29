@@ -29,7 +29,8 @@ def params(tx, source, sn, vas_name):
 
 @mod.route("/pay/zyt/<sn>", methods=["POST"])
 @verify_request('zyt_pay.app')
-def zyt_pay(sn):
+@checkout_entry()
+def zyt_pay(tx, sn):
     """自游通余额支付入口，需要授权"""
     # TODO: 暂时以授权的方式进行，之后需要提供支付密码
     from api_x.zyt.biz.models import TransactionType
@@ -37,7 +38,7 @@ def zyt_pay(sn):
 
     request_client_type = req.client_type()
     # is_success=True/False
-    return prepare_params(TransactionType.PAYMENT, sn, vas.NAME, request_client_type)
+    return prepare_params(TransactionType.PAYMENT, tx, vas.NAME, request_client_type)
 
 
 def query_info(source, tx, request_client_type=RequestClientType.WEB):

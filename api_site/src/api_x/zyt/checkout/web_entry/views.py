@@ -38,7 +38,7 @@ def checkout(tx, source, sn):
     request_client_type = req.client_type()
     vases = get_activated_evases(tx)
 
-    return render_template("checkout.html", root_url=config.HOST_URL, source=source, tx=tx,
+    return render_template("checkout.html", root_url=config.HOST_URL, source=source, tx=tx, sn=sn,
                            vases=vases, request_client_type=request_client_type)
 
 

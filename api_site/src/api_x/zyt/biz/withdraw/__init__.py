@@ -219,8 +219,8 @@ def _withdraw_by_lianlian_pay(tx, withdraw_record):
                               withdraw_record.flag_card, withdraw_record.card_type, withdraw_record.card_no,
                               withdraw_record.acct_name, withdraw_record.bank_code, withdraw_record.province_code,
                               withdraw_record.city_code, withdraw_record.brabank_name, withdraw_record.prcptcd)
-    except Exception as _:
-        raise WithdrawFailedError(res['ret_msg'])
+    except Exception as e:
+        raise WithdrawFailedError(e.message)
     return res
 
 

@@ -22,4 +22,4 @@ class PayClientConfig:
     # sample
     CHANNEL_NAME = 'zyt_sample'
 
-    ROOT_URL = "http://pay.lvye.com/api"
+    ROOT_URL = "http://dev_pay.lvye.com:5100"

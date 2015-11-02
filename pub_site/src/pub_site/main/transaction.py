@@ -49,7 +49,7 @@ TX_CHANNEL_MSG = {
     'lvye_pay_site': '自游通网站',
     'zyt_sample': '自游通sample系统',
     'lvye_skiing': '绿野滑雪',
-    'lvye_lvxing': '绿野滑雪',
+    'lvye_lvxing': '绿野旅行',
     }
 
 

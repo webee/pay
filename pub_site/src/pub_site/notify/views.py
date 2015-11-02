@@ -12,10 +12,6 @@ from . import task
 @mod.route('/withdraw', methods=['POST'])
 @pay_client.verify_request
 def notify_withdraw():
-    is_verify_pass = request.is_verify_pass
-    if not is_verify_pass:
-        return jsonify(code=1)
-
     data = request.params
     code = data['code']
     sn = data['sn']

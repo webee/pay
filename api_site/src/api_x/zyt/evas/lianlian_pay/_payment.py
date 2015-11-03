@@ -32,7 +32,7 @@ def _get_common_params(user_id, user_created_on, ip, order_no, ordered_on, order
         }
 
 
-def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url):
+def pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url):
     params = {
         'version': lianlian_pay.Payment.VERSION,
         'charset_name': 'UTF-8',
@@ -41,26 +41,41 @@ def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_de
     params.update(_get_common_params(user_id, user_created_on, ip, order_no, ordered_on,
                                      order_name, order_desc, amount, notify_url))
     params = _append_md5_sign(params)
+    params['_url'] = lianlian_pay.Payment.URL
     logger.info("request lianlian pay WEB: {0}".format(params))
+
+    return params
+
+
+def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url):
+    params = pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url)
     return _generate_submit_form(params)
 
 
-def wap_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url,
-            app_request=lianlian_pay.AppRequest.WAP):
+def wap_pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url,
+                  notify_url, app_request):
     params = {
         'version': lianlian_pay.Payment.Wap.VERSION,
         'app_request': app_request,
         'url_return': return_url,
-        }
+    }
     params.update(_get_common_params(user_id, user_created_on, ip, order_no, ordered_on,
                                      order_name, order_desc, amount, notify_url))
 
     params = _append_md5_sign(params)
 
     req_params = {
-        'req_data': json.dumps(params)
+        'req_data': json.dumps(params),
+        '_url': lianlian_pay.Payment.Wap.URL
     }
-    logger.info("request lianlian pay WAP {0}".format(params))
+    logger.info("request lianlian pay WAP {0}".format(req_params))
+    return req_params
+
+
+def wap_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url,
+            app_request=lianlian_pay.AppRequest.WAP):
+    req_params = wap_pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,
+                               return_url, notify_url, app_request)
     return _generate_submit_form(req_params, lianlian_pay.Payment.Wap.URL)
 
 
@@ -79,6 +94,8 @@ def _generate_submit_form(req_params, url=lianlian_pay.Payment.URL):
     submit_page = '<meta http-equiv="content-type" content="text/html; charset=UTF-8">'
     submit_page += '<form id="payBillForm" action="{0}" method="POST">'.format(url)
     for key in req_params:
+        if key.startswith('_'):
+            continue
         submit_page += '''<input type="hidden" name="{0}" value='{1}' />'''.format(key, req_params[key])
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'
     submit_page += '<script>document.forms["payBillForm"].submit();</script>'

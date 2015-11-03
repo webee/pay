@@ -11,6 +11,15 @@ NAME = 'ZYT'
 logger = get_logger(__name__)
 
 
+def payment_param(payment_type, source, sn):
+    from api_x.zyt.biz.models import TransactionType
+    if source != TransactionType.PAYMENT:
+        # 自游通支付只支持支付，不支持充值等方式
+        raise Exception("自游通支付暂只支持支付".encode('utf-8'))
+
+    # TODO: 验证密码支付
+
+
 def pay(source, sn, channel=None):
     from api_x.zyt.biz.models import TransactionType
     if source != TransactionType.PAYMENT:

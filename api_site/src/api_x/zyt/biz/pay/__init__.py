@@ -1,10 +1,9 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x.zyt.biz.commons import is_duplicated_notify
-from api_x.zyt.biz.payment.dba import get_payment_by_channel_order_id, get_payment_by_sn, get_payment_tx_by_sn
+from api_x.zyt.biz.pay.dba import get_payment_by_channel_order_id, get_payment_by_sn, get_payment_tx_by_sn
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
 
-from flask import redirect
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.vas.pattern import zyt_bookkeeping
@@ -20,7 +19,6 @@ from api_x.zyt.biz.models import DuplicatedPaymentRecord
 from api_x.zyt.biz import user_roles
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
-from pytoolbox.util.urls import build_url
 from api_x.config import etc as config
 from api_x.task import tasks
 from .error import AlreadyPaidError
@@ -85,10 +83,10 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
         payment_record.product_name = product_name
         payment_record.product_category = product_category
         payment_record.product_desc = product_desc
-        tx.amount = amount
         tx.comments = "在线支付-{0}".format(product_name)
 
-    if is_payment_expired(payment_record):
+    if tx.amount != amount or is_payment_expired(payment_record):
+        tx.amount = amount
         # push old sn to stack.
         tx_sn_stack = TransactionSnStack(tx_id=tx.id, sn=tx.sn, generated_on=tx.updated_on, state=tx.state)
         db.session.add(tx_sn_stack)

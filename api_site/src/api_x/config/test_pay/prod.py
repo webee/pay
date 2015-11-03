@@ -2,12 +2,12 @@
 
 
 class Pay:
-    URL = "http://192.168.0.165:8090/pay"
+    URL = "http://pay.lvye.com/__/t_/pay"
 
 
 class Refund:
-    URL = "http://192.168.0.165:8090/refund"
+    URL = "http://pay.lvye.com/__/t_/refund"
 
 
 class PayToBankcard:
-    URL = "http://192.168.0.165:8090/pay_to_bankcard"
+    URL = "http://pay.lvye.com/__/t_/pay_to_bankcard"

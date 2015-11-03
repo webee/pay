@@ -5,13 +5,15 @@ PROJECT_ROOT = get_project_root()
 
 
 def load_config(env):
-    register_config(__name__, 'etc', env=env)
     register_config(__name__, 'lianlian_pay', env=env)
     register_config(__name__, 'test_pay', env=env)
     register_config(__name__, 'weixin_pay', env=env)
 
     # business
     register_config(__name__, 'application', env=env)
+
+    # etc
+    register_config(__name__, 'etc', env=env)
 
     # celery
     register_config(__name__, 'api_celery_task', env=env)

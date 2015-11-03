@@ -7,6 +7,10 @@ class App:
     SQLALCHEMY_ECHO = True
 
 
+class Biz:
+    VALID_NETLOCS = ['test_pay.lvye.com:5100']
+
+
 HOST_URL = 'http://test_pay.lvye.com:5100'
 
 TEST_CHANNELS = {'zyt_sample'}

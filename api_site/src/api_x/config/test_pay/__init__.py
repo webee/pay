@@ -14,6 +14,11 @@ class Pay:
         WAP = "WAP"
 
 
+class PaymentType:
+    WEB = 'WEB'
+    APP = 'APP'
+
+
 class Refund:
     URL = "http://dev_pay.lvye.com:8090/refund"
 

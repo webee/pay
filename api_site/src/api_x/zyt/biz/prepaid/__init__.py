@@ -31,6 +31,7 @@ def create_prepaid(channel, order_id, to_id, amount, client_callback_url, client
 
     comments = "充值"
     user_ids = [user_roles.to_user(to_id)]
+    # TODO: 处理重复order_id的情况
     tx = create_transaction(channel.name, TransactionType.PREPAID, amount, comments, user_ids, order_id=order_id)
 
     fields = {

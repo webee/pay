@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from api_x import db
 
 from api_x.zyt.biz.models import RefundRecord
-from api_x.zyt.biz.payment.dba import get_payment_by_id
+from api_x.zyt.biz.pay.dba import get_payment_by_id
 from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 from pytoolbox.util.dbs import transactional
 

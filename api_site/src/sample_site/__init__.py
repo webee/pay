@@ -5,7 +5,7 @@ import os
 from flask import Flask
 from pytoolbox.util import pmc_config
 from pytoolbox.pay_client import PayClient
-from pytoolbox.util.flask.utils import ReverseProxied
+from pytoolbox.util.flask_extras.utils import ReverseProxied
 
 
 def register_mods(app):

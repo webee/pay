@@ -36,6 +36,7 @@ def pay():
 
     memo = request.values.get('memo', '')
     use_zyt_pay = request.values.get('use_zyt_pay')
+    use_old_pay = request.values.get('use_old_pay')
     payee = request.values.get('other_payee')
     payee = payee or request.values['payee']
     payee_domain_name = request.values['payee_domain_name']
@@ -64,7 +65,9 @@ def pay():
     if use_zyt_pay:
         return Response(pay_client.web_zyt_pay(sn))
 
-    return redirect(pay_client.web_checkout_url(sn))
+    if use_old_pay:
+        return redirect(pay_client.web_checkout_url(sn))
+    return redirect(config.CHECKOUT_URL.format(sn=sn))
 
 
 @mod.route('/pay_result', methods=['POST'])

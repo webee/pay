@@ -26,6 +26,7 @@ payee: {{ payee }}({{ payee }}), 全部: {{ payee_balance.total }}, 可用: {{ p
         <option value="GUARANTEE">担保支付</option>
     </select>
     使用自游通余额支付: <input type="checkbox" name="use_zyt_pay" />
+    old: <input type="checkbox" name="use_old_pay" />
     <input type="submit" value="去支付"/>
 </form>
 <hr/>
@@ -60,6 +61,7 @@ payee: {{ payee }}({{ payee }}), 全部: {{ payee_balance.total }}, 可用: {{ p
     user_id:<input type="text" name='to_user_id' value=""/>
     domain_name:<input type="text" name='to_domain_name' value=""/>
     <input type="text" name='amount' value="1"/>
+    old: <input type="checkbox" name="use_old_pay" />
     <input type="submit" value="充值"/>
 </form>
 </body>

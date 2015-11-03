@@ -85,10 +85,10 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
         payment_record.product_name = product_name
         payment_record.product_category = product_category
         payment_record.product_desc = product_desc
-        tx.amount = amount
         tx.comments = "在线支付-{0}".format(product_name)
 
-    if is_payment_expired(payment_record):
+    if tx.amount != amount or is_payment_expired(payment_record):
+        tx.amount = amount
         # push old sn to stack.
         tx_sn_stack = TransactionSnStack(tx_id=tx.id, sn=tx.sn, generated_on=tx.updated_on, state=tx.state)
         db.session.add(tx_sn_stack)

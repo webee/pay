@@ -57,6 +57,8 @@ class Transaction(db.Model):
     vas_name = db.Column(db.VARCHAR(32), nullable=False, default='')
     vas_sn = db.Column(db.VARCHAR(128), nullable=False, default='')
 
+    tried_times = db.Column(db.Integer, nullable=False, default=1)
+
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 

@@ -4,6 +4,7 @@ from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.pay.dba import get_payment_by_channel_order_id, get_payment_by_sn, get_payment_tx_by_sn
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
 
+from decimal import InvalidOperation, Decimal
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.vas.pattern import zyt_bookkeeping
@@ -13,7 +14,7 @@ from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType, TransactionSnStack
 from api_x.zyt.biz.error import NonPositiveAmountError, NegativeAmountError
-from api_x.zyt.biz.error import TransactionNotFoundError
+from api_x.zyt.biz.error import TransactionNotFoundError, AmountValueError
 from api_x.zyt.biz.transaction.error import TransactionStateError
 from api_x.zyt.biz.models import DuplicatedPaymentRecord
 from api_x.zyt.biz import user_roles
@@ -35,6 +36,12 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
     如果已经有对应订单，则直接支付成功
     """
     payment_record = PaymentRecord.query.filter_by(channel_id=channel.id, order_id=order_id).first()
+
+    try:
+        amount = Decimal(amount)
+    except InvalidOperation:
+        raise AmountValueError(amount)
+
     if payment_record is None:
         if amount <= 0:
             raise NonPositiveAmountError(amount)
@@ -100,6 +107,7 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
     if tx.state == PaymentTxState.FAILED:
         tx.state = PaymentTxState.CREATED
 
+    tx.tried_times += 1
     payment_record.tried_times += 1
     db.session.add(tx)
     db.session.add(payment_record)

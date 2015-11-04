@@ -5,7 +5,8 @@ class App:
     TESTING = True
 
 
-HOST_URL = 'http://pay.lvye.com/__'
+# ReverseProxy.HTTP_X_SCRIPT_NAME='/__'
+HOST_URL = 'http://pay.lvye.com'
 
 
 class PayClientConfig:

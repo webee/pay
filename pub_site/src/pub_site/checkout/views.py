@@ -65,8 +65,7 @@ def checkout(sn):
         if len(vases) == 1:
             template = "checkout/one_type_checkout.html"
 
-    return render_template(template, root_url=config.HOST_URL, sn=sn, info=info,
-                           vases=vases, vas_infos=VAS_INFOS, client_type=client_type)
+    return render_template(template, sn=sn, info=info, vases=vases, vas_infos=VAS_INFOS, client_type=client_type)
 
 
 @mod.route("/pay/<sn>/<vas_name>", methods=["GET"])

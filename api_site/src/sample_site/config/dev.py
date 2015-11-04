@@ -5,4 +5,5 @@ class App:
     DEBUG = True
 
 
-CHECKOUT_URL = 'http://dev_pay.lvye.com:5102/checkout/{sn}'
+class PayClientConfig:
+    CHECKOUT_URL = 'http://dev_pay.lvye.com:5102/checkout/{sn}'

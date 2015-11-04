@@ -29,7 +29,7 @@ def prepaid():
 
     if use_old_pay:
         return redirect(pay_client.web_checkout_url(sn, pay_client.constant.TransactionType.PREPAID))
-    return redirect(config.CHECKOUT_URL.format(sn=sn))
+    return redirect(pay_client.checkout_url(sn))
 
 
 @mod.route('/prepaid_result', methods=['POST'])

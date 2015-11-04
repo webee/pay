@@ -23,6 +23,4 @@ class PayClientConfig:
     CHANNEL_NAME = 'zyt_sample'
 
     ROOT_URL = "http://dev_pay.lvye.com:5100"
-
-
-CHECKOUT_URL = 'http://pay.lvye.com/checkout/{sn}'
+    CHECKOUT_URL = 'http://pay.lvye.com/checkout/{sn}'

@@ -67,7 +67,7 @@ def pay():
 
     if use_old_pay:
         return redirect(pay_client.web_checkout_url(sn))
-    return redirect(config.CHECKOUT_URL.format(sn=sn))
+    return redirect(pay_client.checkout_url(sn))
 
 
 @mod.route('/pay_result', methods=['POST'])

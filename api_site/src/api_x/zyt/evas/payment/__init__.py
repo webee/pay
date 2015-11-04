@@ -19,6 +19,16 @@ class PaymentEntity(object):
         self.order_id = order_id
         self.channel_name = channel_name
 
+    def dict(self):
+        return {
+            'order_id': self.order_id,
+            'name': self.product_name,
+            'desc': self.product_desc,
+            'sn': self.tx_sn,
+            'amount': self.amount,
+            'created_on': self.tx_created_on
+        }
+
 
 def gen_payment_entity_by_pay_tx(tx):
     payment_record = tx.record

@@ -14,7 +14,7 @@ def payment_param(payment_type, source, out_trade_no, total_fee, ip, body, time_
     if payment_type == config.PaymentType.NATIVE:
         code_url = prepay(source,config.TradeType.NATIVE, out_trade_no, total_fee, ip, body, time_start, detail,
                           fee_type, device_info, attach, goods_tag, product_id, limit_pay, openid, app_config)
-        return {'code_url': code_url}
+        return {'code_url': code_url, '_info': None}
     elif payment_type == config.PaymentType.APP:
         return prepay(source,config.TradeType.APP, out_trade_no, total_fee, ip, body, time_start, detail, fee_type,
                       device_info, attach, goods_tag, product_id, limit_pay, openid, app_config)

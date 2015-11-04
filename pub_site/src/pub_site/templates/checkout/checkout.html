@@ -126,7 +126,7 @@
                                         disable_pay_bt(msg);
                                     } else if (res == 'CREATED') {
                                         {#                                $(".payfinishLayer,.bgLayer").fadeIn();#}
-                                        window.open('{{ CONFIG.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name='') }}' + vas_name, '_self');
+                                        window.open("{{ CONFIG.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name='') }}" + vas_name, '_self');
                                     } else if (res == 'EXPIRED') {
                                         var msg = "本支付链接过期，请关闭页面，重新请求支付";
                                         alert(msg);

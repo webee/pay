@@ -23,7 +23,7 @@
         f.submit();
     }
 
-    var url = "{{ root_url + url_for('checkout_entry.pay', sn=sn, vas_name=vases[0]) }}";
+    var url = "{{ CONFIG.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name=vases[0]) }}";
     navigateToUrl(url);
 </script>
 </html>

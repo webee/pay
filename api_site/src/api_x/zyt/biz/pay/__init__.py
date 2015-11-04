@@ -85,16 +85,25 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
     if not in_to_pay_state(tx.state, exclude=[PaymentTxState.PAID_OUT]):
         raise AlreadyPaidError(payment_record.order_id)
 
+    is_changed = False
     # 更新订单相关信息
     if tx.state in [PaymentTxState.CREATED, PaymentTxState.FAILED]:
+        is_changed = is_changed or payment_record.amount == amount
         payment_record.amount = amount
+
+        is_changed = is_changed or payment_record.product_name == product_name
         payment_record.product_name = product_name
+
+        is_changed = is_changed or payment_record.product_category == product_category
         payment_record.product_category = product_category
+
+        is_changed = is_changed or payment_record.product_desc == product_desc
         payment_record.product_desc = product_desc
+
+        tx.amount = amount
         tx.comments = "在线支付-{0}".format(product_name)
 
-    if tx.amount != amount or is_payment_expired(payment_record):
-        tx.amount = amount
+    if is_changed or is_payment_expired(payment_record):
         # push old sn to stack.
         tx_sn_stack = TransactionSnStack(tx_id=tx.id, sn=tx.sn, generated_on=tx.updated_on, state=tx.state)
         db.session.add(tx_sn_stack)

@@ -62,7 +62,7 @@ def _do_pay(pay_to_lvye_record, pay_channel):
 
     sn = pay_client.prepay(params, ret_sn=True)
     if sn is None:
-        return redirect(url_for('.index'))
+        return redirect(url_for('.pay_to_lvye'))
     if pay_channel == 'ZYT':
         return pay_client.web_zyt_pay(sn)
-    return redirect(pay_client.web_checkout_url(sn))
+    return redirect(pay_client.checkout_url(sn))

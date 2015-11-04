@@ -51,6 +51,7 @@ class PayClientConfig:
     CHANNEL_NAME = 'lvye_pay_site'
 
     ROOT_URL = "http://pay.lvye.com/api/__"
+    CHECKOUT_URL = 'http://pay.lvye.com/checkout/{sn}'
 
 
 # #### data #######

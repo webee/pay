@@ -11,6 +11,7 @@ class Checkout:
 
 class PayClientConfig:
     ROOT_URL = "http://pay.lvye.com/api/__"
+    CHECKOUT_URL = 'http://pay.lvye.com/__/checkout/{sn}'
 
 
 HOST_URL = 'http://dev_pay.lvye.com:5102'

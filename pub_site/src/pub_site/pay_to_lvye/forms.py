@@ -24,6 +24,6 @@ class PayToLvyeForm(Form):
                                       amount_less_than_balance,
                                       NumberRange(min=Decimal('0.01'), message=u'金额必须为大于0')])
     pay_channel = RadioField(u"付款方式", choices=[('LVYE_PAY', '绿野在线支付'), ('ZYT', '自游通余额')],
-                             validators=[DataRequired(u"请选择支付方式")], default='BANKCARD')
+                             validators=[DataRequired(u"请选择支付方式")], default='LVYE_PAY')
     comment = TextAreaField(u"备注", validators=[DataRequired(u"请提供备注信息"), Length(max=150, message=u"备注不能超过150个字")])
     submit = SubmitField(u"确认")

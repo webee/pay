@@ -88,16 +88,16 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
     is_changed = False
     # 更新订单相关信息
     if tx.state in [PaymentTxState.CREATED, PaymentTxState.FAILED]:
-        is_changed = is_changed or payment_record.amount == amount
+        is_changed = is_changed or payment_record.amount != amount
         payment_record.amount = amount
 
-        is_changed = is_changed or payment_record.product_name == product_name
+        is_changed = is_changed or payment_record.product_name != product_name
         payment_record.product_name = product_name
 
-        is_changed = is_changed or payment_record.product_category == product_category
+        is_changed = is_changed or payment_record.product_category != product_category
         payment_record.product_category = product_category
 
-        is_changed = is_changed or payment_record.product_desc == product_desc
+        is_changed = is_changed or payment_record.product_desc != product_desc
         payment_record.product_desc = product_desc
 
         tx.amount = amount

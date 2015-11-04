@@ -8,6 +8,7 @@ from flask import Flask, render_template
 from flask.ext.login import LoginManager
 from flask.ext.migrate import Migrate
 from flask_wtf.csrf import CsrfProtect
+from flask.ext.qrcode import QRcode
 from tools.filters import register_filters, register_global_functions
 from pytoolbox.pay_client import PayClient
 from pytoolbox.util import dbs
@@ -21,6 +22,7 @@ logger = get_logger(__name__)
 
 # extensions
 migrate = Migrate()
+qrcode = QRcode()
 
 
 def init_template(app):
@@ -39,7 +41,6 @@ def init_template(app):
 def init_errors(app):
     @app.errorhandler(404)
     def page_not_found(e):
-        logger.exception(e)
         return render_template('404.html', error=e), 404
 
     @app.errorhandler(400)
@@ -99,6 +100,7 @@ def init_extensions(app):
     csrf.init_app(app)
 
     migrate.init_app(app, db)
+    qrcode.init_app(app)
 
 
 def custom_flask(app):

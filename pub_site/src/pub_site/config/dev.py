@@ -10,7 +10,7 @@ class Checkout:
 
 
 class PayClientConfig:
-    ROOT_URL = "http://localhost:5100"
+    ROOT_URL = "http://dev_pay.lvye.com:5100"
 
 
 HOST_URL = 'http://dev_pay.lvye.com:5102'

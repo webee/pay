@@ -1,0 +1,55 @@
+<!DOCTYPE>
+{% block all %}
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{% block title %}{% endblock %}</title>
+    {% block css %}
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    {% endblock %}
+    <!--[if lte IE 9]>
+    <script src="{{ url_for('static',filename='js/html5.js') }}"></script>
+    <![endif]-->
+    {% block js %}
+        <script src="{{ url_for('static', filename='js/jquery-1.8.3.min.js') }}"></script>
+    {% endblock %}
+</head>
+
+<body>
+<header>
+	<div class="hdCont clearfix">
+    	<h1 class="logo">
+			<a href="http://www.lvye.com" target="_blank">
+				<img src="{{ url_for('static', filename='images/logo_zyt.jpg') }}" class="pngfix" height="34" width="192" title="首页" alt="首页">
+			</a>
+		</h1>
+    </div>
+</header>
+
+<div class="main">
+	<div class="mainCont clearfix">
+        {% block main %}
+        {% endblock %}
+    </div>
+</div>
+
+
+{% block layer %}
+{% endblock %}
+
+<footer>
+	<div class="ftCont clearfix">
+    	<ul class="cL">
+        	<li><a href="http://www.lvye.cn/about/" target="_blank">关于我们</a></li>
+            <li><a href="http://www.lvye.cn/about/contactUs.html" target="_blank">联系我们</a></li>
+        </ul>
+        <p class="cR">Copyright  1999-2015  <a href="http://www.lvye.com">www.lvye.com</a>  绿野户外网版权所有</p>
+    </div>
+</footer>
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+</html>
+{% endblock %}

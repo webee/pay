@@ -1,6 +1,6 @@
 # coding=utf-8
 from api_x.constant import TransactionType
-from .payment import handle_payment_result, handle_payment_notify
+from .pay import handle_payment_result, handle_payment_notify
 from .prepaid import handle_prepaid_result, handle_prepaid_notify
 from .refund import handle_refund_notify
 from .withdraw import handle_withdraw_notify
@@ -77,7 +77,7 @@ def init_weixin_pay_notify_handles():
 
 
 def init_zyt_pay_notify_handles():
-    from .payment import handle_paid_out
+    from .pay import handle_paid_out
     from .refund import handle_refund_in
     from api_x.zyt.vas.constant import NotifyType
     from api_x.zyt.vas.notify import register_pay_notify_handle, register_refund_notify_handle

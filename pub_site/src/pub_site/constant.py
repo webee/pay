@@ -12,3 +12,11 @@ class PayToLvyeState:
     CREATED = "CREATED"
     FAILED = "FAILED"
     SUCCESS = "SUCCESS"
+
+
+class RequestClientType:
+    WEB = 'WEB'
+    WAP = 'WAP'
+    # IOS = 'IOS'
+    # ANDROID = 'ANDROID'
+    WEIXIN = 'WEIXIN'

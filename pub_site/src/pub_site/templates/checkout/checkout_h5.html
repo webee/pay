@@ -1,0 +1,85 @@
+{% extends "checkout/layout.html" %}
+
+{% block title %}选择支付方式{% endblock %}
+{% block js %}
+    <script src="{{ url_for('static', filename='js/jquery-1.8.3.min.js') }}"></script>
+{% endblock %}
+
+{% block main %}
+    <div class="wxpayTit clearfix">
+        <div class="wxpayL">
+            <h3>订单编号：<span>{{ info.order_id }}</span></h3>
+            <h3>商品名称：<span>{{ info.name }}</span></h3>
+            <h3>商品描述：<span>{{ info.desc }}</span></h3>
+            <h3>交易流水：<span>{{ info.sn }}</span></h3>
+        </div>
+        <div class="wxpayR">
+            金额: <span>{{ info.amount }}</span>元
+        </div>
+    </div>
+    <div class="wxCont">
+        <ul class="">
+            {% for vas_name in vases %}
+            {% set vas_info = vas_infos[vas_name] %}
+                <li class="zf_list1 samezf" id="{{ vas_name }}">
+                    <div class="bankChoice">
+                        <input id="i_{{ vas_name }}" type="radio" value="{{ vas_name }}" {% if loop.first %}checked{% endif %} name="zf" class="onlychice">
+                        <label>{{ vas_info.name }}</label>
+                        <img src="{{ url_for('static', filename='images/checkout/%s.png' % vas_name) }}" width="42" height="42" >
+                        <span class="worn">{{ vas_info.desc }}</span>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        <button id="bt_pay_now" class="nowpay" value="{{ vases[0] }}">立即支付</button>
+    </div>
+{% endblock %}
+
+
+{% block layer %}
+    <!--S遮罩层-->
+    <div class="bgLayer"></div>
+    <!--E遮罩层-->
+    <div class="payfinishLayer">
+        <a href="###" class="close"></a>
+        <p class="tit">请新开的页面完成支付</p>
+        <div class="payLine">如已经成功支付，请点击<button>已完成付款</button></div>
+        <div class="payLine2">如付款遇到问题，您可以<button>重新支付</button></div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function(){
+            /*选择支付方式*/
+            $("li.zf_list1.samezf").click(function(){
+                var r = $('#i_' + this.id)[0];
+                var b = $('#bt_pay_now')[0];
+                r.checked = true;
+                b.value = r.value;
+            });
+
+            /*支付完成弹层*/
+            // close
+            $(".payfinishLayer a.close").click(function(){
+                $(".payfinishLayer,.bgLayer").fadeOut();
+            });
+
+            // retry
+            $(".payfinishLayer .payLine2 button").click(function(){
+                $(".payfinishLayer,.bgLayer").fadeOut();
+            });
+
+            // finish
+            $(".payfinishLayer .payLine button").click(function(){
+                window.close();
+            });
+
+            $("#bt_pay_now").click(function(){
+                $(".payfinishLayer,.bgLayer").fadeIn();
+                // 在新窗口中打开具体的支付页面
+                window.open('{{ root_url }}/checkout/pay/{{ sn }}/' + this.value, '_lvye_pay');
+            });
+        })
+    </script>
+{% endblock %}

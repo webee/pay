@@ -5,6 +5,7 @@ from flask import url_for, Response
 from .commons import generate_absolute_url
 from pytoolbox.util.sign import Signer
 from pytoolbox.util.log import get_logger
+from ..error import PaymentTypeNotSupportedError
 from api_x.config import lianlian_pay as config
 
 
@@ -14,6 +15,26 @@ logger = get_logger(__name__)
 NAME = 'LIANLIAN_PAY'
 
 signer = Signer('key', 'sign')
+
+
+def payment_param(payment_type, source, user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc,
+                  amount):
+    from ._payment import pay_param as _pay_param, wap_pay_param as _wap_pay_param, app_params as _app_params
+
+    return_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_result', source=source, order_no=order_no))
+    notify_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_notify', source=source))
+
+    if payment_type == config.PaymentType.WEB:
+        return _pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,
+                          return_url, notify_url)
+    elif payment_type == config.PaymentType.WAP:
+        return _wap_pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,
+                              return_url, notify_url, config.AppRequest.WAP)
+    elif payment_type == config.PaymentType.APP:
+        return _app_params(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,
+                           notify_url)
+    else:
+        raise PaymentTypeNotSupportedError(NAME, payment_type)
 
 
 def pay(source, user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,

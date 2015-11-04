@@ -16,6 +16,7 @@ def date_filter(dt):
     else:
         return ''
 
+
 def checked_filter(bool_val):
     if bool_val:
         return 'checked'
@@ -24,9 +25,19 @@ def checked_filter(bool_val):
 
 
 def register_filters(app):
+    from pytoolbox.util import times
+    app.jinja_env.filters['utc2gmt8'] = times.utc2gmt8
     app.jinja_env.filters['datetime'] = datetime_filter
     app.jinja_env.filters['date'] = date_filter
     app.jinja_env.filters['checked'] = checked_filter
 
+
 def register_global_functions(app):
+    from pub_site import config
+    from flask import url_for
+
+    def abs_url_for(*args, **kwargs):
+        return config.HOST_URL + url_for(*args, **kwargs)
+
+    app.jinja_env.globals['abs_url_for'] = abs_url_for
     app.jinja_env.globals['widgets'] = WidgetLookup()

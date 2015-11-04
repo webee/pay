@@ -41,3 +41,15 @@ class RequestFailedError(ApiError):
     def __init__(self, message=None):
         message = message or "request failed."
         super(ApiError, self).__init__(message)
+
+
+class PaymentTypeNotImplementedError(EvasError):
+    def __init__(self, evas, payment_type):
+        msg = "payment type [{0}] not implemented by [{1}]".format(payment_type, evas)
+        super(EvasError, self).__init__(msg)
+
+
+class PaymentTypeNotSupportedError(EvasError):
+    def __init__(self, evas, payment_type):
+        msg = "payment type [{0}] not supported by [{1}]".format(payment_type, evas)
+        super(EvasError, self).__init__(msg)

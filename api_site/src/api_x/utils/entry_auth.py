@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 from functools import wraps
 import urlparse
+
 from flask import request
 from api_x.utils import response
 from pytoolbox.util.log import get_logger
 from pytoolbox.util.sign import Signer
 from api_x.zyt.user_mapping import get_channel_by_name
 from api_x.config import etc as config
-
 
 logger = get_logger(__name__)
 
@@ -174,3 +174,29 @@ def checkout_entry(on_not_found=None, on_expired=None, on_error=None):
             return response.bad_request()
         return wrapper
     return do_check
+
+
+def payment_entry(f):
+    from api_x.zyt.biz.transaction.dba import get_tx_by_sn
+    from api_x.zyt.biz.models import Transaction
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            params = request.view_args
+            hashed_sn = params.get('sn')
+            sn = Transaction.get_hash_stripped_sn(hashed_sn)
+            tx = get_tx_by_sn(sn)
+            if tx is None:
+                # 没找到
+                return response.not_found()
+            if not tx.check_expire_hashed_sn(hashed_sn):
+                # 过期
+                return response.expired(msg='expired, please retry request pay.')
+
+            return f(tx, *args, **kwargs)
+        except Exception as e:
+            logger.exception(e)
+        # 异常
+        return response.bad_request()
+    return wrapper

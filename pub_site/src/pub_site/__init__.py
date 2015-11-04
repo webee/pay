@@ -8,11 +8,13 @@ from flask import Flask, render_template
 from flask.ext.login import LoginManager
 from flask.ext.migrate import Migrate
 from flask_wtf.csrf import CsrfProtect
+from flask.ext.qrcode import QRcode
 from tools.filters import register_filters, register_global_functions
 from pytoolbox.pay_client import PayClient
 from pytoolbox.util import dbs
 from pytoolbox.util.dbs import db
 from pytoolbox.util.log import get_logger
+from pytoolbox.util.flask_extras.utils import ReverseProxied
 from pub_site import config
 
 
@@ -20,6 +22,7 @@ logger = get_logger(__name__)
 
 # extensions
 migrate = Migrate()
+qrcode = QRcode()
 
 
 def init_template(app):
@@ -38,7 +41,6 @@ def init_template(app):
 def init_errors(app):
     @app.errorhandler(404)
     def page_not_found(e):
-        logger.exception(e)
         return render_template('404.html', error=e), 404
 
     @app.errorhandler(400)
@@ -61,6 +63,7 @@ def register_mods(app):
     from pub_site.pay_to_lvye import pay_to_lvye_mod
     from pub_site.frontpage import frontpage_mod
     from pub_site.notify import notify_mod
+    from pub_site.checkout import checkout_entry_mod
 
     app.register_blueprint(auth_mod, url_prefix='/auth')
     app.register_blueprint(main_mod)
@@ -70,6 +73,7 @@ def register_mods(app):
     app.register_blueprint(pay_to_lvye_mod)
     app.register_blueprint(frontpage_mod)
     app.register_blueprint(notify_mod, url_prefix='/notify')
+    app.register_blueprint(checkout_entry_mod, url_prefix='/checkout')
 
     # exempt api
     csrf.exempt(notify_mod)
@@ -96,6 +100,7 @@ def init_extensions(app):
     csrf.init_app(app)
 
     migrate.init_app(app, db)
+    qrcode.init_app(app)
 
 
 def custom_flask(app):
@@ -139,37 +144,3 @@ def create_app(env='dev', deploy=False):
     # reverse proxied
     app.wsgi_app = ReverseProxied(app.wsgi_app)
     return app
-
-
-class ReverseProxied(object):
-    """Wrap the application in this middleware and configure the
-    front-end server to add these headers, to let you quietly bind
-    this to a URL other than / and to an HTTP scheme that is
-    different than what is used locally.
-
-    In nginx:
-    location /myprefix {
-        proxy_pass http://192.168.0.1:5001;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Scheme $scheme;
-        proxy_set_header X-Script-Name /myprefix;
-        }
-
-    :param app: the WSGI application
-    """
-    def __init__(self, app):
-        self.app = app
-
-    def __call__(self, environ, start_response):
-        script_name = environ.get('HTTP_X_SCRIPT_NAME', '')
-        if script_name:
-            environ['SCRIPT_NAME'] = script_name
-            path_info = environ['PATH_INFO']
-            if path_info.startswith(script_name):
-                environ['PATH_INFO'] = path_info[len(script_name):]
-
-        scheme = environ.get('HTTP_X_SCHEME', '')
-        if scheme:
-            environ['wsgi.url_scheme'] = scheme
-        return self.app(environ, start_response)

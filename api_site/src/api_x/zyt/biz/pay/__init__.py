@@ -1,10 +1,11 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x.zyt.biz.commons import is_duplicated_notify
-from api_x.zyt.biz.payment.dba import get_payment_by_channel_order_id, get_payment_by_sn, get_payment_tx_by_sn
+from api_x.zyt.biz.pay.dba import get_payment_by_channel_order_id, get_payment_by_sn, get_payment_tx_by_sn
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
 
-from flask import redirect
+import time
+from decimal import InvalidOperation, Decimal
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.vas.pattern import zyt_bookkeeping
@@ -14,13 +15,12 @@ from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType, TransactionSnStack
 from api_x.zyt.biz.error import NonPositiveAmountError, NegativeAmountError
-from api_x.zyt.biz.error import TransactionNotFoundError
+from api_x.zyt.biz.error import TransactionNotFoundError, AmountValueError
 from api_x.zyt.biz.transaction.error import TransactionStateError
 from api_x.zyt.biz.models import DuplicatedPaymentRecord
 from api_x.zyt.biz import user_roles
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
-from pytoolbox.util.urls import build_url
 from api_x.config import etc as config
 from api_x.task import tasks
 from .error import AlreadyPaidError
@@ -37,6 +37,12 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
     如果已经有对应订单，则直接支付成功
     """
     payment_record = PaymentRecord.query.filter_by(channel_id=channel.id, order_id=order_id).first()
+
+    try:
+        amount = Decimal(amount)
+    except InvalidOperation:
+        raise AmountValueError(amount)
+
     if payment_record is None:
         if amount <= 0:
             raise NonPositiveAmountError(amount)
@@ -102,6 +108,7 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
     if tx.state == PaymentTxState.FAILED:
         tx.state = PaymentTxState.CREATED
 
+    tx.tried_times += 1
     payment_record.tried_times += 1
     db.session.add(tx)
     db.session.add(payment_record)
@@ -231,8 +238,15 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
     payment_record = tx.record
     client_callback_url = payment_record.client_callback_url
 
-    code = 0 if is_success else 1
-    if client_callback_url:
+    req_code = 0 if is_success else 1
+    code = 0 if tx.state not in [PaymentTxState.FAILED, PaymentTxState.CREATED] else 1
+    if tx.state != PaymentTxState.CREATED and client_callback_url:
+        # 必须要tx状态改变
+        if code != req_code:
+            logger.warn('callback result mismatch with notify result.')
+            # 等待半秒钟
+            time.sleep(0.5)
+            code = 0 if tx.state not in [PaymentTxState.FAILED, PaymentTxState.CREATED] else 1
         from api_x.utils.notify import sign_and_return_client_callback
         user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
         user_id = user_mapping.user_id

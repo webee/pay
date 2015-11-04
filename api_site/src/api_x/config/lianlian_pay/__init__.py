@@ -38,6 +38,12 @@ class Payment:
         WAP = "16"
 
 
+class PaymentType:
+    WEB = 'WEB'
+    WAP = 'WAP'
+    APP = 'APP'
+
+
 class Refund:
     URL = 'https://yintong.com.cn/traderapi/refund.htm'
     QUERY_URL = 'https://yintong.com.cn/traderapi/refundquery.htm'

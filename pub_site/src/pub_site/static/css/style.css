@@ -59,7 +59,7 @@ footer{background:#333;height:60px;}
 
 
 /*提现申请成功页*/
-.main{min-height:860px;overflow-y:auto;width:100%;}
+.main{min-height:800px;overflow-y:auto;width:100%;}
 .mainCont{width:1170px;overflow:hidden;margin:0 auto;max-width:1200px;}
 .contLeft a {color: inherit; display: block;}
 .mainCont .contLeft,.mainCont .contRight{float:left;color:#595757;}
@@ -105,7 +105,7 @@ footer{background:#333;height:60px;}
 .payoffRight .line .tijiao:hover,.finaline button:hover,.choiceLayer .stepBtn:hover{background: #2f8c2f;}
 
 /*确认付款给绿野页*/
-.bgLayer{width:100%;height:100%;margin:0 auto;position:absolute;z-index:100;background:rgba(0,0,0,.5);top:0;left:0;display:none;}
+.bgLayer{width:100%;height:100%;margin:0 auto;position:fixed;z-index:100;background:rgba(0,0,0,.5);top:0;left:0;display:none;}
 .confirm{width:556px;height:344px;background:#fff;position:absolute;left:50%;top:50%;margin:-206px 0 0 -381px;border:4px solid #dcdcdc; z-index:101;padding:32px 110px 36px 96px;color:#595757;display:none;}
 .confirm h2{font-size:24px;font-weight:normal;margin-bottom:30px;}
 .finaline{margin-bottom:20px;}
@@ -182,6 +182,64 @@ footer{background:#333;height:60px;}
 .contRight p.pageNum a{background:#fff!important;border:1px solid #dcdcdc;display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;border-radius:0;-webkit-border-radius:0;-moz-border-radius:0;font-size:12px;color:#595757;}
 .contRight p.pageNum a.long{width:58px;}
 .contRight p.pageNum a:hover{border:1px solid #349cd8;}
+
+
+/*支付方式-微信支付*/
+.wxpayTit{/*height:50px;*/border-bottom:4px solid #3cb43c;padding:15px 30px;color:#595757;}
+.wxpayL{width:830px;/*height:50px;*/float:left;border-right:1px solid #dcdcdc;padding-right: 15px;}
+.wxpayL h3{font-size:16px;}.wxpayL h3 span{margin-left:10px;font-weight: normal;}
+.wxpayL p{margin-top:16px;}
+.wxpayR{width:264px;float:left;text-align:center;padding-top: 30px;font-size: 12px;font-weight: bold;}
+.wxpayR span{font-size:32px;color:#f97700;font-weight:bold;margin:0 10px;position: relative;top: 2px;}
+.wxpayX{width:264px;float:left;text-align:center;padding-top: 10px;font-size: 12px;font-weight: bold;}
+.wxpayX span{font-size:32px;color:#f97700;font-weight:bold;margin:0 10px;position: relative;top: 2px;}
+
+.wxCont{padding:30px 30px 50px;color:#595757;}
+.wxCont h3{font-size:18px;font-weight:normal;}
+.wxCont p.ewm{margin:30px 90px 0 158px;text-align:center;font-size:16px;width:300px;color:#b6b6b6;float:left;}
+.wxCont p.ewm span{display:block;margin-top:20px;line-height:26px;}
+
+/*支付方式*/
+.zf_list1{height:146px;border-bottom:1px solid #dcdcdc;color:#595757;}
+.zf_list1 .worn{color:#8f8f8f;font-size:12px;display:block;margin:15px 0 0 90px;}
+.zf_list1 .bankChoice{height:58px;border:2px solid #b1e1b1;line-height:58px;padding:0 40px;font-size:18px;}
+.bankChoice .onlychice{float:left;margin-top: 22px;}
+.bankChoice label{margin:0 60px 0 32px;float:left;width:54px;}
+.selectZf{float:left;margin-top: 14px;position:relative;}
+.selTit{width:428px; height:28px; border:1px solid #b1e1b1;font-size: 14px;line-height: 28px;position:relative;}
+.selTit img{float:left;margin:4px 6px 4px 18px;}
+.wxCont .bCard{float:right;margin-right:48px;line-height:28px;}
+.wxCont .bCard span{display:inline-block;width:36px;height:18px;background:#76ca76;text-align:center;line-height:18px;color:#fff;font-size:12px;border-radius:3px;-webkit-border-radius:3px;-moz-border-radius:3px;margin-right:10px;}
+.selTit i{display:block;width:30px;height:28px;background:url(../images/checked.jpg) no-repeat center center;position:absolute;right:0;top:0;cursor:pointer;}
+.bankChoice .bc{float:right;font-size:12px;}
+.bankChoice .bc span{font-size:20px;color:#f97700;font-weight:bold;margin:0 10px;position: relative;top: 2px;}
+.choicMore{font-size:12px;color:#349cd8;margin-left:14px;}
+.samezf{height:75px;}
+.samezf:hover{background:#fafafa;}
+.samezf .bankChoice{border:none;height:75px;line-height:75px;}
+.samezf .bankChoice .onlychice{margin-top:32px;}
+.samezf img{float:left;margin: 16px 30px 0 0;}
+.samezf .worn{margin:0;}
+.wxCont .nowpay{width:200px;height:48px;background:#f97700;font-size:20px;line-height:48px;color:#fff;margin-top:48px;cursor:pointer;border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;}
+.wxCont .nowpay:hover{background:#ec6919;}
+.pay_result{color: red; border: dotted;font-size: 16px;}
+
+.selectZf .moreLayer{width:428px;border:1px solid #b1e1b1;border-top:none;position:absolute;top:30px;left:0;background: #fff;display:none;}
+.selectZf .moreLayer li{height: 60px;background: #fff;font-size: 14px;line-height: 60px;cursor:pointer;}
+.selectZf .moreLayer li:hover{background:#fafafa;}
+.selectZf .moreLayer li img{float: left;margin: 20px 6px 0 18px;}
+.selectZf .moreLayer li p{line-height:60px;}
+
+/*支付弹层*/
+.payfinishLayer{width:482px;height:224px;background:#fff;position:fixed;left:50%;top:50%;margin:-146px 0 0 -291px;border:4px solid #dcdcdc;z-index:101;padding:68px 0 0px 100px;color:#595757;display:none;}
+.payfinishLayer p.tit{font-size:16px;}.payfinishLayer p.tit span{color:#f97700;}
+.payfinishLayer a.close{display:block;width:19px;height:19px;background:url(../images/close_btn.jpg) no-repeat 0 0;position:absolute;right:10px;top:10px;z-index:102px;}
+.payfinishLayer .payLine,.payfinishLayer .payLine2{background:url(../images/pay_finish.png) no-repeat left center;line-height:30px;padding-left:34px;font-size:16px;color:#595757;margin-top:36px;}
+.payfinishLayer .payLine button,.payfinishLayer .payLine2 button{width:150px;height:30px;background:#3cb43c;line-height:30px;color:#fff;text-align:center;border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;margin-left:20px;cursor:pointer;}
+.payfinishLayer .payLine button:hover{background:#25843a;}
+.payfinishLayer .payLine2{background:url(../images/pay_warn.png) no-repeat 0 0;}
+.payfinishLayer .payLine2 button{background:#f97700;}.payfinishLayer .payLine2 button:hover{background:#ec6919;}
+
 
 input, textarea, select {
     border: 1px solid #dcdcdc;

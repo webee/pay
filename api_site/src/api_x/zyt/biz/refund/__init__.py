@@ -16,7 +16,7 @@ from ...vas.models import EventType
 from ..transaction import create_transaction, transit_transaction_state, update_transaction_info
 from ..models import TransactionType, RefundRecord, PaymentType
 from .error import *
-from api_x.zyt.biz.payment.dba import get_payment_by_id, get_payment_tx_by_sn
+from api_x.zyt.biz.pay.dba import get_payment_by_id, get_payment_tx_by_sn
 from api_x.zyt.biz.error import *
 from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 from pytoolbox.util.log import get_logger
@@ -135,7 +135,7 @@ def _try_notify_client(tx, refund_record):
 
 
 def _get_tx_payment_to_refund(channel_id, order_id):
-    from api_x.zyt.biz.payment.dba import get_payment_by_channel_order_id
+    from api_x.zyt.biz.pay.dba import get_payment_by_channel_order_id
 
     payment_record = get_payment_by_channel_order_id(channel_id, order_id)
     if not payment_record:

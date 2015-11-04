@@ -61,6 +61,14 @@ class TradeType:
     MICROPAY = 'MICROPAY'  # 刷卡支付
 
 
+class PaymentType:
+    JSAPI = 'JSAPI'
+    NATIVE = 'NATIVE'
+    APP = 'APP'
+
+    MICROPAY = 'MICROPAY'
+
+
 class TradeState:
     SUCCESS = 'SUCCESS' #支付成功
     REFUND = 'REFUND' #转入退款

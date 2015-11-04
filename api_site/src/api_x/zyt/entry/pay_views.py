@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x.utils import response
-from api_x.zyt.biz import payment
+from api_x.zyt.biz import pay
 from api_x.zyt.biz.models import TransactionType
 from api_x.zyt.user_mapping import get_user_domain_by_name
 
@@ -10,7 +10,7 @@ from . import biz_entry_mod as mod
 from pytoolbox.util.log import get_logger
 from api_x.utils.entry_auth import verify_request, prepay_entry
 from api_x.zyt.biz.models import PaymentType
-from api_x.zyt.biz.payment.error import AlreadyPaidError
+from api_x.zyt.biz.pay.error import AlreadyPaidError
 
 
 logger = get_logger(__name__)
@@ -53,10 +53,10 @@ def prepay():
                                                                                              payee_user_id))
 
     try:
-        payment_record = payment.find_or_create_payment(channel, payment_type,
-                                                        payer_user_map.account_user_id, payee_user_map.account_user_id,
-                                                        order_id, product_name, product_category, product_desc, amount,
-                                                        client_callback_url, client_notify_url)
+        payment_record = pay.find_or_create_payment(channel, payment_type,
+                                                    payer_user_map.account_user_id, payee_user_map.account_user_id,
+                                                    order_id, product_name, product_category, product_desc, amount,
+                                                    client_callback_url, client_notify_url)
         return payment_record.tx
     except AlreadyPaidError as e:
         logger.exception(e)
@@ -75,7 +75,7 @@ def confirm_guarantee_payment():
     order_id = data['order_id']
 
     try:
-        payment.confirm_payment(channel, order_id)
+        pay.confirm_payment(channel, order_id)
         return response.success()
     except Exception as e:
         logger.exception(e)

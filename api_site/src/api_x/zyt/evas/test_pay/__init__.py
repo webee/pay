@@ -6,8 +6,24 @@ from api_x.config import test_pay
 import requests
 from .commons import generate_absolute_url
 from api_x.config import test_pay as config
+from ..error import PaymentTypeNotSupportedError
 
 NAME = 'TEST_PAY'
+
+
+def payment_param(payment_type, source, user_id, order_no, product_name, amount):
+    common_params = _get_common_params(source, user_id, order_no, product_name, amount)
+    if payment_type == config.PaymentType.WEB:
+        return_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_result', source=source)
+        params = {
+            'return_url': return_url
+        }
+        params.update(common_params)
+        return params
+    elif payment_type == config.PaymentType.APP:
+        return common_params
+    else:
+        raise PaymentTypeNotSupportedError(NAME, payment_type)
 
 
 def pay(source, user_id, order_no, product_name, amount, channel=None):
@@ -31,7 +47,8 @@ def _get_common_params(source, user_id, order_no, product_name, amount):
         'order_no': order_no,
         'product_name': product_name,
         'amount': str(amount),
-        'notify_url': notify_url
+        'notify_url': notify_url,
+        '_url': test_pay.Pay.URL
     }
 
     return params
@@ -40,6 +57,8 @@ def _get_common_params(source, user_id, order_no, product_name, amount):
 def generate_submit_form(url, req_params):
     submit_page = '<form id="returnForm" action="{0}" method="POST">'.format(url)
     for key in req_params:
+        if key.startswith('_'):
+            continue
         submit_page += '''<input type="hidden" name="{0}" value='{1}' />'''.format(key, req_params[key])
     submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'
     submit_page += '<script>document.forms["returnForm"].submit();</script>'

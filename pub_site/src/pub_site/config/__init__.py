@@ -39,6 +39,10 @@ LVYE_USER_NAME = 'lvye'
 IS_ALL_OPENED = False
 
 
+class Checkout:
+    VALID_NETLOCS = ['pay.lvye.com']
+
+
 # # pay api
 class PayClientConfig:
     MD5_KEY = read_string('conf/test/md5_key.txt')

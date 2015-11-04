@@ -16,13 +16,12 @@ from pytoolbox.util.log import get_logger
 logger = get_logger(__name__)
 
 
-@mod.route("/pay/result/<source>/", methods=["POST", "GET"])
-def pay_result(source):
+@mod.route("/pay/result/<source>/<app>/", methods=["POST", "GET"])
+def pay_result(source, app):
     """支付页面回调, 更多操作可由notify完成，这里只是返回callback"""
     data = request.values
     order_no = data['order_no']
     result = data['result']
-    app = data['app']
     is_success = result == 'SUCCESS'
 
     handle = get_pay_notify_handle(source, NotifyType.Pay.SYNC)

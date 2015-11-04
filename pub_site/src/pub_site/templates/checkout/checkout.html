@@ -1,0 +1,162 @@
+{% extends "checkout/layout.html" %}
+
+{% block title %}选择支付方式{% endblock %}
+{% block css %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='css/showLoading.css') }}" rel="stylesheet">
+{% endblock %}
+{% block js %}
+    <script src="{{ url_for('static', filename='js/jquery-1.8.3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery/jquery.showLoading.js') }}"></script>
+{% endblock %}
+
+{% block main %}
+    <div class="wxpayTit clearfix">
+        <div class="wxpayL">
+            <h3>订单编号：<span>{{ info.order_id }}</span></h3>
+            <h3>商品名称：<span>{{ info.name }}</span></h3>
+            <h3>商品描述：<span>{{ info.desc }}</span></h3>
+            <h3>交易流水：<span>{{ info.sn }}</span></h3>
+        </div>
+        <div class="wxpayR">
+            金额: <span>{{ info.amount }}</span>元
+        </div>
+    </div>
+    <div class="wxCont">
+        <ul class="">
+            {% for vas_name in vases %}
+            {% set vas_info = vas_infos[vas_name] %}
+                <li class="zf_list1 samezf" id="{{ vas_name }}">
+                    <div class="bankChoice">
+                        <input id="i_{{ vas_name }}" type="radio" value="{{ vas_name }}" {% if loop.first %}checked{% endif %} name="zf" class="onlychice">
+                        <label>{{ vas_info.name }}</label>
+                        <img src="{{ url_for('static', filename='images/checkout/%s.png' % vas_name) }}" width="42" height="42" >
+                        <span class="worn">{{ vas_info.desc }}</span>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        <button id="bt_pay_now" class="nowpay" value="{{ vases[0] }}">立即支付</button>
+        <span hidden=true id="pay_result" class="pay_result"></span>
+    </div>
+{% endblock %}
+
+
+{#{% block layer %}#}
+{#    <!--S遮罩层-->#}
+{#    <div class="bgLayer"></div>#}
+{#    <!--E遮罩层-->#}
+{#    <div class="payfinishLayer">#}
+{#        <a href="###" class="close"></a>#}
+{#        <p class="tit">请新开的页面完成支付</p>#}
+{#        <div class="payLine">如已经成功支付，请点击<button>已完成付款</button></div>#}
+{#        <div class="payLine2">如付款遇到问题，您可以<button>重新支付</button></div>#}
+{#    </div>#}
+{#{% endblock %}#}
+
+{% block scripts %}
+    <script>
+        function sync_vas_name() {
+            var r = $('input[type=radio][name=zf]:checked')[0];
+            var b = $('#bt_pay_now')[0];
+            b.value = r.value;
+        }
+
+        onload = function() {
+            sync_vas_name();
+        };
+
+        $(function() {
+            /*选择支付方式*/
+            $("li.zf_list1.samezf").click(function(){
+                var r = $('#i_' + this.id)[0];
+                r.click();
+            });
+
+            $('input:radio[name=zf]').change(function(){
+                sync_vas_name();
+            });
+
+            function disable_pay_bt(msg) {
+                var pay_result = $('#pay_result')[0];
+                pay_result.hidden = false;
+                pay_result.innerText = msg;
+                $('#bt_pay_now').off('click');
+                $('#bt_pay_now').click(function(){
+                    alert(msg);
+                });
+            }
+
+
+{#            /*支付完成弹层*/#}
+{#            // close#}
+{#            $(".payfinishLayer a.close").click(function(){#}
+{#                $(".payfinishLayer,.bgLayer").fadeOut();#}
+{#            });#}
+{##}
+{#            // retry#}
+{#            $(".payfinishLayer .payLine2 button").click(function(){#}
+{#                $(".payfinishLayer,.bgLayer").fadeOut();#}
+{#            });#}
+{##}
+{#            // finish#}
+{#            $(".payfinishLayer .payLine button").click(function(){#}
+{#                $.getJSON('{{ url_for('checkout_entry.pay_result', sn=sn) }}')#}
+{#                        .done(function (data) {#}
+{#                            var res = data.res;#}
+{#                            if (res == 'SUCCESS') {#}
+{#                                var msg = "支付成功，请关闭该页面";#}
+{#                                disable_pay_bt(msg);#}
+{#                            } else if (res == 'FAILED') {#}
+{#                                alert("支付未成功，请重新支付");#}
+{#                            } else if (res == 'EXPIRED') {#}
+{#                                var msg = "本支付链接过期，请关闭页面，重新请求支付";#}
+{#                                alert(msg);#}
+{#                                disable_pay_bt(msg);#}
+{#                            } else if (res == 'INVALID') {#}
+{#                                var msg = "交易号错误或者已失效，请关闭页面，请重新发起支付";#}
+{#                                alert(msg);#}
+{#                                disable_pay_bt(msg);#}
+{#                            } else {#}
+{#                                alert("请求异常");#}
+{#                            }#}
+{#                        }).complete(function(){#}
+{#                            $(".payfinishLayer,.bgLayer").fadeOut();#}
+{#                        });#}
+{#            });#}
+
+            $("#bt_pay_now").click(function(){
+                var pay_type = this.value;
+                jQuery('body').showLoading({
+                    'afterShow': function() {
+                        $.getJSON('{{ url_for('checkout_entry.pay_result', sn=sn) }}')
+                                .done(function (data) {
+                                    var res = data.res;
+                                    if (res != 'CREATED') {
+                                        jQuery('body').hideLoading();
+                                    }
+                                    if (res == 'DONE') {
+                                        var msg = "已支付完成，请关闭该页面, 如果失败，请重新发起支付";
+                                        disable_pay_bt(msg);
+                                    } else if (res == 'CREATED') {
+                                        {#                                $(".payfinishLayer,.bgLayer").fadeIn();#}
+                                        window.open('{{ root_url }}/checkout/pay/{{ sn }}/' + pay_type, '_self');
+                                    } else if (res == 'EXPIRED') {
+                                        var msg = "本支付链接过期，请关闭页面，重新请求支付";
+                                        alert(msg);
+                                        disable_pay_bt(msg);
+                                    } else if (res == 'INVALID') {
+                                        var msg = "交易号错误或者已失效，请关闭页面，请重新发起支付";
+                                        alert(msg);
+                                        disable_pay_bt(msg);
+                                    } else {
+                                        alert("请求异常");
+                                    }
+                                });
+                    }
+                });
+            });
+        })
+
+    </script>
+{% endblock %}

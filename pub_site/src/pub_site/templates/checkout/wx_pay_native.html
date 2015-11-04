@@ -1,0 +1,74 @@
+{% extends "checkout/layout.html" %}
+
+
+{% block title %}微信扫码支付{% endblock %}
+
+{% block main %}
+    <div class="wxpayTit clearfix">
+        <div class="wxpayL">
+            <h3>订单编号：<span>{{ info.order_id }}</span></h3>
+            <h3>商品名称：<span>{{ info.name }}</span></h3>
+        </div>
+        <div class="wxpayX">
+            金额: <span>{{ info.amount }}</span>元
+        </div>
+    </div>
+    <div class="wxCont">
+        <h3><img style="display: inline;" src="{{ url_for('static', filename='images/checkout/wxpay_logo.png') }}" height="30" title="微信支付" alt="微信支付">微信支付
+            <span hidden=true id="pay_result" class="pay_result"></span>
+        </h3>
+        <p class="ewm">
+            <img src="{{ qrcode(code_url) }}" width="260" height="260" alt="二维码">
+            <img src="{{ url_for('static', filename='images/checkout/wxpay_desc.png') }}" title="操作指示" alt="操作指示">
+        </p>
+        <img src="{{ url_for('static', filename='images/checkout/wxPay_guide.jpg') }}" width="381" height="417" alt="" >
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+    <script>
+        function post(path, params, method) {
+            method = method || "post"; // Set method to post by default if not specified.
+
+            // The rest of this code assumes you are not using a library.
+            // It can be made less wordy if you use one.
+            var form = document.createElement("form");
+            form.setAttribute("method", method);
+            form.setAttribute("action", path);
+
+            for(var key in params) {
+                if(params.hasOwnProperty(key)) {
+                    var hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", key);
+                    hiddenField.setAttribute("value", params[key]);
+
+                    form.appendChild(hiddenField);
+                 }
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        $(function(){
+            var req_pay_result = setInterval(function(){
+                $.getJSON('{{ url_for('checkout_entry.pay_result', sn=sn) }}')
+                        .done(function (data) {
+                            var res = data.res;
+                            if (res == 'DONE') {
+                                var msg = "已支付完成，请关闭该页面, 如果失败，请重新发起支付";
+                                var pay_result = $('#pay_result')[0];
+                                pay_result.hidden = false;
+                                pay_result.innerText = msg;
+                                // 回调通知
+                                setTimeout(function(){
+                                    post('', {order_no: {{ info.sn }}, result: 'SUCCESS'})
+                                }, 500);
+                            }
+                        });
+            }, 2000);
+        })
+    </script>
+{% endblock %}

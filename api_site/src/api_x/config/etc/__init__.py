@@ -34,6 +34,15 @@ class Biz:
     ACTIVATED_EVAS = ['TEST_PAY', 'LIANLIAN_PAY', 'WEIXIN_PAY']
     VALID_NETLOCS = ['pay.lvye.com']
 
+    # 各支付场景及支持的第三方支付
+    PAYMENT_SCENE_VASES = {
+        'WEB': ['TEST_PAY', 'LIANLIAN_PAY', 'WEIXIN_PAY'],
+        'WAP': ['TEST_PAY', 'LIANLIAN_PAY'],#, 'WEIXIN_PAY'],
+        'WEIXIN': ['TEST_PAY', 'LIANLIAN_PAY'],#, 'WEIXIN_PAY'],
+        'lvye_skiing': ['TEST_PAY', 'LIANLIAN_PAY', 'WEIXIN_PAY'],
+        # 'lvye_skiing_wp': ['TEST_PAY', 'WEIXIN_PAY']
+    }
+
     class Channel:
         APP = "APP"
         WEB = "WEB"

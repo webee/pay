@@ -20,6 +20,7 @@ class App:
 
 
 HOST_URL = 'http://pay.lvye.com/api'
+CHECKOUT_URL = 'http://pay.lvye.com/checkout/{sn}'
 
 
 class Biz:

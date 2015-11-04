@@ -17,6 +17,7 @@ class Biz:
 
 
 HOST_URL = 'http://dev_pay.lvye.com:5100'
+CHECKOUT_URL = 'http://dev_pay.lvye.com:5102/checkout/{sn}'
 
 
 TEST_CHANNELS = {'zyt_sample', 'lvye_pay_test'}

@@ -13,6 +13,7 @@ class App:
     SQLALCHEMY_ECHO = False
 
 HOST_URL = 'http://pay.lvye.com/api'
+CHECKOUT_URL = 'http://pay.lvye.com/checkout/{sn}'
 
 
 class Biz:

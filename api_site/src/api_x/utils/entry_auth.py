@@ -135,8 +135,9 @@ def prepay_entry(source):
                 tx = res
                 hashed_sn = tx.sn_with_expire_hash
                 # FIXME: 不直接返回pay_url, 修改pay_client, pay_url作为web支付方式在客户端确定
-                pay_url = config.HOST_URL + url_for('web_checkout_entry.checkout', source=source, sn=hashed_sn)
-                return response.success(sn=hashed_sn, pay_url=pay_url)
+                # 目前主要是兼容活动平台
+                checkout_url = config.CHECKOUT_URL.format(sn=hashed_sn)
+                return response.success(sn=hashed_sn, pay_url=checkout_url)
             return res
         return wrapper
     return entry

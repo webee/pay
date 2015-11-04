@@ -47,9 +47,9 @@ def _weixin_pay_params(payment_type, payment_entity):
         wx_name = payment_type[i+1:]
         app_config = weixin_pay.AppConfig(wx_name)
 
-    params = payment_param(payment_type, payment_entity.source, payment_entity.tx_sn,
+    params = payment_param(payment_type, payment_entity.source, app_config, payment_entity.tx_sn,
                            int(100 * payment_entity.amount), req.ip(), payment_entity.product_name,
-                           payment_entity.tx_created_on, detail=payment_entity.product_desc, app_config=app_config)
+                           payment_entity.tx_created_on, detail=payment_entity.product_desc)
     if '_info' in params:
         params['_info'] = payment_entity.dict()
     return params

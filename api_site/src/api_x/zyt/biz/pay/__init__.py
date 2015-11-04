@@ -4,6 +4,7 @@ from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.pay.dba import get_payment_by_channel_order_id, get_payment_by_sn, get_payment_tx_by_sn
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
 
+import time
 from decimal import InvalidOperation, Decimal
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
@@ -237,8 +238,15 @@ def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
     payment_record = tx.record
     client_callback_url = payment_record.client_callback_url
 
-    code = 0 if is_success else 1
-    if client_callback_url:
+    req_code = 0 if is_success else 1
+    code = 0 if tx.state not in [PaymentTxState.FAILED, PaymentTxState.CREATED] else 1
+    if tx.state != PaymentTxState.CREATED and client_callback_url:
+        # 必须要tx状态改变
+        if code != req_code:
+            logger.warn('callback result mismatch with notify result.')
+            # 等待半秒钟
+            time.sleep(0.5)
+            code = 0 if tx.state not in [PaymentTxState.FAILED, PaymentTxState.CREATED] else 1
         from api_x.utils.notify import sign_and_return_client_callback
         user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
         user_id = user_mapping.user_id

@@ -96,7 +96,12 @@ class Transaction(db.Model):
         try:
             _hash += '=' * ((4 - (len(_hash) % 4)) % 4)
             logger.info('try check sn: [%s], updated: [%s], _hash: [%s]' % (self.sn, updated, _hash))
-            expired = int(aes.decrypt_from_urlsafe_base64(_hash, key))
+            try:
+                expired = int(aes.decrypt_from_urlsafe_base64(_hash, key))
+            except Exception as _:
+                updated = times.utc2timestamp(self.record.updated_on)
+                key = str(int(updated)) + etc.KEY
+                expired = int(aes.decrypt_from_urlsafe_base64(_hash, key))
         except Exception as _:
             return False
 

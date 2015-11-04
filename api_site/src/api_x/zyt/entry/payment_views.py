@@ -12,6 +12,12 @@ from pytoolbox.util.log import get_logger
 logger = get_logger(__name__)
 
 
+@mod.route("/payment/<sn>/result", methods=["GET"])
+@payment_entry
+def pay_result(tx, sn):
+    return response.success(state=tx.state)
+
+
 @mod.route("/payment/<sn>/<payment_scene>/info", methods=["GET"])
 @payment_entry
 def info(tx, sn, payment_scene):

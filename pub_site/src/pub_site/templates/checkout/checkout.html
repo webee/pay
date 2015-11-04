@@ -56,25 +56,11 @@
 
 {% block scripts %}
     <script>
-        function sync_vas_name() {
-            var r = $('input[type=radio][name=zf]:checked')[0];
-            var b = $('#bt_pay_now')[0];
-            b.value = r.value;
-        }
-
-        onload = function() {
-            sync_vas_name();
-        };
-
         $(function() {
             /*选择支付方式*/
             $("li.zf_list1.samezf").click(function(){
                 var r = $('#i_' + this.id)[0];
                 r.click();
-            });
-
-            $('input:radio[name=zf]').change(function(){
-                sync_vas_name();
             });
 
             function disable_pay_bt(msg) {
@@ -126,7 +112,7 @@
 {#            });#}
 
             $("#bt_pay_now").click(function(){
-                var pay_type = this.value;
+                var pay_type = $('input[type=radio][name=zf]:checked')[0].value;
                 jQuery('body').showLoading({
                     'afterShow': function() {
                         $.getJSON('{{ url_for('checkout_entry.pay_result', sn=sn) }}')

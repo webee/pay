@@ -51,7 +51,7 @@ def _weixin_pay_params(payment_type, payment_entity):
                            int(100 * payment_entity.amount), req.ip(), payment_entity.product_name,
                            payment_entity.tx_created_on, detail=payment_entity.product_desc, app_config=app_config)
     if '_info' in params:
-        params['_info'] = payment_type.dict()
+        params['_info'] = payment_entity.dict()
     return params
 
 

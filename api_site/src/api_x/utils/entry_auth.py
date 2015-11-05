@@ -124,7 +124,6 @@ def limit_referrer(netlocs, ex_callback=None):
 
 
 def prepay_entry(source):
-    from flask import url_for
     from api_x.zyt.biz.models import Transaction
 
     def entry(f):

@@ -2,11 +2,11 @@
 from __future__ import unicode_literals
 from api_x.constant import PaymentTxState
 
-from flask import request, render_template, url_for, abort, redirect
+from flask import request, render_template, redirect
 from api_x.config import etc as config
 from . import web_checkout_entry_mod as mod
 from pytoolbox.util.log import get_logger
-from api_x.utils.entry_auth import verify_request, limit_referrer, checkout_entry
+from api_x.utils.entry_auth import verify_request, checkout_entry
 from api_x.constant import RequestClientType
 from api_x.utils import req
 from .. import gen_payment_entity_by_pay_tx, gen_payment_entity_by_prepaid_tx, get_activated_evases
@@ -29,30 +29,10 @@ def on_error():
 
 
 @mod.route('/<source>/<sn>', methods=['GET'])
-@checkout_entry(on_not_found=on_not_found, on_expired=on_expired, on_error=on_error)
-def checkout(tx, source, sn):
+def checkout(source, sn):
     """支付收银台入口"""
-    if tx.state != PaymentTxState.CREATED:
-        return render_template("info.html", msg="该订单已支付")
-
-    request_client_type = req.client_type()
-    vases = get_activated_evases(tx)
-
-    return render_template("checkout.html", root_url=config.HOST_URL, source=source, tx=tx, sn=sn,
-                           vases=vases, request_client_type=request_client_type)
-
-
-def pay_ex_callback(*arg, **kwargs):
-    return render_template("info.html", msg="非法请求")
-
-
-@mod.route("/pay/<source>/<sn>/<vas_name>", methods=["GET"])
-@limit_referrer(config.Biz.VALID_NETLOCS, ex_callback=pay_ex_callback)
-@checkout_entry(on_not_found=on_not_found, on_expired=on_expired, on_error=on_error)
-def pay(tx, source, sn, vas_name):
-    """支付入口, 限制只能从checkout过来"""
-    request_client_type = req.client_type()
-    return do_pay(source, tx, vas_name, request_client_type)
+    # FIXME: Deprecated, just redirect to web checkout.
+    return redirect(config.CHECKOUT_URL.format(sn=sn))
 
 
 @mod.route("/pay/zyt/<sn>", methods=["POST"])

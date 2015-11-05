@@ -43,7 +43,7 @@ AppConfig.init_config('public_account', 'ilvyewang', is_main=True)
 AppConfig.init_config('app', 'lvye_skiing')
 
 
-DEFAULT_ORDER_EXPIRATION_SECONDS = 604800  # 7 days
+DEFAULT_ORDER_EXPIRATION_SECONDS = 7200  # 2 hours
 UNIFIED_ORDER_URL = "https://api.mch.weixin.qq.com/pay/unifiedorder"
 QUERY_ORDER_URL = "https://api.mch.weixin.qq.com/pay/orderquery"
 REFUND_URL = "https://api.mch.weixin.qq.com/secapi/pay/refund"

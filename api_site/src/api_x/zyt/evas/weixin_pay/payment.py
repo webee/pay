@@ -1,6 +1,6 @@
 # coding=utf-8
 from api_x.config import weixin_pay as config
-from api_x.utils import times
+from pytoolbox.util import times
 from api_x.zyt.evas.weixin_pay import request, is_success_request, generate_absolute_url, append_md5_sign
 from . import NAME
 from ..error import PaymentTypeNotSupportedError, PaymentTypeNotImplementedError
@@ -37,7 +37,7 @@ def prepay(source, trade_type, out_trade_no, total_fee, ip, body, time_start,
     notify_url = generate_absolute_url(url_for('weixin_pay_entry.pay_notify', source=source, app=app_config.APP_NAME))
 
     time_start = times.utc2gmt8(time_start)
-    time_expire = times.time_offset(time_start, offset=config.DEFAULT_ORDER_EXPIRATION_SECONDS)
+    time_expire = times.utc2gmt8(times.from_now_offset(config.DEFAULT_ORDER_EXPIRATION_SECONDS))
 
     app_config = app_config or config.AppConfig()
     params = {

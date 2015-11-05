@@ -9,16 +9,21 @@ from .commons import is_success_request, append_md5_sign
 
 
 NAME = 'WEIXIN_PAY'
+VAS_PREFIX = 'WX'
 logger = get_logger(__name__)
 
 signers = {}
+
+
+def is_weixin_pay(vas_name):
+    return vas_name.startswith(VAS_PREFIX)
 
 
 def get_vas_id(app):
     # 此vas_id作为微信支付商户号的唯一id, 记录在各数据库中
     # WEIXIN_PAY为微信支付的总称
     app_config = config.AppConfig(app)
-    return 'WX{0}'.format(app_config.MCH_ID)
+    return '{0}{1}'.format(VAS_PREFIX, app_config.MCH_ID)
 
 
 def get_app_config_by_vas_id(vas_id):

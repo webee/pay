@@ -227,7 +227,7 @@ def _create_refund(channel, payment_tx, payment_record, amount, client_notify_ur
 
 
 def _request_refund(payment_tx, payment_record, refund_tx, refund_record, data):
-    from api_x.zyt.evas import test_pay, lianlian_pay
+    from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay
     from api_x.zyt import vas
 
     vas_name = payment_tx.vas_name
@@ -236,7 +236,7 @@ def _request_refund(payment_tx, payment_record, refund_tx, refund_record, data):
         return _refund_by_test_pay(payment_tx, refund_record, data)
     elif vas_name == lianlian_pay.NAME:
         return _refund_by_lianlian_pay(payment_tx, refund_record)
-    elif vas_name.startswith('WX'):
+    elif weixin_pay.is_weixin_pay(vas_name):
         return _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record)
     elif vas_name == vas.NAME:
         return vas.refund(TransactionType.REFUND, refund_record.sn)

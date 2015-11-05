@@ -92,6 +92,15 @@ def add_default_channel(channel_name, user_domain_name, info):
 
 
 @manager.option('-d', '--domain', type=str, dest="domain_name", required=True)
+@manager.option('-i', '--info', type=str, dest="info", required=True)
+def create_user_domain(domain_name, info):
+    from api_x.zyt.user_mapping import create_user_domain
+
+    user_domain = create_user_domain(domain_name, info)
+    print('user domain id: {0}'.format(user_domain.id))
+
+
+@manager.option('-d', '--domain', type=str, dest="domain_name", required=True)
 @manager.option('-u', '--user_id', type=str, dest="user_id", required=True)
 @manager.option('-i', '--info', type=str, dest="info", required=True)
 def add_domain_user(domain_name, user_id, info):

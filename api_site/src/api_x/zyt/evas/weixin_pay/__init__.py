@@ -34,27 +34,26 @@ def get_app_config_by_vas_id(vas_id):
             return app_config
 
 
-def query_pay_notify(source, out_trade_no, vas_name, transaction_id=''):
+def query_pay_notify(source, out_trade_no, vas_name):
     """ 通过主动查询支付订单结果来完成结果通知
     :param source:
     :param out_trade_no:
-    :param transaction_id:
     :return:
     """
     from .notify import notify_pay
     from .payment import query_order
 
     app_config = get_app_config_by_vas_id(vas_name)
-    data = query_order(transaction_id, out_trade_no, app_config=app_config)
+    data = query_order(out_trade_no, app_config=app_config)
 
     return notify_pay(source, app_config.APP_NAME, data)
 
 
-def query_refund_notify(source, out_refund_no, refunded_on, vas_name, refund_id=''):
+def query_refund_notify(source, out_refund_no, refunded_on, vas_name):
     from .notify import notify_refund
     from .refund import query_refund
 
     app_config = get_app_config_by_vas_id(vas_name)
-    data = query_refund(out_refund_no, refund_id, app_config=app_config)
+    data = query_refund(out_refund_no, app_config=app_config)
 
     return notify_refund(source, data, app_config.APP_NAME)

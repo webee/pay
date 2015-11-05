@@ -29,7 +29,7 @@ def refund(out_refund_no, transaction_id, total_fee, refund_fee,
         return data
 
 
-def query_refund(out_refund_no, refund_id, app_config=None):
+def query_refund(out_refund_no, refund_id='', app_config=None):
     app_config = app_config or config.AppConfig()
 
     params = {

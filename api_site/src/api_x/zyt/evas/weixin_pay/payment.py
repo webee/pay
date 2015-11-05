@@ -81,7 +81,7 @@ def prepay(source, trade_type, out_trade_no, total_fee, ip, body, time_start,
         return data
 
 
-def query_order(transaction_id='', out_trade_no='', app_config=None):
+def query_order(out_trade_no='', transaction_id='', app_config=None):
     app_config = app_config or config.AppConfig()
 
     params = {

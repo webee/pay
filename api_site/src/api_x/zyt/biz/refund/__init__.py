@@ -5,7 +5,7 @@ from decimal import InvalidOperation, Decimal
 from api_x import db
 from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.refund.dba import update_payment_refunded_amount
-from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
+from api_x.zyt.biz.transaction.dba import get_tx_by_id
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id
 from api_x.constant import SECURE_USER_NAME, PaymentTxState, RefundTxState
@@ -93,11 +93,6 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
 
     if payment_tx.state != PaymentTxState.REFUNDING and tx.state not in [RefundTxState.CREATED, RefundTxState.REFUNDED_IN]:
         logger.warning('bad refund notify: [sn: {0}]'.format(sn))
-        return
-
-    if tx.vas_sn and tx.vas_sn != vas_sn:
-        # 像微信这种是请求退款就得到refund_id的, notify的时候判断是否一致
-        logger.warning('refund vas_sn mismatch: [{0}] vs [{1}]'.format(tx.vas_sn, vas_sn))
         return
 
     with require_transaction_context():
@@ -299,10 +294,6 @@ def _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record):
     try:
         res = refund(out_refund_no, transaction_id, total_fee, refund_fee,
                      out_trade_no=out_trade_no, app_config=app_config)
-        refund_id = res['refund_id']
-        with require_transaction_context():
-            refund_tx.vas_sn = refund_id
-            db.session.add(refund_tx)
     except Exception as e:
         logger.exception(e)
         raise RefundFailedError()

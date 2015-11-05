@@ -90,9 +90,9 @@ def notify_pay(source, app, data):
 def notify_refund(source, data, app):
     appid = data['appid']
     mch_id = data['mch_id']
-    refund_id = data['refund_id']
     refund_count = int(data['refund_count'])
     idx = refund_count - 1
+    refund_id = data['refund_id_%d' % idx]
     out_refund_no = data['out_refund_no_%d' % idx]
     refund_status = data['refund_status_%d' % idx]
 

@@ -90,11 +90,12 @@ def query_bin(card_no):
     return _query_bin(card_no)
 
 
-def query_refund_notify(source, refund_no, refunded_on, oid_refundno=''):
+def query_refund_notify(source, refund_no, refunded_on, vas_name, oid_refundno=''):
     """ 通过主动查询订单结果来完成结果通知
     :param source: refund来源
     :param refund_no: 退款订单号
     :param refunded_on: 退款订单时间
+    :param vas_name: 支付方式名称
     :param oid_refundno: 连连流水号
     :return:
     """

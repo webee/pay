@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
+from api_x.zyt.evas.constant import NotifyRespTypes
 from .constant import BizType, NotifyType
 from api_x.zyt.evas.lianlian_pay.commons import is_sending_to_me
 from pytoolbox.util.log import get_logger
@@ -92,13 +93,3 @@ def notify_refund(source, data):
         logger.exception(e)
         logger.warning('refund notify error: {0}'.format(e.message))
         return NotifyRespTypes.FAILED
-
-
-class NotifyRespTypes:
-    SUCCEED = 'SUCCEED'
-    FAILED = 'FAILED'
-    DUPLICATE = 'DUPLICATE'
-    BAD = 'BAD'
-    MISS = 'MISS'
-    WRONG = 'WRONG'
-    RETRY = 'RETRY'

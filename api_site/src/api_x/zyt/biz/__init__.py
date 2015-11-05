@@ -49,7 +49,7 @@ def init_lianlian_pay_notify_handles():
     register_pay_to_bankcard_notify_handle(TransactionType.WITHDRAW, handle_withdraw_notify)
 
     # query_notify
-    # notify(source, sn, sn_created_on[, vas_sn])
+    # notify(source, sn, sn_created_on[, vas_name, vas_sn])
     register_query_notify_handle(TransactionType.REFUND, NAME, query_refund_notify)
 
 
@@ -71,8 +71,9 @@ def init_weixin_pay_notify_handles():
     register_refund_notify_handle(TransactionType.REFUND, handle_refund_notify)
 
     # query_notify
-    # notify(source, sn, sn_created_on[, vas_sn])
+    # notify(source, sn, [, vas_name, vas_sn])
     register_query_notify_handle(TransactionType.PAYMENT, NAME, query_pay_notify)
+    # notify(source, sn, sn_created_on[, vas_name, vas_sn])
     register_query_notify_handle(TransactionType.REFUND, NAME, query_refund_notify)
 
 

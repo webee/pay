@@ -29,5 +29,17 @@ def refund(out_refund_no, transaction_id, total_fee, refund_fee,
         return data
 
 
-def query_refund():
-    pass
+def query_refund(out_refund_no, refund_id, app_config=None):
+    app_config = app_config or config.AppConfig()
+
+    params = {
+        'appid': app_config.APPID,
+        'mch_id': app_config.MCH_ID,
+        'device_info': '',
+        'nonce_str': strings.gen_rand_str(32),
+        'out_refund_no': out_refund_no,
+        'refund_id': refund_id,
+    }
+    data = request(config.QUERY_REFUND_URL, params, app_config=app_config)
+    if is_success_request(data, do_raise=True):
+        return data

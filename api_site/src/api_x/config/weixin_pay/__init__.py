@@ -47,7 +47,7 @@ DEFAULT_ORDER_EXPIRATION_SECONDS = 604800  # 7 days
 UNIFIED_ORDER_URL = "https://api.mch.weixin.qq.com/pay/unifiedorder"
 QUERY_ORDER_URL = "https://api.mch.weixin.qq.com/pay/orderquery"
 REFUND_URL = "https://api.mch.weixin.qq.com/secapi/pay/refund"
-REFUND_QUERY_URL = "https://api.mch.weixin.qq.com/pay/refundquery"
+QUERY_REFUND_URL = "https://api.mch.weixin.qq.com/pay/refundquery"
 
 
 class TradeType:

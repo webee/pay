@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from flask import render_template, Response, jsonify
 from . import checkout_entry_mod as mod
-from .constant import VAS_INFOS, VAS_PAYMENT_TYPES
+from .constant import VAS_INFOS, REQUEST_CLIENT_PAYMENT_SCENE_MAPPING
 from pub_site.constant import RequestClientType
 from pytoolbox.util.log import get_logger
 from pub_site.utils.entry_auth import limit_referrer
@@ -44,8 +44,9 @@ def pay_result(sn):
 def checkout(sn):
     """支付收银台入口"""
     client_type = req.client_type()
+    payment_scene = REQUEST_CLIENT_PAYMENT_SCENE_MAPPING[client_type]
 
-    result = pay_client.get_payment_info(sn, client_type)
+    result = pay_client.get_payment_info(sn, payment_scene)
     if not pay_client.is_success_result(result):
         return payment_failed(result)
     info = result.data['info']
@@ -73,17 +74,20 @@ def checkout(sn):
 def pay(sn, vas_name):
     """支付入口, 限制只能从checkout过来"""
     client_type = req.client_type()
-    return do_pay(sn, vas_name, client_type)
+    payment_scene = REQUEST_CLIENT_PAYMENT_SCENE_MAPPING[client_type]
+    return do_pay(sn, vas_name, payment_scene)
 
 
-def do_pay(sn, vas_name, client_type):
+def do_pay(sn, vas_name, payment_scene):
     from .constant import WeixinPayType
 
-    payment_type = VAS_PAYMENT_TYPES[vas_name][client_type]
-    result = pay_client.get_payment_param(sn, vas_name, payment_type)
+    result = pay_client.get_payment_param(sn, vas_name, payment_scene)
     if not pay_client.is_success_result(result):
         return payment_failed(result)
 
+    # echo back vas_name, and payment_type.
+    vas_name = result.data['vas_name']
+    payment_type = result.data['payment_type']
     params = result.data['params']
     if vas_name == 'TEST_PAY':
         url = params['_url']

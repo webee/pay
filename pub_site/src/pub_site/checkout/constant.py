@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from collections import defaultdict
+from pub_site.constant import RequestClientType
 
 VAS_INFOS = {
     'TEST_PAY': {
@@ -27,17 +28,9 @@ class WeixinPayType:
     JSAPI = 'JSAPI'
 
 
-# 各支付方式的支付场景映射
-VAS_PAYMENT_TYPES = {
-    'TEST_PAY': defaultdict(lambda: 'WEB'),
-    'LIANLIAN_PAY': {
-        'WEB': 'WEB',
-        'WAP': 'WAP',
-        'WEIXIN': 'WAP',
-    },
-    'WEIXIN_PAY': {
-        'WEB': WeixinPayType.NATIVE,
-        'WAP': WeixinPayType.JSAPI,
-        'WEIXIN': WeixinPayType.JSAPI
-    }
+# request client与支付场景的映射
+REQUEST_CLIENT_PAYMENT_SCENE_MAPPING = {
+    RequestClientType.WEB: 'WEB',
+    RequestClientType.WAP: 'WAP',
+    RequestClientType.WEIXIN: 'WEIXIN',
 }

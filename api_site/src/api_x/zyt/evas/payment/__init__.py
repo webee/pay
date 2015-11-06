@@ -87,3 +87,4 @@ def get_payment_type(payment_scene, vas_name):
     payment_type = vases_type.get(vas_name)
     if payment_type is None:
         raise Exception("[{0}] is not support payment scene [{1}]".format(vas_name, payment_scene))
+    return payment_type

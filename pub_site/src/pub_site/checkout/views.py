@@ -81,7 +81,7 @@ def pay(sn, vas_name):
 def do_pay(sn, vas_name, payment_scene):
     from .constant import WeixinPayType
 
-    result = pay_client.get_payment_param(sn, vas_name, payment_scene)
+    result = pay_client.get_payment_param(sn, payment_scene, vas_name)
     if not pay_client.is_success_result(result):
         return payment_failed(result)
 

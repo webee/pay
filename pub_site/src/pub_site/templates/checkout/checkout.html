@@ -14,8 +14,8 @@
     <div class="wxpayTit clearfix">
         <div class="wxpayL">
             <h3>订单编号：<span>{{ info.order_id }}</span></h3>
-            <h3>商品名称：<span>{{ info.name }}</span></h3>
-            <h3>商品描述：<span>{{ info.desc }}</span></h3>
+            <h3>商品名称：<span>{{ info.name|truncate(50, True) }}</span></h3>
+            <h3>商品描述：<span>{{ info.desc|truncate(50, True) }}</span></h3>
             <h3>交易流水：<span>{{ info.sn }}</span></h3>
         </div>
         <div class="wxpayR">

@@ -17,10 +17,12 @@ logger = get_logger(__name__)
 def send_verification_code():
     source = request.values['source']
     phone_no = current_user.phone_no
+    if not phone_no:
+        return jsonify(ret=False, code=450, msg='no phone.'), 200
     ret = generate_and_send_verification_code(source, current_user.user_id, phone_no)
     if ret:
-        return jsonify(phone_no=mask_phone_no(phone_no)), 200
-    return 'failed', 400
+        return jsonify(ret=True, phone_no=mask_phone_no(phone_no)), 200
+    return jsonify(ret=False, code=400, msg='failed.'), 200
 
 
 def mask_phone_no(phone_no):

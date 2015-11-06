@@ -23,9 +23,18 @@ $(document).ready(function () {
                 data: {source: this.getAttribute("data-source")},
                 success: function (data, textStatus) {
                     timing($('.hqyzm'));
-                    var message = textStatus === 'success'
-                        ? '验证码已发送到手机号' + data['phone_no']
-                        : '验证码发送失败，请重试。';
+                    var message = '验证码发送失败，请重试。';
+                    if (textStatus === 'success') {
+                        var ret = data.ret;
+                        if (ret) {
+                            message = '验证码已发送到手机号' + data['phone_no']
+                        } else {
+                            var code = data.code;
+                            if (code === 450) {
+                                message = "请到<a href='http://account.lvye.cn'>用户中心</a>绑定手机号, 然后重新登录";
+                            }
+                        }
+                    }
                     $('.verification-code.warn').html(message);
                 },
                 error: function () {

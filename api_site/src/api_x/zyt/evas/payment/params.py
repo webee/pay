@@ -4,9 +4,12 @@ from __future__ import unicode_literals
 from api_x.utils import req
 from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay
 from api_x.zyt import vas
+from . import get_payment_type
 
 
-def prepare(vas_name, payment_type, payment_entity):
+def prepare(payment_scene, vas_name, payment_entity):
+    payment_type = get_payment_type(payment_scene, vas_name)
+
     if vas_name == test_pay.NAME:
         return _test_pay_params(payment_type, payment_entity)
     elif vas_name == lianlian_pay.NAME:

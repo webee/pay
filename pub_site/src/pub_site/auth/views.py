@@ -94,7 +94,7 @@ def auth():
         login_user(user)
         session['current_user'] = user.to_dict()
 
-    next_url = request.args.get('next') or url_for('main.index')
+    next_url = request.args.get('next', url_for('main.index'))
     return redirect(next_url)
 
 
@@ -104,7 +104,8 @@ def logout():
     logout_user()
     session.clear()
 
-    return redirect(config.UserCenter.LOGOUT_URL)
+    next_url = request.referrer
+    return redirect(config.UserCenter.LOGOUT_URL + '?next=' + next_url)
 
 
 @mod.route('/info/')

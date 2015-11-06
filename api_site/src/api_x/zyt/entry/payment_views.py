@@ -59,7 +59,7 @@ def prepare_params(tx, payment_scene, vas_name):
         return response.bad_request()
 
     try:
-        prepared_params = params.prepare(payment_scene, vas_name, payment_entity)
-        return response.success(params=prepared_params)
+        payment_type, params = params.prepare(payment_scene, vas_name, payment_entity)
+        return response.success(params=params, vas_name=vas_name, payment_type=payment_type)
     except Exception as e:
         return response.fail(msg=e.message)

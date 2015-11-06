@@ -11,15 +11,17 @@ def prepare(payment_scene, vas_name, payment_entity):
     payment_type = get_payment_type(payment_scene, vas_name)
 
     if vas_name == test_pay.NAME:
-        return _test_pay_params(payment_type, payment_entity)
+        params = _test_pay_params(payment_type, payment_entity)
     elif vas_name == lianlian_pay.NAME:
-        return _lianlian_pay_params(payment_type, payment_entity)
+        params = _lianlian_pay_params(payment_type, payment_entity)
     elif vas_name == weixin_pay.NAME:
-        return _weixin_pay_params(payment_type, payment_entity)
+        params = _weixin_pay_params(payment_type, payment_entity)
     elif vas_name == vas.NAME:
-        return _pay_by_zyt_pay(payment_type, payment_entity)
+        params = _pay_by_zyt_pay(payment_type, payment_entity)
+    else:
+        raise Exception("unknown vas [{0}]".format(vas_name))
 
-    raise Exception("unknown vas [{0}]".format(vas_name))
+    return payment_type, params
 
 
 def _test_pay_params(payment_type, payment_entity):

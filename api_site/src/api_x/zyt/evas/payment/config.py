@@ -26,24 +26,24 @@ PAYMENT_SCENES = {
 
 # 各支付场景与第三方支付的支付方式的关联
 PAYMENT_SCENE_VASE_TYPES = {
-    PaymentScene.WEB: OrderedDict({
-        TEST_PAY: test_pay.PaymentType.WEB,
-        LIANLIAN_PAY: lianlian_pay.PaymentType.WEB,
-        WEIXIN_PAY: weixin_pay.PaymentType.NATIVE,
-    }),
-    PaymentScene.WAP: OrderedDict({
-        TEST_PAY: test_pay.PaymentType.WEB,
-        LIANLIAN_PAY: lianlian_pay.PaymentType.WAP,
-        #WEIXIN_PAY: weixin_pay.PaymentType.JSAPI,
-    }),
-    PaymentScene.WEIXIN: OrderedDict({
-        TEST_PAY: test_pay.PaymentType.WEB,
-        LIANLIAN_PAY: lianlian_pay.PaymentType.WAP,
-        #WEIXIN_PAY: weixin_pay.PaymentType.JSAPI,
-    }),
-    PaymentScene.lvye_skiing: OrderedDict({
-        TEST_PAY: test_pay.PaymentType.APP,
-        LIANLIAN_PAY: lianlian_pay.PaymentType.APP,
-        WEIXIN_PAY: weixin_pay.PaymentType.APP + '$lvye_skiing',
-    }),
+    PaymentScene.WEB: OrderedDict([
+        (TEST_PAY, test_pay.PaymentType.WEB),
+        (LIANLIAN_PAY, lianlian_pay.PaymentType.WEB),
+        (WEIXIN_PAY, weixin_pay.PaymentType.NATIVE),
+    ]),
+    PaymentScene.WAP: OrderedDict([
+        (TEST_PAY, test_pay.PaymentType.WEB),
+        (LIANLIAN_PAY, lianlian_pay.PaymentType.WAP),
+        #(WEIXIN_PAY, weixin_pay.PaymentType.JSAPI),
+    ]),
+    PaymentScene.WEIXIN: OrderedDict([
+        (TEST_PAY, test_pay.PaymentType.WEB),
+        (LIANLIAN_PAY, lianlian_pay.PaymentType.WAP),
+        #(WEIXIN_PAY, weixin_pay.PaymentType.JSAPI),
+    ]),
+    PaymentScene.lvye_skiing: OrderedDict([
+        (TEST_PAY, test_pay.PaymentType.APP),
+        (LIANLIAN_PAY, lianlian_pay.PaymentType.APP),
+        (WEIXIN_PAY, weixin_pay.PaymentType.APP + '$lvye_skiing'),
+    ]),
 }

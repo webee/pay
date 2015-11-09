@@ -44,6 +44,10 @@ def expired(code=413, msg='expired', **kwargs):
     return _fail(code, msg, **kwargs), code
 
 
+def error(code=500, msg='error', **kwargs):
+    return _fail(code, msg, **kwargs), code
+
+
 def submit_form(url, req_params, method='POST'):
     submit_page = '<form id="formName" action="{0}" method="{1}">'.format(url, method)
     for key in req_params:

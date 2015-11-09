@@ -77,7 +77,6 @@ def register_mods(app):
 
     # exempt api
     csrf.exempt(notify_mod)
-    csrf.exempt(checkout_entry_mod)
 
 
 def init_config(app, env):

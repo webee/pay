@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from flask import request, render_template, redirect, url_for
 from . import checkout_entry_mod as mod
 from pytoolbox.util.log import get_logger
-from pub_site import pay_client
+from pub_site import pay_client, csrf
 from flask.ext.login import current_user, login_required
 from .zyt_forms import ZytPayForm
 from .commons import payment_failed
@@ -16,6 +16,7 @@ logger = get_logger(__name__)
 
 
 @mod.route('/zyt_pay/', methods=['POST'])
+@csrf.exempt
 @pay_client.verify_request
 def zyt_pay():
     is_verify_pass = request.is_verify_pass

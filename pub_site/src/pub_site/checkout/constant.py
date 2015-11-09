@@ -1,6 +1,5 @@
 # coding=utf-8
 from __future__ import unicode_literals
-from collections import defaultdict
 from pub_site.constant import RequestClientType
 
 VAS_INFOS = {

@@ -16,5 +16,9 @@ def prepare(payment_scene, payment_entity):
         'order_id': payment_entity.order_id
     }
 
+    # FIXME: _ 表示不关心evases
+    if payment_scene == '_':
+        return data, None
+
     evases = get_activated_evases(payment_scene)
     return data, evases

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from api_x.zyt.evas.weixin_pay.commons import is_sending_to_me
 
-from flask import request, render_template
+from flask import request
 from . import weixin_pay_entry_mod as mod
 from api_x.zyt.evas.weixin_pay.constant import NotifyType
 from api_x.zyt.evas.weixin_pay.notify import get_pay_notify_handle
@@ -14,24 +14,6 @@ from pytoolbox.util.log import get_logger
 
 
 logger = get_logger(__name__)
-
-
-@mod.route("/pay/result/<source>/<app>/", methods=["POST", "GET"])
-def pay_result(source, app):
-    """支付页面回调, 更多操作可由notify完成，这里只是返回callback"""
-    data = request.values
-    order_no = data['order_no']
-    result = data['result']
-    is_success = result == 'SUCCESS'
-
-    handle = get_pay_notify_handle(source, NotifyType.Pay.SYNC)
-    if handle:
-        # 是否成功，订单号，来源系统，来源系统订单号，数据
-        return handle(is_success, order_no, get_vas_id(app), None, None)
-
-    if is_success:
-        return render_template('info.html', title='支付结果', msg='支付成功({0})-订单号:{1}'.format(source, order_no))
-    return render_template('info.html', title='支付结果', msg='支付失败({0})-订单号:{1}'.format(source, order_no))
 
 
 @mod.route("/pay/notify/<source>/<app>/", methods=["POST"])

@@ -14,11 +14,8 @@ def payment_param(payment_type, source, app_config, out_trade_no, total_fee, ip,
     if payment_type == config.PaymentType.NATIVE:
         code_url = prepay(source,config.TradeType.NATIVE, out_trade_no, total_fee, ip, body, time_start, detail,
                           fee_type, device_info, attach, goods_tag, product_id, limit_pay, openid, app_config)
-        callback_url = generate_absolute_url(url_for('weixin_pay_entry.pay_result', source=source,
-                                                     app=app_config.APP_NAME))
         return {'code_url': code_url,
-                '_info': None,
-                '_callback_url': callback_url
+                '_info': None
                 }
     elif payment_type == config.PaymentType.APP:
         return prepay(source,config.TradeType.APP, out_trade_no, total_fee, ip, body, time_start, detail, fee_type,

@@ -9,22 +9,23 @@ from api_x.zyt.evas.lianlian_pay.notify import get_pay_notify_handle
 from api_x.zyt.evas.lianlian_pay import NAME
 from .commons import parse_and_verify
 from . import notify_response
+from api_x.constant import TransactionType
 from pytoolbox.util.log import get_logger
 
 
 logger = get_logger(__name__)
 
 
-@mod.route("/pay/result/<source>/<order_no>", methods=["POST", "GET"])
+@mod.route("/pay/result/<order_no>", methods=["POST", "GET"])
 @parse_and_verify
-def pay_result(source, order_no):
+def pay_result(order_no):
     """支付页面回调, 更多操作可由notify完成，这里只是返回callback"""
     if request.method == "POST":
         data = request.verified_data
         partner_oid = data['oid_partner']
         order_no = data['no_order']
         result = data['result_pay']
-        paybill_oid = data['oid_paybill']
+        #paybill_oid = data['oid_paybill']
         # 这里一定是成功的
 
         if not is_sending_to_me(partner_oid):
@@ -33,17 +34,16 @@ def pay_result(source, order_no):
         is_success = is_success_result(result)
     elif request.method == "GET":
         is_success = False
-        paybill_oid = ""
         data = None
 
-    handle = get_pay_notify_handle(source, NotifyType.Pay.SYNC)
+    handle = get_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC)
     if handle:
-        # 是否成功，订单号，来源系统，来源系统订单号，数据
-        return handle(is_success, order_no, NAME, paybill_oid, data)
+        # 是否成功，订单号，_数据
+        return handle(is_success, order_no, data)
 
     if is_success:
-        return render_template('info.html', title='支付结果', msg='支付成功({0})-订单号:{1}'.format(source, order_no))
-    return render_template('info.html', title='支付结果', msg='支付失败({0})-订单号:{1}'.format(source, order_no))
+        return render_template('info.html', title='支付结果', msg='支付成功-订单号:{1}'.format(order_no))
+    return render_template('info.html', title='支付结果', msg='支付失败-订单号:{1}'.format(order_no))
 
 
 @mod.route("/pay/notify/<source>", methods=["POST"])

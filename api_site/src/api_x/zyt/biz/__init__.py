@@ -1,7 +1,8 @@
 # coding=utf-8
 from api_x.constant import TransactionType
-from .pay import handle_payment_result, handle_payment_notify
-from .prepaid import handle_prepaid_result, handle_prepaid_notify
+from api_x.zyt.biz.payment import handle_payment_result
+from .pay import handle_payment_notify
+from .prepaid import handle_prepaid_notify
 from .refund import handle_refund_notify
 from .withdraw import handle_withdraw_notify
 from .models import VirtualAccountSystem
@@ -12,12 +13,11 @@ def init_test_pay_notify_handles():
     from api_x.zyt.evas.test_pay.constant import BizType, NotifyType
     from api_x.zyt.evas.test_pay.notify import register_notify_handle, register_pay_to_bankcard_notify_handle
 
-    # payment
     register_notify_handle(TransactionType.PAYMENT, BizType.PAY, NotifyType.Pay.SYNC, handle_payment_result)
+    # payment
     register_notify_handle(TransactionType.PAYMENT, BizType.PAY, NotifyType.Pay.ASYNC, handle_payment_notify)
 
     # prepaid
-    register_notify_handle(TransactionType.PREPAID, BizType.PAY, NotifyType.Pay.SYNC, handle_prepaid_result)
     register_notify_handle(TransactionType.PREPAID, BizType.PAY, NotifyType.Pay.ASYNC, handle_prepaid_notify)
 
     # refund
@@ -34,12 +34,12 @@ def init_lianlian_pay_notify_handles():
     from api_x.zyt.evas.lianlian_pay.notify import register_pay_to_bankcard_notify_handle
     from api_x.zyt.evas.lianlian_pay import query_refund_notify
 
-    # payment
+    # 不管是payment还是prepaid都使用两样的payment_result handler. tx type都为PAYMENT.
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC, handle_payment_result)
+    # payment
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.ASYNC, handle_payment_notify)
 
     # prepaid
-    register_pay_notify_handle(TransactionType.PREPAID, NotifyType.Pay.SYNC, handle_prepaid_result)
     register_pay_notify_handle(TransactionType.PREPAID, NotifyType.Pay.ASYNC, handle_prepaid_notify)
 
     # refund
@@ -59,12 +59,11 @@ def init_weixin_pay_notify_handles():
     from api_x.zyt.evas.weixin_pay.notify import register_pay_notify_handle, register_refund_notify_handle
     from api_x.zyt.evas.weixin_pay import query_pay_notify, query_refund_notify
 
-    # payment
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC, handle_payment_result)
+    # payment
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.ASYNC, handle_payment_notify)
 
     # prepaid
-    register_pay_notify_handle(TransactionType.PREPAID, NotifyType.Pay.SYNC, handle_prepaid_result)
     register_pay_notify_handle(TransactionType.PREPAID, NotifyType.Pay.ASYNC, handle_prepaid_notify)
 
     # refund
@@ -83,8 +82,8 @@ def init_zyt_pay_notify_handles():
     from api_x.zyt.vas.constant import NotifyType
     from api_x.zyt.vas.notify import register_pay_notify_handle, register_refund_notify_handle
 
-    # payment
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC, handle_payment_result)
+    # payment
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.ASYNC, handle_payment_notify)
     register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.PAID_OUT, handle_paid_out)
 

@@ -1,11 +1,10 @@
 # coding=utf-8
 from __future__ import unicode_literals
+from decimal import InvalidOperation, Decimal
+
 from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.pay.dba import get_payment_by_channel_order_id, get_payment_by_sn, get_payment_tx_by_sn
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
-
-import time
-from decimal import InvalidOperation, Decimal
 from api_x import db
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.vas.pattern import zyt_bookkeeping
@@ -24,7 +23,6 @@ from pytoolbox.util.log import get_logger
 from api_x.config import etc as config
 from api_x.task import tasks
 from .error import AlreadyPaidError
-
 
 logger = get_logger(__name__)
 
@@ -158,9 +156,8 @@ def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
 
 
 @transactional
-def succeed_paid_out(vas_name, tx, payment_record):
-    event_id = bookkeeping(EventType.TRANSFER_OUT, tx.sn, payment_record.payer_id, vas_name,
-                           payment_record.amount)
+def succeed_paid_out(vas_name, tx, payer_id, amount):
+    event_id = bookkeeping(EventType.TRANSFER_OUT, tx.sn, payer_id, vas_name, amount)
     transit_transaction_state(tx.id, PaymentTxState.CREATED, PaymentTxState.PAID_OUT, event_id)
 
 
@@ -226,45 +223,13 @@ def fail_payment(payment_record):
 
 
 @transactional
-def handle_paid_out(vas_name, sn, notify_handle=None):
+def handle_paid_out(vas_name, sn, payer_id, amount, notify_handle=None):
     tx = get_payment_tx_by_sn(sn)
-    succeed_paid_out(vas_name, tx, tx.record)
+    succeed_paid_out(vas_name, tx, payer_id, amount)
 
+    # FIXME: 这里按逻辑应该用异步的, 但是由于两方为同一个系统，所以直接同步处理了
     if notify_handle is not None:
         notify_handle(True)
-
-
-def handle_payment_result(is_success, sn, vas_name, vas_sn, data):
-    """
-    :param is_success: 是否成功
-    :param sn: 订单号
-    :param vas_name: 来源系统
-    :param vas_sn: 来源系统订单号
-    :param data: 数据
-    :return:
-    """
-    tx = get_payment_tx_by_sn(sn)
-    payment_record = tx.record
-    client_callback_url = payment_record.client_callback_url
-
-    req_code = 0 if is_success else 1
-    code = 0 if tx.state not in [PaymentTxState.FAILED, PaymentTxState.CREATED] else 1
-    if tx.state != PaymentTxState.CREATED and client_callback_url:
-        # 必须要tx状态改变
-        if code != req_code:
-            logger.warn('callback result mismatch with notify result.')
-            # 等待半秒钟
-            time.sleep(0.5)
-            code = 0 if tx.state not in [PaymentTxState.FAILED, PaymentTxState.CREATED] else 1
-        from api_x.utils.notify import sign_and_return_client_callback
-        user_mapping = get_user_map_by_account_user_id(payment_record.payer_id)
-        user_id = user_mapping.user_id
-        params = {'code': code, 'user_id': user_id, 'sn': payment_record.sn,
-                  'order_id': payment_record.order_id, 'amount': payment_record.amount}
-        return sign_and_return_client_callback(client_callback_url, tx.channel_name, params, method="POST")
-
-    from flask import jsonify
-    return jsonify(code=code, source=TransactionType.PAYMENT, sn=sn, vas_name=vas_name)
 
 
 def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):

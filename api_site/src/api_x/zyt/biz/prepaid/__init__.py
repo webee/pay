@@ -79,32 +79,6 @@ def handle_duplicate_pay(vas_name, vas_sn, tx, prepaid_record):
     db.session.add(duplicate_payment_record)
 
 
-def handle_prepaid_result(is_success, sn, vas_name, vas_sn, data):
-    """
-    :param is_success: 是否成功
-    :param sn: 订单号
-    :param vas_name: 来源系统
-    :param vas_sn: 来源系统订单号
-    :param data: 数据
-    :return:
-    """
-    tx = get_tx_by_sn(sn)
-    prepaid_record = tx.record
-
-    client_callback_url = prepaid_record.client_callback_url
-
-    code = 0 if is_success else 1
-    if client_callback_url:
-        from api_x.utils.notify import sign_and_return_client_callback
-        user_mapping = get_user_map_by_account_user_id(prepaid_record.to_id)
-        user_id = user_mapping.user_id
-        params = {'code': code, 'user_id': user_id, 'sn': sn, 'amount': prepaid_record.amount}
-        return sign_and_return_client_callback(client_callback_url, tx.channel_name, params, method="POST")
-
-    from flask import jsonify
-    return jsonify(code=code, source=TransactionType.PREPAID, sn=sn, vas_name=vas_name)
-
-
 def handle_prepaid_notify(is_success, sn, vas_name, vas_sn, data):
     """
     :param is_success: 是否成功

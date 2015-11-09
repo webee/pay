@@ -20,5 +20,5 @@ def prepare(payment_scene, payment_entity):
     if payment_scene == '_':
         return data, None
 
-    evases = get_activated_evases(payment_scene)
+    evases = get_activated_evases(payment_scene, payment_entity.channel_name)
     return data, evases

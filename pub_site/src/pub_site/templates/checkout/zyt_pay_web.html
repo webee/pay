@@ -1,0 +1,39 @@
+{% extends "checkout/layout.html" %}
+
+{% block css %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='css/showLoading.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block js %}
+    <script src="{{ url_for('static', filename='js/jquery-1.8.3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery/jquery.showLoading.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/verification-code.js') }}"></script>
+{% endblock %}
+
+{% block title %}自由通余额支付{% endblock %}
+
+{% block main %}
+    <div class="wxpayTit clearfix">
+        <div class="wxpayL">
+            <h3>订单编号：<span>{{ info.order_id }}</span></h3>
+            <h3>商品名称：<span>{{ info.name|truncate(45, True) }}</span></h3>
+        </div>
+        <div class="wxpayX">
+            金额: <span>{{ info.amount }}</span>元
+        </div>
+    </div>
+    <div class="wxCont">
+    <div class="contRight payoffRight firstRight">
+        <div class="line firstline margin48">
+            <label class="widthauto">可用余额</label>
+            <span id="available_balance" class="money" >{{ balance }}</span>&nbsp;元
+        </div>
+        <form class="withdraw" method="post" action="">
+            {{ form.csrf_token }}
+            {% from 'forms.html' import input, verification_code_and_submit, submit %}
+            {{ verification_code_and_submit(form) }}
+        </form>
+    </div>
+    </div>
+{% endblock %}

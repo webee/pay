@@ -25,3 +25,11 @@ def add_sign_for_params(channel_name, params, sign_type=SignType.RSA):
     params['_lvye_aes_key'] = channel_pub_key.encrypt_to_base64(lvye_aes_key)
 
     return params
+
+
+def vas_payment_is_enabled(channel_name, vas_name):
+    from api_x.zyt.vas import NAME
+    if NAME == vas_name:
+        channel = get_channel_by_name(channel_name)
+        return channel.zyt_pay_enabled
+    return True

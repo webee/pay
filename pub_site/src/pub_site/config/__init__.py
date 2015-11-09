@@ -41,6 +41,8 @@ IS_ALL_OPENED = False
 
 class Checkout:
     VALID_NETLOCS = ['pay.lvye.com']
+    AES_KEY = "SGGN8L8LXO0FV00K0AVO7F9HYEU6HMH4"
+    PAYMENT_CHECKOUT_VALID_SECONDS = 5 * 60
 
 
 # # pay api

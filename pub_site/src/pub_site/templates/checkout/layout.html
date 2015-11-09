@@ -23,6 +23,16 @@
 				<img src="{{ url_for('static', filename='images/logo_zyt.jpg') }}" class="pngfix" height="34" width="192" title="首页" alt="首页">
 			</a>
 		</h1>
+        <div class="loginBtn clearfix">
+            <div class="yh">
+                {% if current_user.is_authenticated() %}
+                    <span class="userName">当前用户：<em>{{ current_user.user_name }}</em></span>
+                    <span style="color:#fff;margin:0 5px">|</span>
+                    <a class="logout" href="{{ url_for('auth.logout') }}">安全退出</a>
+                {% endif %}
+            </div>
+
+        </div>
     </div>
 </header>
 

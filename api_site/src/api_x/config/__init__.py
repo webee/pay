@@ -5,6 +5,7 @@ PROJECT_ROOT = get_project_root()
 
 
 def load_config(env):
+    register_config(__name__, 'zyt_pay', env=env)
     register_config(__name__, 'lianlian_pay', env=env)
     register_config(__name__, 'test_pay', env=env)
     register_config(__name__, 'weixin_pay', env=env)

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from api_x.utils import req
 from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay
-from api_x.zyt import vas
+from api_x.zyt import vas as zyt_pay
 from . import get_payment_type
 
 
@@ -16,7 +16,7 @@ def prepare(payment_scene, vas_name, payment_entity):
         params = _lianlian_pay_params(payment_type, payment_entity)
     elif vas_name == weixin_pay.NAME:
         params = _weixin_pay_params(payment_type, payment_entity)
-    elif vas_name == vas.NAME:
+    elif vas_name == zyt_pay.NAME:
         params = _pay_by_zyt_pay(payment_type, payment_entity)
     else:
         raise Exception("unknown vas [{0}]".format(vas_name))

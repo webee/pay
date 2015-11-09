@@ -79,6 +79,9 @@ class Channel(db.Model):
     # 渠道应用对应的weixin移动app
     wx_app = db.Column(db.VARCHAR(32), nullable=True)
 
+    # enable zyt pay
+    zyt_pay_enabled = db.Column(db.BOOLEAN, nullable=False, default=False)
+
     def __init__(self, *args, **kwargs):
         super(Channel, self).__init__(*args, **kwargs)
 

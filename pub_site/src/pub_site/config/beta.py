@@ -9,6 +9,12 @@ class App:
 HOST_URL = 'http://pay.lvye.com'
 
 
+class Checkout:
+    VALID_NETLOCS = ['pay.lvye.com']
+    AES_KEY = "2HF5UKPIADDYBHDSKOVP9GMA80MU2IV2"
+    PAYMENT_CHECKOUT_VALID_SECONDS = 1 * 60 * 60
+
+
 class PayClientConfig:
     ROOT_URL = "http://pay.lvye.com/api/__"
     CHECKOUT_URL = 'http://pay.lvye.com/__/checkout/{sn}'

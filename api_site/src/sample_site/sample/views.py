@@ -35,7 +35,6 @@ def pay():
     payer = '96355632'
 
     memo = request.values.get('memo', '')
-    use_zyt_pay = request.values.get('use_zyt_pay')
     use_old_pay = request.values.get('use_old_pay')
     payee = request.values.get('other_payee')
     payee = payee or request.values['payee']
@@ -61,9 +60,6 @@ def pay():
     sn = pay_client.prepay(params, ret_sn=True)
     if sn is None:
         return redirect(url_for('.index'))
-
-    if use_zyt_pay:
-        return Response(pay_client.web_zyt_pay(sn))
 
     if use_old_pay:
         return redirect(pay_client.web_checkout_url(sn))

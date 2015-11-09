@@ -3,6 +3,10 @@ from __future__ import unicode_literals
 from pub_site.constant import RequestClientType
 
 VAS_INFOS = {
+    'ZYT': {
+        'name': '自游通',
+        'desc': '余额支付'
+    },
     'TEST_PAY': {
         'name': '测试付',
         'desc': '随意付'

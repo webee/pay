@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 
 from . import sms_mod as mod
 from flask import request, jsonify
-from flask.ext.login import current_user
-from pub_site.auth.utils import login_required
+from flask.ext.login import current_user, login_required
 from pub_site.sms.verification_code_manager import generate_and_send_verification_code
 from pytoolbox.util.log import get_logger
 

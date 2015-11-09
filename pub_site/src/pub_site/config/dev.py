@@ -7,6 +7,7 @@ class App:
 
 class Checkout:
     VALID_NETLOCS = ['dev_pay.lvye.com:5102']
+    PAYMENT_CHECKOUT_VALID_SECONDS = 5 * 60
 
 
 class PayClientConfig:

@@ -60,19 +60,17 @@ def gen_payment_entity_by_prepaid_tx(tx):
                          prepaid_record.amount, tx.state, channel_name=tx.channel_name)
 
 
-def get_activated_evases(payment_scene, with_vas=False):
+def get_activated_evases(payment_scene, channel_name):
+    from api_x.zyt.user_mapping.auth import vas_payment_is_enabled
     from api_x.config import etc
     from . import config
-    from api_x.zyt import vas
 
     evases = []
 
-    if with_vas:
-        evases.append(vas.NAME)
-
     for v in config.PAYMENT_SCENE_VASE_TYPES.get(payment_scene, {}):
         if v in etc.Biz.ACTIVATED_EVAS:
-            evases.append(v)
+            if vas_payment_is_enabled(channel_name, v):
+                evases.append(v)
 
     if len(evases) <= 0:
         raise Exception("no payment type for [{0}]".format(payment_scene))

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from flask import render_template, Response, jsonify
 from . import checkout_entry_mod as mod
 from .constant import VAS_INFOS, REQUEST_CLIENT_PAYMENT_SCENE_MAPPING
+from pub_site.checkout.commons import payment_failed, generate_submit_form
 from pub_site.constant import RequestClientType
 from pytoolbox.util.log import get_logger
 from pub_site.utils.entry_auth import limit_referrer
@@ -38,6 +39,22 @@ def pay_result(sn):
     if state != 'CREATED':
         res = 'DONE'
     return jsonify(res=res)
+
+
+@mod.route('/<sn>/callback', methods=['GET'])
+def pay_callback(sn):
+    """支付结果web回调
+    """
+    data = pay_client.get_payment_result(sn)
+    result = ""
+    if pay_client.is_success_result(data):
+        state = data.data['state']
+        if state != 'CREATED':
+            result = 'SUCCESS'
+
+    # pure sn.
+    sn = sn.split('$', 1)[0]
+    return pay_client.web_payment_callback(sn, result)
 
 
 @mod.route('/<sn>', methods=['GET'])
@@ -91,45 +108,21 @@ def do_pay(sn, vas_name, payment_scene):
     params = result.data['params']
     if vas_name == 'TEST_PAY':
         url = params['_url']
-        return Response(_generate_submit_form(url, params))
+        return Response(generate_submit_form(url, params))
     elif vas_name == 'LIANLIAN_PAY':
         url = params['_url']
-        return Response(_generate_submit_form(url, params))
+        return Response(generate_submit_form(url, params))
     elif vas_name == 'WEIXIN_PAY':
         if payment_type == WeixinPayType.NATIVE:
             code_url = params['code_url']
             info = params['_info']
-            callback_url = params['_callback_url']
-            return render_template("checkout/wx_pay_native.html", code_url=code_url, info=info, sn=sn,
-                                   callback_url=callback_url)
+            return render_template("checkout/wx_pay_native.html", code_url=code_url, info=info, sn=sn)
         elif payment_type == WeixinPayType.JSAPI:
             # TODO: 微信内支付
             pass
+    elif vas_name == 'ZYT':
+        # 自游通余额支付
+        url = params['_url']
+        params['_sn'] = sn
+        return Response(generate_submit_form(url, params, keep_all=True))
     return render_template("checkout/info.html", msg="支付方式错误")
-
-
-def payment_failed(result):
-    if result is None:
-        msg = "请求支付失败"
-    elif result.status_code == 413:
-        # 过期
-        msg = "本支付链接已过期，请重新发起支付!"
-    elif result.status_code == 404:
-        msg = "交易号错误或者已失效，请重新发起支付!"
-    elif result.status_code == 202:
-        msg = "交易已支付，如果失败，请重新发起支付!"
-    else:
-        msg = "failed: code: {0}, msg: {1}".format(result.data['code'], result.data['msg'])
-    return render_template("checkout/info.html", msg=msg)
-
-
-def _generate_submit_form(url, req_params):
-    submit_page = '<meta http-equiv="content-type" content="text/html; charset=UTF-8">'
-    submit_page += '<form id="payBillForm" action="{0}" method="POST">'.format(url)
-    for key in req_params:
-        if key.startswith('_'):
-            continue
-        submit_page += '''<input type="hidden" name="{0}" value='{1}' />'''.format(key, req_params[key])
-    submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'
-    submit_page += '<script>document.forms["payBillForm"].submit();</script>'
-    return submit_page

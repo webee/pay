@@ -12,6 +12,12 @@ class App:
     SQLALCHEMY_ECHO = False
 
 
+class Checkout:
+    VALID_NETLOCS = ['pay.lvye.com']
+    AES_KEY = read_string('conf/checkout/aes_key.txt')
+    PAYMENT_CHECKOUT_VALID_SECONDS = 2 * 60 * 60
+
+
 IS_PROD = True
 HOST_URL = 'http://pay.lvye.com'
 

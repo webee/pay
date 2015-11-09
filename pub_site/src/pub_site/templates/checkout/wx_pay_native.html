@@ -16,7 +16,7 @@
     <div class="wxpayTit clearfix">
         <div class="wxpayL">
             <h3>订单编号：<span>{{ info.order_id }}</span></h3>
-            <h3>商品名称：<span>{{ info.name }}</span></h3>
+            <h3>商品名称：<span>{{ info.name|truncate(45, True) }}</span></h3>
         </div>
         <div class="wxpayX">
             金额: <span>{{ info.amount }}</span>元
@@ -37,36 +37,14 @@
 
 {% block scripts -%}
     <script>
-        function post(path, params, method) {
-            method = method || "post"; // Set method to post by default if not specified.
-
-            // The rest of this code assumes you are not using a library.
-            // It can be made less wordy if you use one.
-            var form = document.createElement("form");
-            form.setAttribute("method", method);
-            form.setAttribute("action", path);
-
-            for(var key in params) {
-                if(params.hasOwnProperty(key)) {
-                    var hiddenField = document.createElement("input");
-                    hiddenField.setAttribute("type", "hidden");
-                    hiddenField.setAttribute("name", key);
-                    hiddenField.setAttribute("value", params[key]);
-
-                    form.appendChild(hiddenField);
-                 }
-            }
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-
         $(function(){
             var req_pay_result = setInterval(function(){
                 $.getJSON('{{ url_for('checkout_entry.pay_result', sn=sn) }}')
                         .done(function (data) {
                             var res = data.res;
                             if (res == 'DONE') {
+                                clearInterval(req_pay_result);
+
                                 var msg = "已支付完成，请关闭该页面, 如果失败，请重新发起支付";
                                 var pay_result = $('#pay_result')[0];
                                 pay_result.hidden = false;
@@ -75,8 +53,8 @@
                                 jQuery('body').showLoading({
                                     'afterShow': function() {
                                         setTimeout(function () {
-                                            post('{{ callback_url }}', {order_no: '{{ info.sn }}', result: 'SUCCESS'})
-                                        }, 500);
+                                            window.open('{{ url_for('checkout.pay_callback', sn=sn) }}', '_self')
+                                        }, 300);
                                 }});
                             }
                         });

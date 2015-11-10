@@ -20,32 +20,18 @@ logger = get_logger(__name__)
 def transfer():
     data = request.values
     channel = request.channel
+    from_user_domain_name = data['from_user_domain_name']
     from_user_id = data['from_user_id']
+    to_user_domain_name = data['to_user_domain_name']
     to_user_id = data['to_user_id']
-    to_user_domain_name = data.get('to_user_domain_name')
     order_id = data.get('order_id')
     amount = data['amount']
-
-    from_user_map = channel.get_user_map(from_user_id)
-    if from_user_map is None:
-        return response.fail(msg="from user with domain [{0}] user [{1}] not exists.".format(channel.user_domain.name, from_user_id))
-    if not to_user_domain_name:
-        # 默认from用户域和to是一致的
-        to_user_map = channel.get_user_map(to_user_id)
-        if to_user_map is None:
-            return response.fail(msg="to user with domain [{0}] user [{1}] not exists.".format(channel.user_domain.name, to_user_id))
-    else:
-        # 指定不同的payee用户域
-        to_user_domain = get_user_domain_by_name(to_user_domain_name)
-        if to_user_domain is None:
-            return response.fail(msg="domain [{0}] not exists.".format(to_user_domain_name))
-        to_user_map = to_user_domain.get_user_map(to_user_id)
-        if to_user_map is None:
-            return response.fail(msg="to user with domain [{0}] user [{1}] not exists.".format(to_user_domain_name, to_user_id))
+    info = data['info']
 
     try:
-        tx = transfer.apply_to_transfer(channel, order_id, from_user_map.account_user_id,
-                                        to_user_map.account_user_id, amount)
+        tx = transfer.apply_to_transfer(channel, order_id,
+                                        from_user_domain_name, from_user_id,
+                                        to_user_domain_name, to_user_id, amount, info)
         return response.success(sn=tx.sn)
     except Exception as e:
         logger.exception(e)

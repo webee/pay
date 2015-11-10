@@ -52,6 +52,7 @@ def zyt_do_pay(sn, token):
 
     form = ZytPayForm()
     if form.validate_on_submit():
+        sn = info['sn']
         result = 'SUCCESS' if pay_client.zyt_pay(sn, user_id) else ''
         return pay_client.web_payment_callback(sn, result)
 

@@ -148,7 +148,9 @@ def query_notify_refund():
             vas_name = weixin_pay.NAME
         handle = get_query_notify_handle(tx.type, vas_name)
         res = handle(TransactionType.REFUND, tx.sn, tx.created_on, tx.vas_name)
-        print('{0}: {1}'.format(tx.order_id, res))
+        print('#########################################')
+        print('####{0}: {1}'.format(tx.order_id, res))
+        print('#########################################')
 
 
 @manager.option('-d', '--domain', type=str, dest="user_domain_name", required=True)

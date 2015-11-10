@@ -21,16 +21,6 @@
             {% from 'forms.html' import input, verification_code_and_submit, radio, submit %}
             {{ form.csrf_token }}
             {{ input(form.amount, "") }}
-            <div class="line">
-                <div class="pay-channel">
-                    <label>{{ form.pay_channel.label }}</label>
-                    {{ form.pay_channel() }}
-                    <em class="warn"></em>
-                    {% for error in form.pay_channel.errors %}
-                        <em class="mistake">{{ error }}</em>
-                    {% endfor %}
-                </div>
-            </div>
 
             <div class="line last">
                 <label>{{ form.comment.label }}</label>

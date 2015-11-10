@@ -27,10 +27,9 @@ def pay_to_lvye():
     form = PayToLvyeForm()
     if form.validate_on_submit():
         amount = Decimal(form.amount.data)
-        pay_channel = form.pay_channel.data
         comment = form.comment.data
         pay_to_lvye_record = dba.add_pay_to_lvye_record(user_id, amount, "付款给绿野", comment)
-        return _do_pay(pay_to_lvye_record, pay_channel)
+        return _do_pay(pay_to_lvye_record)
     return render_template('pay/pay.html', form=form,
                            balance='%.2f' % pay_client.app_query_user_available_balance(user_id))
 
@@ -43,7 +42,7 @@ def _handle_result(result, process):
         return redirect(url_for('.pay'))
 
 
-def _do_pay(pay_to_lvye_record, pay_channel):
+def _do_pay(pay_to_lvye_record):
     params = {
         'payer_user_id': pay_to_lvye_record.user_id,
         'payee_domain_name': config.LVYE_CORP_DOMAIN_NAME,
@@ -63,6 +62,4 @@ def _do_pay(pay_to_lvye_record, pay_channel):
     sn = pay_client.prepay(params, ret_sn=True)
     if sn is None:
         return redirect(url_for('.pay_to_lvye'))
-    if pay_channel == 'ZYT':
-        return pay_client.web_zyt_pay(sn)
     return redirect(pay_client.checkout_url(sn))

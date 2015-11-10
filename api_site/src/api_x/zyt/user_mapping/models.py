@@ -74,11 +74,6 @@ class Channel(db.Model):
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    # 渠道应用对应的主要微信公众号，一般所有应用对应同一个公众号就可以了
-    wx_main = db.Column(db.VARCHAR(32), nullable=True)
-    # 渠道应用对应的weixin移动app
-    wx_app = db.Column(db.VARCHAR(32), nullable=True)
-
     # enable zyt pay
     zyt_pay_enabled = db.Column(db.BOOLEAN, nullable=False, default=False)
 

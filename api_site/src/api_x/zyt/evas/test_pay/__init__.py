@@ -14,7 +14,7 @@ NAME = 'TEST_PAY'
 def payment_param(payment_type, source, user_id, order_no, product_name, amount):
     common_params = _get_common_params(source, user_id, order_no, product_name, amount)
     if payment_type == config.PaymentType.WEB:
-        return_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_result', source=source)
+        return_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_result')
         params = {
             'return_url': return_url
         }

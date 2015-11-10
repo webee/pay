@@ -32,7 +32,7 @@ def pay(source, sn, payer_id, amount):
     from api_x.zyt.biz.models import TransactionType
     if source != TransactionType.PAYMENT:
         # 自游通支付只支持支付，不支持充值等方式
-        raise Exception("自游通支付暂只支持支付".encode('utf-8'))
+        raise Exception("自游通余额付款暂只支持支付".encode('utf-8'))
 
     payer = get_account_user(payer_id)
     if payer is None:

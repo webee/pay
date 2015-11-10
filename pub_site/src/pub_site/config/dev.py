@@ -6,6 +6,7 @@ class App:
 
 
 class Checkout:
+    ZYT_MAIN_PAGE = 'http://dev_pay.lvye.com:5102/main'
     VALID_NETLOCS = ['dev_pay.lvye.com:5102']
     PAYMENT_CHECKOUT_VALID_SECONDS = 5 * 60
 

@@ -55,16 +55,16 @@ def prepare_params(tx, payment_scene, vas_name):
     # TODO: log to db.
     logger.info("[PAYMENT PARAMS] {0}, {1}, {2}, {3}".format(payment_scene, vas_name, tx.type, tx.sn))
 
-    # 目前暂时用来控制zyt余额支付仅限于lvye_pay_site.
-    if not vas_payment_is_enabled(tx.channel_name, vas_name):
-        return response.refused(msg='[{0}] is not allowed for [{1}]'.format(vas_name, tx.channel_name))
-
     if tx.state != PaymentTxState.CREATED:
         return response.processed()
 
     payment_entity = gen_payment_entity(tx)
     if payment_entity is None:
         return response.bad_request()
+
+    # 目前暂时用来控制zyt余额支付仅限于lvye_pay_site.
+    if not vas_payment_is_enabled(payment_entity, vas_name):
+        return response.refused(msg='[{0}] is not allowed for [{1}]'.format(vas_name, tx.channel_name))
 
     try:
         payment_type, prepared_params = params.prepare(payment_scene, vas_name, payment_entity)

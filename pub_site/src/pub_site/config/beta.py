@@ -10,6 +10,7 @@ HOST_URL = 'http://pay.lvye.com'
 
 
 class Checkout:
+    ZYT_MAIN_PAGE = 'http://pay.lvye.com/__/main'
     VALID_NETLOCS = ['pay.lvye.com']
     AES_KEY = "2HF5UKPIADDYBHDSKOVP9GMA80MU2IV2"
     PAYMENT_CHECKOUT_VALID_SECONDS = 1 * 60 * 60

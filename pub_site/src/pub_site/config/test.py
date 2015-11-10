@@ -10,6 +10,7 @@ class Checkout:
 
 
 class PayClientConfig:
+    ZYT_MAIN_PAGE = 'http://dev_pay.lvye.com:5102/main'
     ROOT_URL = "http://dev_pay.lvye.com:5000"
     CHECKOUT_URL = 'http://dev_pay.lvye.com:5102/checkout/{sn}'
 

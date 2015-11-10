@@ -4,6 +4,7 @@ from api_x.zyt.user_mapping import get_channel_by_name
 from pytoolbox.util.sign import SignType, Signer
 from pytoolbox.util import public_key, aes
 from pytoolbox.util.strings import gen_rand_str
+from api_x.constant import TransactionType
 
 
 def add_sign_for_params(channel_name, params, sign_type=SignType.RSA):
@@ -27,9 +28,10 @@ def add_sign_for_params(channel_name, params, sign_type=SignType.RSA):
     return params
 
 
-def vas_payment_is_enabled(channel_name, vas_name):
+def vas_payment_is_enabled(payment_entity, vas_name):
     from api_x.zyt.vas import NAME
     if NAME == vas_name:
-        channel = get_channel_by_name(channel_name)
-        return channel.zyt_pay_enabled
+        channel = get_channel_by_name(payment_entity.channel_name)
+        # 只支持支付
+        return channel.zyt_pay_enabled and payment_entity.source in [TransactionType.PAYMENT]
     return True

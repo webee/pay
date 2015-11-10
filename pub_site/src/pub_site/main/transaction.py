@@ -33,6 +33,9 @@ TX_STATE_MSG = {
     'WITHDRAW:PROCESSING': '正在处理',
     'WITHDRAW:FAILED': '提现失败',
     'WITHDRAW:SUCCESS': '交易完成',
+    'TRANSFER:CREATED': '等待支付',
+    'TRANSFER:FAILED': '转账失败',
+    'TRANSFER:SUCCESS': '交易完成',
 }
 
 # TODO: 直接从接口获取

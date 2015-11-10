@@ -22,11 +22,11 @@ $(document).ready(function () {
                 type: 'post',
                 data: {source: this.getAttribute("data-source")},
                 success: function (data, textStatus) {
-                    timing($('.hqyzm'));
                     var message = '验证码发送失败，请重试。';
                     if (textStatus === 'success') {
                         var ret = data.ret;
                         if (ret) {
+                            timing($('.hqyzm'));
                             message = '验证码已发送到手机号' + data['phone_no']
                         } else {
                             var code = data.code;

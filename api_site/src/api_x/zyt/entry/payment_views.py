@@ -77,7 +77,7 @@ def prepare_params(tx, payment_scene, vas_name):
 @verify_request('payment_callback')
 def payment_callback():
     """通用支付页面回调"""
-    data = request.values
+    data = request.params
     sn = data['sn']
     result = data['result']
     is_success = result == 'SUCCESS'

@@ -153,6 +153,33 @@ def query_notify_refund():
         print('#########################################')
 
 
+@manager.option('-c', '--channel', type=str, dest="channel_name", required=True)
+@manager.option('-f', '--from', type=str, dest="from_user_id", required=True)
+@manager.option('-t', '--to', type=str, dest="to_user_id", required=True)
+@manager.option('-a', '--amount', type=str, dest="amount", required=True)
+@manager.option('-i', '--info', type=str, dest="info", required=True)
+def test_transfer(channel_name, from_user_id, to_user_id, amount, info):
+    from api_x.zyt.user_mapping import get_channel_by_name
+    from api_x.zyt.biz import transfer
+
+    channel = get_channel_by_name(channel_name)
+    if channel is None:
+        print("channel [{0}] not exists.".format(channel_name))
+        return
+
+    from_user_map = channel.get_user_map(from_user_id)
+    if from_user_map is None:
+        print("from user with domain [{0}] user [{1}] not exists.".format(channel.user_domain.name, from_user_id))
+    to_user_map = channel.get_user_map(to_user_id)
+    if to_user_map is None:
+        print("to user with domain [{0}] user [{1}] not exists.".format(channel.user_domain.name, to_user_id))
+
+    tx = transfer.apply_to_transfer(channel, '', from_user_map.account_user_id, to_user_map.account_user_id, amount,
+                                    info.decode('utf-8'))
+
+    print('sn: %s' % tx.sn)
+
+
 @manager.option('-d', '--domain', type=str, dest="user_domain_name", required=True)
 @manager.option('-u', '--user', type=str, dest="user_id", required=True)
 def test_get_user_balance(user_domain_name, user_id):

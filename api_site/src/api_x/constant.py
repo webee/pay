@@ -50,6 +50,12 @@ class PrepaidTxState:
     SUCCESS = 'SUCCESS'
 
 
+class TransferTxState:
+    CREATED = 'CREATED'
+    FAILED = 'FAILED'
+    SUCCESS = 'SUCCESS'
+
+
 class RefundTxState:
     CREATED = 'CREATED'
     # payer已收到退款，payee未扣钱

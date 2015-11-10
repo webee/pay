@@ -16,8 +16,6 @@ from api_x.zyt.biz.models import DuplicatedPaymentRecord
 from api_x.zyt.biz import user_roles
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
-from api_x.config import etc as config
-from pytoolbox.util.urls import build_url
 from api_x.task import tasks
 
 

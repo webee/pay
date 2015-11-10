@@ -341,8 +341,8 @@ class TransferRecord(db.Model):
 
     sn = db.Column(db.CHAR(32), nullable=False)
 
-    from_user_id = db.Column(db.Integer, nullable=False)
-    to_user_id = db.Column(db.Integer, nullable=False)
+    from_id = db.Column(db.Integer, nullable=False)
+    to_id = db.Column(db.Integer, nullable=False)
     amount = db.Column(db.Numeric(12, 2), nullable=False)
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

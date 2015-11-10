@@ -5,6 +5,7 @@ from . import sms_mod as mod
 from flask import request, jsonify
 from flask.ext.login import current_user, login_required
 from pub_site.sms.verification_code_manager import generate_and_send_verification_code
+from pub_site import config
 from pytoolbox.util.log import get_logger
 
 
@@ -16,7 +17,7 @@ logger = get_logger(__name__)
 def send_verification_code():
     source = request.values['source']
     phone_no = current_user.phone_no
-    if not phone_no:
+    if not phone_no and config.IS_PROD:
         return jsonify(ret=False, code=450, msg='no phone.'), 200
     ret = generate_and_send_verification_code(source, current_user.user_id, phone_no)
     if ret:

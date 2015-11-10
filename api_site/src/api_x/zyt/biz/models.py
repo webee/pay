@@ -290,6 +290,10 @@ class PrepaidRecord(db.Model):
     client_notify_url = db.Column(db.VARCHAR(128))
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+    @property
+    def payer_id(self):
+        return self.to_id
+
     def __repr__(self):
         return '<Prepaid %r>' % (self.user_id, self.amount)
 

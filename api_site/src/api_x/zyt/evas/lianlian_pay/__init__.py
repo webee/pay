@@ -21,7 +21,7 @@ def payment_param(payment_type, source, user_id, user_created_on, ip, order_no, 
                   amount):
     from ._payment import pay_param as _pay_param, wap_pay_param as _wap_pay_param, app_params as _app_params
 
-    return_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_result', source=source, order_no=order_no))
+    return_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_result', order_no=order_no))
     notify_url = generate_absolute_url(url_for('lianlian_pay_entry.pay_notify', source=source))
 
     if payment_type == config.PaymentType.WEB:

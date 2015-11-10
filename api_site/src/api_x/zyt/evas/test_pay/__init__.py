@@ -31,7 +31,7 @@ def pay(source, user_id, order_no, product_name, amount, channel=None):
         # app请求参数
         return _get_common_params(source, user_id, order_no, product_name, amount)
 
-    return_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_result', source=source)
+    return_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_result')
     params = {
         'return_url': return_url
     }

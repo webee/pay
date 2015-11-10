@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from api_x import db
 from api_x.constant import TransferTxState
 from api_x.zyt.vas.pattern import transfer
-from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state
+from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
 from api_x.zyt.biz.models import TransactionType, TransferRecord
 from api_x.zyt.biz.error import NonPositiveAmountError, AmountValueError
 from api_x.zyt.biz import user_roles
@@ -49,5 +49,8 @@ def apply_to_transfer(channel, order_id, from_id, to_id, amount, info):
 
 @transactional
 def do_transfer(tx, transfer_record):
+    from api_x.zyt.vas import NAME
     event_ids = transfer(tx.sn, transfer_record.from_id, transfer_record.to_id, transfer_record.amount)
     transit_transaction_state(tx.id, tx.state, TransferTxState.SUCCESS, event_ids)
+
+    update_transaction_info(tx.id, tx.sn, vas_name=NAME)

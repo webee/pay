@@ -1,0 +1,105 @@
+{% extends "reconciliation/base.html" %}
+{% block header %}
+<script src="{{ url_for('static', filename='js/debitnote/searchCtrl.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+
+<div ng-app="debitnote" ng-controller="searchCtrl"> 
+<form class="form-inline" action="">
+  <div class="form-group">
+    <label for="orderid">按订单号:</label>
+    <input type="text" class="form-control" name="orderid" id="orderid" placeholder="订单号">
+  </div>
+  <input type="submit" class="btn btn-primary"/>
+</form>
+
+<br>
+
+<table class="table table-bordered table-striped table-hover table-condensed">
+  <thead>
+    <tr>
+      <th>创建时间</th>
+      <th>发起人</th>
+      <th>对方</th>
+      <th>操作</th>
+      <th>订单号</th>
+      <th>交易金额（元）</th>
+      <th>状态</th>
+      <th>交易名称</th>
+      <th>详情</th>
+    </tr>
+  </thead>
+  <tr ng-repeat="item in tx">
+  <td>[[item.created_on]]</td>
+  <td>[[item.payee]]</td>
+  <td>[[item.payer]]</td>
+  <td>[[item.type]]</td>
+  <td>[[item.orderid]]</td>
+  <td>[[item.amount]]</td>
+  <td>[[item.state]]</td>
+  <td>[[item.comments]]</td>
+  <td><button ng-click="toggle([[item.tx_id]])" class="btn btn-info">明细详情</button></td>
+  </tr>
+</table>
+
+<br>
+<h2>交易明细</h2>
+<table class="table table-bordered table-striped table-hover table-condensed">
+  <thead>
+    <tr>
+      <th>时间</th>
+      <th>前一状态</th>
+      <th>目前状态</th>
+      <th>第三方名称</th>
+      <th>类型</th>
+      <th>金额（元）</th>
+      <th>事件ID</th>
+    </tr>
+  </thead>
+  <tr ng-repeat="item in txd">
+  <td>[[item.created_on]]</td>
+  <td>[[item.prev_state]]</td>
+  <td>[[item.state]]</td>
+  <td>[[item.vas_name]]</td>
+  <td>[[item.type]]</td>
+  <td>[[item.amount]]</td>
+  <td>[[item.event_id]]</td>
+  <tr>
+</table>
+
+<br>
+<h2>关联账户资金流转</h2>
+<table class="table table-bordered table-striped table-hover table-condensed">
+  <thead>
+    <tr>
+      <th>时间</th>
+      <th>账户</th>
+      <th>初始金额</th>
+      <th>资金变动</th>
+      <th>最终余额</th>
+      <th>备注</th>
+      <th>事件ID</th>
+    </tr>
+  </thead>
+  <tr ng-repeat="item in ad">
+  <td>[[item.created_on]]</td>
+  <td>[[item.user_id]]</td>
+  <td>[[item.balance1]]</td>
+  <td>[[item.amount]]</td>
+  <td>[[item.balance2]]</td>
+  <td></td>
+  <td>[[item.event_id]]</td>
+  </tr>
+</table>
+
+<br>
+
+
+
+
+</div>
+</div>
+
+{% endblock %}

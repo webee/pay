@@ -3,6 +3,7 @@ from __future__ import unicode_literals, print_function, division
 import os
 
 from flask import Flask
+from flask_cors import CORS
 from flask.ext.migrate import Migrate
 from pytoolbox.util import dbs
 from pytoolbox.util.dbs import db
@@ -10,6 +11,7 @@ from pytoolbox.util.dbs import db
 
 # extensions
 migrate = Migrate()
+
 
 
 def register_mods(app):
@@ -35,6 +37,8 @@ def register_mods(app):
     from api_x.application.entry import application_mod
     app.register_blueprint(application_mod, url_prefix="/application")
 
+    from api_x.debit_note import debitnote_mod
+    app.register_blueprint(debitnote_mod,url_prefix="/recon")
 
 def init_config(app, env):
     from api_x import config
@@ -52,6 +56,7 @@ def init_extensions(app):
     from api_x.zyt.vas import models
     from api_x.zyt.user_mapping import models
     from api_x.application import models
+    from api_x.debit_note import models
 
     dbs.init_db(app)
     db.init_app(app)
@@ -79,6 +84,7 @@ def custom_flask(app):
     app.json_encoder = CustomJSONEncoder
 
 
+
 def create_app(env='dev', deploy=False):
     if deploy:
         return Flask(__name__)
@@ -99,5 +105,7 @@ def create_app(env='dev', deploy=False):
     evas.init()
 
     init_tasks(app)
+    CORS(app)
 
     return app
+

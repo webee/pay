@@ -1,0 +1,23 @@
+
+{% extends "reconciliation/base.html" %}
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+{{ tips }}
+<form  action="/recon/login" method="post">
+  <div class="form-group">
+    <label for="username">用户名：</label>
+    <input type="text" class="form-control" id="username" name="username"  placeholder="用户名">
+  </div>
+  <div class="form-group">
+    <label for="pw">Password</label>
+    <input type="password" class="form-control" id="pw" name="pw" placeholder="密码">
+  </div>
+  <button type="submit" class="btn btn-default">登录</button>
+</form>
+
+
+
+{% endblock %}

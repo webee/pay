@@ -17,3 +17,6 @@ class DataBase:
     INSTANCE = 'lvye_pay'
     USERNAME = 'lvye_pay'
     PASSWORD = 'p@55word'
+
+class Host:
+    API_SITE = ''

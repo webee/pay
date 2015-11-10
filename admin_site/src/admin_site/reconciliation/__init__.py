@@ -6,4 +6,3 @@ recon_mod = Blueprint('reconciliation', __name__, static_folder='static')
 
 from . import views
 
-

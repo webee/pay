@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head lang="zh">
-    <meta charset="UTF-8">
-    <title>{{ title }}</title>
-</head>
-<body>
-<p>{{ msg }}</p>
-</body>
-</html>
+{% extends "checkout/layout.html" %}
+
+{% block title %}提示{% endblock %}
+
+{% block main %}
+    <div class="wxpayTit clearfix">
+    <p>{{ msg }}</p>
+    </div>
+{% endblock %}

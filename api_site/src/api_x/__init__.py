@@ -31,11 +31,6 @@ def register_mods(app):
     app.register_blueprint(lianlian_pay_entry_mod, url_prefix="/vas/lianlian_pay")
     app.register_blueprint(weixin_pay_entry_mod, url_prefix="/vas/weixin_pay")
 
-    from api_x.zyt.checkout.web_entry import web_checkout_entry_mod
-    from api_x.zyt.checkout.app_entry import app_checkout_entry_mod
-    app.register_blueprint(web_checkout_entry_mod, url_prefix='/checkout/web')
-    app.register_blueprint(app_checkout_entry_mod, url_prefix='/checkout/app')
-
     from api_x.application.entry import application_mod
     app.register_blueprint(application_mod, url_prefix="/application")
 

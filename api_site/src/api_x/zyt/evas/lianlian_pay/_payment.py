@@ -47,11 +47,6 @@ def pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name, or
     return params
 
 
-def pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url):
-    params = pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url)
-    return _generate_submit_form(params)
-
-
 def wap_pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url,
                   notify_url, app_request):
     params = {
@@ -70,13 +65,6 @@ def wap_pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name
     }
     logger.info("request lianlian pay WAP {0}".format(req_params))
     return req_params
-
-
-def wap_pay(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, return_url, notify_url,
-            app_request=lianlian_pay.AppRequest.WAP):
-    req_params = wap_pay_param(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount,
-                               return_url, notify_url, app_request)
-    return _generate_submit_form(req_params, lianlian_pay.Payment.Wap.URL)
 
 
 def app_params(user_id, user_created_on, ip, order_no, ordered_on, order_name, order_desc, amount, notify_url):

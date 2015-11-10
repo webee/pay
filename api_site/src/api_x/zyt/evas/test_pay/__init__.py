@@ -26,19 +26,6 @@ def payment_param(payment_type, source, user_id, order_no, product_name, amount)
         raise PaymentTypeNotSupportedError(NAME, payment_type)
 
 
-def pay(source, user_id, order_no, product_name, amount, channel=None):
-    if channel in [config.Pay.Channel.APP, config.Pay.Channel.API]:
-        # app请求参数
-        return _get_common_params(source, user_id, order_no, product_name, amount)
-
-    return_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_result')
-    params = {
-        'return_url': return_url
-    }
-    params.update(_get_common_params(source, user_id, order_no, product_name, amount))
-    return Response(generate_submit_form(test_pay.Pay.URL, params))
-
-
 def _get_common_params(source, user_id, order_no, product_name, amount):
     notify_url = test_pay.ROOT_URL + url_for('test_pay_entry.pay_notify', source=source)
     params = {

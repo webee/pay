@@ -22,13 +22,13 @@ def pay_result(tx, sn):
 
 @mod.route("/payment/<sn>/<payment_scene>/info", methods=["GET"])
 @payment_entry
-def info(tx, sn, payment_scene):
+def pay_info(tx, sn, payment_scene):
     return query_info(tx, payment_scene)
 
 
 @mod.route("/payment/<sn>/<payment_scene>/<vas_name>/param", methods=["GET"])
 @payment_entry
-def params(tx, sn, payment_scene, vas_name):
+def pay_params(tx, sn, payment_scene, vas_name):
     return prepare_params(tx, payment_scene, vas_name)
 
 

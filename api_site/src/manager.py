@@ -61,6 +61,15 @@ def update_api_entry():
 
     update_api_entries()
 
+@manager.command
+def recon_debitnote():
+    from api_x.debit_note.sftp import main
+    main()
+
+@manager.command
+def init_recon_debitnote():
+    from api_x.debit_note.sftp import init_recon
+    init_recon()
 
 @manager.option('-u', '--update_only', action="store_true", dest="update_only", required=False, default=False)
 def deploy_prod(update_only):

@@ -5,6 +5,10 @@ import os
 from flask import Flask, render_template, current_app
 from pytoolbox.util import dbe
 
+import flask.ext.login as flask_login
+
+login_manager = flask_login.LoginManager()
+
 
 def _init_template(app):
     @app.context_processor
@@ -42,15 +46,15 @@ def _init_csrf_protect(app):
     csrf.init_app(app)
 
 
-def create_app(env):
-    from pytoolbox.conf import config as conf
+def create_app(env="dev"):
+    from pytoolbox.util import pmc_config
     from admin_site import config
 
     app = Flask(__name__, template_folder='./templates')
 
     env = env or 'dev'
     os.environ['ENV'] = env
-    conf.load(config, env=env)
+    pmc_config.register_config(config, env=env)
 
     app.config.from_object(config.App)
 
@@ -58,7 +62,9 @@ def create_app(env):
                          config.DataBase.USERNAME, config.DataBase.PASSWORD)
     _register_mods(app)
     _init_template(app)
-    _init_errors(app)
-    _init_csrf_protect(app)
+    #_init_errors(app)
+    #_init_csrf_protect(app)
+    login_manager.init_app(app)
+    #app.debug=True
 
     return app

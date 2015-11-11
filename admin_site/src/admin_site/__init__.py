@@ -23,7 +23,10 @@ def _register_mods(app):
     app.register_blueprint(recon_mod, url_prefix='/recon')
 
 
-def create_app(env="dev"):
+def create_app(env='dev', deploy=False):
+    if deploy:
+        return Flask(__name__)
+
     from pytoolbox.util import pmc_config
     from admin_site import config
 

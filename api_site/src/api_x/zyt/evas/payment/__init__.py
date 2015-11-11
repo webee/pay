@@ -75,6 +75,7 @@ def get_activated_evases(payment_scene, payment_entity):
     if len(evases) <= 0:
         raise Exception("no payment type for [{0}]".format(payment_scene))
 
+    evases = sorted(evases, key=lambda x: config.PAYMENT_TYPE_WEIGHTS.get(x, 100))
     return evases
 
 

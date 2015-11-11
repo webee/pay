@@ -2,13 +2,12 @@
 from . import recon_mod as mod
 from flask import render_template
 import flask
-from admin_site import flask_login,login_manager
+from admin_site import flask_login, login_manager
 from admin_site import config
 
-
 users = {
-	'yl': {'pw': 'lvye'},
-	'op': {'pw': 'lvye123'}
+    'yl': {'pw': 'lvye'},
+    'op': {'pw': 'lvye123'}
 }
 
 
@@ -41,25 +40,27 @@ def request_loader(request):
 
     return user
 
-@mod.route('/login', methods=['GET','POST'])
-def login():
-	if flask.request.method == 'GET':
-		return render_template('reconciliation/login.html')
-	username = flask.request.form['username']
-	if flask.request.form['pw'] == users.get(username,{}).get('pw'):
-		user = User()
-		user.id = username
-		flask_login.login_user(user)
-		print 'redirect'
-		return flask.redirect('/recon/')
 
-	return render_template('reconciliation/login.html',tips=u"用户名或者密码错误")
+@mod.route('/login', methods=['GET', 'POST'])
+def login():
+    if flask.request.method == 'GET':
+        return render_template('reconciliation/login.html')
+    username = flask.request.form['username']
+    if flask.request.form['pw'] == users.get(username, {}).get('pw'):
+        user = User()
+        user.id = username
+        flask_login.login_user(user)
+        print 'redirect'
+        return flask.redirect('/recon/')
+
+    return render_template('reconciliation/login.html', tips=u"用户名或者密码错误")
 
 
 @mod.route('/protected')
 @flask_login.login_required
 def protected():
     return 'Logged in as: ' + flask_login.current_user.id
+
 
 @mod.route('/logout')
 def logout():
@@ -69,23 +70,27 @@ def logout():
 
 @login_manager.unauthorized_handler
 def unauthorized():
-	return flask.redirect('/recon/login')
+    return flask.redirect('/recon/login')
 
 
 @mod.route('/', methods=['GET'])
 @flask_login.login_required
 def list_reconciliation():
-    return render_template('reconciliation/list.html',config=_get_config())
+    return render_template('reconciliation/list.html', config=_get_config())
+
+
 @mod.route('/search', methods=['GET'])
 @flask_login.login_required
 def search_transaction():
-    return render_template('reconciliation/search.html',config=_get_config())
+    return render_template('reconciliation/search.html', config=_get_config())
 
 
 def _get_config():
     return compose_conf(
         apiHost=config.Host.API_SITE
     )
+
+
 def compose_conf(**kwargs):
     conf = {}
     for key, value in kwargs.iteritems():

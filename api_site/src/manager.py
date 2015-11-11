@@ -195,5 +195,17 @@ def test_get_user_balance(user_domain_name, user_id):
                                                                  cash_balance.frozen))
 
 
+@manager.command
+def recon_debitnote():
+    from api_x.debit_note.sftp import main
+    main()
+
+
+@manager.command
+def init_recon_debitnote():
+    from api_x.debit_note.sftp import init_recon
+    init_recon()
+
+
 if __name__ == '__main__':
     manager.run()

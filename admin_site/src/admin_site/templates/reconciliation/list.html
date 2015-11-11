@@ -1,10 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
 
-</body>
-</html>
+{% extends "reconciliation/base.html" %}
+{% block header %}
+<script src="{{ url_for('static', filename='js/debitnote/ctrl.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+
+
+<div ng-app="debitnote" ng-controller="debitnoteCtrl"> 
+
+<div>最后对账时间：  <label ng-bind="datestr.date"></label></div>
+
+<div>不一致记录共：  <label ng-bind="num"></label> 条</div>
+
+<table class="table table-bordered table-striped table-hover table-condensed">
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>SN</th>
+      <th>绿野支付记录</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>第三方记录</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>交易时间</th>
+      <th>绿野单号</th>
+      <th>交易状态</th>
+      <th>金额</th>
+      <th>交易时间</th>
+      <th>第三方支付单号</th>
+      <th>第三方渠道</th>
+      <th>交易状态</th>
+      <th>金额</th>
+    </tr>
+  </thead>
+  <tr ng-repeat="item in datas" class="danger">
+  <td>[[$index]]</td>
+  <td>[[item.sn]]</td>
+  <td>[[item.ly_date]]</td>
+  <td>[[item.ly_orderid]]</td>
+  <td>[[item.ly_type]]</td>
+  <td>[[item.ly_amount]]</td>
+  <td>[[item.ll_date]]</td>
+  <td>[[item.ll_orderid]]</td>
+  <td>[[item.ll_vasname]]</td>
+  <td>[[item.ll_type]]</td>
+  <td>[[item.ll_amount]]</td>
+  </tr>
+<table>
+</div>
+
+{% endblock %}

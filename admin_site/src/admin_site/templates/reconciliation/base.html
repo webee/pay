@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="{{ url_for('static', filename='js/angular.min.js') }}"></script>
+	<script>
+	angular.module("global-config", []);
+	angular.module('global-config').value('globalConfig', {{ config | safe }});
+	</script>
+
+	<script src="{{ url_for('static', filename='js/debitnote.js') }}"></script>
+	<link href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+	<script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+	<script src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js') }}"></script>
+	{% block header %}{% endblock %}
+    <title></title>
+</head>
+<body>
+<div class="container">
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+	  <a class="brand" href="/recon" style="padding: 5px 20px;"><img src="http://img01.lvye.com.cn/lvyehuodong/static/huodong/images/logo.png"></a>
+    </div>
+	<a class="btn btn-success" href="/recon" role="button">对账结果查看</a>
+	<a class="btn btn-success" href="/recon/search" role="button">交易记录查询</a>
+  </div>
+</nav>
+
+
+{% block content %}{% endblock %}
+
+
+</body>
+</html>

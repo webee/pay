@@ -1,6 +1,7 @@
 *.py[co]
 
 env.local.sh
+.python-version
 *venv/
 null/
 .idea/

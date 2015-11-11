@@ -1,7 +1,5 @@
 # coding=utf-8
-from pytoolbox.util import pmc_config
-
-ROOT_URL = "http://pay.lvye.com/api"
+ROOT_URL = "http://dev_pay.lvye.com:5100"
 
 
 class AppConfig:
@@ -20,16 +18,13 @@ class AppConfig:
             return
 
         # init
-        _main = pmc_config.load_yaml('conf/weixin/%s/%s/main.yaml' % (app_type, name))
-        _pay_main = pmc_config.load_yaml('conf/weixin/%s/%s/pay/main.yaml' % (app_type, name))
-
         self.APP_NAME = name
-        self.APPID = _main['AppID']
-        self.APP_SECRET = _main['AppSecret']
-        self.MCH_ID = _pay_main['MchID']
-        self.API_KEY = pmc_config.read_string('conf/weixin/%s/%s/pay/api_key.txt' % (app_type, name))
-        self.CERT_PATH = pmc_config.abstract_path('conf/weixin/%s/%s/pay/apiclient_cert.pem' % (app_type, name))
-        self.CERT_KEY_PATH = pmc_config.abstract_path('conf/weixin/%s/%s/pay/apiclient_key.pem' % (app_type, name))
+        self.APPID = ""
+        self.APP_SECRET = ""
+        self.MCH_ID = ""
+        self.API_KEY = ""
+        self.CERT_PATH = ""
+        self.CERT_KEY_PATH = ""
 
     @staticmethod
     def init_config(app_type, name, is_main=False):

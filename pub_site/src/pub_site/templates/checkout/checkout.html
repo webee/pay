@@ -8,6 +8,7 @@
 {% block js %}
     <script src="{{ url_for('static', filename='js/jquery-1.8.3.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery/jquery.showLoading.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/browser_detect.js') }}"></script>
 {% endblock %}
 
 {% block main %}
@@ -127,6 +128,9 @@
                                     } else if (res == 'CREATED') {
                                         {#                                $(".payfinishLayer,.bgLayer").fadeIn();#}
                                         window.open("{{ CONFIG.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name='') }}" + vas_name, '_self');
+                                        if (is_safari) {
+                                            jQuery('body').hideLoading();
+                                        };
                                     } else if (res == 'EXPIRED') {
                                         var msg = "本支付链接过期，请关闭页面，重新请求支付";
                                         alert(msg);

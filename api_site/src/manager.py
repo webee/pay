@@ -61,15 +61,6 @@ def update_api_entry():
 
     update_api_entries()
 
-@manager.command
-def recon_debitnote():
-    from api_x.debit_note.sftp import main
-    main()
-
-@manager.command
-def init_recon_debitnote():
-    from api_x.debit_note.sftp import init_recon
-    init_recon()
 
 @manager.option('-u', '--update_only', action="store_true", dest="update_only", required=False, default=False)
 def deploy_prod(update_only):
@@ -202,6 +193,18 @@ def test_get_user_balance(user_domain_name, user_id):
                                                                  cash_balance.total,
                                                                  cash_balance.available,
                                                                  cash_balance.frozen))
+
+
+@manager.command
+def recon_debitnote():
+    from api_x.debit_note.sftp import main
+    main()
+
+
+@manager.command
+def init_recon_debitnote():
+    from api_x.debit_note.sftp import init_recon
+    init_recon()
 
 
 if __name__ == '__main__':

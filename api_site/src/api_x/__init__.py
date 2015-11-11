@@ -3,17 +3,13 @@ from __future__ import unicode_literals, print_function, division
 import os
 
 from flask import Flask
-from flask_cors import CORS
 from flask.ext.migrate import Migrate
-from flask.ext.qrcode import QRcode
 from pytoolbox.util import dbs
 from pytoolbox.util.dbs import db
 
 
 # extensions
 migrate = Migrate()
-qrcode = QRcode()
-
 
 
 def register_mods(app):
@@ -37,7 +33,8 @@ def register_mods(app):
     app.register_blueprint(application_mod, url_prefix="/application")
 
     from api_x.debit_note import debitnote_mod
-    app.register_blueprint(debitnote_mod,url_prefix="/recon")
+    app.register_blueprint(debitnote_mod, url_prefix="/recon")
+
 
 def init_config(app, env):
     from api_x import config
@@ -62,8 +59,6 @@ def init_extensions(app):
 
     migrate.init_app(app, db)
 
-    qrcode.init_app(app)
-
 
 def init_tasks(app):
     from api_x.task import celery
@@ -83,7 +78,6 @@ def custom_flask(app):
                 return obj.isoformat(sep=str(' '))
             return super(CustomJSONEncoder, self).default(obj)
     app.json_encoder = CustomJSONEncoder
-
 
 
 def create_app(env='dev', deploy=False):
@@ -106,12 +100,10 @@ def create_app(env='dev', deploy=False):
     evas.init()
 
     init_tasks(app)
-    CORS(app)
 
     init_template(app)
 
     return app
-
 
 
 def init_template(app):

@@ -11,12 +11,5 @@ class App:
     WTF_CSRF_SECRET_KEY = 'a random string'
 
 
-class DataBase:
-    HOST = 'localhost'
-    PORT = 3306
-    INSTANCE = 'lvye_pay'
-    USERNAME = 'lvye_pay'
-    PASSWORD = 'p@55word'
-
 class Host:
-    API_SITE = ''
+    API_SITE = 'http://dev_pay.lvye.com:5100'

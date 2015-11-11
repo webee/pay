@@ -7,7 +7,7 @@ port=${3:-5000}
 PROJ_ROOT=$(dirname $0)
 NAME="pay-admin-site"
 FLASK_DIR=${PROJ_ROOT}/src
-VENV_DIR=${PROJ_ROOT}/api_venv
+VENV_DIR=${PROJ_ROOT}/venv
 NUM_WORKERS=${NUM_WORKERS:-8}
 ENV_FILE=${HOME}/.pay_env.sh
 

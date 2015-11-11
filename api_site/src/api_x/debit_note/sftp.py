@@ -8,6 +8,7 @@ import datetime
 from api_x import db
 
 from api_x.debit_note.models import DebitNoteDate, DebitNoteDetail
+from api_x.config import etc
 from api_x.config import lianlian_pay as config
 
 
@@ -375,6 +376,14 @@ def parse_file(date='2015-09-10'):
         tmp = {}
         items = line.decode("gb18030").split(",")
         sn = cleanit(items[0])
+
+        # 生产环境过滤'__', 非生产环境过滤非'__'
+        is_prod = etc.Biz.IS_PROD
+        is_normal = not sn.startswith('__')
+
+        if is_prod ^ is_normal:
+                continue
+
         tmp['sn'] = sn
         tmp['vas_name'] = "LIANLIAN_PAY"
         tmp['amount'] = abs(float(cleanit(items[6])))

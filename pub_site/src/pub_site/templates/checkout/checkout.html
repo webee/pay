@@ -8,7 +8,7 @@
 {% block js %}
     <script src="{{ url_for('static', filename='js/jquery-1.8.3.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery/jquery.showLoading.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/browser_detect.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/browser_utils.js') }}"></script>
 {% endblock %}
 
 {% block main %}
@@ -38,7 +38,7 @@
             {% endfor %}
         </ul>
         <button id="bt_pay_now" class="nowpay" value="{{ vases[0] }}">立即支付</button>
-        <span hidden=true id="pay_result" class="pay_result"></span>
+        <span hidden=true id="pay_result" class="pay_result_before"></span>
     </div>
 {% endblock %}
 
@@ -66,6 +66,7 @@
 
             function disable_pay_bt(msg) {
                 var pay_result = $('#pay_result')[0];
+                pay_result.setAttribute("class", "pay_result")
                 pay_result.hidden = false;
                 pay_result.innerText = msg;
                 $('#bt_pay_now').off('click');
@@ -127,7 +128,8 @@
                                         disable_pay_bt(msg);
                                     } else if (res == 'CREATED') {
                                         {#                                $(".payfinishLayer,.bgLayer").fadeIn();#}
-                                        window.open("{{ CONFIG.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name='') }}" + vas_name, '_self');
+                                        var url = "{{ CONFIG.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name='') }}" + vas_name;
+                                        navigateToUrl(url);
                                         if (is_safari) {
                                             jQuery('body').hideLoading();
                                         };

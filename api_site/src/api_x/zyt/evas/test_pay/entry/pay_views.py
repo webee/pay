@@ -7,6 +7,10 @@ from api_x.zyt.evas.test_pay.constant import BizType, NotifyType
 from api_x.zyt.evas.test_pay.notify import get_notify_handle
 from api_x.zyt.evas.test_pay import NAME
 from api_x.constant import TransactionType
+from decimal import Decimal
+from pytoolbox.util.log import get_logger
+
+logger = get_logger(__name__)
 
 
 @mod.route("/pay/result", methods=["POST"])
@@ -33,14 +37,19 @@ def pay_notify(source):
     data = dict(request.values.items())
     order_no = data['order_no']
     vas_order_no = data['sn']
+    amount = Decimal(data['amount'])
     result = data['result']
     # TODO: check.
 
     handle = get_notify_handle(source, BizType.PAY, NotifyType.Pay.ASYNC)
     if handle:
-        # 是否成功，订单号，来源系统，来源系统订单号，数据
-        if handle(is_success_result(result), order_no, NAME, vas_order_no, data):
+        try:
+            # 是否成功，订单号，来源系统，来源系统订单号，数据
+            handle(is_success_result(result), order_no, NAME, vas_order_no, amount, data)
             return jsonify(code=0)
+        except Exception as e:
+            logger.exception(e)
+            logger.warning('pay notify error: {0}'.format(e.message))
 
     return jsonify(code=1)
 

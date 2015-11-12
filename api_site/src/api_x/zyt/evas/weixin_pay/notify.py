@@ -6,6 +6,7 @@ from .constant import BizType, NotifyType
 from api_x.zyt.evas.weixin_pay import get_vas_id
 from .commons import is_trade_success_or_fail, is_refund_success_or_fail, is_sending_to_me
 from pytoolbox.util.log import get_logger
+from decimal import Decimal
 
 logger = get_logger(__name__)
 
@@ -62,6 +63,7 @@ def notify_pay(source, app, data):
     mch_id = data['mch_id']
     out_trade_no = data['out_trade_no']
     transaction_id = data['transaction_id']
+    total_fee = Decimal(data['total_fee'])/100
     trade_state = data['trade_state']
 
     logger.info('pay notify {0}@{1}: {2}'.format(source, app, data))
@@ -78,7 +80,7 @@ def notify_pay(source, app, data):
 
     try:
         # 是否成功，订单号，来源系统，来源系统订单号，数据
-        handle(result, out_trade_no, get_vas_id(app), transaction_id, data)
+        handle(result, out_trade_no, get_vas_id(app), transaction_id, total_fee, data)
         return NotifyRespTypes.SUCCEED
     except Exception as e:
         logger.exception(e)

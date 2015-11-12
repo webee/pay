@@ -45,7 +45,7 @@ def _do_pay(source, sn, payer_id, amount):
     def notify_payee(is_success):
         # 通知payee到账
         async_handle = get_pay_notify_handle(source, NotifyType.Pay.ASYNC)
-        async_handle(is_success, sn, NAME, sn, None)
+        async_handle(is_success, sn, NAME, sn, amount, None)
         # TODO: 在失败的情况下，添加异步任务
 
     # 通知payer扣钱

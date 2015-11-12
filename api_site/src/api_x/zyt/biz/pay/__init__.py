@@ -13,7 +13,7 @@ from api_x.constant import SECURE_USER_NAME, PaymentTxState
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType, TransactionSnStack
-from api_x.zyt.biz.error import NonPositiveAmountError, NegativeAmountError
+from api_x.zyt.biz.error import NonPositiveAmountError, NegativeAmountError, AmountValueMissMatchError
 from api_x.zyt.biz.error import TransactionNotFoundError, AmountValueError
 from api_x.zyt.biz.transaction.error import TransactionStateError
 from api_x.zyt.biz.models import DuplicatedPaymentRecord
@@ -199,9 +199,13 @@ def duplicate_payment_to_balance(vas_name, vas_sn, tx, payment_record):
 def secure_payment(vas_name, tx, payment_record):
     if not in_to_pay_state(tx.state):
         raise TransactionStateError()
-    secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-    event_id = bookkeeping(EventType.TRANSFER_IN_FROZEN, tx.sn, secure_user_id, vas_name,
-                           payment_record.amount)
+    if payment_record.amount == 0:
+        # 不用记账
+        event_id = None
+    else:
+        secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
+        event_id = bookkeeping(EventType.TRANSFER_IN_FROZEN, tx.sn, secure_user_id, vas_name,
+                               payment_record.amount)
     transit_transaction_state(tx.id, tx.state, PaymentTxState.SECURED, event_id)
 
 
@@ -232,7 +236,7 @@ def handle_paid_out(vas_name, sn, payer_id, amount, notify_handle=None):
         notify_handle(True)
 
 
-def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
+def handle_payment_notify(is_success, sn, vas_name, vas_sn, amount, data):
     """
     :param is_success: 是否成功
     :param sn: 订单号
@@ -243,6 +247,9 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, data):
     """
     tx = get_payment_tx_by_sn(sn)
     payment_record = tx.record
+
+    if amount != payment_record.amount:
+        raise AmountValueMissMatchError(payment_record.amount, amount)
 
     if is_duplicated_notify(tx, vas_name, vas_sn):
         return

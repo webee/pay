@@ -11,6 +11,7 @@ from .commons import parse_and_verify
 from . import notify_response
 from ..commons import is_success_request
 from pytoolbox.util.log import get_logger
+from decimal import Decimal
 
 
 logger = get_logger(__name__)
@@ -24,6 +25,7 @@ def pay_notify(source, app):
     mch_id = data['mch_id']
     out_trade_no = data['out_trade_no']
     transaction_id = data['transaction_id']
+    total_fee = Decimal(data['total_fee'])/100
 
     logger.info('pay notify {0}@{1}: {2}'.format(source, app, data))
     if not is_sending_to_me(app, appid, mch_id):
@@ -37,7 +39,7 @@ def pay_notify(source, app):
         # 此通知的调用协议
         # 是否成功，订单号，来源系统，来源系统订单号，数据
         # TODO: 提出接口
-        handle(is_success_request(data), out_trade_no, get_vas_id(app), transaction_id, data)
+        handle(is_success_request(data), out_trade_no, get_vas_id(app), transaction_id, total_fee, data)
         return notify_response.succeed()
     except Exception as e:
         logger.exception(e)

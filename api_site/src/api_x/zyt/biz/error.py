@@ -20,6 +20,12 @@ class AmountValueError(AmountError):
         super(AmountValueError, self).__init__(message)
 
 
+class AmountValueMissMatchError(AmountError):
+    def __init__(self, amount, ret_amount):
+        message = "amount value miss match: [{0}], [{1}]".format(amount, ret_amount)
+        super(AmountValueMissMatchError, self).__init__(message)
+
+
 class NonPositiveAmountError(AmountError):
     def __init__(self, amount):
         message = "amount must be positive: [{0}]".format(amount)

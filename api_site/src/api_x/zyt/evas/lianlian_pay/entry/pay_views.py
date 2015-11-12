@@ -11,6 +11,7 @@ from .commons import parse_and_verify
 from . import notify_response
 from api_x.constant import TransactionType
 from pytoolbox.util.log import get_logger
+from decimal import Decimal
 
 
 logger = get_logger(__name__)
@@ -54,6 +55,7 @@ def pay_notify(source):
     order_no = data['no_order']
     result = data['result_pay']
     paybill_oid = data['oid_paybill']
+    money_order = Decimal(data['money_order'])
 
     logger.info('pay notify {0}: {1}'.format(source, data))
     if not is_sending_to_me(partner_oid):
@@ -67,7 +69,7 @@ def pay_notify(source):
         # 此通知的调用协议
         # 是否成功，订单号，来源系统，来源系统订单号，数据
         # TODO: 提出接口
-        handle(is_success_result(result), order_no, NAME, paybill_oid, data)
+        handle(is_success_result(result), order_no, NAME, paybill_oid, money_order, data)
         return notify_response.succeed()
     except Exception as e:
         logger.exception(e)

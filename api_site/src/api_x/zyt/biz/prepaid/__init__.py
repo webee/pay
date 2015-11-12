@@ -77,7 +77,7 @@ def handle_duplicate_pay(vas_name, vas_sn, tx, prepaid_record):
     db.session.add(duplicate_payment_record)
 
 
-def handle_prepaid_notify(is_success, sn, vas_name, vas_sn, data):
+def handle_prepaid_notify(is_success, sn, vas_name, vas_sn, amount, data):
     """
     :param is_success: 是否成功
     :param sn: 订单号

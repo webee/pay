@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pytoolbox.util import deploy_commons as dc
+import fabric.api as fab
 
 
 def init_config(env):
@@ -19,10 +20,15 @@ def deploy(env, name=None, manager_name="manager", do_deploy=True):
 
     with dc.require_cmd_context(env, config):
         dc.upgrade_db(manager_name, env)
+        update_api_entry(manager_name, env)
         if do_deploy and name:
             dc.update_deploy_file(name)
             dc.stop_python_server(name)
             dc.start_python_server(name)
+
+
+def update_api_entry(manager_name, env):
+    fab.run('python src/%s.py -e %s update_api_entry' % (manager_name, env))
 
 
 def db_migrate(env, manager_name="manager"):

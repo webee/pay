@@ -19,7 +19,7 @@ def sign_params(params):
     return params
 
 
-def request(api_url, params):
+def request(api_url, params, pass_verify=False):
     data = json.dumps(sign_params(params))
 
     logger.info("request {0}: {1}".format(api_url, data))
@@ -30,7 +30,7 @@ def request(api_url, params):
         except Exception as e:
             raise DataEncodingError(e.message)
         logger.info("response {0}: {1}".format(api_url, raw_data))
-        return _parse_and_verify_response_data(raw_data)
+        return _parse_and_verify_response_data(raw_data, pass_verify)
     return UnExpectedResponseError(resp.status_code, resp.content)
 
 
@@ -57,7 +57,7 @@ def _parse_data(raw_data):
     return data
 
 
-def _parse_and_verify_response_data(raw_data):
+def _parse_and_verify_response_data(raw_data, pass_verify=False):
     try:
         parsed_data = _parse_data(raw_data)
     except Exception, e:
@@ -66,7 +66,7 @@ def _parse_and_verify_response_data(raw_data):
     if not ('ret_code' in parsed_data and parsed_data['ret_code'] == '0000'):
         raise ApiError('ret_code: [{0}], ret_msg: [{1}]'.format(parsed_data.get('ret_code'), parsed_data.get('ret_msg')))
 
-    if 'sign_type' not in parsed_data or not signer.verify(parsed_data, parsed_data['sign_type']):
-        raise InvalidSignError(parsed_data.get('sign_type'), parsed_data)
+    if not pass_verify:
+        _verify_sign(parsed_data, do_raise=True)
 
     return parsed_data

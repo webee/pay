@@ -2,6 +2,7 @@
 from .api_access import request
 from api_x.config import lianlian_pay
 from pytoolbox.util.sign import SignType
+from .commons import get_pure_result
 
 
 def query_order(no_order):
@@ -15,4 +16,6 @@ def query_order(no_order):
         'query_version': lianlian_pay.OrderQuery.VERSION
     }
 
-    return request(lianlian_pay.OrderQuery.URL, params)
+    # FIXME: 处理成功时无法通过验证的问题。
+    res = request(lianlian_pay.OrderQuery.URL, params, pass_verify=True)
+    return get_pure_result(res)

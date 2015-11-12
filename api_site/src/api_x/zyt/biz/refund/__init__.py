@@ -16,7 +16,8 @@ from ...vas.models import EventType
 from ..transaction import create_transaction, transit_transaction_state, update_transaction_info
 from ..models import TransactionType, RefundRecord, PaymentType
 from .error import *
-from api_x.zyt.biz.pay.dba import get_payment_by_id, get_payment_tx_by_sn
+from api_x.zyt.biz.pay.dba import get_payment_tx_by_sn
+from api_x.utils.entry_auth import verify_call_perm
 from api_x.zyt.biz.error import *
 from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 from pytoolbox.util.log import get_logger
@@ -28,13 +29,6 @@ logger = get_logger(__name__)
 
 def apply_to_refund(channel, order_id, amount, client_notify_url, data):
     payment_tx, payment_record = _get_tx_payment_to_refund(channel.id, order_id)
-
-    # FIXME:
-    # 以下事实上是拒绝所有成功的交易进行退款
-    # 因为金额可能被提现出去。
-    if payment_tx.state == PaymentTxState.SUCCESS:
-        # disable success finished pay refund.
-        raise RefundSuccessPayError(payment_tx.sn)
 
     try:
         amount_value = Decimal(amount)
@@ -98,13 +92,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
     with require_transaction_context():
         tx = update_transaction_info(refund_record.tx_id, vas_sn)
         if is_success:
-            # 直付和担保付的不同操作
-            if payment_record.type == PaymentType.DIRECT:
-                # !!impossible.
-                # direct pay is not allowed to refund.
-                succeed_refund(vas_name, payment_record, refund_record)
-            elif payment_record.type == PaymentType.GUARANTEE:
-                succeed_refund_secured(vas_name, payment_record, refund_record)
+            succeed_refund(vas_name, payment_record, refund_record)
         else:
             fail_refund(payment_record, refund_record)
 
@@ -137,21 +125,29 @@ def _get_tx_payment_to_refund(channel_id, order_id):
         raise NoPaymentFoundError(channel_id, order_id)
 
     tx = payment_record.tx
-    if tx.state == PaymentTxState.REFUNDING:
-        raise PaymentIsRefundingError()
     if not _is_refundable(tx, payment_record):
         raise PaymentNotRefundableError()
     return tx, payment_record
 
 
+@verify_call_perm('refund.direct')
+def _direct_payment_is_refundable(channel_name, tx):
+    return tx.state == PaymentTxState.SUCCESS
+
+
 def _is_refundable(tx, payment_record):
+    if tx.state == PaymentTxState.REFUNDING:
+        raise PaymentIsRefundingError()
+
+    if tx.state == PaymentTxState.REFUNDED:
+        raise PaymentRefundedError()
+
     if tx.state == PaymentTxState.CREATED:
         raise PaymentNotPaidError()
+
     pay_type = payment_record.type
     if pay_type == PaymentType.DIRECT:
-        raise RefundDirectPayError(tx.sn)
-        # return False
-        # return tx.state == PaymentTransactionState.SUCCESS
+        return _direct_payment_is_refundable(tx.channel_name, tx)
     if pay_type == PaymentType.GUARANTEE:
         return tx.state == PaymentTxState.SECURED
 
@@ -180,7 +176,7 @@ def _create_refund(channel, payment_tx, payment_record, amount, client_notify_ur
     transit_transaction_state(payment_tx.id, payment_tx.state, PaymentTxState.REFUNDING)
 
     payment_tx = get_tx_by_id(payment_tx.id)
-    payment_record = get_payment_by_id(payment_record.id)
+    payment_record = payment_tx.record
     if payment_tx.state != PaymentTxState.REFUNDING:
         raise PaymentNotRefundableError()
 
@@ -308,7 +304,16 @@ def succeed_refund(vas_name, payment_record, refund_record):
     payment_amount = payment_record.amount
     refunded_amount = payment_record.refunded_amount
     refund_amount = refund_record.amount
-    event_id = bookkeeping(EventType.TRANSFER_OUT, refund_record.sn, refund_record.payee_id, vas_name, refund_amount)
+
+    # 直付和担保付的不同操作
+    if payment_record.type == PaymentType.DIRECT:
+        event_id = bookkeeping(EventType.TRANSFER_OUT, refund_record.sn, refund_record.payee_id, vas_name, refund_amount)
+    elif payment_record.type == PaymentType.GUARANTEE:
+        secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
+        event_id = bookkeeping(EventType.TRANSFER_OUT_FROZEN, refund_record.sn, secure_user_id, vas_name, refund_amount)
+    else:
+        logger.warn('bad payment type: [{0}]'.format(payment_record.type))
+        return
 
     # 全部金额都退款，则状态为已退款
     is_refunded = payment_amount == refunded_amount + refund_amount
@@ -323,29 +328,6 @@ def succeed_refund(vas_name, payment_record, refund_record):
     refund_tx = refund_record.tx
     transit_transaction_state(refund_tx.id, refund_tx.state,
                               RefundTxState.SUCCESS, event_id)
-
-    update_payment_refunded_amount(payment_record.id, refund_amount)
-
-
-@transactional
-def succeed_refund_secured(vas_name, payment_record, refund_record):
-    payment_amount = payment_record.amount
-    refunded_amount = payment_record.refunded_amount
-    refund_amount = refund_record.amount
-    secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-    event_id = bookkeeping(EventType.TRANSFER_OUT_FROZEN, refund_record.sn, secure_user_id, vas_name, refund_amount)
-
-    # 全部金额都退款，则状态为已退款
-    is_refunded = payment_amount == refunded_amount + refund_amount
-
-    if is_refunded:
-        transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING,
-                                  PaymentTxState.REFUNDED, event_id)
-    else:
-        transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING,
-                                  refund_record.payment_state, event_id)
-    refund_tx = refund_record.tx
-    transit_transaction_state(refund_tx.id, refund_tx.state, RefundTxState.SUCCESS, event_id)
 
     update_payment_refunded_amount(payment_record.id, refund_amount)
 

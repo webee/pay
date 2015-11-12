@@ -16,10 +16,10 @@ class PaymentScene:
     # lvye_skiing_wp = 'lvye_skiing_wp' # 绿野滑雪windows phone app
 
 PAYMENT_TYPE_WEIGHTS = {
-    ZYT_PAY: 0,
-    TEST_PAY: 1,
-    WEIXIN_PAY: 2,
-    LIANLIAN_PAY: 3,
+    TEST_PAY: 0,
+    WEIXIN_PAY: 1,
+    LIANLIAN_PAY: 2,
+    ZYT_PAY: 3,
 }
 
 # 所有支持的支付场景

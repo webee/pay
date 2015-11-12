@@ -51,6 +51,19 @@ def get_api_entry_by_name(name):
     return _name_idx_api_entries.get(name)
 
 
+class EntryAuthError(Exception):
+    def __init__(self, message=None):
+        message = message or 'entry auth error.'
+        message = message.encode('utf-8') if isinstance(message, unicode) else message
+        super(EntryAuthError, self).__init__(message)
+
+
+def _verify_channel_perm(channel, entry_name):
+    if channel.name not in config.TEST_CHANNELS and not channel.has_entry_perm(entry_name):
+        msg = 'channel [{0}] has no perm for entry [{1}]'.format(channel.name, entry_name)
+        raise EntryAuthError(msg)
+
+
 def verify_request(entry_name, multi_entries=False):
     def do_verify_request(f):
         # register api entry.
@@ -74,9 +87,10 @@ def verify_request(entry_name, multi_entries=False):
                     msg = 'channel not exits: [{0}]'.format(channel_name)
                     return response.fail(msg=msg)
 
-                if channel_name not in config.TEST_CHANNELS and not channel.has_entry_perm(entry_name):
-                    msg = 'channel [{0}] has no perm for entry [{1}]'.format(channel_name, entry_name)
-                    return response.refused(msg=msg)
+                try:
+                    _verify_channel_perm(channel, entry_name)
+                except EntryAuthError as e:
+                    return response.refused(msg=e.message)
 
                 # verify sign
                 sign_type = params['sign_type']
@@ -103,6 +117,30 @@ def verify_request(entry_name, multi_entries=False):
         return wrapper
 
     return do_verify_request
+
+
+def verify_call_perm(entry_name, multi_entries=False):
+    def do_verify_call(f):
+        # register api entry.
+        _register_api_entry(f, entry_name, multi_entries)
+
+        @wraps(f)
+        def wrapper(channel_name, *args, **kwargs):
+            logger.info("[{0}]: [{1}]".format(entry_name, channel_name))
+
+            channel = get_channel_by_name(channel_name)
+            if channel is None:
+                msg = 'channel not exits: [{0}]'.format(channel_name)
+                raise EntryAuthError(msg=msg)
+
+            _verify_channel_perm(channel, entry_name)
+
+            logger.info("[{0}] verify done.".format(entry_name))
+            return f(channel_name, *args, **kwargs)
+
+        return wrapper
+
+    return do_verify_call
 
 
 def limit_referrer(netlocs, ex_callback=None):

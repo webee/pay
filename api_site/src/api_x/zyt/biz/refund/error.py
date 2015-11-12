@@ -45,6 +45,12 @@ class PaymentIsRefundingError(RefundError):
         super(PaymentIsRefundingError, self).__init__(message)
 
 
+class PaymentRefundedError(RefundError):
+    def __init__(self, message=None):
+        message = message or "payment has refunded."
+        super(PaymentRefundedError, self).__init__(message)
+
+
 class RefundStateMissMatchError(RefundError):
     def __init__(self, message=None):
         message = message or "refund state miss match."
@@ -62,15 +68,3 @@ class RefundBalanceError(RefundError):
     def __init__(self, amount, balance):
         message = "refund balance error: [amount: {0}, balance: {1}.".format(amount, balance)
         super(RefundBalanceError, self).__init__(message)
-
-
-class RefundDirectPayError(RefundError):
-    def __init__(self, sn):
-        message = "direct pay is not allowed refund. [{0}]".format(sn)
-        super(RefundDirectPayError, self).__init__(message)
-
-
-class RefundSuccessPayError(RefundError):
-    def __init__(self, sn):
-        message = "success finished payment is not allowed refund. [{0}]".format(sn)
-        super(RefundDirectPayError, self).__init__(message)

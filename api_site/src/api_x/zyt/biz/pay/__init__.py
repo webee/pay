@@ -307,7 +307,7 @@ def _is_duplicated_payment(tx, vas_name, vas_sn):
 def confirm_payment(channel, order_id):
     payment_record = get_payment_by_channel_order_id(channel.id, order_id)
     if payment_record is None or payment_record.type != PaymentType.GUARANTEE:
-        raise TransactionNotFoundError('guarantee payment tx channel={0}, order_id={1} not found.'.format(channel.name, order_id))
+        raise TransactionNotFoundError('guarantee payment tx channel=[{0}], order_id=[{1}] not found.'.format(channel.name, order_id))
 
     tx = get_tx_by_id(payment_record.tx_id)
     # 只有担保才能确认

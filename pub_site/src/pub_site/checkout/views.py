@@ -92,7 +92,7 @@ def checkout(sn):
 @limit_referrer(config.Checkout.VALID_NETLOCS)
 def pay(sn, vas_name):
     """支付入口, 限制只能从checkout过来"""
-    if vas_name.startswith('_') or vas_name[0].isdigit() or sn.isupper():
+    if request.args.get('x') is not None or vas_name.startswith('_') or vas_name[0].isdigit() or sn.isupper():
         # FIXME: 自动判断sn和vas_name
         vas_name, sn = sn, vas_name
 
@@ -128,7 +128,8 @@ def do_pay(sn, vas_name, payment_scene, extra_params=None, client_type=None):
             if '_url' in params:
                 import urllib
                 url = params['_url']
-                dest_url = config.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name=vas_name)
+                # FIXME: sn, vas_name exchange
+                dest_url = config.HOST_URL + url_for('checkout_entry.pay', sn=vas_name, vas_name=sn, x='')
                 redirect_uri = urls.build_url(config.Checkout.WEIXIN_AUTH_REDIRECT_URI, dest_url=dest_url)
                 url = url % (urllib.urlencode({'x': redirect_uri})[2:],)
                 return redirect(url)

@@ -90,9 +90,9 @@ def checkout(sn):
 
 @mod.route("/pay/<sn>/<vas_name>", methods=["GET"])
 @limit_referrer(config.Checkout.VALID_NETLOCS)
-def pay(vas_name, sn):
+def pay(sn, vas_name):
     """支付入口, 限制只能从checkout过来"""
-    if vas_name.startswith('_') or vas_name.startswith('2') or vas_name.isupper():
+    if vas_name.startswith('_') or vas_name[0].isdigit() or sn.isupper():
         # FIXME: 自动判断sn和vas_name
         vas_name, sn = sn, vas_name
 

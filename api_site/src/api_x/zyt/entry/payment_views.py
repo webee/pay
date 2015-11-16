@@ -29,7 +29,8 @@ def pay_info(tx, sn, payment_scene):
 @mod.route("/payment/<sn>/<payment_scene>/<vas_name>/param", methods=["GET"])
 @payment_entry
 def pay_params(tx, sn, payment_scene, vas_name):
-    return prepare_params(tx, payment_scene, vas_name)
+    extra_params = request.args or None
+    return prepare_params(tx, payment_scene, vas_name, extra_params=extra_params)
 
 
 def query_info(tx, payment_scene):
@@ -48,7 +49,7 @@ def query_info(tx, payment_scene):
         return response.fail(msg=e.message)
 
 
-def prepare_params(tx, payment_scene, vas_name):
+def prepare_params(tx, payment_scene, vas_name, extra_params=None):
     from api_x.zyt.user_mapping.auth import vas_payment_is_enabled
     from api_x.zyt.evas.payment import params
 
@@ -67,7 +68,7 @@ def prepare_params(tx, payment_scene, vas_name):
         return response.refused(msg='[{0}] is not allowed for [{1}]'.format(vas_name, tx.channel_name))
 
     try:
-        payment_type, prepared_params = params.prepare(payment_scene, vas_name, payment_entity)
+        payment_type, prepared_params = params.prepare(payment_scene, vas_name, payment_entity, extra_params=extra_params)
         return response.success(params=prepared_params, vas_name=vas_name, payment_type=payment_type)
     except Exception as e:
         return response.fail(msg=e.message)

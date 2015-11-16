@@ -7,7 +7,7 @@ from api_x.zyt import vas as zyt_pay
 from . import get_payment_type
 
 
-def prepare(payment_scene, vas_name, payment_entity):
+def prepare(payment_scene, vas_name, payment_entity, extra_params=None):
     payment_type = get_payment_type(payment_scene, vas_name)
 
     if vas_name == test_pay.NAME:
@@ -15,7 +15,7 @@ def prepare(payment_scene, vas_name, payment_entity):
     elif vas_name == lianlian_pay.NAME:
         params = _lianlian_pay_params(payment_type, payment_entity)
     elif vas_name == weixin_pay.NAME:
-        params = _weixin_pay_params(payment_type, payment_entity)
+        params = _weixin_pay_params(payment_type, payment_entity, extra_params)
     elif vas_name == zyt_pay.NAME:
         params = _pay_by_zyt_pay(payment_type, payment_entity)
     else:
@@ -39,7 +39,7 @@ def _lianlian_pay_params(payment_type, payment_entity):
                          payment_entity.product_desc, payment_entity.amount)
 
 
-def _weixin_pay_params(payment_type, payment_entity):
+def _weixin_pay_params(payment_type, payment_entity, extra_params=None):
     from api_x.config import weixin_pay
     from api_x.zyt.evas.weixin_pay.payment import payment_param
 
@@ -54,7 +54,7 @@ def _weixin_pay_params(payment_type, payment_entity):
 
     params = payment_param(payment_type, payment_entity.source, app_config, payment_entity.tx_sn,
                            int(100 * payment_entity.amount), req.ip(), payment_entity.product_name,
-                           payment_entity.tx_created_on, detail=payment_entity.product_desc)
+                           payment_entity.tx_created_on, detail=payment_entity.product_desc, extra_params=extra_params)
     if '_info' in params:
         params['_info'] = payment_entity.dict()
     return params

@@ -10,7 +10,7 @@ from pytoolbox.util import strings
 
 def payment_param(payment_type, source, app_config, out_trade_no, total_fee, ip, body, time_start,
                   detail='', fee_type='CNY', device_info='WEB', attach='', goods_tag='',
-                  product_id='', limit_pay='', openid=''):
+                  product_id='', limit_pay='', openid='', extra_params=None):
     if payment_type == config.PaymentType.NATIVE:
         code_url = prepay(source,config.TradeType.NATIVE, out_trade_no, total_fee, ip, body, time_start, detail,
                           fee_type, device_info, attach, goods_tag, product_id, limit_pay, openid, app_config)
@@ -18,10 +18,20 @@ def payment_param(payment_type, source, app_config, out_trade_no, total_fee, ip,
                 '_info': None
                 }
     elif payment_type == config.PaymentType.APP:
-        return prepay(source,config.TradeType.APP, out_trade_no, total_fee, ip, body, time_start, detail, fee_type,
+        return prepay(source, config.TradeType.APP, out_trade_no, total_fee, ip, body, time_start, detail, fee_type,
                       device_info, attach, goods_tag, product_id, limit_pay, openid, app_config)
     elif payment_type == config.PaymentType.JSAPI:
-        raise PaymentTypeNotImplementedError(NAME, payment_type)
+        if not extra_params or 'code' not in extra_params:
+            return {
+                '_url': config.GET_CODE_URL.format(appid=app_config.APPID)
+            }
+        import requests
+        code = extra_params['code']
+        url = config.GET_ACCESS_TOKEN_URL.format(appid=app_config.APPID, secret=app_config.APP_SECRET, code=code)
+        res = requests.get(url, verify=False).json()
+        openid = res.get('openid', openid)
+        return prepay(source, config.TradeType.JSAPI, out_trade_no, total_fee, ip, body, time_start, detail, fee_type,
+                      device_info, attach, goods_tag, product_id, limit_pay, openid, app_config)
     elif payment_type == config.PaymentType.MICROPAY:
         raise PaymentTypeNotImplementedError(NAME, payment_type)
     else:
@@ -75,6 +85,16 @@ def prepay(source, trade_type, out_trade_no, total_fee, ip, body, time_start,
             return params
         elif trade_type == config.TradeType.NATIVE:
             return data['code_url']
+        elif trade_type == config.TradeType.JSAPI:
+            params = {
+                'appid': app_config.APPID,
+                'timestamp': str(int(times.timestamp())),
+                'noncestr': strings.gen_rand_str(32),
+                'package': 'prepay_id=%s' % data['prepay_id'],
+                'signType': 'MD5',
+            }
+            params['paySign'] = append_md5_sign(app_config.APP_NAME, params, ret_sign=True)
+            return params
         return data
 
 

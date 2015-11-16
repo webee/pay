@@ -46,13 +46,15 @@ def is_success_request(data, do_raise=False):
     return ret
 
 
-def append_md5_sign(app, params, keys=None):
+def append_md5_sign(app, params, keys=None, ret_sign=False):
     from . import signers
 
     sign_params = params
     if keys is not None:
         sign_params = {k: params[k] for k in keys}
     digest = signers[app].md5_sign(sign_params)
+    if ret_sign:
+        return digest
     params['sign'] = digest
     return params
 

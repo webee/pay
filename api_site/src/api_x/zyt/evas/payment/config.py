@@ -43,13 +43,13 @@ PAYMENT_SCENE_VASE_TYPES = {
         #(ZYT_PAY, zyt_pay.PaymentType.WEB),
         (TEST_PAY, test_pay.PaymentType.WEB),
         (LIANLIAN_PAY, lianlian_pay.PaymentType.WAP),
-        #(WEIXIN_PAY, weixin_pay.PaymentType.JSAPI),
+        (WEIXIN_PAY, weixin_pay.PaymentType.JSAPI),
     ]),
     PaymentScene.WEIXIN: OrderedDict([
         #(ZYT_PAY, zyt_pay.PaymentType.WEB),
         (TEST_PAY, test_pay.PaymentType.WEB),
         (LIANLIAN_PAY, lianlian_pay.PaymentType.WAP),
-        #(WEIXIN_PAY, weixin_pay.PaymentType.JSAPI),
+        (WEIXIN_PAY, weixin_pay.PaymentType.JSAPI),
     ]),
     PaymentScene.lvye_skiing: OrderedDict([
         #(ZYT_PAY, zyt_pay.PaymentType.APP),

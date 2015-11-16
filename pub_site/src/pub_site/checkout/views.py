@@ -85,7 +85,8 @@ def checkout(sn):
     else:
         template = get_template("checkout/checkout", client_type)
 
-    return render_template(template, sn=sn, info=info, vases=vases, vas_infos=VAS_INFOS, client_type=client_type)
+    return render_template(template, sn=sn, info=info, vases=vases, vas_infos=VAS_INFOS, client_type=client_type,
+                           activated_vas=request.args.get('activated_vas'))
 
 
 @mod.route("/pay/<sn>/<vas_name>", methods=["GET"])

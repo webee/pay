@@ -25,7 +25,7 @@ def pay_limit_referrer(netlocs):
                     if vas_name == 'LIANLIAN_PAY':
                         # FIXME: 连连支付h5无法返回的问题
                         # 此为连连返回, 则直接去收银台
-                        return redirect(url_for('checkout_entry.checkout', sn=sn))
+                        return redirect(url_for('checkout_entry.checkout', sn=sn, activated_vas='LIANLIAN_PAY'))
                 parts = urlparse.urlparse(referrer)
                 if parts.netloc in netlocs:
                     return f(*args, **kwargs)

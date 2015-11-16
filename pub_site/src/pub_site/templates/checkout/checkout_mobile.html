@@ -44,6 +44,11 @@
 {% block scripts %}
 <script>
     $(function() {
+        {% if activated_vas %}
+            var r = $('#i_{{ activated_vas }}')[0];
+            r.click();
+        {% endif %}
+
         /*选择支付方式*/
         $("div.pay-list").click(function(){
             var r = $('#i_' + this.id)[0];

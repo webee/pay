@@ -7,7 +7,7 @@ from .constant import VAS_INFOS, REQUEST_CLIENT_PAYMENT_SCENE_MAPPING
 from pub_site.checkout.commons import payment_failed, generate_submit_form
 from pytoolbox.util.log import get_logger
 from pytoolbox.util import urls
-from pub_site.utils.entry_auth import limit_referrer
+from pub_site.utils.entry_auth import pay_limit_referrer
 from pub_site.utils import req
 from pub_site import config, pay_client
 from .utils import get_template
@@ -89,7 +89,7 @@ def checkout(sn):
 
 
 @mod.route("/pay/<sn>/<vas_name>", methods=["GET"])
-@limit_referrer(config.Checkout.VALID_NETLOCS)
+@pay_limit_referrer(config.Checkout.VALID_NETLOCS)
 def pay(sn, vas_name):
     """支付入口, 限制只能从checkout过来"""
     if request.args.get('x') is not None or vas_name.startswith('_') or vas_name[0].isdigit() or sn.isupper():

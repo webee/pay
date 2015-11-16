@@ -17,6 +17,7 @@ def limit_referrer(netlocs):
         def wrapper(*args, **kwargs):
             try:
                 client_type = req.client_type()
+                logger.info("client type: [{0}]".format(client_type))
                 if client_type != RequestClientType.WEB:
                     return f(*args, **kwargs)
                 referrer = request.referrer

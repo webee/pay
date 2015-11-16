@@ -87,7 +87,7 @@ def prepay(source, trade_type, out_trade_no, total_fee, ip, body, time_start,
             return data['code_url']
         elif trade_type == config.TradeType.JSAPI:
             params = {
-                'appid': app_config.APPID,
+                'appId': app_config.APPID,
                 'timestamp': str(int(times.timestamp())),
                 'noncestr': strings.gen_rand_str(32),
                 'package': 'prepay_id=%s' % data['prepay_id'],

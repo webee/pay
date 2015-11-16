@@ -7,6 +7,7 @@ from .constant import VAS_INFOS, REQUEST_CLIENT_PAYMENT_SCENE_MAPPING
 from pub_site.checkout.commons import payment_failed, generate_submit_form
 from pub_site.constant import RequestClientType
 from pytoolbox.util.log import get_logger
+from pytoolbox.util import urls
 from pub_site.utils.entry_auth import limit_referrer
 from pub_site.utils import req
 from pub_site import config, pay_client
@@ -126,7 +127,8 @@ def do_pay(sn, vas_name, payment_scene, extra_params=None):
             if '_url' in params:
                 import urllib
                 url = params['_url']
-                redirect_uri = config.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name=vas_name)
+                dest_url = config.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name=vas_name)
+                redirect_uri = urls.build_url(config.Checkout.WEIXIN_AUTH_REDIRECT_URI, dest_url=dest_url)
                 url = url % (urllib.urlencode({'x': redirect_uri})[2:],)
                 return redirect(url)
             return render_template("checkout/wx_pay_jsapi.html", params=params, sn=sn)

@@ -12,6 +12,10 @@ def success(**kwargs):
 
 
 def _fail(code=1, msg='fail', **kwargs):
+    try:
+        msg = msg.decode('utf-8')
+    except:
+        pass
     logger.info(msg)
     return jsonify(ret=False, code=code, msg=msg, **kwargs)
 

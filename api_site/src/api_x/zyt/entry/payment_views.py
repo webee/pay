@@ -29,7 +29,7 @@ def pay_info(tx, sn, payment_scene):
 @mod.route("/payment/<sn>/<payment_scene>/<vas_name>/param", methods=["GET"])
 @payment_entry
 def pay_params(tx, sn, payment_scene, vas_name):
-    extra_params = request.args or None
+    extra_params = {k: v for k,v in request.args.items()} or None
     return prepare_params(tx, payment_scene, vas_name, extra_params=extra_params)
 
 

@@ -53,7 +53,7 @@
                                 jQuery('body').showLoading({
                                     'afterShow': function() {
                                         setTimeout(function () {
-                                            window.open('{{ url_for('checkout_entry.pay_callback', sn=sn) }}', '_self')
+                                            window.open('{{ CONFIG.HOST_URL + url_for('checkout_entry.pay_callback', sn=sn) }}', '_self')
                                         }, 300);
                                 }});
                             }

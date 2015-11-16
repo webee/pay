@@ -127,7 +127,7 @@ def do_pay(sn, vas_name, payment_scene, extra_params=None):
                 import urllib
                 url = params['_url']
                 redirect_uri = config.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name=vas_name)
-                url = url % (urllib.urlencode({'x': redirect_uri})[:2],)
+                url = url % (urllib.urlencode({'x': redirect_uri})[2:],)
                 return redirect(url)
             return render_template("checkout/wx_pay_jsapi.html", params=params, sn=sn)
     elif vas_name == 'ZYT':

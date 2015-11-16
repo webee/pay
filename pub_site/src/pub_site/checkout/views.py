@@ -95,7 +95,7 @@ def checkout(sn):
 @limit_referrer(config.Checkout.VALID_NETLOCS)
 def pay(sn, vas_name):
     """支付入口, 限制只能从checkout过来"""
-    extra_params = request.args or None
+    extra_params = {k: v for k, v in request.args.items()} or None
     client_type = req.client_type()
     payment_scene = REQUEST_CLIENT_PAYMENT_SCENE_MAPPING[client_type]
     return do_pay(sn, vas_name, payment_scene, extra_params=extra_params)

@@ -88,10 +88,14 @@ def checkout(sn):
     return render_template(template, sn=sn, info=info, vases=vases, vas_infos=VAS_INFOS, client_type=client_type)
 
 
-@mod.route("/pay/<sn>/<vas_name>", methods=["GET"])
+@mod.route("/pay/<vas_name>/<sn>", methods=["GET"])
 @limit_referrer(config.Checkout.VALID_NETLOCS)
-def pay(sn, vas_name):
+def pay(vas_name, sn):
     """支付入口, 限制只能从checkout过来"""
+    if vas_name.startswith('_') or vas_name.startswith('2'):
+        # FIXME: 自动判断sn和vas_name
+        vas_name, sn = sn, vas_name
+
     extra_params = {k: v for k, v in request.args.items()} or None
     client_type = req.client_type()
     payment_scene = REQUEST_CLIENT_PAYMENT_SCENE_MAPPING[client_type]

@@ -13,7 +13,7 @@ VAS_INFOS = {
     },
     'LIANLIAN_PAY': {
         'name': '银行卡',
-        'desc': '快捷支付，无需开通网银'
+        'desc': '借记卡/信用卡 快捷支付'
     },
     'ALI_PAY': {
         'name': '支付宝',
@@ -21,7 +21,7 @@ VAS_INFOS = {
     },
     'WEIXIN_PAY': {
         'name': '微信',
-        'desc': '微信扫码支付'
+        'desc': '微信内支付或扫码支付'
     },
 }
 

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,user-scalable=0">
+    <meta name="keyword" content="绿野,户外应用,户外APP,户外手机应用,绿野应用,绿野APP">
+    <meta name="description" content="绿野为您打造了户外专用的手机应用（手机APP下载），让您在户外旅行中得到个性的发乎、自由的张扬">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=no">
+
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="{{ url_for('static', filename='css/checkout_mobile.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/showLoading.css') }}" rel="stylesheet">
+    <title>选择支付方式</title>
+    <!--[if lte IE 9]>
+    <script src="{{ url_for('static',filename='js/html5.js') }}"></script>
+    <![endif]-->
+    <script src="{{ url_for('static', filename='js/jquery-1.8.3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery/jquery.showLoading.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/browser_utils.js') }}"></script>
+</head>
+
+<body>
+<div class="wrap">
+    <!-- ================= header begin ================= -->
+    <header class="header">
+        <div class="logo">
+            <a href="http://www.lvye.com" target="_blank">
+                <img src="{{ url_for('static', filename='images/logo_zyt.jpg') }}" height="34" width="192" title="首页" alt="首页">
+            </a>
+        </div>
+    </header>
+
+    <div class="body">
+        {% for vas_name in vases %}
+            {% set vas_info = vas_infos[vas_name] %}
+            <div class="row zf_list1 samezf" id="{{ vas_name }}">
+                <div class="pay-item-select">
+                    <input id="i_{{ vas_name }}" type="radio" value="{{ vas_name }}" {% if loop.first %}checked{% endif %} name="zf" class="onlychice">
+                </div>
+                <div class="pay-item">
+                    <img src="{{ url_for('static', filename='images/checkout/%s.png' % vas_name) }}" width="42" height="42" >
+                </div>
+                <div class="pay-content">
+                    <h2 class="pay-title">{{ vas_info.name }}</h2>
+                    <p class="pay-desc">
+                        {{ vas_info.desc }}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+        <button id="bt_pay_now" class="nowpay" value="{{ vases[0] }}">立即支付</button>
+        <div class="pay_result_row"><span hidden=true id="pay_result" class="pay_result_before"></span></div>
+    </div>
+    <footer>
+        <p class="grayColor copyright">
+        © 1999-2015 <a href="http://www.lvye.com">www.lvye.com</a> 绿野户外网版权所有
+        </p>
+    </footer>
+</div>
+<script>
+    $(function() {
+        /*选择支付方式*/
+        $("div.zf_list1.samezf").click(function(){
+            var r = $('#i_' + this.id)[0];
+            r.click();
+        });
+
+        function disable_pay_bt(msg) {
+            var pay_result = $('#pay_result')[0];
+            pay_result.setAttribute("class", "pay_result")
+            pay_result.hidden = false;
+            pay_result.innerText = msg;
+            $('#bt_pay_now').off('click');
+            $('#bt_pay_now').click(function(){
+                alert(msg);
+            });
+        }
+
+        $("#bt_pay_now").click(function(){
+            var vas_name = $('input[type=radio][name=zf]:checked')[0].value;
+            jQuery('body').showLoading({
+                'afterShow': function() {
+                    $.getJSON('{{ url_for('checkout_entry.pay_result', sn=sn) }}')
+                            .done(function (data) {
+                                var res = data.res;
+                                if (res != 'CREATED') {
+                                    jQuery('body').hideLoading();
+                                }
+                                if (res == 'DONE') {
+                                    var msg = "已支付完成，请关闭该页面, 如果失败，请重新发起支付";
+                                    disable_pay_bt(msg);
+                                } else if (res == 'CREATED') {
+                                    {#                                $(".payfinishLayer,.bgLayer").fadeIn();#}
+                                    var url = "{{ CONFIG.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name='') }}" + vas_name;
+                                    navigateToUrl(url);
+                                    if (is_safari) {
+                                        jQuery('body').hideLoading();
+                                    };
+                                } else if (res == 'EXPIRED') {
+                                    var msg = "本支付链接过期，请关闭页面，重新请求支付";
+                                    alert(msg);
+                                    disable_pay_bt(msg);
+                                } else if (res == 'INVALID') {
+                                    var msg = "交易号错误或者已失效，请关闭页面，请重新发起支付";
+                                    alert(msg);
+                                    disable_pay_bt(msg);
+                                } else {
+                                    alert("请求异常");
+                                }
+                            })
+                            .fail(function () {
+                                alert("请求异常");
+                                jQuery('body').hideLoading();
+                            });
+                }});
+        });
+    })
+
+</script>
+</body>
+</html>

@@ -144,6 +144,10 @@
                                     } else {
                                         alert("请求异常");
                                     }
+                                })
+                                .fail(function () {
+                                    alert("请求异常");
+                                    jQuery('body').hideLoading();
                                 });
                 }});
             });

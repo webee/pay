@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
-from flask import render_template, Response, jsonify
+from flask import render_template, Response, jsonify, request, url_for, redirect
 from . import checkout_entry_mod as mod
 from .constant import VAS_INFOS, REQUEST_CLIENT_PAYMENT_SCENE_MAPPING
 from pub_site.checkout.commons import payment_failed, generate_submit_form
@@ -57,6 +57,12 @@ def pay_callback(sn):
     return pay_client.web_payment_callback(sn, result)
 
 
+@mod.route('/mobile', methods=['GET'])
+def checkout_mobile():
+    vases = ['TEST_PAY', 'LIANLIAN_PAY', 'WEIXIN_PAY']
+    return render_template("checkout/checkout_mobile.html", vases=vases, vas_infos=VAS_INFOS)
+
+
 @mod.route('/<sn>', methods=['GET'])
 def checkout(sn):
     """支付收银台入口"""
@@ -73,15 +79,13 @@ def checkout(sn):
     vases = result.data['activated_evas']
 
     # 页面适配
-    if client_type == RequestClientType.WEB:
+    if len(vases) == 1:
+        template = "checkout/one_type_checkout.html"
+    elif client_type == RequestClientType.WEB:
         template = "checkout/checkout.html"
-        if len(vases) == 1:
-            template = "checkout/one_type_checkout.html"
     else:
-        # h5
-        template = "checkout/checkout_h5.html"
-        if len(vases) == 1:
-            template = "checkout/one_type_checkout.html"
+        # mobile
+        template = "checkout/checkout_mobile.html"
 
     return render_template(template, sn=sn, info=info, vases=vases, vas_infos=VAS_INFOS, client_type=client_type)
 
@@ -90,15 +94,16 @@ def checkout(sn):
 @limit_referrer(config.Checkout.VALID_NETLOCS)
 def pay(sn, vas_name):
     """支付入口, 限制只能从checkout过来"""
+    extra_params = request.args or None
     client_type = req.client_type()
     payment_scene = REQUEST_CLIENT_PAYMENT_SCENE_MAPPING[client_type]
-    return do_pay(sn, vas_name, payment_scene)
+    return do_pay(sn, vas_name, payment_scene, extra_params=extra_params)
 
 
-def do_pay(sn, vas_name, payment_scene):
+def do_pay(sn, vas_name, payment_scene, extra_params=None):
     from .constant import WeixinPayType
 
-    result = pay_client.get_payment_param(sn, payment_scene, vas_name)
+    result = pay_client.get_payment_param(sn, payment_scene, vas_name, extra_params)
     if not pay_client.is_success_result(result):
         return payment_failed(result)
 
@@ -118,8 +123,13 @@ def do_pay(sn, vas_name, payment_scene):
             info = params['_info']
             return render_template("checkout/wx_pay_native.html", code_url=code_url, info=info, sn=sn)
         elif payment_type == WeixinPayType.JSAPI:
-            # TODO: 微信内支付
-            pass
+            if '_url' in params:
+                import urllib
+                url = params['_url']
+                redirect_uri = config.HOST_URL + url_for('checkout_entry.pay', sn=sn, vas_name=vas_name)
+                url = url % (urllib.urlencode({'x': redirect_uri})[:2],)
+                return redirect(url)
+            return render_template("checkout/wx_pay_jsapi.html", params=params, sn=sn)
     elif vas_name == 'ZYT':
         # 自游通余额支付
         url = params['_url']

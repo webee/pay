@@ -18,7 +18,7 @@
                 },
                 function(res){
                     if (res.err_msg == "get_brand_wcpay_request:ok" ) {
-                        window.open('{{ CONFIG.HOST_URL + url_for('checkout_entry.pay_callback', sn=sn) }}', '_self')
+                        window.location.href = '{{ CONFIG.HOST_URL + url_for('checkout_entry.pay_callback', sn=sn) }}';
                     } else if (res.err_msg == "get_brand_wcpay_request:cancel") {
                         window.history.back();
                     } else if (res.err_msg == "get_brand_wcpay_request:fail") {

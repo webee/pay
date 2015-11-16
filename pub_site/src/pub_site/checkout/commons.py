@@ -1,9 +1,10 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from flask import render_template
+from .utils import get_template
 
 
-def payment_failed(result):
+def payment_failed(result, client_type=None):
     if result is None:
         msg = "请求支付失败"
     elif result.status_code == 413:
@@ -15,7 +16,7 @@ def payment_failed(result):
         msg = "交易已支付，如果失败，请重新发起支付!"
     else:
         msg = "failed: code: {0}, msg: {1}".format(result.data['code'], result.data['msg'])
-    return render_template("checkout/info.html", msg=msg)
+    return render_template(get_template("checkout/info", client_type), msg=msg)
 
 
 def generate_submit_form(url, req_params, keep_all=False):

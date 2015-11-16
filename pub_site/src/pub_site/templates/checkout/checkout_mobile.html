@@ -1,70 +1,51 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,user-scalable=0">
-    <meta name="keyword" content="绿野,户外应用,户外APP,户外手机应用,绿野应用,绿野APP">
-    <meta name="description" content="绿野为您打造了户外专用的手机应用（手机APP下载），让您在户外旅行中得到个性的发乎、自由的张扬">
-    <meta name="HandheldFriendly" content="True">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=no">
+{% extends "checkout/layout_mobile.html" %}
 
-    <meta name="format-detection" content="telephone=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <link href="{{ url_for('static', filename='css/checkout_mobile.css') }}" rel="stylesheet">
+{% block title %}选择支付方式{% endblock %}
+
+{% block css %}
+    {{ super() }}
     <link href="{{ url_for('static', filename='css/showLoading.css') }}" rel="stylesheet">
-    <title>选择支付方式</title>
-    <!--[if lte IE 9]>
-    <script src="{{ url_for('static',filename='js/html5.js') }}"></script>
-    <![endif]-->
+{% endblock %}
+
+{% block js %}
     <script src="{{ url_for('static', filename='js/jquery-1.8.3.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery/jquery.showLoading.js') }}"></script>
     <script src="{{ url_for('static', filename='js/browser_utils.js') }}"></script>
-</head>
+{% endblock %}
 
-<body>
-<div class="wrap">
-    <!-- ================= header begin ================= -->
-    <header class="header">
-        <div class="logo">
-            <a href="http://www.lvye.com" target="_blank">
-                <img src="{{ url_for('static', filename='images/logo_zyt.jpg') }}" height="34" width="192" title="首页" alt="首页">
-            </a>
-        </div>
-    </header>
-
-    <div class="body">
-        {% for vas_name in vases %}
-            {% set vas_info = vas_infos[vas_name] %}
-            <div class="row zf_list1 samezf" id="{{ vas_name }}">
-                <div class="pay-item-select">
-                    <input id="i_{{ vas_name }}" type="radio" value="{{ vas_name }}" {% if loop.first %}checked{% endif %} name="zf" class="onlychice">
-                </div>
-                <div class="pay-item">
-                    <img src="{{ url_for('static', filename='images/checkout/%s.png' % vas_name) }}" width="42" height="42" >
-                </div>
-                <div class="pay-content">
-                    <h2 class="pay-title">{{ vas_info.name }}</h2>
-                    <p class="pay-desc">
-                        {{ vas_info.desc }}
-                    </p>
-                </div>
-            </div>
-        {% endfor %}
-        <button id="bt_pay_now" class="nowpay" value="{{ vases[0] }}">立即支付</button>
-        <div class="pay_result_row"><span hidden=true id="pay_result" class="pay_result_before"></span></div>
+{% block main %}
+    <div class="pay-info">
+        <h3>订单编号: <span>{{ info.order_id }}</span></h3>
+        <h3>商品名称: <span>{{ info.name|truncate(24, True) }}</span></h3>
+        <h3>订单金额: <span>{{ info.amount }}</span>元</h3>
+        <hr>
     </div>
-    <footer>
-        <p class="grayColor copyright">
-        © 1999-2015 <a href="http://www.lvye.com">www.lvye.com</a> 绿野户外网版权所有
-        </p>
-    </footer>
-</div>
+    {% for vas_name in vases %}
+        {% set vas_info = vas_infos[vas_name] %}
+        <div class="pay-list" id="{{ vas_name }}">
+            <div class="pay-item-select">
+                <input id="i_{{ vas_name }}" type="radio" value="{{ vas_name }}" {% if loop.first %}checked{% endif %} name="zf" class="onlychice">
+            </div>
+            <div class="pay-item">
+                <img src="{{ url_for('static', filename='images/checkout/%s.png' % vas_name) }}" width="42" height="42" >
+            </div>
+            <div class="pay-content">
+                <h2 class="pay-title">{{ vas_info.name }}</h2>
+                <p class="pay-desc">
+                    {{ vas_info.desc }}
+                </p>
+            </div>
+        </div>
+    {% endfor %}
+    <button id="bt_pay_now" class="nowpay" value="{{ vases[0] }}">立即支付</button>
+    <div class="pay_result_row"><span hidden=true id="pay_result" class="pay_result_before"></span></div>
+{% endblock %}
+
+{% block scripts %}
 <script>
     $(function() {
         /*选择支付方式*/
-        $("div.zf_list1.samezf").click(function(){
+        $("div.pay-list").click(function(){
             var r = $('#i_' + this.id)[0];
             r.click();
         });
@@ -119,7 +100,5 @@
                 }});
         });
     })
-
 </script>
-</body>
-</html>
+{% endblock %}

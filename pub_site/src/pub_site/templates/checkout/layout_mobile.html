@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+{% block all %}
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="viewport" content="width=device-width,user-scalable=0">
+    <meta name="keyword" content="绿野,户外应用,户外APP,户外手机应用,绿野应用,绿野APP">
+    <meta name="description" content="绿野为您打造了户外专用的手机应用（手机APP下载），让您在户外旅行中得到个性的发乎、自由的张扬">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=no">
+
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>{% block title %}{% endblock %}</title>
+    {% block css %}
+        <link href="{{ url_for('static', filename='css/checkout_mobile.css') }}" rel="stylesheet">
+    {% endblock %}
+    <!--[if lte IE 9]>
+    <script src="{{ url_for('static',filename='js/html5.js') }}"></script>
+    <![endif]-->
+    {% block js %}
+    {% endblock %}
+
+    <!--[if lte IE 9]>
+    <script src="{{ url_for('static',filename='js/html5.js') }}"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="wrap">
+    <header class="header">
+        <div class="logo">
+            <a href="http://www.lvye.com" target="_blank">
+                <img src="{{ url_for('static', filename='images/logo_zyt.jpg') }}" height="34" width="192" title="首页" alt="首页">
+            </a>
+        </div>
+    </header>
+
+    <div class="body">
+        {% block main %}
+        {% endblock %}
+    </div>
+    <footer>
+        <hr>
+        <p class="grayColor copyright">
+        © 1999-2015 <a href="http://www.lvye.com">www.lvye.com</a> 绿野户外网版权所有
+        </p>
+    </footer>
+</div>
+
+<script>
+    var csrftoken = $('meta[name=csrf-token]').attr('content');
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+</script>
+{% block scripts %}
+{% endblock %}
+</body>
+</html>
+{% endblock %}

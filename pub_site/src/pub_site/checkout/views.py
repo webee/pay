@@ -5,12 +5,12 @@ from flask import render_template, Response, jsonify, request, url_for, redirect
 from . import checkout_entry_mod as mod
 from .constant import VAS_INFOS, REQUEST_CLIENT_PAYMENT_SCENE_MAPPING
 from pub_site.checkout.commons import payment_failed, generate_submit_form
-from pub_site.constant import RequestClientType
 from pytoolbox.util.log import get_logger
 from pytoolbox.util import urls
 from pub_site.utils.entry_auth import limit_referrer
 from pub_site.utils import req
 from pub_site import config, pay_client
+from .utils import get_template
 
 
 logger = get_logger(__name__)
@@ -75,18 +75,15 @@ def checkout(sn):
         return payment_failed(result)
     info = result.data['info']
     if info['state'] != 'CREATED':
-        return render_template("checkout/info.html", msg="该订单已支付, 如失败，请重新请求支付")
+        return render_template(get_template("checkout/info", client_type), msg="该订单已支付, 如失败，请重新请求支付")
 
     vases = result.data['activated_evas']
 
     # 页面适配
     if len(vases) == 1:
         template = "checkout/one_type_checkout.html"
-    elif client_type == RequestClientType.WEB:
-        template = "checkout/checkout.html"
     else:
-        # mobile
-        template = "checkout/checkout_mobile.html"
+        template = get_template("checkout/checkout", client_type)
 
     return render_template(template, sn=sn, info=info, vases=vases, vas_infos=VAS_INFOS, client_type=client_type)
 
@@ -98,15 +95,15 @@ def pay(sn, vas_name):
     extra_params = {k: v for k, v in request.args.items()} or None
     client_type = req.client_type()
     payment_scene = REQUEST_CLIENT_PAYMENT_SCENE_MAPPING[client_type]
-    return do_pay(sn, vas_name, payment_scene, extra_params=extra_params)
+    return do_pay(sn, vas_name, payment_scene, extra_params=extra_params, client_type=client_type)
 
 
-def do_pay(sn, vas_name, payment_scene, extra_params=None):
+def do_pay(sn, vas_name, payment_scene, extra_params=None, client_type=None):
     from .constant import WeixinPayType
 
     result = pay_client.get_payment_param(sn, payment_scene, vas_name, extra_params)
     if not pay_client.is_success_result(result):
-        return payment_failed(result)
+        return payment_failed(result, client_type=client_type)
 
     # echo back vas_name, and payment_type.
     vas_name = result.data['vas_name']
@@ -137,4 +134,4 @@ def do_pay(sn, vas_name, payment_scene, extra_params=None):
         url = params['_url']
         params['_sn'] = sn
         return Response(generate_submit_form(url, params, keep_all=True))
-    return render_template("checkout/info.html", msg="支付方式错误")
+    return render_template(get_template("checkout/info", client_type), msg="支付方式错误")

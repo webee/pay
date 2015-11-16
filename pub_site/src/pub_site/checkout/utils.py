@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 from pytoolbox.util import times, aes
 from pub_site import config
+from pub_site.utils import req
+from pub_site.constant import RequestClientType
 
 
 def gen_payment_token(sn):
@@ -28,3 +30,12 @@ def check_payment_token(sn, token):
 
 def _gen_key(sn):
     return sn[:8] + config.Checkout.AES_KEY
+
+
+def get_template(name, client_type=None):
+    client_type = client_type or req.client_type()
+
+    if client_type == RequestClientType.WEB:
+        return "%s.html" % name
+
+    return "%s_mobile.html" % name

@@ -9,6 +9,7 @@ from flask.ext.login import current_user, login_required
 from .zyt_forms import ZytPayForm
 from .commons import payment_failed
 from . import utils
+from .utils import get_template
 from decimal import Decimal
 
 
@@ -35,20 +36,20 @@ def zyt_pay():
 @login_required
 def zyt_do_pay(sn, token):
     if not utils.check_payment_token(sn, token):
-        return render_template("checkout/info.html", msg="支付链接过期，请重新请求支付")
+        return render_template(get_template("checkout/info"), msg="支付链接过期，请重新请求支付")
 
     result = pay_client.get_payment_info(sn)
     if not pay_client.is_success_result(result):
         return payment_failed(result)
     info = result.data['info']
     if info['state'] != 'CREATED':
-        return render_template("checkout/info.html", msg="该订单已支付, 如失败，请重新请求支付")
+        return render_template(get_template("checkout/info"), msg="该订单已支付, 如失败，请重新请求支付")
 
     amount = Decimal(info['amount'])
     user_id = current_user.user_id
     balance = pay_client.app_query_user_available_balance(user_id)
     if amount > balance:
-        return render_template("checkout/info.html", msg="自游通余额不足")
+        return render_template(get_template("checkout/info"), msg="自游通余额不足")
 
     form = ZytPayForm()
     if form.validate_on_submit():

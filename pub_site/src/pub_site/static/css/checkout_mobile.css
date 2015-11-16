@@ -48,9 +48,17 @@ body{
     font-family: "Microsoft YaHei", serif;
     overflow-x: hidden;
     position: relative;
-    padding-bottom: 50px;
+    padding-bottom: 30px;
     word-break: break-all;
     word-wrap:break-word;
+}
+
+footer hr{
+    margin-top: 30px;
+}
+
+.msg{
+    margin-top: 15px;
 }
 
 .blueColor{
@@ -94,7 +102,19 @@ footer{
     display: inline;
 }
 
-.row{
+.pay-info{
+    width: 100%;
+    float: left;
+    margin: 10px 0;
+    text-align: left;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.pay-info h3{font-size:20px;margin-left: 10px;}
+.pay-info h3 span{margin-left:10px;font-weight: normal;}
+
+.pay-list{
     width: 100%;
     padding: 10px;
     margin: 0 auto;

@@ -8,6 +8,7 @@ logger = get_logger(__name__)
 
 
 def success(**kwargs):
+    logger.info("response: [{0}]".format(kwargs))
     return jsonify(ret=True, **kwargs)
 
 

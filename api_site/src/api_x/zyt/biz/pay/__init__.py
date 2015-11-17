@@ -155,6 +155,7 @@ def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
         'product_category': product_category,
         'product_desc': product_desc,
         'amount': amount,
+        'real_amount': amount,
         'client_callback_url': client_callback_url,
         'client_notify_url': client_notify_url,
         'type': payment_type
@@ -277,6 +278,9 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, amount, data):
     with require_transaction_context():
         tx = update_transaction_info(tx.id, vas_sn, vas_name=vas_name)
         if is_success:
+            # update paid amount
+            payment_record.paid_amount = amount
+            db.session.add(payment_record)
             # 直付和担保付的不同操作
             if payment_record.type == PaymentType.DIRECT:
                 succeed_payment(vas_name, tx, payment_record)

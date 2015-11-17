@@ -12,7 +12,7 @@ def get_tx_by_sn(sn, search_stack=False):
         sn_item = TransactionSnStack.query.filter_by(sn=sn).first()
         if sn_item is not None:
             tx = sn_item.tx
-            tx.source_sn = sn
+            tx.source_sn = sn_item.sn
     return tx
 
 

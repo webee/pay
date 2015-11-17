@@ -99,14 +99,14 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
         is_changed = is_changed or is_amount_changed
         payment_record.amount = amount
 
-        is_changed = is_changed or payment_record.product_name != product_name
-        payment_record.product_name = product_name
+        is_changed = is_changed or payment_record.product_name != product_name[:150]
+        payment_record.product_name = product_name[:150]
 
-        is_changed = is_changed or payment_record.product_category != product_category
-        payment_record.product_category = product_category
+        is_changed = is_changed or payment_record.product_category != product_category[:50]
+        payment_record.product_category = product_category[:50]
 
-        is_changed = is_changed or payment_record.product_desc != product_desc
-        payment_record.product_desc = product_desc
+        is_changed = is_changed or payment_record.product_desc != product_desc[:350]
+        payment_record.product_desc = product_desc[:350]
 
         tx.amount = amount
         tx.comments = "在线支付-{0}".format(product_name)

@@ -13,6 +13,7 @@ def get_tx_by_sn(sn, search_stack=False):
         if sn_item is not None:
             tx = sn_item.tx
             tx.source_sn = sn_item.sn
+            tx.source_sn_item = sn_item
     return tx
 
 

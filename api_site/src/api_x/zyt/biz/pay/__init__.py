@@ -20,6 +20,7 @@ from api_x.zyt.biz.models import DuplicatedPaymentRecord
 from api_x.zyt.biz import user_roles
 from pytoolbox.util.dbs import require_transaction_context, transactional
 from pytoolbox.util.log import get_logger
+from api_x.constant import PaymentChangeType
 from api_x.config import etc as config
 from api_x.task import tasks
 from .error import AlreadyPaidError
@@ -64,15 +65,22 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
     return payment_record
 
 
-def is_payment_expired(record):
+def is_payment_need_change(record, is_amount_changed, is_changed):
+    if is_amount_changed:
+        change = PaymentChangeType.AMOUNT
+        return change
+    if is_changed:
+        change = PaymentChangeType.INFO
+        return change
     from datetime import datetime
 
     if record.tried_times >= config.Biz.PAYMENT_MAX_TRIAL_TIMES:
-        return True
+        return PaymentChangeType.EXPIRED
 
     d = datetime.utcnow() - record.updated_on
     s = d.total_seconds()
-    return s >= config.Biz.PAYMENT_MAX_VALID_SECONDS
+    if s >= config.Biz.PAYMENT_MAX_VALID_SECONDS:
+        return PaymentChangeType.EXPIRED
 
 
 @transactional
@@ -84,9 +92,11 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
         raise AlreadyPaidError(payment_record.order_id)
 
     is_changed = False
+    is_amount_changed = False
     # 更新订单相关信息
     if tx.state in [PaymentTxState.CREATED, PaymentTxState.FAILED]:
-        is_changed = is_changed or payment_record.amount != amount
+        is_amount_changed = payment_record.amount != amount
+        is_changed = is_changed or is_amount_changed
         payment_record.amount = amount
 
         is_changed = is_changed or payment_record.product_name != product_name
@@ -101,9 +111,10 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
         tx.amount = amount
         tx.comments = "在线支付-{0}".format(product_name)
 
-    if is_changed or is_payment_expired(payment_record):
+    change = is_payment_need_change(payment_record, is_amount_changed, is_changed)
+    if change is not None:
         # push old sn to stack.
-        tx_sn_stack = TransactionSnStack(tx_id=tx.id, sn=tx.sn, generated_on=tx.updated_on, state=tx.state)
+        tx_sn_stack = TransactionSnStack(tx_id=tx.id, sn=tx.sn, generated_on=tx.updated_on, state=tx.state, change=change)
         db.session.add(tx_sn_stack)
 
         # new sn.

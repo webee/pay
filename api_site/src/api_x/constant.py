@@ -32,8 +32,16 @@ class TransactionType:
     WITHDRAW = 'WITHDRAW'
 
 
+class PaymentChangeType:
+    EXPIRED = 'EXPIRED'
+    AMOUNT = 'AMOUNT'
+    INFO = 'INFO'
+
+
 class PaymentTxState:
     CREATED = 'CREATED'
+    # 部分支付
+    PARTIAL_PAID = 'PARTIAL_PAID'
     # 已付钱，未收钱
     PAID_OUT = 'PAID_OUT'
     FAILED = 'FAILED'

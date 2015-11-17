@@ -1,7 +1,7 @@
 # coding=utf-8
 from api_x import db
 from datetime import datetime
-from api_x.constant import TransactionType
+from api_x.constant import TransactionType, PaymentChangeType
 from api_x.config import etc
 from api_x.utils import times
 from pytoolbox.util import aes
@@ -66,6 +66,7 @@ class Transaction(db.Model):
         super(Transaction, self).__init__(*args, **kwargs)
         self.__record = None
         self.__source_sn = None
+        self.__stack_sn_item = None
 
     @staticmethod
     def get_hash_stripped_sn(sn):
@@ -139,6 +140,19 @@ class Transaction(db.Model):
     def source_sn(self, sn):
         self.__source_sn = sn
 
+    @property
+    def stack_sn_item(self):
+        """ 表示当前使用的sn，参考 TransactionSnStack
+        """
+        # NOTE: Model类的属性名前面都添加了_<ClassName>前缀
+        if hasattr(self, '_Transaction__stack_sn_item') and self.__stack_sn_item:
+            return self.__stack_sn_item
+        return self.sn
+
+    @stack_sn_item.setter
+    def stack_sn_item(self, sn):
+        self.__stack_sn_item = sn
+
     def __repr__(self):
         return '<Transaction %s, %s, %s, %s>' % (self.type, str(self.amount), self.state, str(self.created_on))
 
@@ -155,11 +169,13 @@ class TransactionSnStack(db.Model):
     sn = db.Column(db.CHAR(32), index=True)
     generated_on = db.Column(db.DateTime, nullable=False)
     state = db.Column(db.VARCHAR(32), nullable=False)
+    # 改变原因、类型
+    change = db.Column(db.Enum(PaymentChangeType.EXPIRED, PaymentChangeType.AMOUNT, PaymentChangeType.INFO), default=None)
 
     pushed_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return '<TransactionSnStack %s, %s>' % (self.tx_id, self.sn)
+        return '<TransactionSnStack %s, %s, %s, %s>' % (self.tx_id, self.sn, self.state, self.change)
 
 
 class UserTransaction(db.Model):
@@ -214,6 +230,8 @@ class PaymentRecord(db.Model):
     product_category = db.Column(db.VARCHAR(50), nullable=False)
     product_desc = db.Column(db.VARCHAR(350), nullable=False)
     amount = db.Column(db.Numeric(12, 2), nullable=False)
+    real_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    paid_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     refunded_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
     client_callback_url = db.Column(db.VARCHAR(128))
     client_notify_url = db.Column(db.VARCHAR(128))
@@ -226,7 +244,7 @@ class PaymentRecord(db.Model):
     __table_args__ = (db.UniqueConstraint('channel_id', 'order_id', name='channel_order_id_uniq_idx'),)
 
     def __repr__(self):
-        return '<Payment %r, %r->%r$%r/%r, >' % (self.id, self.payer_id, self.payee_id, self.amount, self.refunded_amount)
+        return '<Payment %r, %r->%r$%r/%r>' % (self.id, self.payer_id, self.payee_id, self.amount, self.refunded_amount)
 
 
 class DuplicatedPaymentRecord(db.Model):

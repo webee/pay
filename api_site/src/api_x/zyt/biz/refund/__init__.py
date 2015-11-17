@@ -180,8 +180,8 @@ def _create_refund(channel, payment_tx, payment_record, amount, client_notify_ur
     if payment_tx.state != PaymentTxState.REFUNDING:
         raise PaymentNotRefundableError()
 
-    if amount + payment_record.refunded_amount > payment_record.amount:
-        raise RefundAmountError(payment_record.amount, payment_record.refunded_amount, amount)
+    if amount + payment_record.refunded_amount > payment_record.paid_amount:
+        raise RefundAmountError(payment_record.paid_amount, payment_record.refunded_amount, amount)
 
     comments = "退款-{0}".format(payment_record.product_name)
 

@@ -58,9 +58,9 @@ class RefundStateMissMatchError(RefundError):
 
 
 class RefundAmountError(RefundError):
-    def __init__(self, payment_amount, refunded_amount, refund_amount):
-        message = "refund amount error: [payment_amount: {0}, refunded_amount: {1}, refund_amount: {2}]."\
-            .format(payment_amount, refunded_amount, refund_amount)
+    def __init__(self, paid_amount, refunded_amount, refund_amount):
+        message = "refund amount error: [paid_amount: {0}, refunded_amount: {1}, refund_amount: {2}]."\
+            .format(paid_amount, refunded_amount, refund_amount)
         super(RefundAmountError, self).__init__(message)
 
 

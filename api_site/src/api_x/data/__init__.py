@@ -16,11 +16,12 @@ def init_data():
 def add_vases():
     from api_x.zyt.biz.vas import add_vas
     from api_x.zyt import vas as zyt
-    from api_x.zyt.evas import test_pay, lianlian_pay
+    from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay
 
     add_vas(zyt.NAME)
     add_vas(test_pay.NAME)
     add_vas(lianlian_pay.NAME)
+    add_vas(weixin_pay.NAME)
 
 
 def default_create_channel(user_domain_name, channel_name, channel_desc):

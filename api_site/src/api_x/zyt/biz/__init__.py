@@ -5,7 +5,6 @@ from .pay import handle_payment_notify
 from .prepaid import handle_prepaid_notify
 from .refund import handle_refund_notify
 from .withdraw import handle_withdraw_notify
-from .models import VirtualAccountSystem
 from .query_notify import register_query_notify_handle
 
 

@@ -23,13 +23,6 @@
 				$(".quickly p").addClass('xianshi');
 			}	 
 			})
-			//弹层	
-			$(".join_center a").click(function(){
-				$(".bgLayer,.confirm").stop().fadeIn(500);
-			})	
-			$(".confirm a.close").click(function(){
-				$(".bgLayer,.confirm").stop().fadeOut(500);
-			})
 
 			$(".mainSq").css("height",$(window).height()-154);
 			

@@ -36,7 +36,7 @@ LVYE_CORP_DOMAIN_NAME = 'lvye_corp'
 LVYE_USER_NAME = 'lvye'
 
 # TODO: 同步该配置
-IS_ALL_OPENED = False
+IS_ALL_OPENED = True
 
 
 class Checkout:

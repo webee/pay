@@ -68,6 +68,11 @@ class Transaction(db.Model):
         self.__source_sn = None
         self.__stack_sn_item = None
 
+    @property
+    def channel(self):
+        from api_x.zyt.user_mapping import get_channel_by_name
+        return get_channel_by_name(self.channel_name)
+
     @staticmethod
     def get_hash_stripped_sn(sn):
         return sn.split('$', 1)[0]
@@ -226,6 +231,7 @@ class PaymentRecord(db.Model):
     payee_id = db.Column(db.Integer, nullable=False)
     channel_id = db.Column(db.Integer, nullable=False)
     order_id = db.Column(db.VARCHAR(64), nullable=False)
+    origin = db.Column(db.VARCHAR(32), default=None)
     product_name = db.Column(db.VARCHAR(150), nullable=False)
     product_category = db.Column(db.VARCHAR(50), nullable=False)
     product_desc = db.Column(db.VARCHAR(350), nullable=False)
@@ -241,10 +247,11 @@ class PaymentRecord(db.Model):
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # index
-    __table_args__ = (db.UniqueConstraint('channel_id', 'order_id', name='channel_order_id_uniq_idx'),)
+    __table_args__ = (db.UniqueConstraint('channel_id', 'order_id', 'origin', name='channel_order_id_origin_uniq_idx'),)
 
     def __repr__(self):
-        return '<Payment %r, %r->%r$%r/%r>' % (self.id, self.payer_id, self.payee_id, self.amount, self.refunded_amount)
+        return '<Payment %r, %r->%r$%r:%r:%r/%r>' % (self.id, self.payer_id, self.payee_id,
+                                                     self.amount, self.real_amount, self.paid_amount, self.refunded_amount)
 
 
 class DuplicatedPaymentRecord(db.Model):

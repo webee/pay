@@ -103,3 +103,8 @@ class RequestClientType:
     WAP = 'WAP'
     IOS = 'IOS'
     ANDROID = 'ANDROID'
+
+
+class PaymentOriginType:
+    DUPLICATE = 'DUPLICATE'
+    PART = 'PART'

@@ -48,13 +48,14 @@ def pay_callback(sn):
     """
     data = pay_client.get_payment_result(sn)
     result = ""
-    if pay_client.is_success_result(data):
-        state = data.data['state']
-        if state != 'CREATED':
-            result = 'SUCCESS'
+    if not pay_client.is_success_result(data):
+        return payment_failed(result)
+    state = data.data['state']
+    if state != 'CREATED':
+        result = 'SUCCESS'
 
     # pure sn.
-    sn = sn.split('$', 1)[0]
+    sn = data.data['sn']
     return pay_client.web_payment_callback(sn, result)
 
 

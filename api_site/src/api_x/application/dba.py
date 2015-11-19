@@ -51,12 +51,13 @@ def unbind_bankcard(user_id, bankcard_id):
 
 
 @transactional
-def add_user_withdraw_log(user_id, tx_sn, bankcard_id, amount, fee, state):
+def add_user_withdraw_log(user_id, tx_sn, bankcard_id, amount, actual_amount, fee, state):
     fields = {
         'user_id': user_id,
         'tx_sn': tx_sn,
         'bankcard_id': bankcard_id,
         'amount': amount,
+        'actual_amount': actual_amount,
         'fee': fee,
         'state': state
     }

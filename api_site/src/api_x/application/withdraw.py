@@ -21,8 +21,8 @@ def apply_to_withdraw(channel, order_id, from_user_id, bankcard, amount, fee, cl
     return withdraw_record
 
 
-def log_user_withdraw(user_id, tx_sn, bankcard_id, amount, fee):
-    dba.add_user_withdraw_log(user_id, tx_sn, bankcard_id, amount, fee, WithdrawState.PROCESSING)
+def log_user_withdraw(user_id, tx_sn, bankcard_id, amount, actual_amount, fee):
+    dba.add_user_withdraw_log(user_id, tx_sn, bankcard_id, amount, actual_amount, fee, WithdrawState.PROCESSING)
 
 
 def calc_user_withdraw_fee(user_id, amount):

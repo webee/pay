@@ -270,7 +270,7 @@ def _refund_by_lianlian_pay(tx, refund_record):
         res = refund(TransactionType.REFUND, sn, created_on, amount, vas_sn)
     except Exception as e:
         logger.exception(e)
-        raise RefundFailedError(res['ret_msg'])
+        raise RefundFailedError(e.message)
 
     # try to query refund notify.
     # TODO: start query refund notify task.

@@ -229,7 +229,7 @@ def succeed_payment(vas_name, tx, payment_record, state=PaymentTxState.SUCCESS, 
         # 不用记账
         event_id = None
     else:
-        event_id = bk() if bk else bookkeeping(EventType.TRANSFER_IN, tx.sn, payee_id, vas_name, amount)
+        event_id = bk(tx.sn, amount) if bk else bookkeeping(EventType.TRANSFER_IN, tx.sn, payee_id, vas_name, amount)
     transit_transaction_state(tx.id, tx.state, state, event_id)
 
 

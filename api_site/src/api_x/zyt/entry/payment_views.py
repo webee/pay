@@ -54,7 +54,7 @@ def prepare_params(tx, payment_scene, vas_name, extra_params=None):
     from api_x.zyt.evas.payment import params
 
     # TODO: log to db.
-    logger.info("[PAYMENT PARAMS] {0}, {1}, {2}, {3}".format(payment_scene, vas_name, tx.type, tx.sn))
+    logger.info("[PAYMENT PARAMS] {0}, {1}, {2}, {3}, {4}".format(payment_scene, vas_name, tx.type, tx.sn, extra_params))
 
     if tx.state != PaymentTxState.CREATED:
         return response.processed()

@@ -48,8 +48,8 @@ def _weixin_pay_params(payment_type, payment_entity, extra_params=None):
     if i < 0:
         app_config = weixin_pay.AppConfig()
     else:
-        payment_type = payment_type[:i]
         wx_name = payment_type[i+1:]
+        payment_type = payment_type[:i]
         app_config = weixin_pay.AppConfig(wx_name)
 
     params = payment_param(payment_type, payment_entity.source, app_config, payment_entity.tx_sn,

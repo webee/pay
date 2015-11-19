@@ -25,7 +25,7 @@ CHECKOUT_URL = 'http://pay.lvye.com/checkout/{sn}'
 
 class Biz:
     # 是否全面开放
-    IS_ALL_OPENED = False
+    IS_ALL_OPENED = True
     TX_SN_PREFIX = '__'
     IS_PROD = False
 

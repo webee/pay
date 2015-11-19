@@ -47,7 +47,7 @@ def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
 
         payment_record = _create_payment(channel, payment_type, payer_id, payee_id, order_id,
                                          product_name, product_category, product_desc, amount,
-                                         client_callback_url, client_notify_url, super_tx_id=super_tx_id, origin=None)
+                                         client_callback_url, client_notify_url, super_tx_id=super_tx_id, origin=origin)
     else:
         payment_record = _restart_payment(channel, payment_record, amount, product_name, product_category, product_desc)
 

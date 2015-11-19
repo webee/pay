@@ -1,11 +1,13 @@
 # coding=utf-8
 from api_x import db
+from pytoolbox.util.dbs import transactional
 from datetime import datetime
 from api_x.constant import TransactionType, PaymentChangeType
 from api_x.config import etc
 from api_x.utils import times
-from pytoolbox.util import aes
+from api_x.zyt.biz import utils
 from pytoolbox.util.log import get_logger
+from api_x import db
 
 
 logger = get_logger(__name__)
@@ -49,7 +51,7 @@ class Transaction(db.Model):
     order_id = db.Column(db.VARCHAR(64), nullable=False, default='')
     # 涉及到的总金额
     # 支付金额，退款金额，提现金额(+手续费), 充值金额
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
     comments = db.Column(db.VARCHAR(128), default='')
     state = db.Column(db.VARCHAR(32), nullable=False)
 
@@ -74,40 +76,33 @@ class Transaction(db.Model):
         return get_channel_by_name(self.channel_name)
 
     @staticmethod
-    def get_hash_stripped_sn(sn):
-        return sn.split('$', 1)[0]
+    def get_tx_from_hashed_sn(hashed_sn):
+        try:
+            tx_id, _hash = utils.aes_decrypt(hashed_sn).split('$', 1)
+            return Transaction.query.get(tx_id), _hash
+        except Exception as e:
+            logger.warn('bad hashed sn: [{0}], [{1}]'.format(hashed_sn, e.message))
+        return None, None
 
     @property
     def sn_with_expire_hash(self):
-        updated = times.utc2timestamp(self.updated_on)
-        expired = updated + etc.Biz.PAYMENT_CHECKOUT_VALID_SECONDS
+        now = times.timestamp()
+        expired = now + etc.Biz.PAYMENT_CHECKOUT_VALID_SECONDS
 
-        key = str(int(updated)) + etc.KEY
+        key = str(self.id) + str(self.tried_times) + etc.KEY
         data = str(int(expired))
 
-        logger.info('hash sn: [%s], updated: [%s], expired: [%s]' % (self.sn, updated, expired))
-        _hash = aes.encrypt_to_urlsafe_base64(data, key).rstrip('=')
+        logger.info('hash sn: [%s], now: [%s], expired: [%s]' % (self.sn, now, expired))
+        _hash = utils.aes_encrypt(data, key)
 
-        return '%s$%s' % (self.sn, _hash)
+        return utils.aes_encrypt('%s$%s' % (self.id, _hash))
 
-    def check_expire_hashed_sn(self, hashed_sn):
-        sn = Transaction.get_hash_stripped_sn(hashed_sn)
-        if self.sn != sn:
-            return False
-
-        _hash = str(hashed_sn[len(sn)+1:])
-
-        updated = times.utc2timestamp(self.updated_on)
-        key = str(int(updated)) + etc.KEY
+    def check_expire_hash(self, expire_hash):
+        now = times.timestamp()
+        key = str(self.id) + str(self.tried_times) + etc.KEY
         try:
-            _hash += str('=') * ((4 - (len(_hash) % 4)) % 4)
-            logger.info('try check sn: [%s], updated: [%s], _hash: [%s]' % (self.sn, updated, _hash))
-            try:
-                expired = int(aes.decrypt_from_urlsafe_base64(_hash, key))
-            except Exception as _:
-                updated = times.utc2timestamp(self.record.updated_on)
-                key = str(int(updated)) + etc.KEY
-                expired = int(aes.decrypt_from_urlsafe_base64(_hash, key))
+            logger.info('try check sn: [%s], now: [%s], _hash: [%s]' % (self.sn, now, expire_hash))
+            expired = long(utils.aes_decrypt(expire_hash, key))
         except Exception as _:
             return False
 
@@ -235,10 +230,10 @@ class PaymentRecord(db.Model):
     product_name = db.Column(db.VARCHAR(150), nullable=False)
     product_category = db.Column(db.VARCHAR(50), nullable=False)
     product_desc = db.Column(db.VARCHAR(350), nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
-    real_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
-    paid_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
-    refunded_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
+    real_amount = db.Column(db.Numeric(16, 2), nullable=False, default=0)
+    paid_amount = db.Column(db.Numeric(16, 2), nullable=False, default=0)
+    refunded_amount = db.Column(db.Numeric(16, 2), nullable=False, default=0)
     client_callback_url = db.Column(db.VARCHAR(128))
     client_notify_url = db.Column(db.VARCHAR(128))
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -248,6 +243,39 @@ class PaymentRecord(db.Model):
 
     # index
     __table_args__ = (db.UniqueConstraint('channel_id', 'order_id', 'origin', name='channel_order_id_origin_uniq_idx'),)
+
+    def is_finished(self):
+        return self.real_amount == self.paid_amount - self.refunded_amount
+
+    @transactional
+    def add_refund(self, refund_record, event_id):
+        from api_x.constant import PaymentTxState
+        from api_x.zyt.biz.transaction import transit_transaction_state
+        self.refunded_amount += refund_record.amount
+        # 全部金额都退款，则状态为已退款
+        is_refunded = self.paid_amount == self.refunded_amount
+
+        if self.tx.state == PaymentTxState.REFUNDING:
+            if is_refunded:
+                transit_transaction_state(self.tx_id, PaymentTxState.REFUNDING, PaymentTxState.REFUNDED, event_id)
+            else:
+                transit_transaction_state(self.tx_id, PaymentTxState.REFUNDING, refund_record.payment_state, event_id)
+        db.session.add(self)
+
+        super_tx = self.tx.super
+        if super_tx and super_tx.type == TransactionType.PAYMENT:
+            super_payment = super_tx.record
+            super_payment.add_refund(refund_record, event_id)
+
+    @transactional
+    def add_paid(self, amount):
+        self.paid_amount += amount
+        db.session.add(self)
+
+        super_tx = self.tx.super
+        if super_tx and super_tx.type == TransactionType.PAYMENT:
+            super_payment = super_tx.record
+            super_payment.add_paid(amount)
 
     def __repr__(self):
         return '<Payment %r, %r->%r$%r:%r:%r/%r>' % (self.id, self.payer_id, self.payee_id,
@@ -289,7 +317,7 @@ class RefundRecord(db.Model):
     payee_id = db.Column(db.Integer, nullable=False)
     order_id = db.Column(db.VARCHAR(64), nullable=False)
 
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
     client_notify_url = db.Column(db.VARCHAR(128))
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
@@ -309,7 +337,7 @@ class PrepaidRecord(db.Model):
     sn = db.Column(db.CHAR(32), nullable=False)
 
     to_id = db.Column(db.Integer, nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
 
     client_callback_url = db.Column(db.VARCHAR(128))
     client_notify_url = db.Column(db.VARCHAR(128))
@@ -344,9 +372,9 @@ class WithdrawRecord(db.Model):
     brabank_name = db.Column(db.VARCHAR(50))
     prcptcd = db.Column(db.CHAR(12))
 
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
-    actual_amount = db.Column(db.Numeric(12, 2), nullable=False)
-    fee = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
+    actual_amount = db.Column(db.Numeric(16, 2), nullable=False)
+    fee = db.Column(db.Numeric(16, 2), nullable=False, default=0)
 
     client_notify_url = db.Column(db.VARCHAR(128))
 
@@ -368,7 +396,7 @@ class TransferRecord(db.Model):
 
     from_id = db.Column(db.Integer, nullable=False)
     to_id = db.Column(db.Integer, nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 

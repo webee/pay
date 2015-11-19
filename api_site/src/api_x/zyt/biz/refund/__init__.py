@@ -4,7 +4,6 @@ from decimal import InvalidOperation, Decimal
 
 from api_x import db
 from api_x.zyt.biz.commons import is_duplicated_notify
-from api_x.zyt.biz.refund.dba import update_payment_refunded_amount
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id
@@ -323,8 +322,6 @@ def _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record):
 
 @transactional
 def handle_succeed_refund(vas_name, payment_record, refund_record):
-    payment_amount = payment_record.amount
-    refunded_amount = payment_record.refunded_amount
     refund_amount = refund_record.amount
 
     # 直付和担保付的不同操作
@@ -337,21 +334,11 @@ def handle_succeed_refund(vas_name, payment_record, refund_record):
         logger.warn('bad payment type: [{0}]'.format(payment_record.type))
         return
 
-    # 全部金额都退款，则状态为已退款
-    is_refunded = payment_amount == refunded_amount + refund_amount
-
-    if is_refunded:
-        transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING,
-                                  PaymentTxState.REFUNDED, event_id)
-    else:
-        transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING,
-                                  refund_record.payment_state, event_id)
-
     refund_tx = refund_record.tx
     transit_transaction_state(refund_tx.id, refund_tx.state,
                               RefundTxState.SUCCESS, event_id)
 
-    update_payment_refunded_amount(payment_record.id, refund_amount)
+    payment_record.add_refund(refund_record, event_id)
 
 
 @transactional

@@ -30,7 +30,7 @@ logger = get_logger(__name__)
 
 def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
                            product_name, product_category, product_desc, amount,
-                           client_callback_url, client_notify_url, super_tx_id=None, origin=None):
+                           client_callback_url='', client_notify_url='', super_tx_id=None, origin=None):
     """
     如果金额为0, 则本次新建订单操作失败
     如果已经有对应订单，则直接支付成功
@@ -108,7 +108,7 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
         payment_record.product_desc = product_desc[:350]
 
         tx.amount = amount
-        tx.comments = "在线支付-{0}".format(product_name)
+        tx.comments = "支付-{0}".format(product_name)
 
     change = is_payment_need_change(payment_record, is_amount_changed, is_changed)
     if change is not None:
@@ -136,7 +136,7 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
 def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url, super_tx_id=None, origin=None):
-    comments = "在线支付-{0}".format(product_name)
+    comments = "支付-{0}".format(product_name)
     user_ids = [user_roles.from_user(payer_id), user_roles.to_user(payee_id)]
     if payment_type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
@@ -183,19 +183,6 @@ def in_to_pay_state(state, exclude=None):
 
 
 @transactional
-def succeed_payment(vas_name, tx, payment_record):
-    if not in_to_pay_state(tx.state):
-        raise TransactionStateError()
-    if payment_record.amount == 0:
-        # 不用记账
-        event_id = None
-    else:
-        event_id = bookkeeping(EventType.TRANSFER_IN, tx.sn, payment_record.payee_id, vas_name,
-                               payment_record.amount)
-    transit_transaction_state(tx.id, tx.state, PaymentTxState.SUCCESS, event_id)
-
-
-@transactional
 def _record_and_refund_duplicate_payment(vas_name, vas_sn, tx, payment_record):
     # 自动退款
     from api_x.zyt.biz.refund import create_and_request_refund
@@ -212,13 +199,16 @@ def _record_and_refund_duplicate_payment(vas_name, vas_sn, tx, payment_record):
 
 
 @transactional
-def handle_duplicate_payment(vas_name, vas_sn, tx, payment_record, amount):
+def handle_duplicate_payment(vas_name, vas_sn, tx, payment_record):
+    from api_x.zyt.biz import utils
     # 创建重复支付交易
-    order_id = tx.sn
+    amount = payment_record.real_amount
+    order_id = utils.generate_order_id(tx.id)
+    product_name = "重复支付: " + payment_record.product_name
     product_desc = "重复支付: order_id: [{0}]".format(payment_record.order_id)
     dup_payment_record = find_or_create_payment(tx.channel, payment_record.type,
                                                 payment_record.payer_id, payment_record.payee_id, order_id,
-                                                '重复支付', '重复支付', product_desc, amount, '', '',
+                                                product_name, '重复支付', product_desc, amount,
                                                 super_tx_id=tx.id, origin=PaymentOriginType.DUPLICATE)
     dup_payment_tx = dup_payment_record.tx
     # handle right now!
@@ -229,17 +219,27 @@ def handle_duplicate_payment(vas_name, vas_sn, tx, payment_record, amount):
 
 
 @transactional
-def secure_payment(vas_name, tx, payment_record):
+def succeed_payment(vas_name, tx, payment_record, state=PaymentTxState.SUCCESS, bk=None):
+    payee_id = payment_record.payee_id
+    amount = payment_record.real_amount
     if not in_to_pay_state(tx.state):
-        raise TransactionStateError()
-    if payment_record.amount == 0:
+        raise TransactionStateError(msg='state error: [{0}]'.format(tx.state))
+
+    if amount == 0:
         # 不用记账
         event_id = None
     else:
+        event_id = bk() if bk else bookkeeping(EventType.TRANSFER_IN, tx.sn, payee_id, vas_name, amount)
+    transit_transaction_state(tx.id, tx.state, state, event_id)
+
+
+@transactional
+def secure_payment(vas_name, tx, payment_record):
+    def bk(sn, amount):
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
-        event_id = bookkeeping(EventType.TRANSFER_IN_FROZEN, tx.sn, secure_user_id, vas_name,
-                               payment_record.amount)
-    transit_transaction_state(tx.id, tx.state, PaymentTxState.SECURED, event_id)
+        return bookkeeping(EventType.TRANSFER_IN_FROZEN, sn, secure_user_id, vas_name, amount)
+
+    succeed_payment(vas_name, tx, payment_record, state=PaymentTxState.SECURED, bk=bk)
 
 
 @transactional
@@ -278,30 +278,29 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, amount, data=None):
     :param data: 数据
     :return:
     """
+    logger.info('receive payment notify: [{0}], [{1}], [{2}], [{3}], [{4}]'.format(is_success, sn, vas_name, vas_sn, amount))
     tx = get_payment_tx_by_sn(sn)
     payment_record = tx.record
 
-    if amount != payment_record.amount:
+    if amount != payment_record.real_amount:
+        # 单次支付的金额一定要完全一致
         raise AmountValueMissMatchError(payment_record.amount, amount)
 
     if is_duplicated_notify(tx, vas_name, vas_sn):
         return
 
-    if _is_duplicated_payment(tx, vas_name, vas_sn):
-        # 重复支付
-        logger.warning('duplicated payment: [{0}, {1}], [{2}, {3}], [{4}]'.format(tx.vas_name, tx.vas_sn,
-                                                                                  vas_name, vas_sn, amount))
-        if is_success:
-            # 重复支付成功
-            handle_duplicate_payment(vas_name, vas_sn, tx, payment_record, amount)
-        return
-
     with require_transaction_context():
-        tx = update_transaction_info(tx.id, vas_sn, vas_name=vas_name)
         if is_success:
             # update paid amount
-            payment_record.paid_amount += amount
-            db.session.add(payment_record)
+            payment_record.add_paid(amount)
+
+            if _is_duplicated_payment(tx, vas_name, vas_sn):
+                # 重复支付
+                logger.warning('duplicated payment: [{0}, {1}], [{2}, {3}], [{4}]'.format(tx.vas_name, tx.vas_sn,
+                                                                                          vas_name, vas_sn, amount))
+                handle_duplicate_payment(vas_name, vas_sn, tx, payment_record)
+                return
+
             # 直付和担保付的不同操作
             if payment_record.type == PaymentType.DIRECT:
                 succeed_payment(vas_name, tx, payment_record)
@@ -309,6 +308,7 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, amount, data=None):
                 secure_payment(vas_name, tx, payment_record)
         else:
             fail_payment(payment_record)
+        tx = update_transaction_info(tx.id, vas_sn, vas_name=vas_name)
 
     # notify client.
     tx = get_tx_by_id(tx.id)

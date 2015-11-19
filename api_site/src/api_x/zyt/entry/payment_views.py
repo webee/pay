@@ -17,7 +17,7 @@ logger = get_logger(__name__)
 @mod.route("/payment/<sn>/result", methods=["GET"])
 @payment_entry
 def pay_result(tx, sn):
-    return response.success(state=tx.state)
+    return response.success(state=tx.state, sn=tx.sn)
 
 
 @mod.route("/payment/<sn>/<payment_scene>/info", methods=["GET"])

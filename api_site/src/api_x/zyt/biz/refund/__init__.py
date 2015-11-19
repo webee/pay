@@ -288,12 +288,12 @@ def _refund_by_lianlian_pay(tx, refund_record):
 
     try:
         res = refund(TransactionType.REFUND, sn, created_on, amount, vas_sn)
+    except RefundBalanceInsufficientError as e:
+        raise e
     except Exception as e:
         logger.exception(e)
         raise RefundFailedError(e.message)
 
-    # try to query refund notify.
-    # TODO: start query refund notify task.
     return res
 
 

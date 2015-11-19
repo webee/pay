@@ -88,9 +88,9 @@ class UserWithdrawLog(db.Model):
     user_id = db.Column(db.Integer, nullable=False)
     bankcard_id = db.Column(db.Integer, db.ForeignKey('bankcard.id'), nullable=False)
 
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
-    actual_amount = db.Column(db.Numeric(12, 2))
-    fee = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
+    actual_amount = db.Column(db.Numeric(16, 2))
+    fee = db.Column(db.Numeric(16, 2), nullable=False, default=0)
 
     state = db.Column(db.Enum(WithdrawState.PROCESSING, WithdrawState.FAILED, WithdrawState.SUCCESS), nullable=False)
 

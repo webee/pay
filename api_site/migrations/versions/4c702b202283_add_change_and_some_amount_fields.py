@@ -15,8 +15,8 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('payment_record', sa.Column('paid_amount', sa.Numeric(precision=12, scale=2), nullable=False, info={'after': 'amount'}))
-    op.add_column('payment_record', sa.Column('real_amount', sa.Numeric(precision=12, scale=2), nullable=False, info={'after': 'amount'}))
+    op.add_column('payment_record', sa.Column('paid_amount', sa.Numeric(precision=16, scale=2), nullable=False, info={'after': 'amount'}))
+    op.add_column('payment_record', sa.Column('real_amount', sa.Numeric(precision=16, scale=2), nullable=False, info={'after': 'amount'}))
     op.add_column('transaction_sn_stack', sa.Column('change', sa.Enum(u'EXPIRED', u'AMOUNT', u'INFO'), nullable=True, info={'after': 'state'}))
 
 

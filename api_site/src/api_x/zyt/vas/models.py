@@ -46,7 +46,7 @@ class Event(db.Model):
                              EventType.FREEZE, EventType.UNFREEZE,
                              EventType.TRANSFER_IN_FROZEN, EventType.TRANSFER_OUT_FROZEN), nullable=False)
 
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
@@ -66,7 +66,7 @@ class SystemAssetAccountItem(db.Model):
     event = db.relationship('Event', backref=db.backref('asset_account_items', lazy='dynamic'))
 
     side = db.Column(db.Enum('DEBIT', 'CREDIT'), nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
@@ -87,7 +87,7 @@ class UserLiabilityAccountItem(db.Model):
     event = db.relationship('Event', backref=db.backref('liability_account_items', lazy='dynamic'))
 
     side = db.Column(db.Enum('DEBIT', 'CREDIT'), nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
@@ -102,9 +102,9 @@ class UserCashBalance(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('account_user.id'), nullable=False)
     user = db.relationship('AccountUser', backref=db.backref('cash_balance', lazy='dynamic'), uselist=False)
 
-    total = db.Column(db.Numeric(12, 2), nullable=False, default=0)
-    available = db.Column(db.Numeric(12, 2), nullable=False, default=0)
-    frozen = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    total = db.Column(db.Numeric(16, 2), nullable=False, default=0)
+    available = db.Column(db.Numeric(16, 2), nullable=False, default=0)
+    frozen = db.Column(db.Numeric(16, 2), nullable=False, default=0)
 
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -123,9 +123,9 @@ class UserCashBalanceLog(db.Model):
     event_id = db.Column(db.BigInteger, db.ForeignKey('event.id'), nullable=False)
     event = db.relationship('Event', backref=db.backref('cash_balance_logs', lazy='dynamic'))
 
-    total = db.Column(db.Numeric(12, 2), nullable=False, default=0)
-    available = db.Column(db.Numeric(12, 2), nullable=False, default=0)
-    frozen = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    total = db.Column(db.Numeric(16, 2), nullable=False, default=0)
+    available = db.Column(db.Numeric(16, 2), nullable=False, default=0)
+    frozen = db.Column(db.Numeric(16, 2), nullable=False, default=0)
 
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 

@@ -27,7 +27,7 @@ def upgrade():
                     sa.Column('id', sa.BigInteger(), nullable=False),
                     sa.Column('sn', sa.CHAR(length=32), nullable=False),
                     sa.Column('vas_name', sa.VARCHAR(length=32), nullable=False),
-                    sa.Column('amount', sa.Numeric(precision=12, scale=2), nullable=False),
+                    sa.Column('amount', sa.Numeric(precision=16, scale=2), nullable=False),
                     sa.Column('order_id', sa.VARCHAR(length=64), nullable=False),
                     sa.Column('state', sa.Boolean(), nullable=False),
                     sa.Column('valid', sa.Boolean(), nullable=False),

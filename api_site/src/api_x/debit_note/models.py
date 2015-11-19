@@ -23,7 +23,7 @@ class DebitNoteDetail(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     sn = db.Column(db.CHAR(32), nullable=False)
     vas_name = db.Column(db.VARCHAR(32), nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
     order_id = db.Column(db.VARCHAR(64), nullable=False, default='')
     state = db.Column(db.Boolean, nullable=False, default=False)  # False:Lvyeok    True:LLok
     valid = db.Column(db.Boolean, nullable=False, default=False)  # False:checking  True:ok

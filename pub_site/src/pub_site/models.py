@@ -49,9 +49,9 @@ class WithdrawRecord(db.Model):
     user_id = db.Column(db.VARCHAR(32), nullable=False)
     bankcard_id = db.Column(db.Integer, nullable=False)
     phone_no = db.Column(db.VARCHAR(18), nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
-    actual_amount = db.Column(db.Numeric(12, 2), nullable=False)
-    fee = db.Column(db.Numeric(12, 2), nullable=False)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
+    actual_amount = db.Column(db.Numeric(16, 2), nullable=False)
+    fee = db.Column(db.Numeric(16, 2), nullable=False)
 
     state = db.Column(db.Enum(WithdrawState.REQUESTED, WithdrawState.FAILED, WithdrawState.SUCCESS),
                       nullable=False, default=WithdrawState.REQUESTED)
@@ -69,7 +69,7 @@ class PayToLvyeRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.VARCHAR(32), nullable=False, unique=True)
     user_id = db.Column(db.VARCHAR(32), nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
     name = db.Column(db.VARCHAR(100), nullable=False)
     comment = db.Column(db.VARCHAR(255), nullable=False)
 

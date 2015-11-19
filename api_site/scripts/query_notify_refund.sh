@@ -6,6 +6,7 @@ name=${2:-api_venv}
 PROJ_ROOT=$(dirname $(dirname $0))
 VENV_DIR=${PROJ_ROOT}/${name}
 
+source ${PROJ_ROOT}/scripts/common.sh
 # activate the virtualenv
 source ${VENV_DIR}/bin/activate
 

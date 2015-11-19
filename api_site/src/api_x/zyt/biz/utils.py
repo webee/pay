@@ -12,14 +12,15 @@ _SN_MAX_LEN = 32
 
 def generate_sn(user_id=0):
     d = (datetime.utcnow() - _start).total_seconds()
-    s = config.Biz.TX_SN_PREFIX + str(int(d)) + '-%d-' % user_id
+    s = config.Biz.TX_SN_PREFIX + str(int(d)) + '_%d_' % user_id
     l = _SN_GEN_LEN - len(s)
     return s + strings.gen_rand_str(l)
 
 
 def generate_order_id(tx_id):
+    # #->-, .->_
     d = (datetime.utcnow() - _start).total_seconds()
-    s = '#' + str(tx_id) + '-' + str(int(d)) + '-'
+    s = '#' + str(tx_id) + '.' + str(int(d)) + '.'
     l = _SN_GEN_LEN - len(s)
     return s + strings.gen_rand_str(l)
 

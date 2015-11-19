@@ -11,6 +11,7 @@ Flask-Migrate==1.5.1
 SQLAlchemy==1.0.6
 amqp==1.4.6
 anyjson==0.3.3
+simplejson==3.8.0
 billiard==3.3.0.20
 celery==3.1.18
 docopt==0.6.2

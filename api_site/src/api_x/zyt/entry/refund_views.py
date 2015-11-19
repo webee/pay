@@ -22,7 +22,7 @@ def apply_to_refund():
 
     logger.info('receive refund: {0}'.format({k: v for k, v in data.items()}))
     try:
-        refund_record = refund.apply_to_refund(channel, order_id, amount, client_notify_url, data)
+        refund_record = refund.apply_to_refund(channel, order_id, amount, client_notify_url, data=data)
         return response.success(sn=refund_record.sn)
     except Exception as e:
         logger.exception(e)

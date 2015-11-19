@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 from api_x import db
 
-from api_x.zyt.biz.models import RefundRecord
+from api_x.constant import TransactionType, RefundTxState
+from api_x.zyt.biz.models import RefundRecord, Transaction
 from api_x.zyt.biz.pay.dba import get_payment_by_id
-from api_x.zyt.biz.transaction.dba import get_tx_by_sn
 from pytoolbox.util.dbs import transactional
 
 
@@ -18,6 +18,10 @@ def get_refund_by_sn(sn):
 
 def get_refund_by_id(id):
     return RefundRecord.query.get(id)
+
+
+def get_blocked_refunds():
+    return Transaction.query.filter_by(type=TransactionType.REFUND, state=RefundTxState.BLOCK).all()
 
 
 @transactional

@@ -9,8 +9,9 @@ class EvasError(Exception):
 
 
 class ApiError(EvasError):
-    def __init__(self, message):
+    def __init__(self, message, data=None):
         super(ApiError, self).__init__(message)
+        self.data = data
 
 
 class InvalidSignError(ApiError):
@@ -29,6 +30,12 @@ class DictParsingError(ApiError):
     def __init__(self, raw_data):
         message = "Data [{0}] must be a dict.".format(raw_data)
         super(ApiError, self).__init__(message)
+
+
+class RefundBalanceInsufficientError(ApiError):
+    def __init__(self):
+        msg = "refund balance insufficient error."
+        super(RefundBalanceInsufficientError, self).__init__(msg)
 
 
 class DataEncodingError(ApiError):

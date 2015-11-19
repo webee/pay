@@ -16,7 +16,7 @@ from ...vas.models import EventType
 from ..transaction import create_transaction, transit_transaction_state, update_transaction_info
 from ..models import TransactionType, RefundRecord, PaymentType
 from .error import *
-from api_x.zyt.biz.pay.dba import get_payment_tx_by_sn
+from api_x.zyt.evas.error import RefundBalanceInsufficientError
 from api_x.utils.entry_auth import verify_call_perm
 from api_x.zyt.biz.error import *
 from api_x.zyt.biz.transaction.dba import get_tx_by_sn
@@ -27,8 +27,8 @@ from api_x.task import tasks
 logger = get_logger(__name__)
 
 
-def apply_to_refund(channel, order_id, amount, client_notify_url, data):
-    payment_tx, payment_record = _get_tx_payment_to_refund(channel.id, order_id)
+def apply_to_refund(channel, order_id, amount, client_notify_url, data=None):
+    payment_tx = _get_payment_tx_to_refund(channel.id, order_id)
 
     try:
         amount_value = Decimal(amount)
@@ -37,7 +37,7 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data):
     if amount_value <= 0:
         raise NonPositiveAmountError(amount_value)
 
-    refund_record = _create_and_request_refund(channel, payment_tx, payment_record, amount_value, client_notify_url, data)
+    refund_record = _create_and_request_refund(channel, payment_tx, amount_value, client_notify_url, data=data)
 
     return refund_record
 
@@ -119,7 +119,7 @@ def _try_notify_client(tx, refund_record):
     sign_and_notify_client(url, params, tx.channel_name, task=tasks.refund_notify)
 
 
-def _get_tx_payment_to_refund(channel_id, order_id):
+def _get_payment_tx_to_refund(channel_id, order_id):
     from api_x.zyt.biz.pay.dba import get_payment_by_channel_order_id
 
     payment_record = get_payment_by_channel_order_id(channel_id, order_id)
@@ -129,7 +129,7 @@ def _get_tx_payment_to_refund(channel_id, order_id):
     tx = payment_record.tx
     if not _is_refundable(tx, payment_record):
         raise PaymentNotRefundableError()
-    return tx, payment_record
+    return tx
 
 
 @verify_call_perm('refund.direct')
@@ -155,12 +155,15 @@ def _is_refundable(tx, payment_record):
 
 
 @transactional
-def _create_and_request_refund(channel, payment_tx, payment_record, amount, client_notify_url, data):
-    payment_record, refund_tx, refund_record = _create_refund(channel, payment_tx, payment_record, amount, client_notify_url)
+def _create_and_request_refund(channel, payment_tx, amount, client_notify_url, data=None):
+    payment_record, refund_tx, refund_record = _create_refund(channel, payment_tx, amount, client_notify_url)
 
     try:
         # FIXME: 暂时忽略返回结果，无异常表明执行正常
-        _request_refund(payment_tx, payment_record, refund_tx, refund_record, data)
+        _request_refund(payment_tx, payment_record, refund_tx, refund_record, data=data)
+    except RefundBalanceInsufficientError as _:
+        # 退款余额不足
+        block_refund(refund_record)
     except Exception as e:
         logger.exception(e)
         # FIXME: because this is in a transaction, below is useless.
@@ -171,7 +174,30 @@ def _create_and_request_refund(channel, payment_tx, payment_record, amount, clie
 
 
 @transactional
-def _create_refund(channel, payment_tx, payment_record, amount, client_notify_url):
+def try_unblock_refund(refund_tx):
+    refund_record = refund_tx.record
+    unblock_refund(refund_record)
+
+    payment_sn = refund_record.payment_sn
+    payment_tx = get_tx_by_sn(payment_sn)
+    payment_record = payment_tx.record
+
+    try:
+        _request_refund(payment_tx, payment_record, refund_tx, refund_record)
+    except RefundBalanceInsufficientError as _:
+        # 退款余额不足
+        block_refund(refund_record)
+    except Exception as e:
+        logger.exception(e)
+        # FIXME: because this is in a transaction, below is useless.
+        fail_refund(payment_record, refund_record)
+        raise RefundFailedError()
+
+    return refund_record
+
+
+@transactional
+def _create_refund(channel, payment_tx, amount, client_notify_url):
     cur_payment_state = payment_tx.state
 
     # start refunding.
@@ -219,7 +245,7 @@ def _create_refund(channel, payment_tx, payment_record, amount, client_notify_ur
     return payment_record, tx, refund_record
 
 
-def _request_refund(payment_tx, payment_record, refund_tx, refund_record, data):
+def _request_refund(payment_tx, payment_record, refund_tx, refund_record, data=None):
     from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay
     from api_x.zyt import vas
 
@@ -236,7 +262,7 @@ def _request_refund(payment_tx, payment_record, refund_tx, refund_record, data):
     raise RefundFailedError('unknown vas {0}'.format(vas_name))
 
 
-def _refund_by_test_pay(tx, refund_record, data):
+def _refund_by_test_pay(tx, refund_record, data=None):
     """测试支付退款"""
     from api_x.zyt.evas.test_pay import refund
     from api_x.zyt.evas.test_pay.commons import is_success_request
@@ -246,7 +272,7 @@ def _refund_by_test_pay(tx, refund_record, data):
     sn = refund_record.sn
     amount = refund_record.amount
 
-    result = data.get('result')
+    result = data.get('result') if data else None
     res = refund(TransactionType.REFUND, sn, amount, vas_sn, result or 'SUCCESS')
 
     if not is_success_request(res):
@@ -332,6 +358,16 @@ def succeed_refund(vas_name, payment_record, refund_record):
                               RefundTxState.SUCCESS, event_id)
 
     update_payment_refunded_amount(payment_record.id, refund_amount)
+
+
+@transactional
+def block_refund(refund_record):
+    transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED, RefundTxState.BLOCK)
+
+
+@transactional
+def unblock_refund(refund_record):
+    transit_transaction_state(refund_record.tx_id, RefundTxState.BLOCK, RefundTxState.CREATED)
 
 
 @transactional

@@ -2,6 +2,7 @@
 from .api_access import request
 from api_x.utils.times import datetime_to_str
 from api_x.config import lianlian_pay
+from ..error import ApiError, RefundBalanceInsufficientError
 from pytoolbox.util.sign import SignType
 
 
@@ -15,7 +16,13 @@ def refund(refund_no, refunded_on, amount, paybill_id, notify_url):
         'oid_paybill': paybill_id,
         'notify_url': notify_url
     }
-    return request(lianlian_pay.Refund.URL, params)
+    try:
+        return request(lianlian_pay.Refund.URL, params)
+    except ApiError as e:
+        data = e.data
+        if data and data['ret_code'] == "5006":
+            raise RefundBalanceInsufficientError()
+        raise e
 
 
 def is_success_or_fail(status):

@@ -69,6 +69,7 @@ class RefundTxState:
     # payer已收到退款，payee未扣钱
     REFUNDED_IN = 'REFUNDED_IN'
     FAILED = 'FAILED'
+    BLOCK = 'BLOCK'
     SUCCESS = 'SUCCESS'
 
 

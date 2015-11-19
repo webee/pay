@@ -195,6 +195,20 @@ def test_get_user_balance(user_domain_name, user_id):
                                                                  cash_balance.frozen))
 
 
+##########
+# refund
+##########
+@manager.command
+def try_blocked_refunds():
+    from api_x.zyt.biz.refund import try_unblock_refund
+    from api_x.zyt.biz.refund.dba import get_blocked_refund_txs
+
+    refund_txs = get_blocked_refund_txs()
+
+    for refund_tx in refund_txs:
+        try_unblock_refund(refund_tx)
+
+
 @manager.command
 def recon_debitnote():
     from api_x.debit_note.sftp import main

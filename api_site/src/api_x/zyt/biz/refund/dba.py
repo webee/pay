@@ -20,7 +20,7 @@ def get_refund_by_id(id):
     return RefundRecord.query.get(id)
 
 
-def get_blocked_refunds():
+def get_blocked_refund_txs():
     return Transaction.query.filter_by(type=TransactionType.REFUND, state=RefundTxState.BLOCK).all()
 
 

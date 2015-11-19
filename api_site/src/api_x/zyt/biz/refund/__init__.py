@@ -163,6 +163,7 @@ def _create_and_request_refund(channel, payment_tx, amount, client_notify_url, d
         _request_refund(payment_tx, payment_record, refund_tx, refund_record, data=data)
     except RefundBalanceInsufficientError as _:
         # 退款余额不足
+        logger.info("block refund: [{0}]".format(refund_tx.sn))
         block_refund(refund_record)
     except Exception as e:
         logger.exception(e)
@@ -184,16 +185,9 @@ def try_unblock_refund(refund_tx):
 
     try:
         _request_refund(payment_tx, payment_record, refund_tx, refund_record)
-    except RefundBalanceInsufficientError as _:
-        # 退款余额不足
-        block_refund(refund_record)
     except Exception as e:
-        logger.exception(e)
-        # FIXME: because this is in a transaction, below is useless.
-        fail_refund(payment_record, refund_record)
-        raise RefundFailedError()
-
-    return refund_record
+        logger.info("failed to unblock refund: [{0}], [{1}]".format(refund_tx.sn, e.message))
+        block_refund(refund_record)
 
 
 @transactional

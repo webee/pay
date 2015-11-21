@@ -136,11 +136,13 @@ def close_domain_user(domain_name, user_id):
 
 @manager.command
 def query_notify_refund():
+    from collections import defaultdict
     from api_x.zyt.evas import weixin_pay
     from api_x.zyt.biz.transaction.dba import get_tx_list
     from api_x.constant import TransactionType, RefundTxState
     from api_x.zyt.biz.query_notify import get_query_notify_handle
 
+    res_state = defaultdict(int)
     txs = get_tx_list(TransactionType.REFUND, RefundTxState.CREATED)
     for tx in txs:
         vas_name = tx.vas_name
@@ -148,9 +150,14 @@ def query_notify_refund():
             vas_name = weixin_pay.NAME
         handle = get_query_notify_handle(tx.type, vas_name)
         res = handle(TransactionType.REFUND, tx.sn, tx.created_on, tx.vas_name)
+        res_state[res] += 1
         print('#########################################')
         print('####{0}: {1}'.format(tx.order_id, res))
         print('#########################################')
+    print('#########################################')
+    for k, v in res_state.items():
+        print("####{0}: {1}".format(k, v))
+    print('#########################################')
 
 
 @manager.option('-c', '--channel', type=str, dest="channel_name", required=True)
@@ -200,13 +207,20 @@ def test_get_user_balance(user_domain_name, user_id):
 ##########
 @manager.command
 def try_blocked_refunds():
+    from collections import defaultdict
     from api_x.zyt.biz.refund import try_unblock_refund
     from api_x.zyt.biz.refund.dba import get_blocked_refund_txs
 
     refund_txs = get_blocked_refund_txs()
 
+    res_state = defaultdict(int)
     for refund_tx in refund_txs:
-        try_unblock_refund(refund_tx)
+        res = try_unblock_refund(refund_tx)
+        res_state[res] += 1
+    print('#########################################')
+    for k, v in res_state.items():
+        print("####{0}: {1}".format(k, v))
+    print('#########################################')
 
 
 @manager.command

@@ -184,9 +184,11 @@ def try_unblock_refund(refund_tx):
 
     try:
         _request_refund(payment_tx, payment_record, refund_tx, refund_record)
+        return True
     except Exception as e:
         logger.info("failed to unblock refund: [{0}], [{1}]".format(refund_tx.sn, e.message))
         block_refund(refund_record)
+    return False
 
 
 @transactional

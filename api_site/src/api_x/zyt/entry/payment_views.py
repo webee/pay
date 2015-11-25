@@ -46,6 +46,7 @@ def query_info(tx, payment_scene):
         data, evases, vas_infos = infos.prepare(payment_scene, payment_entity)
         return response.success(info=data, activated_evas=evases, vas_infos=vas_infos)
     except Exception as e:
+        logger.exception(e)
         return response.fail(msg=e.message)
 
 

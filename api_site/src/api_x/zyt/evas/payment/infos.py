@@ -19,7 +19,7 @@ def prepare(payment_scene, payment_entity):
 
     # FIXME: _ 表示不关心evases
     if payment_scene == '_':
-        return data, None
+        return data, None, None
 
     evases = get_activated_evases(payment_scene, payment_entity)
     return data, evases, {vas: VAS_INFOS[vas] for vas in evases}

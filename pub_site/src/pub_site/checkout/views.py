@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from flask import render_template, Response, jsonify, request, url_for, redirect
 from . import checkout_entry_mod as mod
-from .constant import VAS_INFOS, REQUEST_CLIENT_PAYMENT_SCENE_MAPPING
+from .constant import REQUEST_CLIENT_PAYMENT_SCENE_MAPPING
 from pub_site.checkout.commons import payment_failed, generate_submit_form
 from pytoolbox.util.log import get_logger
 from pytoolbox.util import urls
@@ -59,12 +59,6 @@ def pay_callback(sn):
     return pay_client.web_payment_callback(sn, result)
 
 
-@mod.route('/mobile', methods=['GET'])
-def checkout_mobile():
-    vases = ['TEST_PAY', 'LIANLIAN_PAY', 'WEIXIN_PAY']
-    return render_template("checkout/checkout_mobile.html", vases=vases, vas_infos=VAS_INFOS)
-
-
 @mod.route('/<sn>', methods=['GET'])
 def checkout(sn):
     """支付收银台入口"""
@@ -79,6 +73,7 @@ def checkout(sn):
         return render_template(get_template("checkout/info", client_type), msg="该订单已支付, 如失败，请重新请求支付")
 
     vases = result.data['activated_evas']
+    vas_infos = result.data['vas_infos']
 
     # 页面适配
     if len(vases) == 1:
@@ -86,7 +81,7 @@ def checkout(sn):
     else:
         template = get_template("checkout/checkout", client_type)
 
-    return render_template(template, sn=sn, info=info, vases=vases, vas_infos=VAS_INFOS, client_type=client_type,
+    return render_template(template, sn=sn, info=info, vases=vases, vas_infos=vas_infos, client_type=client_type,
                            activated_vas=request.args.get('activated_vas'))
 
 

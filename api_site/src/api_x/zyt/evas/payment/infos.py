@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
+from .config import VAS_INFOS
 from . import get_activated_evases
 
 
@@ -21,4 +22,4 @@ def prepare(payment_scene, payment_entity):
         return data, None
 
     evases = get_activated_evases(payment_scene, payment_entity)
-    return data, evases
+    return data, evases, {vas: VAS_INFOS[vas] for vas in evases}

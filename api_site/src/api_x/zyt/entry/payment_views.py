@@ -43,8 +43,8 @@ def query_info(tx, payment_scene):
         return response.bad_request()
 
     try:
-        data, evases = infos.prepare(payment_scene, payment_entity)
-        return response.success(info=data, activated_evas=evases)
+        data, evases, vas_infos = infos.prepare(payment_scene, payment_entity)
+        return response.success(info=data, activated_evas=evases, vas_infos=vas_infos)
     except Exception as e:
         return response.fail(msg=e.message)
 

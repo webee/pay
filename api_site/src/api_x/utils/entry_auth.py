@@ -45,7 +45,7 @@ def _do_register_api_entry(f, name, super_name=None):
     _name_idx_super_entries[name] = super_name
 
 
-def _register_api_entry(f, _entry_name):
+def _register_api_entry(f, _entry_name, group=None):
     """
     注册api入口
     :param f: 入口函数
@@ -53,7 +53,7 @@ def _register_api_entry(f, _entry_name):
     :return:
     """
     entry_names = _entry_name if isinstance(_entry_name, (list, tuple)) else [_entry_name]
-    names = [n for n in entry_names] + [None]
+    names = [n for n in entry_names] + ([None] if group is None else [group, None])
     for i in range(len(entry_names)):
         _do_register_api_entry(f if i == 0 else None, names[i], names[i+1])
     return names[0]
@@ -84,10 +84,10 @@ def _verify_channel_perm(channel, entry_name):
         raise EntryAuthError(msg)
 
 
-def verify_request(_entry_name):
+def verify_request(_entry_name, group=None):
     def do_verify_request(f):
         # register api entry.
-        entry_name = _register_api_entry(f, _entry_name)
+        entry_name = _register_api_entry(f, _entry_name, group)
 
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -139,10 +139,21 @@ def verify_request(_entry_name):
     return do_verify_request
 
 
-def verify_call_perm(_entry_name):
+class GroupEntry:
+    def __init__(self, name):
+        self.name = name
+
+    def verify_request(self, _entry_name):
+        return verify_request(_entry_name, group=self.name)
+
+    def verify_call_perm(self, _entry_name):
+        return verify_call_perm(_entry_name, group=self.name)
+
+
+def verify_call_perm(_entry_name, group=None):
     def do_verify_call(f):
         # register api entry.
-        entry_name = _register_api_entry(f, _entry_name)
+        entry_name = _register_api_entry(f, _entry_name, group)
 
         @wraps(f)
         def wrapper(channel_name, *args, **kwargs):

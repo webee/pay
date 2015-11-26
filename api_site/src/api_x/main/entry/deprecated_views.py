@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from flask import url_for, redirect
 from api_x.config import etc as config
-from . import main_entry as mod
+from . import main_entry_mod as mod
 
 
 @mod.route('/checkout/web/<source>/<sn>', methods=['GET'])

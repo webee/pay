@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from flask import jsonify, request
-from . import main_entry as mod
+from . import main_entry_mod as mod
 import time
 from api_x.utils import req
 

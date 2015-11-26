@@ -119,6 +119,10 @@ def verify_request(entry_name, multi_entries=False):
     return do_verify_request
 
 
+def multi_verify_request(entry_name):
+    return verify_call_perm(entry_name, multi_entries=True)
+
+
 def verify_call_perm(entry_name, multi_entries=False):
     def do_verify_call(f):
         # register api entry.

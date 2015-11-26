@@ -100,6 +100,8 @@ class ApiEntry(db.Model):
     __tablename__ = 'api_entry'
 
     id = db.Column(db.Integer, primary_key=True)
+    super_id = db.Column(db.Integer, db.ForeignKey('api_entry.id'), nullable=True, default=None)
+    super = db.relationship('ApiEntry', remote_side=id, backref=db.backref('subs', lazy='dynamic'), lazy='joined')
 
     name = db.Column(db.VARCHAR(64), nullable=False, unique=True)
 

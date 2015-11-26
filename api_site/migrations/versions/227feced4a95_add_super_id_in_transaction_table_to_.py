@@ -17,9 +17,9 @@ import sqlalchemy as sa
 
 def upgrade():
     op.add_column('transaction', sa.Column('super_id', sa.BigInteger(), nullable=True, info={'after': 'id'}))
-    op.create_foreign_key(None, 'transaction', 'transaction', ['super_id'], ['id'])
+    op.create_foreign_key('transaction_ibfk_1', 'transaction', 'transaction', ['super_id'], ['id'])
 
 
 def downgrade():
-    op.drop_constraint(None, 'transaction', type_='foreignkey')
+    op.drop_constraint('transaction_ibfk_1', 'transaction', type_='foreignkey')
     op.drop_column('transaction', 'super_id')

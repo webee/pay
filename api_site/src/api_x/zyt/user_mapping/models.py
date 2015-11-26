@@ -80,11 +80,18 @@ class Channel(db.Model):
     def __init__(self, *args, **kwargs):
         super(Channel, self).__init__(*args, **kwargs)
 
-    def has_entry_perm(self, api_entry_name):
+    def has_entry_perm(self, api_entry_name, level=1):
         from sqlalchemy.orm import lazyload
 
-        return self.perms.options(lazyload('api_entry')).outerjoin(ApiEntry).filter(
-            ApiEntry.name == api_entry_name).count() > 0
+        has_perm = self.perms.options(lazyload('api_entry')).outerjoin(ApiEntry).filter(ApiEntry.name == api_entry_name).count() > 0
+        if has_perm or level >= 2:
+            return has_perm
+
+        e = ApiEntry.query.filter_by(name=api_entry_name).first()
+        if e is None or e.super is None:
+            return False
+        e = e.super
+        return self.has_entry_perm(e.name, level=level+1)
 
     def get_user_map(self, user_id):
         return self.user_domain.user_maps.filter_by(user_id=user_id).first()

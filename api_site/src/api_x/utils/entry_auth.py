@@ -14,37 +14,57 @@ logger = get_logger(__name__)
 
 _func_idx_api_entries = {}
 _name_idx_api_entries = {}
+_name_idx_super_entries = {}
 
 
-def _register_api_entry(f, name, multi_entries=False):
+def _do_register_api_entry(f, name, super_name=None):
     """
     注册api入口
     :param f: 入口函数
-    :param name: entry名称
-    :param multi_entries: 是否有多个入口函数
+    :param name: entry
     :return:
     """
-    if f in _func_idx_api_entries:
-        logger.error('func [{0}] already registered'.format(f))
-        raise RuntimeError('duplicated api entries.')
-    _func_idx_api_entries[f] = name
+    if f in _func_idx_api_entries and _func_idx_api_entries[f] != name:
+        msg = 'func [{0}] already registered to name [{1}]'.format(f, _func_idx_api_entries[f])
+        logger.error(msg)
+        raise RuntimeError(msg)
 
-    if name in _name_idx_api_entries:
-        logger.warn('name [{0}] already registered'.format(name))
-        if f != _name_idx_api_entries[name]:
-            if not multi_entries:
-                msg = 'name [{0}] already registered by [{1}]'.format(name, _name_idx_api_entries[name])
-                logger.error(msg)
-                raise ValueError(msg)
-    if multi_entries:
-        entries = _name_idx_api_entries.setdefault(name, [])
-        entries.append(f)
-    else:
-        _name_idx_api_entries[name] = f
+    if name in _name_idx_api_entries and _name_idx_api_entries[name] != f:
+        msg = 'name [{0}] already registered to func [{1}]'.format(name, _name_idx_api_entries[name])
+        logger.error(msg)
+        raise RuntimeError(msg)
+
+    if name in _name_idx_super_entries and _name_idx_super_entries[name] != super_name:
+        msg = 'name [{0}] already has super [{1}]'.format(name, _name_idx_super_entries[name])
+        logger.error(msg)
+        raise RuntimeError(msg)
+
+    if f is not None:
+        _func_idx_api_entries[f] = name
+    _name_idx_api_entries[name] = f
+    _name_idx_super_entries[name] = super_name
 
 
-def get_api_entry_name_list():
-    return _name_idx_api_entries.keys()
+def _register_api_entry(f, _entry_name):
+    """
+    注册api入口
+    :param f: 入口函数
+    :param names: entry路径
+    :return:
+    """
+    entry_names = _entry_name if isinstance(_entry_name, (list, tuple)) else [_entry_name]
+    names = [n for n in entry_names] + [None]
+    for i in range(len(entry_names)):
+        _do_register_api_entry(f if i == 0 else None, names[i], names[i+1])
+    return names[0]
+
+
+def get_super_sub_entries():
+    res = {}
+    for k, v in _name_idx_super_entries.iteritems():
+        entries = res.setdefault(v, [])
+        entries.append(k)
+    return res
 
 
 def get_api_entry_by_name(name):
@@ -64,10 +84,10 @@ def _verify_channel_perm(channel, entry_name):
         raise EntryAuthError(msg)
 
 
-def verify_request(entry_name, multi_entries=False):
+def verify_request(_entry_name):
     def do_verify_request(f):
         # register api entry.
-        _register_api_entry(f, entry_name, multi_entries)
+        entry_name = _register_api_entry(f, _entry_name)
 
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -119,14 +139,10 @@ def verify_request(entry_name, multi_entries=False):
     return do_verify_request
 
 
-def multi_verify_request(entry_name):
-    return verify_call_perm(entry_name, multi_entries=True)
-
-
-def verify_call_perm(entry_name, multi_entries=False):
+def verify_call_perm(_entry_name):
     def do_verify_call(f):
         # register api entry.
-        _register_api_entry(f, entry_name, multi_entries)
+        entry_name = _register_api_entry(f, _entry_name)
 
         @wraps(f)
         def wrapper(channel_name, *args, **kwargs):

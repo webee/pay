@@ -13,7 +13,7 @@ migrate = Migrate()
 
 
 def register_mods(app):
-    from api_x.main import main_mod
+    from api_x.entry_main import main_entry
     from api_x.zyt.biz.entry import biz_entry_mod
     from api_x.zyt.user_mapping.entry import user_mapping_entry_mod
     from api_x.zyt.vas.entry import vas_entry_mod
@@ -21,7 +21,7 @@ def register_mods(app):
     from api_x.zyt.evas.lianlian_pay.entry import lianlian_pay_entry_mod
     from api_x.zyt.evas.weixin_pay.entry import weixin_pay_entry_mod
 
-    app.register_blueprint(main_mod)
+    app.register_blueprint(main_entry)
     app.register_blueprint(biz_entry_mod, url_prefix='/biz')
     app.register_blueprint(user_mapping_entry_mod, url_prefix='/user_mapping')
     app.register_blueprint(vas_entry_mod, url_prefix='/vas/zyt')

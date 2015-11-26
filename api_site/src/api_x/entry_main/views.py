@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from api_x.config import etc as config
 from flask import jsonify
-from . import main_mod as mod
+from . import main_entry as mod
 import time
 from pytoolbox.util import public_key, strings
 

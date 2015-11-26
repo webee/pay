@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from flask import Blueprint
 
-main_mod = Blueprint('main', __name__)
+main_entry = Blueprint('main_entry', __name__)
 
 
 from . import views, test_views, deprecated_views

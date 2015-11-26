@@ -8,6 +8,11 @@ import time
 from pytoolbox.util import public_key, strings
 
 
+@mod.route('/')
+def index():
+    return "LVYE PAY"
+
+
 @mod.route('/ping')
 def ping():
     return jsonify(env=config.__env_name__,

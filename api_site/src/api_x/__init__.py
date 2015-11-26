@@ -14,7 +14,7 @@ migrate = Migrate()
 
 def register_mods(app):
     from api_x.main import main_mod
-    from api_x.zyt.entry import biz_entry_mod
+    from api_x.zyt.biz.entry import biz_entry_mod
     from api_x.zyt.user_mapping.entry import user_mapping_entry_mod
     from api_x.zyt.vas.entry import vas_entry_mod
     from api_x.zyt.evas.test_pay.entry import test_pay_entry_mod

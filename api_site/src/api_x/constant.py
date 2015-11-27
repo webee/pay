@@ -7,6 +7,7 @@ class DefaultUserDomain:
     TEST_DOMAIN_NAME = 'testing'
     LVYE_CORP_DOMAIN_NAME = 'lvye_corp'
     LVYE_ACCOUNT_DOMAIN_NAME = 'lvye_account'
+    LVYE_CORP_MEMBER_DOMAIN_NAME = 'lvye_corp_member'
 
 # 系统用户
 SECURE_USER_NAME = 'secure'

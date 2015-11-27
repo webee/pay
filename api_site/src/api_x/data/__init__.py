@@ -44,6 +44,7 @@ def add_system_users():
     system_user_domain = create_user_domain(DefaultUserDomain.SYSTEM_USER_DOMAIN_NAME, '系统用户')
     lvye_corp_user_domain = create_user_domain(DefaultUserDomain.LVYE_CORP_DOMAIN_NAME, '绿野公司用户')
     lvye_account_user_domain = create_user_domain(DefaultUserDomain.LVYE_ACCOUNT_DOMAIN_NAME, '绿野用户中心')
+    lvye_corp_member_user_domain = create_user_domain(DefaultUserDomain.LVYE_CORP_MEMBER_DOMAIN_NAME, '绿野公司成员中心')
 
     # 担保用户(secure)
     _ = create_account_user(system_user_domain.id, SECURE_USER_NAME, '担保用户')
@@ -51,11 +52,18 @@ def add_system_users():
     _ = create_account_user(lvye_corp_user_domain.id, LVYE_CORP_USER_NAME, '绿野公司')
     # 绿野滑雪
     _ = create_account_user(lvye_corp_user_domain.id, LVYE_SKIING_USER_NAME, '绿野滑雪')
+    # 滑雪活动
+    _ = create_account_user(lvye_corp_user_domain.id, "huaxue_huodong", '滑雪活动')
+
+    # 添加渠道: 绿野自游通管理后台
+    channel = create_channel(lvye_corp_member_user_domain.name, "lvye_pay_admin", "绿野自游通管理后台")
+    add_perm_to_channel(channel.name, 'system')
 
     # 添加渠道: 绿野活动
     default_create_channel(lvye_account_user_domain.name, 'lvye_huodong', '绿野活动')
     default_create_channel(lvye_account_user_domain.name, 'lvye_pay_test', '绿野自游通测试渠道')
     default_create_channel(lvye_account_user_domain.name, 'lvye_skiing', '绿野滑雪')
+    default_create_channel(lvye_account_user_domain.name, 'lvye_lvxing', '绿野旅行(滑雪活动)')
 
     # 添加渠道: 绿野自游通
     channel = default_create_channel(lvye_account_user_domain.name, 'lvye_pay_site', '绿野自游通网站')

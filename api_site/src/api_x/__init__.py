@@ -20,7 +20,7 @@ def register_mods(app):
     from api_x.zyt.evas.test_pay.entry import test_pay_entry_mod
     from api_x.zyt.evas.lianlian_pay.entry import lianlian_pay_entry_mod
     from api_x.zyt.evas.weixin_pay.entry import weixin_pay_entry_mod
-    from api_x.zyt.system.entry import system_entry_mod
+    from api_x.system.entry import system_entry_mod
 
     app.register_blueprint(main_entry_mod)
     app.register_blueprint(biz_entry_mod, url_prefix='/biz')

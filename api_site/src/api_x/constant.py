@@ -66,6 +66,7 @@ class TransferTxState:
 
 class RefundTxState:
     CREATED = 'CREATED'
+    PROCESSING = 'PROCESSING'
     # payer已收到退款，payee未扣钱
     REFUNDED_IN = 'REFUNDED_IN'
     FAILED = 'FAILED'

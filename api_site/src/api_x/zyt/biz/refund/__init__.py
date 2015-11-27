@@ -43,7 +43,7 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data=None):
 def handle_refund_in(vas_name, sn, notify_handle=None):
     tx = get_tx_by_sn(sn)
     refund_record = tx.record
-    succeed_refund_in(vas_name, refund_record)
+    _succeed_refund_in(vas_name, refund_record)
 
     if notify_handle is not None:
         notify_handle(True)
@@ -82,7 +82,7 @@ def handle_refund_notify(is_success, sn, vas_name, vas_sn, data):
         logger.warning('refund notify duplicated: [{0}, {1}]'.format(vas_name, vas_sn))
         return
 
-    if tx.state not in [RefundTxState.CREATED, RefundTxState.REFUNDED_IN]:
+    if tx.state not in [RefundTxState.PROCESSING, RefundTxState.REFUNDED_IN]:
         logger.warning('bad refund notify: [sn: {0}]'.format(sn))
         return
 
@@ -168,7 +168,7 @@ def create_and_request_refund(channel, payment_tx, amount, client_notify_url, da
 
         # 退款余额不足
         logger.info("block refund: [{0}]".format(refund_tx.sn))
-        block_refund(refund_record)
+        _block_refund(refund_record)
 
     return refund_record
 
@@ -176,7 +176,7 @@ def create_and_request_refund(channel, payment_tx, amount, client_notify_url, da
 @transactional
 def try_unblock_refund(refund_tx):
     refund_record = refund_tx.record
-    unblock_refund(refund_record)
+    _unblock_refund(refund_record)
 
     payment_sn = refund_record.payment_sn
     payment_tx = get_tx_by_sn(payment_sn)
@@ -187,7 +187,7 @@ def try_unblock_refund(refund_tx):
         return True
     except Exception as e:
         logger.info("failed to unblock refund: [{0}], [{1}]".format(refund_tx.sn, e.message))
-        block_refund(refund_record)
+        _block_refund(refund_record)
     return False
 
 
@@ -240,6 +240,12 @@ def _create_refund(channel, payment_tx, amount, client_notify_url):
     return payment_record, tx, refund_record
 
 
+@transactional
+def _refund_to_processing(tx):
+    if tx.state == RefundTxState.CREATED:
+        transit_transaction_state(tx.id, RefundTxState.CREATED, RefundTxState.PROCESSING)
+
+
 def _request_refund(payment_tx, payment_record, refund_tx, refund_record, data=None):
     from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay
     from api_x.zyt import vas
@@ -247,14 +253,19 @@ def _request_refund(payment_tx, payment_record, refund_tx, refund_record, data=N
     vas_name = payment_tx.vas_name
 
     if vas_name == test_pay.NAME:
-        return _refund_by_test_pay(payment_tx, refund_record, data)
+        res = _refund_by_test_pay(payment_tx, refund_record, data)
     elif vas_name == lianlian_pay.NAME:
-        return _refund_by_lianlian_pay(payment_tx, refund_record)
+        res = _refund_by_lianlian_pay(payment_tx, refund_record)
     elif weixin_pay.is_weixin_pay(vas_name):
-        return _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record)
+        res = _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record)
     elif vas_name == vas.NAME:
-        return vas.refund(TransactionType.REFUND, refund_record.sn)
-    raise RefundFailedError('unknown vas {0}'.format(vas_name))
+        res = _refund_by_zyt(refund_record)
+        refund_tx = get_tx_by_sn(refund_tx.sn)
+    else:
+        raise RefundFailedError('unknown vas {0}'.format(vas_name))
+
+    _refund_to_processing(refund_tx)
+    return res
 
 
 def _refund_by_test_pay(tx, refund_record, data=None):
@@ -322,6 +333,14 @@ def _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record):
     return res
 
 
+def _refund_by_zyt(refund_record):
+    """自游通支付退款"""
+    from api_x.zyt import vas
+
+    if not vas.refund(TransactionType.REFUND, refund_record.sn):
+        raise RefundFailedError()
+
+
 @transactional
 def handle_succeed_refund(vas_name, payment_record, refund_record):
     refund_amount = refund_record.amount
@@ -346,21 +365,21 @@ def handle_succeed_refund(vas_name, payment_record, refund_record):
 @transactional
 def handle_fail_refund(payment_record, refund_record):
     transit_transaction_state(payment_record.tx_id, PaymentTxState.REFUNDING, refund_record.payment_state)
-    transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED, RefundTxState.FAILED)
+    transit_transaction_state(refund_record.tx_id, RefundTxState.PROCESSING, RefundTxState.FAILED)
 
 
 @transactional
-def block_refund(refund_record):
+def _block_refund(refund_record):
     transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED, RefundTxState.BLOCK)
 
 
 @transactional
-def unblock_refund(refund_record):
+def _unblock_refund(refund_record):
     transit_transaction_state(refund_record.tx_id, RefundTxState.BLOCK, RefundTxState.CREATED)
 
 
 @transactional
-def succeed_refund_in(vas_name, refund_record):
+def _succeed_refund_in(vas_name, refund_record):
     """处理被退款人的事务"""
     refund_amount = refund_record.amount
     event_id = bookkeeping(EventType.TRANSFER_IN, refund_record.sn, refund_record.payer_id, vas_name, refund_amount)

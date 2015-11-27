@@ -33,6 +33,14 @@ def refund():
         'refund_no': refund_no,
     }
 
+    if result not in ['SUCCESS', 'FAILED']:
+        # 错误返回
+        params = {
+            'sn': params['sn'],
+            'result': result,
+        }
+        return jsonify(params)
+
     # async notify
     thread.start_new(notify_client, (notify_url, params))
 

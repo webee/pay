@@ -143,7 +143,7 @@ def query_notify_refund():
     from api_x.zyt.biz.query_notify import get_query_notify_handle
 
     res_state = defaultdict(int)
-    txs = get_tx_list(TransactionType.REFUND, RefundTxState.CREATED)
+    txs = get_tx_list(TransactionType.REFUND, RefundTxState.PROCESSING)
     for tx in txs:
         vas_name = tx.vas_name
         if weixin_pay.is_weixin_pay(tx.vas_name):

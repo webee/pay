@@ -134,7 +134,7 @@ def _get_payment_tx_to_refund(channel_id, order_id):
     return tx
 
 
-@verify_call_perm('refund.direct')
+@verify_call_perm('refund_direct')
 def _direct_payment_is_refundable(channel_name, tx):
     return tx.state == PaymentTxState.SUCCESS
 

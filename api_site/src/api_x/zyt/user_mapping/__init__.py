@@ -132,6 +132,8 @@ def _discard_api_entries(api_entry_trie):
     api_entries, old_api_entry_trie = ApiEntry.load_trie()
     for api_entry in api_entries:
         if not api_entry_trie.contains_path(api_entry.path):
+            for channel_perm in api_entry.channel_perms.all():
+                db.session.delete(channel_perm)
             db.session.delete(api_entry)
 
 

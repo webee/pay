@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function, division
 import os
 
-from flask import Flask
+from flask import Flask, jsonify
 from flask.ext.migrate import Migrate
 from pytoolbox.util import dbs
 from pytoolbox.util.dbs import db
@@ -82,6 +82,15 @@ def custom_flask(app):
     app.json_encoder = CustomJSONEncoder
 
 
+def init_errors(app):
+    for code in [404, 500]:
+        def handler(_code):
+            def h(e):
+                return jsonify(ret=False, code=_code, msg=str(e)), _code
+            return h
+        app.register_error_handler(code, handler(code))
+
+
 def create_app(env='dev', deploy=False):
     if deploy:
         return Flask(__name__)
@@ -104,6 +113,7 @@ def create_app(env='dev', deploy=False):
     init_tasks(app)
 
     init_template(app)
+    init_errors(app)
 
     return app
 

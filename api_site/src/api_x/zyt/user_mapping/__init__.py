@@ -103,60 +103,45 @@ def get_channel_by_name(name):
 
 
 @transactional
-def add_perm_to_channel(channel_name, api_entry_name):
+def add_perm_to_channel(channel_name, *api_entry_path):
     channel = get_channel_by_name(channel_name)
-    if channel.has_entry_perm(api_entry_name):
+    if channel.has_entry_perm(api_entry_path):
         return
 
-    api_entry = ApiEntry.query.filter_by(name=api_entry_name).first()
+    _, api_entry_trie = ApiEntry.load_trie()
+    api_entry = api_entry_trie[api_entry_path]
 
     channel_perm = ChannelPermission(channel_id=channel.id, api_entry_id=api_entry.id)
 
     db.session.add(channel_perm)
 
 
+def _update_api_entries(super_entry, api_entry_trie):
+    for sub in api_entry_trie.subs():
+        prefix = sub.prefix
+        e = prefix[-1]
+        entry = ApiEntry.query.filter_by(super_id=super_entry.id if super_entry is not None else None, name=e).first()
+        if entry is None:
+            entry = ApiEntry(name=e, super=super_entry)
+        entry.value = sub.value.value
+        db.session.add(entry)
+        _update_api_entries(entry, sub)
+
+
+def _discard_api_entries(api_entry_trie):
+    api_entries, old_api_entry_trie = ApiEntry.load_trie()
+    for api_entry in api_entries:
+        if not api_entry_trie.contains_path(api_entry.path):
+            db.session.delete(api_entry)
+
+
 @transactional
 def update_api_entries():
-    from api_x.utils.entry_auth import get_super_sub_entries
+    from api_x.utils.entry_auth import get_api_entry_trie
 
-    super_sub_entries = get_super_sub_entries()
-    entry_names = []
-
-    def add_entry(e, s_id=None):
-        entry_names.append(e)
-        _e = ApiEntry.query.filter_by(name=e).first()
-        if _e is None:
-            _e = ApiEntry(name=e, super_id=s_id)
-            db.session.add(_e)
-            db.session.flush()
-        return _e.id
-
-    for s, es in super_sub_entries.iteritems():
-        _e_id = None
-        if s is not None:
-            _e_id = add_entry(s)
-        for _s in es:
-            add_entry(_s, _e_id)
-
-    _delete_discards_entries(entry_names)
-
-
-def _delete_discards_entries(current_entries):
-    deleted = []
-
-    def delete_entry(entry):
-        for ae in entry.subs.all():
-            for channel_perm in entry.channel_perms.all():
-                # delete exists perm.
-                db.session.delete(channel_perm)
-            delete_entry(ae)
-        db.session.delete(entry)
-        deleted.append(entry.name)
-
-    # delete discards.
-    for api_entry in ApiEntry.query.all():
-        if api_entry.name not in current_entries and api_entry.name not in deleted:
-            delete_entry(api_entry)
+    api_entry_trie = get_api_entry_trie()
+    _update_api_entries(None, api_entry_trie)
+    _discard_api_entries(api_entry_trie)
 
 
 @transactional

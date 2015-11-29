@@ -80,18 +80,14 @@ class Channel(db.Model):
     def __init__(self, *args, **kwargs):
         super(Channel, self).__init__(*args, **kwargs)
 
-    def has_entry_perm(self, api_entry_name, level=1):
-        from sqlalchemy.orm import lazyload
+    def has_entry_perm(self, api_entry_path, level=0):
+        _, api_entry_trie = ApiEntry.load_trie()
+        api_entry = api_entry_trie[api_entry_path]
+        id_path = api_entry.id_path
+        if level:
+            id_path = id_path[-level:]
 
-        has_perm = self.perms.options(lazyload('api_entry')).outerjoin(ApiEntry).filter(ApiEntry.name == api_entry_name).count() > 0
-        if has_perm or level >= 2:
-            return has_perm
-
-        e = ApiEntry.query.filter_by(name=api_entry_name).first()
-        if e is None or e.super is None:
-            return False
-        e = e.super
-        return self.has_entry_perm(e.name, level=level+1)
+        return self.perms.filter(ChannelPermission.api_entry_id.in_(id_path)).count() > 0
 
     def get_user_map(self, user_id):
         return self.user_domain.user_maps.filter_by(user_id=user_id).first()
@@ -110,9 +106,43 @@ class ApiEntry(db.Model):
     super_id = db.Column(db.Integer, db.ForeignKey('api_entry.id'), nullable=True, default=None)
     super = db.relationship('ApiEntry', remote_side=id, backref=db.backref('subs', lazy='dynamic'), lazy='joined')
 
-    name = db.Column(db.VARCHAR(64), nullable=False, unique=True)
+    name = db.Column(db.VARCHAR(64), nullable=False, index=True)
+    value = db.Column(db.VARCHAR(256), nullable=True)
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (db.UniqueConstraint('super_id', 'name', name='super_id_name_uniq_idx'),)
+
+    @staticmethod
+    def load_trie():
+        from api_x.utils import ds
+        trie = ds.Trie()
+
+        api_entries = ApiEntry.query.all()
+        for api_entry in api_entries:
+            if api_entry.value is not None:
+                trie.put(api_entry.path, api_entry)
+        return api_entries, trie
+
+    @property
+    def path(self):
+        s, path = self, tuple()
+        while s is not None:
+            path = (s.name,) + path
+            s = s.super
+        return path
+
+    @property
+    def id_path(self):
+        s, path = self, tuple()
+        while s is not None:
+            path = (s.id,) + path
+            s = s.super
+        return path
+
+    def __repr__(self):
+        return 'ApiEntry<%r>' % (self.path, )
 
 
 class ChannelPermission(db.Model):
@@ -129,3 +159,6 @@ class ChannelPermission(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     __table_args__ = (db.UniqueConstraint('channel_id', 'api_entry_id', name='channel_api_entry_uniq_idx'),)
+
+    def __repr__(self):
+        return 'ChannelPermission<%r->%r>' % (self.channel.name, self.api_entry.path)

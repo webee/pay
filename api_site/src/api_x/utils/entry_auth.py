@@ -4,71 +4,80 @@ from functools import wraps
 import urlparse
 
 from flask import request
-from api_x.utils import response
+from api_x.utils import response, ds
 from pytoolbox.util.log import get_logger
 from pytoolbox.util.sign import Signer
 from api_x.zyt.user_mapping import get_channel_by_name
 from api_x.config import etc as config
+import types
 
 logger = get_logger(__name__)
 
-_func_idx_api_entries = {}
-_name_idx_api_entries = {}
-_name_idx_super_entries = {}
+
+class ApiEntry:
+    def __init__(self, entry=None):
+        self.entry = entry
+
+    def __eq__(self, other):
+        return isinstance(other, ApiEntry) and other.entry == self.entry
+
+    def __hash__(self):
+        return hash(self.entry)
+
+    @property
+    def value(self):
+        if isinstance(self.entry, types.FunctionType):
+            return self.entry.__module__ + '.' + self.entry.func_name
+        return repr(self.entry)
+
+    def __repr__(self):
+        return "<ApiEntry: %r>" % (self.value,)
+
+_api_entry_path_map = {}
+_api_entry_trie = ds.Trie()
 
 
-def _do_register_api_entry(f, name, super_name=None):
+def _do_register_api_entry(entry, path):
+    """
+    注册api入口
+    :param entry:
+    :param path:
+    :return:
+    """
+    if entry in _api_entry_path_map and _api_entry_path_map[entry] != path:
+        msg = 'api entry [{0}] already registered to [{1}] != [{2}]'.format(entry, _api_entry_path_map[entry], path)
+        logger.error(msg)
+        raise RuntimeError(msg)
+
+    if path in _api_entry_trie:
+        _entry = _api_entry_path_map[path]
+        if _entry != entry:
+            msg = 'path [{0}] already registered by [{1}] != [{2}]'.format(path, _entry, entry)
+            logger.error(msg)
+            raise RuntimeError(msg)
+
+    _api_entry_trie[path] = entry
+    _api_entry_path_map[entry] = path
+
+
+def _register_api_entry(f, _entry_name):
     """
     注册api入口
     :param f: 入口函数
-    :param name: entry
+    :param _entry_name: entry路径
     :return:
     """
-    if f in _func_idx_api_entries and _func_idx_api_entries[f] != name:
-        msg = 'func [{0}] already registered to name [{1}]'.format(f, _func_idx_api_entries[f])
-        logger.error(msg)
-        raise RuntimeError(msg)
-
-    if name in _name_idx_api_entries and _name_idx_api_entries[name] != f:
-        msg = 'name [{0}] already registered to func [{1}]'.format(name, _name_idx_api_entries[name])
-        logger.error(msg)
-        raise RuntimeError(msg)
-
-    if name in _name_idx_super_entries and _name_idx_super_entries[name] != super_name:
-        msg = 'name [{0}] already has super [{1}]'.format(name, _name_idx_super_entries[name])
-        logger.error(msg)
-        raise RuntimeError(msg)
-
-    if f is not None:
-        _func_idx_api_entries[f] = name
-    _name_idx_api_entries[name] = f
-    _name_idx_super_entries[name] = super_name
+    entry_path = _to_entry_path(_entry_name)
+    _do_register_api_entry(ApiEntry(f), entry_path)
+    return entry_path
 
 
-def _register_api_entry(f, _entry_name, group=None):
-    """
-    注册api入口
-    :param f: 入口函数
-    :param names: entry路径
-    :return:
-    """
-    entry_names = _entry_name if isinstance(_entry_name, (list, tuple)) else [_entry_name]
-    names = [n for n in entry_names] + ([None] if group is None else [group, None])
-    for i in range(len(entry_names)):
-        _do_register_api_entry(f if i == 0 else None, names[i], names[i+1])
-    return names[0]
+def get_api_entry_trie():
+    return _api_entry_trie.clone()
 
 
-def get_super_sub_entries():
-    res = {}
-    for k, v in _name_idx_super_entries.iteritems():
-        entries = res.setdefault(v, [])
-        entries.append(k)
-    return res
-
-
-def get_api_entry_by_name(name):
-    return _name_idx_api_entries.get(name)
+def get_api_entry_by_path(path):
+    return _api_entry_trie[path]
 
 
 class EntryAuthError(Exception):
@@ -78,16 +87,16 @@ class EntryAuthError(Exception):
         super(EntryAuthError, self).__init__(message)
 
 
-def _verify_channel_perm(channel, entry_name):
-    if channel.name not in config.TEST_CHANNELS and not channel.has_entry_perm(entry_name):
-        msg = 'channel [{0}] has no perm for entry [{1}]'.format(channel.name, entry_name)
+def _verify_channel_perm(channel, entry_path):
+    if channel.name not in config.TEST_CHANNELS and not channel.has_entry_perm(entry_path):
+        msg = 'channel [{0}] has no perm for entry [{1}]'.format(channel.name, entry_path)
         raise EntryAuthError(msg)
 
 
-def verify_request(_entry_name, group=None):
+def verify_request(_entry_name):
     def do_verify_request(f):
         # register api entry.
-        entry_name = _register_api_entry(f, _entry_name, group)
+        entry_path = _register_api_entry(f, _entry_name)
 
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -96,7 +105,7 @@ def verify_request(_entry_name, group=None):
                 params.update(request.values.items())
                 params.update(request.view_args)
 
-                logger.info("[{0}] {1}: {2}".format(entry_name, request.url, params))
+                logger.info("[{0}] {1}: {2}".format(entry_path, request.url, params))
                 # check perm
                 channel_name = params.get('channel_name')
                 if channel_name is None:
@@ -108,7 +117,7 @@ def verify_request(_entry_name, group=None):
                     return response.fail(msg=msg)
 
                 try:
-                    _verify_channel_perm(channel, entry_name)
+                    _verify_channel_perm(channel, entry_path)
                 except EntryAuthError as e:
                     return response.refused(msg=e.message)
 
@@ -129,7 +138,7 @@ def verify_request(_entry_name, group=None):
                 logger.exception(e)
                 return response.bad_request(msg=e.message)
 
-            logger.info("[{0}] verify done.".format(entry_name))
+            logger.info("[{0}] verify done.".format(entry_path))
             request.__dict__['channel'] = channel
             request.__dict__['params'] = params
             return f(*args, **kwargs)
@@ -139,34 +148,46 @@ def verify_request(_entry_name, group=None):
     return do_verify_request
 
 
+def _to_entry_path(name):
+    return tuple(n for n in name) if isinstance(name, (list, tuple)) else (name,)
+
+
 class GroupEntry:
     def __init__(self, name):
-        self.name = name
+        """
+        :param name: str/unicode, list or tuple.
+        :return:
+        """
+        self.path = _to_entry_path(name)
+
+    def _get_path(self, _entry_name):
+        entry_path = _to_entry_path(_entry_name)
+        return self.path + entry_path
 
     def verify_request(self, _entry_name):
-        return verify_request(_entry_name, group=self.name)
+        return verify_request(self._get_path(_entry_name))
 
     def verify_call_perm(self, _entry_name):
-        return verify_call_perm(_entry_name, group=self.name)
+        return verify_call_perm(self._get_path(_entry_name))
 
 
-def verify_call_perm(_entry_name, group=None):
+def verify_call_perm(_entry_name):
     def do_verify_call(f):
         # register api entry.
-        entry_name = _register_api_entry(f, _entry_name, group)
+        entry_path = _register_api_entry(f, _entry_name)
 
         @wraps(f)
         def wrapper(channel_name, *args, **kwargs):
-            logger.info("[{0}]: [{1}]".format(entry_name, channel_name))
+            logger.info("[{0}]: [{1}]".format(entry_path, channel_name))
 
             channel = get_channel_by_name(channel_name)
             if channel is None:
                 msg = 'channel not exits: [{0}]'.format(channel_name)
                 raise EntryAuthError(msg=msg)
 
-            _verify_channel_perm(channel, entry_name)
+            _verify_channel_perm(channel, entry_path)
 
-            logger.info("[{0}] verify done.".format(entry_name))
+            logger.info("[{0}] verify done.".format(entry_path))
             return f(channel_name, *args, **kwargs)
 
         return wrapper

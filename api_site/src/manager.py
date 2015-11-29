@@ -111,11 +111,12 @@ def add_domain_user(domain_name, user_id, info):
 
 
 @manager.option('-c', '--channel', type=str, dest="channel_name", required=True)
-@manager.option('-e', '--entry', type=str, dest="entry_name", required=True)
-def add_channel_perm(channel_name, entry_name):
+@manager.option('-e', '--entry', type=str, dest="entry_path", required=True)
+def add_channel_perm(channel_name, entry_path):
     from api_x.zyt.user_mapping import add_perm_to_channel
 
-    add_perm_to_channel(channel_name, entry_name)
+    entry_path = entry_path.split('.')
+    add_perm_to_channel(channel_name, *entry_path)
 
 
 @manager.option('-d', '--domain', type=str, dest="domain_name", required=True)

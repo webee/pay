@@ -5,6 +5,7 @@ import os
 from flask import Flask
 
 import flask.ext.login as flask_login
+from pytoolbox.util.flask_extras.utils import ReverseProxied
 
 login_manager = flask_login.LoginManager()
 
@@ -41,4 +42,6 @@ def create_app(env='dev', deploy=False):
     _init_template(app)
     login_manager.init_app(app)
 
+    # reverse proxied
+    app.wsgi_app = ReverseProxied(app.wsgi_app)
     return app

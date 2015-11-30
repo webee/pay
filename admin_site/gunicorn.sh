@@ -2,7 +2,7 @@
 
 env=${1:-dev}
 host=${2:-127.0.0.1}
-port=${3:-5000}
+port=${3:-5104}
 
 PROJ_ROOT=$(dirname $0)
 NAME="pay-admin-site"

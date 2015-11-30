@@ -32,8 +32,8 @@
       </button>
 	  <a class="brand" href="/recon" style="padding: 5px 20px;"><img src="http://img01.lvye.com.cn/lvyehuodong/static/huodong/images/logo.png"></a>
     </div>
-	<a class="btn btn-success" href="/recon" role="button">对账结果查看</a>
-	<a class="btn btn-success" href="/recon/search" role="button">交易记录查询</a>
+	<a class="btn btn-success" href="{{ url_for('reconciliation.list_reconciliation') }}" role="button">对账结果查看</a>
+	<a class="btn btn-success" href="{{ url_for('reconciliation.search_reconciliation') }}" role="button">交易记录查询</a>
   </div>
 </nav>
 

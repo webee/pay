@@ -6,7 +6,7 @@
 {% block content %}
 
 {{ tips }}
-<form  action="/recon/login" method="post">
+<form  action="{{ url_for('reconciliation.login') }}" method="post">
   <div class="form-group">
     <label for="username">用户名：</label>
     <input type="text" class="form-control" id="username" name="username"  placeholder="用户名">

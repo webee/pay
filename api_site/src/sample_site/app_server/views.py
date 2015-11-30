@@ -24,12 +24,13 @@ def prepay():
     amount = Decimal(data['amount'])
     payment_type = data['payment_type']
     order_id = request.values.get('order_id') or generate_order_id()
+    info = data.get('info', '')
     params = {
         'payer_user_id': payer,
         'payee_user_id': payee,
         'payee_domain_name': payee_domain_name,
         'order_id': request.values.get('order_id') or generate_order_id(),
-        'product_name': 'APP测试{1}支付{0}元'.format(amount, '担保' if payment_type == 'GUARANTEE' else ''),
+        'product_name': 'APP测试{1}支付{0}元_{2}'.format(amount, '担保' if payment_type == 'GUARANTEE' else '', info),
         'product_category': '测试',
         'product_desc': '用于测试的商品',
         'amount': amount,

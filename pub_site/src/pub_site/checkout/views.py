@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from flask import render_template, Response, jsonify, request, url_for, redirect
 from . import checkout_entry_mod as mod
 from .constant import REQUEST_CLIENT_PAYMENT_SCENE_MAPPING
+from .constant import RequestClientType
 from pub_site.checkout.commons import payment_failed, generate_submit_form
 from pytoolbox.util.log import get_logger
 from pytoolbox.util import urls
@@ -122,6 +123,8 @@ def do_pay(sn, vas_name, payment_scene, extra_params=None, client_type=None):
             info = params['_info']
             return render_template("checkout/wx_pay_native.html", code_url=code_url, info=info, sn=sn)
         elif payment_type == WeixinPayType.JSAPI:
+            if client_type != RequestClientType.WEIXIN:
+                return render_template(get_template("checkout/info", client_type), msg="请返回, 在微信中使用微信支付。")
             if '_url' in params:
                 import urllib
                 url = params['_url']

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from flask import url_for, Response
+from flask import url_for
 from .commons import generate_absolute_url
 from pytoolbox.util.sign import Signer
 from pytoolbox.util.log import get_logger

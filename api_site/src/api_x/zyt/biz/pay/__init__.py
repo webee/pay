@@ -97,6 +97,7 @@ def _restart_payment(channel, payment_record, amount, product_name, product_cate
         is_amount_changed = payment_record.amount != amount
         is_changed = is_changed or is_amount_changed
         payment_record.amount = amount
+        payment_record.real_amount = amount
 
         is_changed = is_changed or payment_record.product_name != product_name[:150]
         payment_record.product_name = product_name[:150]
@@ -284,7 +285,7 @@ def handle_payment_notify(is_success, sn, vas_name, vas_sn, amount, data=None):
 
     if amount != payment_record.real_amount:
         # 单次支付的金额一定要完全一致
-        raise AmountValueMissMatchError(payment_record.amount, amount)
+        raise AmountValueMissMatchError(payment_record.real_amount, amount)
 
     if is_duplicated_notify(tx, vas_name, vas_sn):
         return

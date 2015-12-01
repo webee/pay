@@ -52,6 +52,22 @@ def init_lianlian_pay_notify_handles():
     register_query_notify_handle(TransactionType.REFUND, NAME, query_refund_notify)
 
 
+def init_ali_pay_notify_handles():
+    from api_x.zyt.evas.ali_pay.constant import NotifyType
+    from api_x.zyt.evas.ali_pay.notify import register_pay_notify_handle, register_refund_notify_handle
+
+    # 不管是payment还是prepaid都使用两样的payment_result handler. tx type都为PAYMENT.
+    register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC, handle_payment_result)
+    # payment
+    register_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.ASYNC, handle_payment_notify)
+
+    # prepaid
+    register_pay_notify_handle(TransactionType.PREPAID, NotifyType.Pay.ASYNC, handle_prepaid_notify)
+
+    # refund
+    register_refund_notify_handle(TransactionType.REFUND, handle_refund_notify)
+
+
 def init_weixin_pay_notify_handles():
     from api_x.zyt.evas.weixin_pay import NAME
     from api_x.zyt.evas.weixin_pay.constant import NotifyType
@@ -93,6 +109,7 @@ def init_zyt_pay_notify_handles():
 
 def init_register_notify_handles():
     init_test_pay_notify_handles()
+    init_ali_pay_notify_handles()
     init_lianlian_pay_notify_handles()
     init_weixin_pay_notify_handles()
     init_zyt_pay_notify_handles()

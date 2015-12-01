@@ -20,6 +20,7 @@ def register_mods(app):
     from api_x.zyt.evas.test_pay.entry import test_pay_entry_mod
     from api_x.zyt.evas.lianlian_pay.entry import lianlian_pay_entry_mod
     from api_x.zyt.evas.weixin_pay.entry import weixin_pay_entry_mod
+    from api_x.zyt.evas.ali_pay.entry import ali_pay_entry_mod
     from api_x.system.entry import system_entry_mod
 
     app.register_blueprint(main_entry_mod)
@@ -30,6 +31,7 @@ def register_mods(app):
     app.register_blueprint(test_pay_entry_mod, url_prefix="/vas/test_pay")
     app.register_blueprint(lianlian_pay_entry_mod, url_prefix="/vas/lianlian_pay")
     app.register_blueprint(weixin_pay_entry_mod, url_prefix="/vas/weixin_pay")
+    app.register_blueprint(ali_pay_entry_mod, url_prefix="/vas/ali_pay")
 
     from api_x.application.entry import application_mod
     app.register_blueprint(application_mod, url_prefix="/application")

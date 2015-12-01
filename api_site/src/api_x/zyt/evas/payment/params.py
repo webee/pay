@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from api_x.utils import req
-from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay
+from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay, ali_pay
 from api_x.zyt import vas as zyt_pay
 from . import get_payment_type
 
@@ -12,10 +12,12 @@ def prepare(payment_scene, vas_name, payment_entity, extra_params=None):
 
     if vas_name == test_pay.NAME:
         params = _test_pay_params(payment_type, payment_entity)
-    elif vas_name == lianlian_pay.NAME:
-        params = _lianlian_pay_params(payment_type, payment_entity)
+    elif vas_name == ali_pay.NAME:
+        params = _ali_pay_params(payment_type, payment_entity)
     elif vas_name == weixin_pay.NAME:
         params = _weixin_pay_params(payment_type, payment_entity, extra_params)
+    elif vas_name == lianlian_pay.NAME:
+        params = _lianlian_pay_params(payment_type, payment_entity)
     elif vas_name == zyt_pay.NAME:
         params = _pay_by_zyt_pay(payment_type, payment_entity)
     else:
@@ -29,6 +31,13 @@ def _test_pay_params(payment_type, payment_entity):
 
     return payment_param(payment_type, payment_entity.source, payment_entity.user_id, payment_entity.tx_sn,
                          payment_entity.product_name, payment_entity.amount)
+
+
+def _ali_pay_params(payment_type, payment_entity):
+    from api_x.zyt.evas.ali_pay import payment_param
+
+    return payment_param(payment_type, payment_entity.source, payment_entity.tx_sn, payment_entity.product_name,
+                         payment_entity.product_desc, payment_entity.amount)
 
 
 def _lianlian_pay_params(payment_type, payment_entity):

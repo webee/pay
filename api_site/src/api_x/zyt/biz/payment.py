@@ -1,8 +1,13 @@
 # coding=utf-8
+from __future__ import unicode_literals
 import time
 from api_x.constant import PaymentTxState, TransactionType
 from api_x.zyt.biz.pay import get_payment_tx_by_sn, logger
 from api_x.zyt.user_mapping import get_user_map_by_account_user_id
+from pytoolbox.util.log import get_logger
+
+
+logger = get_logger(__name__)
 
 
 def handle_payment_result(is_success, sn, data=None):
@@ -12,6 +17,7 @@ def handle_payment_result(is_success, sn, data=None):
     :param data: 数据
     :return:
     """
+    logger.info('notify payment result: {0}, {1}, {2}'.format(is_success, sn, data))
     tx = get_payment_tx_by_sn(sn)
     record = tx.record
     client_callback_url = record.client_callback_url

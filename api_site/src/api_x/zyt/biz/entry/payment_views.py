@@ -72,6 +72,7 @@ def prepare_params(tx, payment_scene, vas_name, extra_params=None):
         payment_type, prepared_params = params.prepare(payment_scene, vas_name, payment_entity, extra_params=extra_params)
         return response.success(params=prepared_params, vas_name=vas_name, payment_type=payment_type)
     except Exception as e:
+        logger.exception(e)
         return response.fail(msg=e.message)
 
 

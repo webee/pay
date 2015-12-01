@@ -20,7 +20,7 @@ class Biz:
     TX_SN_PREFIX = ''
     IS_PROD = True
 
-    ACTIVATED_EVAS = ['ZYT', 'LIANLIAN_PAY', 'WEIXIN_PAY']
+    ACTIVATED_EVAS = ['ZYT', 'LIANLIAN_PAY', 'WEIXIN_PAY', 'ALI_PAY']
 
 
 KEY = read_string('conf/lvye/key.txt')

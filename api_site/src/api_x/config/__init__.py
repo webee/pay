@@ -9,6 +9,7 @@ def load_config(env):
     register_config(__name__, 'lianlian_pay', env=env)
     register_config(__name__, 'test_pay', env=env)
     register_config(__name__, 'weixin_pay', env=env)
+    register_config(__name__, 'ali_pay', env=env)
 
     # business
     register_config(__name__, 'application', env=env)

@@ -2,4 +2,4 @@
 ROOT_URL = "http://pay.lvye.com/api"
 
 
-from _prod_default import *
+from ._prod_default import *

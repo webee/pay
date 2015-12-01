@@ -83,9 +83,7 @@ class Channel(db.Model):
     def has_entry_perm(self, api_entry_path, level=0):
         _, api_entry_trie = ApiEntry.load_trie()
         api_entry = api_entry_trie[api_entry_path]
-        id_path = api_entry.id_path
-        if level:
-            id_path = id_path[-level:]
+        id_path = api_entry.id_path[-level:]
 
         return self.perms.filter(ChannelPermission.api_entry_id.in_(id_path)).count() > 0
 

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from api_x.utils import response
 from api_x.zyt.biz import pay
 from api_x.zyt.biz.models import TransactionType
-from api_x.zyt.user_mapping import get_user_domain_by_name
+from api_x.zyt.user_mapping import get_user_domain_by_name, get_channel_by_name
 
 from flask import request
 from . import biz_entry_mod as mod
@@ -57,6 +57,26 @@ def prepay():
                                                     payer_user_map.account_user_id, payee_user_map.account_user_id,
                                                     order_id, product_name, product_category, product_desc, amount,
                                                     client_callback_url, client_notify_url)
+        return payment_record.tx
+    except AlreadyPaidError as e:
+        logger.exception(e)
+        return response.fail(msg=e.message)
+    except Exception as e:
+        logger.exception(e)
+        return response.fail(code=1, msg=e.message)
+
+
+@mod.route('/prepay/<order_channel>/<order_id>/', methods=['GET'])
+@verify_request('prepay_channel_order')
+@prepay_entry(TransactionType.PAYMENT)
+def prepay_channel_order(order_channel, order_id):
+    """超级支付接口"""
+    channel = get_channel_by_name(order_channel)
+    if channel is None:
+        return response.refused('bad channel: [{0}]'.format(order_channel))
+
+    try:
+        payment_record = pay.find_payment(channel, order_id)
         return payment_record.tx
     except AlreadyPaidError as e:
         logger.exception(e)

@@ -28,6 +28,19 @@ from .error import AlreadyPaidError
 logger = get_logger(__name__)
 
 
+def find_payment(channel, order_id, origin=None):
+    payment_record = PaymentRecord.query.filter_by(channel_id=channel.id, order_id=order_id, origin=origin).first()
+    if payment_record is None:
+        msg = "channel [{0}] has no order [{1}].".format(channel.name, order_id)
+        raise TransactionNotFoundError(msg)
+
+    tx = payment_record.tx
+    if not in_to_pay_state(tx.state, exclude=[PaymentTxState.PAID_OUT]):
+        raise AlreadyPaidError(payment_record.order_id)
+
+    return payment_record
+
+
 def find_or_create_payment(channel, payment_type, payer_id, payee_id, order_id,
                            product_name, product_category, product_desc, amount,
                            client_callback_url='', client_notify_url='', super_tx_id=None, origin=None):

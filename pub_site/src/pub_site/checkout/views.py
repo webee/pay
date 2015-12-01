@@ -111,12 +111,9 @@ def do_pay(sn, vas_name, payment_scene, extra_params=None, client_type=None):
     vas_name = result.data['vas_name']
     payment_type = result.data['payment_type']
     params = result.data['params']
-    if vas_name == 'TEST_PAY':
+    if vas_name == 'ALI_PAY':
         url = params['_url']
-        return Response(generate_submit_form(url, params))
-    elif vas_name == 'LIANLIAN_PAY':
-        url = params['_url']
-        return Response(generate_submit_form(url, params))
+        return Response(generate_submit_form(url, params, keep_all=True, excludes={'_url'}))
     elif vas_name == 'WEIXIN_PAY':
         if payment_type == WeixinPayType.NATIVE:
             code_url = params['code_url']
@@ -134,6 +131,12 @@ def do_pay(sn, vas_name, payment_scene, extra_params=None, client_type=None):
                 url = url % (urllib.urlencode({'x': redirect_uri})[2:],)
                 return redirect(url)
             return render_template("checkout/wx_pay_jsapi.html", params=params, sn=sn)
+    elif vas_name == 'LIANLIAN_PAY':
+        url = params['_url']
+        return Response(generate_submit_form(url, params))
+    elif vas_name == 'TEST_PAY':
+        url = params['_url']
+        return Response(generate_submit_form(url, params))
     elif vas_name == 'ZYT':
         # 自游通余额支付
         url = params['_url']

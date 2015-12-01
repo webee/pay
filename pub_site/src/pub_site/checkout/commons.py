@@ -19,10 +19,12 @@ def payment_failed(result, client_type=None):
     return render_template(get_template("checkout/info", client_type), msg=msg)
 
 
-def generate_submit_form(url, req_params, keep_all=False):
+def generate_submit_form(url, req_params, method='post', keep_all=False, excludes=set()):
     submit_page = '<meta http-equiv="content-type" content="text/html; charset=UTF-8">'
-    submit_page += '<form id="payBillForm" action="{0}" method="POST">'.format(url)
+    submit_page += '<form id="payBillForm" action="{0}" method="{1}">'.format(url, method)
     for key in req_params:
+        if key in excludes:
+            continue
         if not keep_all and key.startswith('_'):
             continue
         submit_page += '''<input type="hidden" name="{0}" value='{1}' />'''.format(key, req_params[key])

@@ -78,18 +78,6 @@ def app_params(user_id, user_created_on, ip, order_no, ordered_on, order_name, o
     return params
 
 
-def _generate_submit_form(req_params, url=lianlian_pay.Payment.URL):
-    submit_page = '<meta http-equiv="content-type" content="text/html; charset=UTF-8">'
-    submit_page += '<form id="payBillForm" action="{0}" method="POST">'.format(url)
-    for key in req_params:
-        if key.startswith('_'):
-            continue
-        submit_page += '''<input type="hidden" name="{0}" value='{1}' />'''.format(key, req_params[key])
-    submit_page += '<input type="submit" value="Submit" style="display:none" /></form>'
-    submit_page += '<script>document.forms["payBillForm"].submit();</script>'
-    return submit_page
-
-
 def _append_md5_sign(params, keys=None):
     sign_params = params
     if keys is not None:

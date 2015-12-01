@@ -66,6 +66,20 @@ def pay():
     return redirect(pay_client.checkout_url(sn))
 
 
+@mod.route('/pay_order', methods=['POST'])
+def pay_order():
+    """支付指定订单"""
+
+    order_channel = request.values.get('order_channel')
+    order_id = request.values.get('order_id', '')
+
+    sn = pay_client.prepay_channel_order(order_id, order_channel, ret_sn=True)
+    if sn is None:
+        return redirect(url_for('.index'))
+
+    return redirect(pay_client.checkout_url(sn))
+
+
 @mod.route('/pay_result', methods=['POST'])
 @pay_client.verify_request
 def pay_result():

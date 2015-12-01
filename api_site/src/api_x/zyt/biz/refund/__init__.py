@@ -7,7 +7,7 @@ from api_x.zyt.biz.commons import is_duplicated_notify
 from api_x.zyt.biz.transaction.dba import get_tx_by_id
 from api_x.zyt.vas.bookkeep import bookkeeping
 from api_x.zyt.user_mapping import get_system_account_user_id
-from api_x.constant import SECURE_USER_NAME, PaymentTxState, RefundTxState
+from api_x.constant import SECURE_USER_NAME, PaymentTxState, RefundTxState, TxState
 from api_x.zyt.vas.user import get_user_cash_balance
 from api_x.zyt.biz import user_roles
 from pytoolbox.util.dbs import transactional, require_transaction_context
@@ -129,6 +129,11 @@ def _get_payment_tx_to_refund(channel_id, order_id):
         raise NoPaymentFoundError(channel_id, order_id)
 
     tx = payment_record.tx
+
+    if tx.state == TxState.FINISHED:
+        # 交易结束，不能退款
+        raise TransactionFinishedError()
+
     if not _is_refundable(tx, payment_record):
         raise PaymentNotRefundableError()
     return tx

@@ -30,8 +30,12 @@ def pay_result():
     out_trade_no = data['out_trade_no']
     trade_status = data['trade_status']
     notify_id = data['notify_id']
+    seller_id = data['seller_id']
 
     if not notify_verify(notify_id):
+        return render_template('info.html', title='支付结果', msg='支付异常-交易号:{0}'.format(out_trade_no))
+
+    if seller_id != ali_pay.PID:
         return render_template('info.html', title='支付结果', msg='支付异常-交易号:{0}'.format(out_trade_no))
 
     is_success = is_success_result(trade_status)
@@ -50,14 +54,18 @@ def pay_result():
 @parse_and_verify
 def pay_notify(source):
     data = request.verified_data
-    partner_oid = data['oid_partner']
-    order_no = data['no_order']
-    result = data['result_pay']
-    paybill_oid = data['oid_paybill']
-    money_order = Decimal(data['money_order'])
+    out_trade_no = data['out_trade_no']
+    trade_no = data['out_trade']
+    trade_status = data['trade_status']
+    notify_id = data['notify_id']
+    total_fee = Decimal(data['total_fee'])
+    seller_id = data['seller_id']
 
     logger.info('pay notify {0}: {1}'.format(source, data))
-    if not is_sending_to_me(partner_oid):
+    if not notify_verify(notify_id):
+        return notify_response.bad()
+
+    if seller_id != ali_pay.PID:
         return notify_response.bad()
 
     handle = get_pay_notify_handle(source, NotifyType.Pay.ASYNC)
@@ -65,10 +73,13 @@ def pay_notify(source):
         return notify_response.miss()
 
     try:
-        # 此通知的调用协议
-        # 是否成功，订单号，来源系统，来源系统订单号，数据
-        # TODO: 提出接口
-        handle(is_success_result(result), order_no, NAME, paybill_oid, money_order, data)
+        if trade_status == ali_pay.TradeStatus.TRADE_SUCCESS:
+            # 此通知的调用协议
+            # 是否成功，订单号，来源系统，来源系统订单号，数据
+            handle(is_success_result(trade_status), out_trade_no, NAME, trade_no, total_fee, data)
+        elif trade_status == ali_pay.TradeStatus.TRADE_FINISHED:
+            # FIXME: 暂时忽略
+            logger.info('pay notify the finish: [{0}]'.format(out_trade_no))
         return notify_response.succeed()
     except Exception as e:
         logger.exception(e)

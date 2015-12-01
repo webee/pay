@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import json
 
 from api_x.config import ali_pay
 from pytoolbox.util.log import get_logger
@@ -20,7 +19,6 @@ def _get_common_params(out_trade_no, subject, body, total_fee, notify_url):
         'seller_id': ali_pay.PID,
         'paymethod': ali_pay.PayMethod.DIRECT_PAY,
         'enable_paymethod': 'directPay^bankPay^creditCardExpress^debitCardExpress',
-        'it_b_pay': ali_pay.PAYMENT_EXPIRE_TIME,
         'notify_url': notify_url,
         'out_trade_no': out_trade_no,
         'subject': subject,
@@ -34,7 +32,7 @@ def pay_param(out_trade_no, subject, body, total_fee, notify_url, return_url):
     params.update({
         'service': ali_pay.Service.DIRECT_PAY_BY_USER,
         'return_url': return_url,
-        'qr_pay_mode': '2',
+        #'qr_pay_mode': '2',
     })
 
     params['sign'] = signer.sign(params, params['sign_type'])
@@ -49,8 +47,8 @@ def wap_pay_param(out_trade_no, subject, body, total_fee, notify_url, return_url
     params.update({
         'service': ali_pay.Service.WAP_DIRECT_PAY_BY_USER,
         'return_url': return_url,
-        'qr_pay_mode': '2',
         'rn_check': 'F',
+        'it_b_pay': ali_pay.PAYMENT_EXPIRE_TIME,
     })
 
     params['sign'] = signer.sign(params, params['sign_type'])
@@ -65,8 +63,8 @@ def app_param(out_trade_no, subject, body, total_fee, notify_url):
     params.update({
         'service': ali_pay.Service.MOBILE_SECURITYPAY_PAY,
         'sign_type': SignType.RSA,
-        'qr_pay_mode': '2',
         'rn_check': 'F',
+        'it_b_pay': ali_pay.PAYMENT_EXPIRE_TIME,
     })
 
     params['sign'] = signer.sign(params, params['sign_type'])

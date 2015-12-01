@@ -35,7 +35,7 @@ def request(api_url, params, pass_verify=False):
 
 
 def parse_and_verify_request_data(data):
-    logger.info("requested : %s" % data)
+    logger.info("requested : %r" % data)
     if _verify_sign(data, do_raise=True):
         return data
 

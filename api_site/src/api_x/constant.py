@@ -39,6 +39,10 @@ class PaymentChangeType:
     INFO = 'INFO'
 
 
+class TxState:
+    FINISHED = 'FINISHED'
+
+
 class PaymentTxState:
     CREATED = 'CREATED'
     # 部分支付

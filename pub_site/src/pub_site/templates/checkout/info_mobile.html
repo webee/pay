@@ -4,5 +4,7 @@
 
 {% block main %}
     <h3 class="msg">{{ msg }}</h3>
-    <button class="nowpay" onclick="window.history.go(-1);">返回</button>
+    {% if go_back %}
+        <button class="nowpay" onclick="window.history.go(-1);">返回</button>
+    {% endif %}
 {% endblock %}

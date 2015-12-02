@@ -61,6 +61,11 @@ def pay_notify(source):
     seller_id = data['seller_id']
 
     logger.info('pay notify {0}: {1}'.format(source, data))
+
+    if 'refund_status' in data:
+        logger.info('ignore refund notify.')
+        return notify_response.succeed()
+
     if not notify_verify(notify_id):
         return notify_response.bad()
 

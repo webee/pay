@@ -24,13 +24,16 @@ def handle_payment_result(is_success, sn, data=None):
 
     req_code = 0 if is_success else 1
     code = 0 if tx.state not in [PaymentTxState.FAILED, PaymentTxState.CREATED] else 1
-    if tx.state != PaymentTxState.CREATED and client_callback_url:
+    if code != req_code:
+        logger.warn('callback result before notify result.')
         # 必须要tx状态改变
-        if code != req_code:
-            logger.warn('callback result mismatch with notify result.')
-            # 等待半秒钟
-            time.sleep(0.5)
-            code = 0 if tx.state not in [PaymentTxState.FAILED, PaymentTxState.CREATED] else 1
+        # 等待1.5s
+        time.sleep(1.5)
+        tx = get_payment_tx_by_sn(sn)
+
+    code = 0 if tx.state not in [PaymentTxState.FAILED, PaymentTxState.CREATED] else 1
+
+    if tx.state != PaymentTxState.CREATED and client_callback_url:
         from api_x.utils.notify import sign_and_return_client_callback
         user_mapping = get_user_map_by_account_user_id(record.payer_id)
         user_id = user_mapping.user_id

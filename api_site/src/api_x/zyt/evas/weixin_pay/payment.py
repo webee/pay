@@ -1,7 +1,8 @@
 # coding=utf-8
 from api_x.config import weixin_pay as config
 from pytoolbox.util import times
-from api_x.zyt.evas.weixin_pay import request, is_success_request, generate_absolute_url, append_md5_sign
+from api_x.zyt.evas.weixin_pay import is_success_request, generate_absolute_url, append_md5_sign
+from .api_access import request
 from . import NAME
 from ..error import PaymentTypeNotSupportedError, PaymentTypeNotImplementedError
 from flask import url_for

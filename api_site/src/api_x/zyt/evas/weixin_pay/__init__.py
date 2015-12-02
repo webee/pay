@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from pytoolbox.util.log import get_logger
 from api_x.config import weixin_pay as config
 from .commons import generate_absolute_url
-from .api_access import request
 from .commons import is_success_request, append_md5_sign
 
 

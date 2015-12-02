@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals
-from api_x.zyt.evas.lianlian_pay.notify import NotifyRespTypes
+from api_x.zyt.evas.constant import NotifyRespTypes
 
 from flask import jsonify
 

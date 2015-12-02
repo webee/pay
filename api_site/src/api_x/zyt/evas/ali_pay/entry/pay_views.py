@@ -1,13 +1,12 @@
 # coding=utf-8
 from __future__ import unicode_literals
-from api_x.zyt.evas.lianlian_pay.commons import is_sending_to_me
 
 from flask import request, render_template
 from . import ali_pay_entry_mod as mod
 from api_x.config import ali_pay
-from api_x.zyt.evas.lianlian_pay.constant import NotifyType
-from api_x.zyt.evas.lianlian_pay.notify import get_pay_notify_handle
-from api_x.zyt.evas.lianlian_pay import NAME
+from api_x.zyt.evas.ali_pay.constant import NotifyType
+from api_x.zyt.evas.ali_pay.notify import get_pay_notify_handle
+from api_x.zyt.evas.ali_pay import NAME
 from .commons import parse_and_verify
 from ..commons import notify_verify
 from . import notify_response

@@ -112,6 +112,8 @@ def do_pay(sn, vas_name, payment_scene, extra_params=None, client_type=None):
     payment_type = result.data['payment_type']
     params = result.data['params']
     if vas_name == 'ALI_PAY':
+        if client_type == RequestClientType.WEIXIN:
+            return render_template(get_template("checkout/info", client_type), go_back=True, msg="请在浏览器或支付宝中打开使用支付宝支付。")
         url = params['_url']
         return Response(generate_submit_form(url, params, keep_all=True, excludes={'_url'}))
     elif vas_name == 'WEIXIN_PAY':

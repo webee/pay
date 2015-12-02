@@ -55,7 +55,7 @@ def pay_result():
 def pay_notify(source):
     data = request.verified_data
     out_trade_no = data['out_trade_no']
-    trade_no = data['out_trade']
+    trade_no = data['trade_no']
     trade_status = data['trade_status']
     notify_id = data['notify_id']
     total_fee = Decimal(data['total_fee'])

@@ -81,7 +81,7 @@ VAS_INFOS = {
     },
     ALI_PAY: {
         'name': '支付宝',
-        'desc': '支付宝网页支付或扫码支付'
+        'desc': '推荐有支付宝账号的用户使用'
     },
     WEIXIN_PAY: {
         'name': '微信',

@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 from pytoolbox.util import strings
 from api_x.config import weixin_pay as config
-from api_x.zyt.evas.weixin_pay import request, is_success_request, append_md5_sign
+from api_x.zyt.evas.weixin_pay import is_success_request
+from .api_access import request
 
 
 def refund(out_refund_no, transaction_id, total_fee, refund_fee,

@@ -252,7 +252,7 @@ def _refund_to_processing(tx):
 
 
 def _request_refund(payment_tx, payment_record, refund_tx, refund_record, data=None):
-    from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay
+    from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay, ali_pay
     from api_x.zyt import vas
 
     vas_name = payment_tx.vas_name
@@ -263,6 +263,8 @@ def _request_refund(payment_tx, payment_record, refund_tx, refund_record, data=N
         res = _refund_by_lianlian_pay(payment_tx, refund_record)
     elif weixin_pay.is_weixin_pay(vas_name):
         res = _refund_by_weixin_pay(payment_tx, payment_record, refund_tx, refund_record)
+    elif vas_name == ali_pay.NAME:
+        res = _refund_by_ali_pay(payment_tx, payment_record, refund_tx, refund_record)
     elif vas_name == vas.NAME:
         res = _refund_by_zyt(refund_record)
         refund_tx = get_tx_by_sn(refund_tx.sn)
@@ -310,6 +312,27 @@ def _refund_by_lianlian_pay(tx, refund_record):
     except Exception as e:
         logger.exception(e)
         raise RefundFailedError(e.message)
+
+    return res
+
+
+def _refund_by_ali_pay(payment_tx, payment_record, refund_tx, refund_record):
+    """支付宝退款"""
+    from api_x.zyt.evas.ali_pay import refund
+
+    trade_no = payment_tx.vas_sn
+    out_trade_no = payment_tx.sn
+    out_refund_no = refund_tx.sn
+    total_fee = payment_record.amount
+    refund_fee = refund_record.amount
+
+    raise RefundFailedError('ali pay refund not implemented.')
+
+    try:
+        res = refund(out_refund_no, out_trade_no, trade_no, total_fee, refund_fee)
+    except Exception as e:
+        logger.exception(e)
+        raise RefundFailedError()
 
     return res
 

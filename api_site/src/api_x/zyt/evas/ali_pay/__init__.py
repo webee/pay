@@ -49,6 +49,10 @@ def query_pay_notify(source, out_trade_no, trade_no=''):
     return notify_pay(source, data)
 
 
+def refund(out_refund_no, out_trade_no, trade_no, total_fee, refund_fee):
+    pass
+
+
 def query_refund_notify(source, out_refund_no, refunded_on, vas_name=''):
     from .notify import notify_refund
 

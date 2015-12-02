@@ -21,6 +21,8 @@ class Service:
 
     NOTIFY_VERIFY = 'notify_verify'
 
+    SINGLE_TRADE_QUERY = 'single_trade_query'
+
 
 class PaymentType:
     WEB = 'WEB'

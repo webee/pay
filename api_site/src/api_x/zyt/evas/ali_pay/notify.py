@@ -1,8 +1,13 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
+from api_x.zyt.evas.constant import NotifyRespTypes
+from api_x.config import ali_pay
 from .constant import BizType, NotifyType
 from pytoolbox.util.log import get_logger
+from decimal import Decimal
+from .commons import is_success_status
+from . import NAME
 
 logger = get_logger(__name__)
 
@@ -53,33 +58,40 @@ def get_refund_notify_handle(refund_source):
     return _get_notify_handle(refund_source, BizType.REFUND, NotifyType.Refund.ASYNC)
 
 
-# refund
-def notify_refund(source, data):
-    from . import NAME
-    from ._refund import is_success_or_fail
-    partner_oid = data['oid_partner']
-    refund_no = data['no_refund']
-    status = data['sta_refund']
-    refundno_oid = data['oid_refundno']
+# pay
+def notify_pay(source, data):
+    out_trade_no = data['out_trade_no']
+    trade_no = data['trade_no']
+    trade_status = data['trade_status']
+    total_fee = Decimal(data['total_fee'])
+    seller_id = data['seller_id']
 
-    logger.info('refund notify {0}: {1}'.format(source, data))
-    if not is_sending_to_me(partner_oid):
+    logger.info('query pay notify {0}: {1}'.format(source, data))
+
+    if seller_id != ali_pay.PID:
         return NotifyRespTypes.BAD
 
-    handle = get_refund_notify_handle(source)
+    result = is_success_status(trade_status)
+
+    handle = get_pay_notify_handle(source, NotifyType.Pay.ASYNC)
     if handle is None:
         return NotifyRespTypes.MISS
 
-    result = is_success_or_fail(status)
-    if result is None:
-        return NotifyRespTypes.RETRY
-
     try:
-        # 是否成功，订单号，来源系统，来源系统订单号，数据
-        handle(result, refund_no, NAME, refundno_oid, data)
-        logger.info('refund notify success: {0}, {1}'.format(source, refund_no))
+        if trade_status == ali_pay.TradeStatus.TRADE_SUCCESS:
+            # 此通知的调用协议
+            # 是否成功，订单号，来源系统，来源系统订单号，数据
+            handle(is_success_status(trade_status), out_trade_no, NAME, trade_no, total_fee, data)
+        elif trade_status == ali_pay.TradeStatus.TRADE_FINISHED:
+            # FIXME: 暂时忽略
+            logger.info('pay notify the finish: [{0}]'.format(out_trade_no))
         return NotifyRespTypes.SUCCEED
     except Exception as e:
         logger.exception(e)
-        logger.warning('refund notify error: {0}'.format(e.message))
+        logger.warning('pay notify error: {0}'.format(e.message))
         return NotifyRespTypes.FAILED
+
+
+# refund
+def notify_refund(source, data=None):
+    return NotifyRespTypes.RETRY

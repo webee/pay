@@ -33,3 +33,23 @@ def payment_param(payment_type, source, out_trade_no, subject, body, total_fee):
         return _app_param(out_trade_no, subject, body, total_fee, notify_url)
     else:
         raise PaymentTypeNotSupportedError(NAME, payment_type)
+
+
+def query_pay_notify(source, out_trade_no, trade_no=''):
+    """ 通过主动查询支付订单结果来完成结果通知
+    :param source:
+    :param out_trade_no:
+    :return:
+    """
+    from .notify import notify_pay
+    from ._payment import query_trade
+
+    data = query_trade(out_trade_no, trade_no)
+
+    return notify_pay(source, data)
+
+
+def query_refund_notify(source, out_refund_no, refunded_on, vas_name=''):
+    from .notify import notify_refund
+
+    return notify_refund(source)

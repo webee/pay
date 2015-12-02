@@ -1,6 +1,8 @@
 # coding=utf-8
 from __future__ import unicode_literals
+from decimal import Decimal
 
+from api_x.zyt.evas.ali_pay.commons import is_success_status
 from flask import request, render_template
 from . import ali_pay_entry_mod as mod
 from api_x.config import ali_pay
@@ -12,7 +14,6 @@ from ..commons import notify_verify
 from . import notify_response
 from api_x.constant import TransactionType
 from pytoolbox.util.log import get_logger
-from decimal import Decimal
 
 
 logger = get_logger(__name__)
@@ -37,7 +38,7 @@ def pay_result():
     if seller_id != ali_pay.PID:
         return render_template('info.html', title='支付结果', msg='支付异常-交易号:{0}'.format(out_trade_no))
 
-    is_success = is_success_result(trade_status)
+    is_success = is_success_status(trade_status)
 
     handle = get_pay_notify_handle(TransactionType.PAYMENT, NotifyType.Pay.SYNC)
     if handle:
@@ -80,7 +81,7 @@ def pay_notify(source):
         if trade_status == ali_pay.TradeStatus.TRADE_SUCCESS:
             # 此通知的调用协议
             # 是否成功，订单号，来源系统，来源系统订单号，数据
-            handle(is_success_result(trade_status), out_trade_no, NAME, trade_no, total_fee, data)
+            handle(is_success_status(trade_status), out_trade_no, NAME, trade_no, total_fee, data)
         elif trade_status == ali_pay.TradeStatus.TRADE_FINISHED:
             # FIXME: 暂时忽略
             logger.info('pay notify the finish: [{0}]'.format(out_trade_no))
@@ -89,7 +90,3 @@ def pay_notify(source):
         logger.exception(e)
         logger.warning('pay notify error: {0}'.format(e.message))
         return notify_response.failed()
-
-
-def is_success_result(status):
-    return status in {ali_pay.TradeStatus.TRADE_SUCCESS, ali_pay.TradeStatus.TRADE_FINISHED}

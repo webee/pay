@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json
-
+import xmltodict
 import requests
 from ..error import *
 from . import signer
+from .commons import verify_sign
 from pytoolbox.util.log import get_logger
 
 
@@ -19,18 +19,19 @@ def sign_params(params):
     return params
 
 
-def request(api_url, params, pass_verify=False):
-    data = json.dumps(sign_params(params))
+def request(api_url, params):
+    data = sign_params(params)
 
     logger.info("request {0}: {1}".format(api_url, data))
     resp = requests.post(api_url, data)
+
     if resp.status_code == 200:
         try:
             raw_data = resp.content.decode('utf-8')
         except Exception as e:
             raise DataEncodingError(e.message)
-        logger.info("response {0}: {1}".format(api_url, raw_data))
-        return _parse_and_verify_response_data(raw_data, pass_verify)
+        logger.info("response : %s: %s" % (api_url, raw_data))
+        return _parse_and_verify_response_data(raw_data)
     return UnExpectedResponseError(resp.status_code, resp.content)
 
 
@@ -49,23 +50,26 @@ def _verify_sign(data, do_raise=False):
 
 
 def _parse_data(raw_data):
-    data = json.loads(raw_data)
-    if not isinstance(data, dict):
+    """ raw_data必须是unicode
+    :type raw_data: unicode
+    :return:
+    """
+    res = xmltodict.parse(raw_data, encoding='utf-8')
+    if not isinstance(res, dict) or 'alipay' not in res:
         raise DictParsingError(raw_data)
+    data = res['alipay']
+
+    if data.get('is_success') != 'T':
+        raise ApiError(data.get('error', '接口请求异常'))
+
     return data
 
 
-def _parse_and_verify_response_data(raw_data, pass_verify=False):
-    try:
-        parsed_data = _parse_data(raw_data)
-    except Exception, e:
-        raise ApiError(str(e))
+def _parse_and_verify_response_data(raw_data):
+    parsed_data = _parse_data(raw_data)
 
-    if not ('ret_code' in parsed_data and parsed_data['ret_code'] == '0000'):
-        raise ApiError('ret_code: [{0}], ret_msg: [{1}]'.format(parsed_data.get('ret_code'), parsed_data.get('ret_msg')),
-                       data=parsed_data)
-
-    if not pass_verify:
-        _verify_sign(parsed_data, do_raise=True)
-
-    return parsed_data
+    resp_data = parsed_data['response']['trade']
+    resp_data['sign_type'] = parsed_data['sign_type']
+    resp_data['sign'] = parsed_data['sign']
+    if verify_sign(resp_data, do_raise=True):
+        return resp_data

@@ -5,6 +5,7 @@ from api_x.config import ali_pay
 from pytoolbox.util.log import get_logger
 from pytoolbox.util.urls import build_url
 from pytoolbox.util.sign import SignType
+from .api_access import request
 from . import signer
 
 logger = get_logger(__name__)
@@ -72,3 +73,17 @@ def app_param(out_trade_no, subject, body, total_fee, notify_url):
 
     logger.info("request ali pay APP {0}".format(params))
     return params
+
+
+def query_trade(out_trade_no, trade_no=''):
+    params = {
+        'service': ali_pay.Service.SINGLE_TRADE_QUERY,
+        'partner': ali_pay.PID,
+        '_input_charset': ali_pay.INPUT_CHARSET,
+        'sign_type': SignType.MD5,
+        'out_trade_no': out_trade_no,
+        'trade_no': trade_no
+    }
+    url = build_url(ali_pay.GATEWAY_URL, _input_charset=ali_pay.INPUT_CHARSET)
+
+    return request(url, params)

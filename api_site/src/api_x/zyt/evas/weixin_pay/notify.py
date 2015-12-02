@@ -66,7 +66,7 @@ def notify_pay(source, app, data):
     total_fee = Decimal(data['total_fee'])/100
     trade_state = data['trade_state']
 
-    logger.info('pay notify {0}@{1}: {2}'.format(source, app, data))
+    logger.info('query pay notify {0}@{1}: {2}'.format(source, app, data))
     if not is_sending_to_me(app, appid, mch_id):
         return NotifyRespTypes.BAD
 
@@ -98,7 +98,7 @@ def notify_refund(source, data, app):
     out_refund_no = data['out_refund_no_%d' % idx]
     refund_status = data['refund_status_%d' % idx]
 
-    logger.info('refund notify {0}@{1}: {2}'.format(source, app, data))
+    logger.info('query refund notify {0}@{1}: {2}'.format(source, app, data))
     if not is_sending_to_me(app, appid, mch_id):
         return NotifyRespTypes.BAD
 

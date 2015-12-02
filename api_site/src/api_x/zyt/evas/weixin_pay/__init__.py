@@ -33,7 +33,7 @@ def get_app_config_by_vas_id(vas_id):
             return app_config
 
 
-def query_pay_notify(source, out_trade_no, vas_name):
+def query_pay_notify(source, out_trade_no, vas_name, vas_sn=''):
     """ 通过主动查询支付订单结果来完成结果通知
     :param source:
     :param out_trade_no:

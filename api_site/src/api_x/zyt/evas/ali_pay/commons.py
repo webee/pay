@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 from api_x.config import ali_pay
 from pytoolbox.util.urls import build_url
 from pytoolbox.util.log import get_logger
+from api_x.zyt.evas.error import InvalidSignError
 import requests
-
 
 logger = get_logger(__name__)
 
@@ -31,3 +31,19 @@ def notify_verify(notify_id):
     except Exception as e:
         logger.warn(e.message)
     return False
+
+
+def verify_sign(data, do_raise=False):
+    from . import signer
+
+    if 'sign_type' in data and signer.verify(data, data['sign_type']):
+        return True
+
+    if do_raise:
+        raise InvalidSignError(data.get('sign_type'), data)
+    return False
+
+
+def is_success_status(status):
+    return status in {ali_pay.TradeStatus.TRADE_SUCCESS, ali_pay.TradeStatus.TRADE_FINISHED}
+

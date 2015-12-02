@@ -51,3 +51,35 @@ def register_refund_notify_handle(source, handle):
 
 def get_refund_notify_handle(refund_source):
     return _get_notify_handle(refund_source, BizType.REFUND, NotifyType.Refund.ASYNC)
+
+
+# refund
+def notify_refund(source, data):
+    from . import NAME
+    from ._refund import is_success_or_fail
+    partner_oid = data['oid_partner']
+    refund_no = data['no_refund']
+    status = data['sta_refund']
+    refundno_oid = data['oid_refundno']
+
+    logger.info('refund notify {0}: {1}'.format(source, data))
+    if not is_sending_to_me(partner_oid):
+        return NotifyRespTypes.BAD
+
+    handle = get_refund_notify_handle(source)
+    if handle is None:
+        return NotifyRespTypes.MISS
+
+    result = is_success_or_fail(status)
+    if result is None:
+        return NotifyRespTypes.RETRY
+
+    try:
+        # 是否成功，订单号，来源系统，来源系统订单号，数据
+        handle(result, refund_no, NAME, refundno_oid, data)
+        logger.info('refund notify success: {0}, {1}'.format(source, refund_no))
+        return NotifyRespTypes.SUCCEED
+    except Exception as e:
+        logger.exception(e)
+        logger.warning('refund notify error: {0}'.format(e.message))
+        return NotifyRespTypes.FAILED

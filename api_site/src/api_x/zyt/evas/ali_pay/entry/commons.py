@@ -13,7 +13,8 @@ def parse_and_verify(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         try:
-            verified_data = parse_and_verify_request_data(request.values)
+            data = {k: v for k, v in request.values.items()}
+            verified_data = parse_and_verify_request_data(data)
         except (DictParsingError, InvalidSignError):
             return notify_response.wrong()
         request.__dict__['verified_data'] = verified_data

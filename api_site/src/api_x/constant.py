@@ -13,6 +13,8 @@ class DefaultUserDomain:
 SECURE_USER_NAME = 'secure'
 # 绿野广告
 LVYE_ADVERTISING_USER_NAME = 'lvye_advertising'
+# 绿野提现手续费
+LVYE_WITHDRAW_FEE_USER_NAME = 'lvye_withdraw_fee'
 # 绿野滑雪
 LVYE_SKIING_USER_NAME = 'lvye_skiing'
 

@@ -50,9 +50,9 @@
     //分享链接的缩略图
     var imgUrl = "{{ abs_url_for('static', filename='images/checkout/lvye_logo_360.png') }}";
     //分享链接的链接地址
-    var lineLink = "商品: {{ info.name }}";
+    var lineLink = window.location.href;
     //分享链接的描述信息
-    var descContent = "{{  }}";
+    var descContent = "商品: {{ info.name }}";
     //分享链接的标题
     var shareTitle = "绿野支付: {{ info.amount }}元";
     //一般为空 就好

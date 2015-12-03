@@ -14,9 +14,7 @@
 {% endblock %}
 
 {% block body_start %}
-    {% if is_in_weixin %}
-        <img hidden="hidden" src="{{ url_for('static', filename='images/checkout/lvye_logo.png') }}" width="360" height="360" >
-    {% endif %}
+    <img hidden="hidden" src="{{ url_for('static', filename='images/checkout/lvye_logo.png') }}" width="360" height="360" >
 {% endblock %}
 {% block main %}
     <div class="pay-info">

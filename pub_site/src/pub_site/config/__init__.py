@@ -33,7 +33,7 @@ HOST_URL = 'http://pay.lvye.com'
 
 # 绿野公司域和用户
 LVYE_CORP_DOMAIN_NAME = 'lvye_corp'
-LVYE_USER_NAME = 'lvye'
+LVYE_ADVERTISING_USER_NAME = 'lvye_advertising'
 
 # TODO: 同步该配置
 IS_ALL_OPENED = True

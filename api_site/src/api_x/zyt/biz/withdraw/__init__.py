@@ -170,8 +170,8 @@ def _success_withdraw(tx, withdraw_record):
     if fee > 0:
         from api_x.zyt.vas.pattern import transfer_frozen
         from api_x.zyt.user_mapping import get_lvye_corp_account_user_id
-        from api_x.constant import LVYE_CORP_USER_NAME
-        lvye_corp_user_id = get_lvye_corp_account_user_id(LVYE_CORP_USER_NAME)
+        from api_x.constant import LVYE_ADVERTISING_USER_NAME
+        lvye_corp_user_id = get_lvye_corp_account_user_id(LVYE_ADVERTISING_USER_NAME)
         # 手续费转账
         event_ids.extend(transfer_frozen(tx.sn, from_user_id, lvye_corp_user_id, fee))
     # 提现金额转出

@@ -11,8 +11,8 @@ class DefaultUserDomain:
 
 # 系统用户
 SECURE_USER_NAME = 'secure'
-# 绿野公司
-LVYE_CORP_USER_NAME = 'lvye'
+# 绿野广告
+LVYE_ADVERTISING_USER_NAME = 'lvye_advertising'
 # 绿野滑雪
 LVYE_SKIING_USER_NAME = 'lvye_skiing'
 

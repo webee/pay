@@ -46,7 +46,7 @@ def _do_pay(pay_to_lvye_record):
     params = {
         'payer_user_id': pay_to_lvye_record.user_id,
         'payee_domain_name': config.LVYE_CORP_DOMAIN_NAME,
-        'payee_user_id': config.LVYE_USER_NAME,
+        'payee_user_id': config.LVYE_ADVERTISING_USER_NAME,
         'order_id': pay_to_lvye_record.order_id,
         'product_name': '{0}: {1}元'.format(pay_to_lvye_record.name, pay_to_lvye_record.amount),
         'product_category': pay_to_lvye_record.name,

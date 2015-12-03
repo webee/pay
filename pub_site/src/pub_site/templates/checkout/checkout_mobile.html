@@ -1,6 +1,6 @@
 {% extends "checkout/layout_mobile.html" %}
 
-{% block title %}选择支付方式{% endblock %}
+{% block title %}绿野支付{% endblock %}
 
 {% block css %}
     {{ super() }}
@@ -13,6 +13,11 @@
     <script src="{{ url_for('static', filename='js/browser_utils.js') }}"></script>
 {% endblock %}
 
+{% block body_start %}
+    {% if is_in_weixin %}
+        <img hidden="hidden" src="{{ url_for('static', filename='images/checkout/lvye_logo.png') }}" width="360" height="360" >
+    {% endif %}
+{% endblock %}
 {% block main %}
     <div class="pay-info">
         <h3>订单编号: <span>{{ info.order_id }}</span></h3>

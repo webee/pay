@@ -82,8 +82,10 @@ def checkout(sn):
     else:
         template = get_template("checkout/checkout", client_type)
 
+    is_in_weixin = client_type == RequestClientType.WEIXIN
     return render_template(template, sn=sn, info=info, vases=vases, vas_infos=vas_infos, client_type=client_type,
-                           activated_vas=request.args.get('activated_vas'))
+                           activated_vas=request.args.get('activated_vas'),
+                           is_in_weixin=is_in_weixin)
 
 
 @mod.route("/pay/<sn>/<vas_name>", methods=["GET"])

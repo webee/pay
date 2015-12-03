@@ -49,7 +49,8 @@ QUERY_REFUND_URL = "https://api.mch.weixin.qq.com/pay/refundquery"
 DOWNLOAD_BILL_URL = 'https://api.mch.weixin.qq.com/pay/downloadbill'
 
 GET_CODE_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect"
-GET_ACCESS_TOKEN_URL = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={appid}&secret={secret}&code={code}&grant_type=authorization_code"
+GET_OPENID_URL = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={appid}&secret={secret}&code={code}&grant_type=authorization_code"
+GET_ACCESS_TOKEN_URL = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret={secret}'
 
 
 class TradeType:

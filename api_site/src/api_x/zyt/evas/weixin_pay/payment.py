@@ -28,7 +28,7 @@ def payment_param(payment_type, source, app_config, out_trade_no, total_fee, ip,
             }
         import requests
         code = extra_params['code']
-        url = config.GET_ACCESS_TOKEN_URL.format(appid=app_config.APPID, secret=app_config.APP_SECRET, code=code)
+        url = config.GET_OPENID_URL.format(appid=app_config.APPID, secret=app_config.APP_SECRET, code=code)
         res = requests.get(url, verify=False).json()
         openid = res.get('openid', openid)
         return prepay(source, config.TradeType.JSAPI, out_trade_no, total_fee, ip, body, time_start, detail, fee_type,

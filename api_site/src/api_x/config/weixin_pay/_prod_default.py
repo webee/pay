@@ -35,6 +35,9 @@ class AppConfig:
         if is_main:
             AppConfig.CONFIGS['main'] = AppConfig.CONFIGS[name]
 
+    def __repr__(self):
+        return 'AppConfig<%s@%s>' % (self.APP_NAME, self.MCH_ID)
+
 # init
 WX_MAIN = 'ilvyewang'
 AppConfig.init_config('public_account', 'ilvyewang', is_main=True)

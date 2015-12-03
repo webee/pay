@@ -26,6 +26,12 @@ class UnExpectedResponseError(ApiError):
         super(UnExpectedResponseError, self).__init__(message)
 
 
+class DataParsingError(ApiError):
+    def __init__(self, msg):
+        message = "data parse error: {0}".format(msg)
+        super(ApiError, self).__init__(message)
+
+
 class DictParsingError(ApiError):
     def __init__(self, raw_data):
         message = "Data [{0}] must be a dict.".format(raw_data)

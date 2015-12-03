@@ -2,11 +2,21 @@
 # coding=utf-8
 from __future__ import unicode_literals, print_function
 
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+
 from flask.ext.script import Manager, Shell, Server
 from flask.ext.script_extras import Celery
 from flask.ext.migrate import MigrateCommand
 from api_x import create_app
 from ops.deploy.deploy import deploy, db_migrate
+from pytoolbox.util.log import get_logger
+
+
+logger = get_logger(__name__)
 
 
 manager = Manager(create_app)
@@ -222,6 +232,42 @@ def try_blocked_refunds():
     for k, v in res_state.items():
         print("####{0}: {1}".format(k, v))
     print('#########################################')
+
+
+@manager.option('-n', '--name', type=str, dest="name", default='main')
+def download_weixin_last_month_bills(name):
+    from pytoolbox.util import times
+    from api_x.zyt.evas.weixin_pay.bill import download_bill
+    from api_x.config import weixin_pay
+    from decimal import Decimal
+    import operator as op
+
+    app_config = weixin_pay.AppConfig(name)
+
+    header_printed = False
+    sh = []
+    final_sv = None
+    for dt in times.last_monthdays():
+        logger.info('download bill: {0}'.format(dt))
+        try:
+            h, vs, sh, sv = download_bill(dt, app_config=app_config)
+        except Exception as e:
+            logger.warn('download bill error: {0}'.format(e.message))
+            continue
+
+        if not header_printed:
+            print('\t'.join(h))
+            header_printed = True
+        for v in vs:
+            print('\t'.join(v))
+
+        sv = map(Decimal, sv)
+        if final_sv is None:
+            final_sv = sv
+        else:
+            final_sv = map(op.add, final_sv, sv)
+    print('\t'.join(sh))
+    print('\t'.join(map(str, final_sv)))
 
 
 @manager.command

@@ -12,7 +12,7 @@ from pytoolbox.util.log import get_logger
 logger = get_logger(__name__)
 
 
-def request(api_url, params, app_config=None, need_cert=False):
+def request(api_url, params, app_config=None, need_cert=False, ret_raw_data=False, log_resp=True):
     app_config = app_config or config.AppConfig()
     params = append_md5_sign(app_config.APP_NAME, params)
 
@@ -31,7 +31,10 @@ def request(api_url, params, app_config=None, need_cert=False):
             raw_data = resp.content.decode('utf-8')
         except Exception as e:
             raise DataEncodingError(e.message)
-        logger.info("response : %s: %s" % (api_url, raw_data))
+        if log_resp:
+            logger.info("response : %s: %s" % (api_url, raw_data))
+        if ret_raw_data:
+            return raw_data
         return _parse_and_verify_response_data(raw_data, app_config.APP_NAME)
     return UnExpectedResponseError(resp.status_code, resp.content)
 
@@ -54,7 +57,11 @@ def _parse_data(raw_data):
     :type raw_data: unicode
     :return:
     """
-    res = xmltodict.parse(raw_data, encoding='utf-8')
+    try:
+        res = xmltodict.parse(raw_data, encoding='utf-8')
+    except Exception as e:
+        raise DataParsingError(e.message)
+
     if not isinstance(res, dict) or 'xml' not in res:
         raise DictParsingError(raw_data)
     data = res['xml']

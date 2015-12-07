@@ -7,9 +7,12 @@ from pytoolbox.util.urls import build_url
 from .api_access import request
 
 
-def do_refund(batch_no, trade_no, refund_fee, notify_url, dback_notify_url, info=None):
+def do_refund(refund_no, trade_no, refund_fee, notify_url, dback_notify_url, info=None):
+    dt = datetime.now()
+
     info = info if info else "程序退款"
     detail_data = '%s^%s^%s' % (trade_no, refund_fee, info)
+    batch_no = '%s%s' % (dt.strftime('%Y%m%d'), refund_no)
     params = {
         'service': config.Service.REFUND_NOPWD_URL,
         'partner': config.PID,
@@ -18,7 +21,7 @@ def do_refund(batch_no, trade_no, refund_fee, notify_url, dback_notify_url, info
         'notify_url': notify_url,
         'dback_notify_url': dback_notify_url,
         'batch_no': batch_no,
-        'refund_date': _current_date_time(),
+        'refund_date': dt.strftime('%Y-%m-%d %H:%M:%S'),
         'batch_num': '1',
         'detail_data': detail_data,
     }

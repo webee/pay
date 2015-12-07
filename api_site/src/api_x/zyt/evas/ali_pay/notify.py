@@ -8,6 +8,7 @@ from pytoolbox.util.log import get_logger
 from .commons import notify_verify
 from decimal import Decimal
 from .commons import is_success_status
+from .. import dba
 from . import NAME
 
 logger = get_logger(__name__)
@@ -104,4 +105,32 @@ def notify_pay(source, data):
 def notify_refund(source, data=None):
     logger.info('refund notify {0}: {1}'.format(source, data))
 
-    return NotifyRespTypes.RETRY
+    batch_no = data['batch_no']
+    result_details = data['result_details']
+
+    if not notify_verify(data.get('notify_id')):
+        return NotifyRespTypes.BAD
+
+    if 'notify_type' in data and data['notify_type'] != 'batch_refund_notify':
+        return NotifyRespTypes.BAD
+
+    if 'success_num' in data and data['success_num'] != '1':
+        return NotifyRespTypes.BAD
+
+    trade_no, refund_fee, refund_status = result_details.split('^')
+    batch_record = dba.get_alipay_batch_refund_record(batch_no, trade_no)
+    if batch_record is None:
+        return NotifyRespTypes.BAD
+
+    handle = get_refund_notify_handle(source)
+    if handle is None:
+        return NotifyRespTypes.MISS
+
+    try:
+        result = refund_status == 'SUCCESS'
+        handle(result, batch_record.refund_tx_sn, NAME, batch_record.batch_no, data)
+        return NotifyRespTypes.SUCCEED
+    except Exception as e:
+        logger.exception(e)
+        logger.warning('refund notify error: {0}'.format(e.message))
+        return NotifyRespTypes.FAILED

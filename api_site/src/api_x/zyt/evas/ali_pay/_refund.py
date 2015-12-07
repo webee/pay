@@ -14,7 +14,7 @@ def do_refund(refund_no, trade_no, refund_fee, notify_url, dback_notify_url, inf
     info = info if info else "程序退款"
     detail_data = '%s^%s^%s' % (trade_no, refund_fee, info)
 
-    batch_record = dba.get_or_create_alipay_batch_refund_record(refund_no)
+    batch_record = dba.get_or_create_alipay_batch_refund_record(trade_no, refund_no)
     batch_no = batch_record.batch_no
 
     params = {

@@ -24,10 +24,13 @@ class EvasAlipayBatchRefundRecord(db.Model):
     __tablename__ = 'evas_alipay_batch_refund_record'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    batch_no = db.Column(db.CHAR(32), nullable=False)
-    refund_tx_sn = db.Column(db.CHAR(32), nullable=False, unique=True)
+    batch_no = db.Column(db.VARCHAR(64), nullable=False)
+    trade_no = db.Column(db.VARCHAR(64), nullable=False)
+    refund_tx_sn = db.Column(db.VARCHAR(64), nullable=False, unique=True)
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+    __table_args__ = (db.UniqueConstraint('batch_no', 'trade_no', name='batch_no_trade_no_uniq_idx'),)
+
     def __repr__(self):
-        return '<AlipayBatchRefund %r->%r>' % (self.batch_no, self.refund_tx_sn)
+        return '<AlipayBatchRefund %r->%r:%r>' % (self.batch_no, self.tx_sn, self.refund_tx_sn)

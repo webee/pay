@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from pytoolbox.util.sign import SignType
-from pytoolbox.util import strings, times
+from datetime import datetime
 from api_x.config import ali_pay as config
 from pytoolbox.util.urls import build_url
 from .api_access import request
@@ -34,5 +34,5 @@ def query_refund(out_trade_no, trade_no=''):
 
 
 def _current_date_time():
-    dt = times.datetime()
+    dt = datetime.now()
     return dt.strftime('%Y-%m-%d %H:%M:%S')

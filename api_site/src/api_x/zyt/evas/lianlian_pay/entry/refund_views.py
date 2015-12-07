@@ -14,7 +14,6 @@ logger = get_logger(__name__)
 @mod.route("/refund/notify/<source>", methods=["POST"])
 @parse_and_verify
 def refund_notify(source):
-    # FIXME: 目前微信退款是不带通知的，所以这个入口没用
     from ..notify import notify_refund
     data = request.verified_data
 

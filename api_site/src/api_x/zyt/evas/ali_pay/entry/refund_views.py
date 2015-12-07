@@ -19,3 +19,12 @@ def refund_notify(source):
 
     resp_type = notify_refund(source, data)
     return notify_response.response(resp_type)
+
+
+@mod.route("/refund/dback_notify/", methods=["POST"])
+@parse_and_verify
+def refund_dback_notify():
+    data = request.verified_data
+
+    logger.info('refund dback notify: {1}'.format(data))
+    return notify_response.retry()

@@ -325,7 +325,7 @@ def _refund_by_ali_pay(payment_tx, payment_record, refund_tx, refund_record):
     refund_fee = refund_record.amount
 
     try:
-        res = refund(out_refund_no, trade_no, refund_fee)
+        res = refund(TransactionType.REFUND, out_refund_no, trade_no, refund_fee)
     except Exception as e:
         logger.exception(e)
         raise RefundFailedError()

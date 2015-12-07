@@ -56,5 +56,5 @@ def pay_notify(source):
 
     resp_type = notify_pay(source, data)
 
-    return notify_response(resp_type)
+    return notify_response.response(resp_type)
 

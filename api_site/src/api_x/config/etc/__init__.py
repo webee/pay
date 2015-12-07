@@ -27,7 +27,7 @@ class Biz:
     # 是否全面开放
     IS_ALL_OPENED = True
     TX_SN_PREFIX = '__'
-    TX_SN_NUM_PREFIX = '00'
+    TX_SN_NUM_SUFFIX = '00'
     IS_PROD = False
 
     PAYMENT_MAX_TRIAL_TIMES = 5

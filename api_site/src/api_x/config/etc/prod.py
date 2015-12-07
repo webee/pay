@@ -18,7 +18,7 @@ CHECKOUT_URL = 'http://pay.lvye.com/checkout/{sn}'
 
 class Biz:
     TX_SN_PREFIX = ''
-    TX_SN_NUM_PREFIX = '13'
+    TX_SN_NUM_SUFFIX = '13'
     IS_PROD = True
 
     ACTIVATED_EVAS = ['ZYT', 'LIANLIAN_PAY', 'WEIXIN_PAY', 'ALI_PAY']

@@ -10,13 +10,29 @@ _SN_GEN_LEN = 26
 _SN_MAX_LEN = 32
 
 
-def generate_sn(user_id=0, size=_SN_GEN_LEN):
+def generate_sn(user_id=0, use_date_sn=False):
+    if use_date_sn:
+        return generate_date_sn(user_id)
+    return generate_sem_sn(user_id)
+
+
+def generate_sem_sn(user_id=0, size=_SN_GEN_LEN):
     size = size if size is not None else _SN_GEN_LEN
 
     d = (datetime.utcnow() - _start).total_seconds()
     s = config.Biz.TX_SN_PREFIX + str(int(d)) + '-%d-' % user_id
     l = size - len(s)
     return s + strings.gen_rand_str(l)
+
+
+def generate_date_sn(user_id=0, size=_SN_MAX_LEN):
+    # 8 + n + x + suffix
+    size = size if size is not None else _SN_MAX_LEN
+
+    dt = datetime.utcnow().strftime('%Y%m%d%H%M%S')
+    s = dt + str(user_id)
+    l = size - len(s) - len(config.Biz.TX_SN_NUM_SUFFIX)
+    return s + strings.gen_rand_str(l, strings.string.ascii_lowercase) + config.Biz.TX_SN_NUM_SUFFIX
 
 
 def generate_order_id(tx_id):

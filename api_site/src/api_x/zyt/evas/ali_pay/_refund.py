@@ -5,6 +5,7 @@ from datetime import datetime
 from api_x.config import ali_pay as config
 from pytoolbox.util.urls import build_url
 from .api_access import request
+from .. import dba
 
 
 def do_refund(refund_no, trade_no, refund_fee, notify_url, dback_notify_url, info=None):
@@ -12,7 +13,10 @@ def do_refund(refund_no, trade_no, refund_fee, notify_url, dback_notify_url, inf
 
     info = info if info else "程序退款"
     detail_data = '%s^%s^%s' % (trade_no, refund_fee, info)
-    batch_no = '%s%s' % (dt.strftime('%Y%m%d'), refund_no)
+
+    batch_record = dba.get_or_create_alipay_batch_refund_record(refund_no)
+    batch_no = batch_record.batch_no
+
     params = {
         'service': config.Service.REFUND_NOPWD_URL,
         'partner': config.PID,

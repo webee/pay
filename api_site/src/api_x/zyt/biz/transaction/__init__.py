@@ -14,13 +14,13 @@ from .error import TransactionError, TransactionNotFoundError, TransactionStateE
 @transactional
 def create_transaction(channel_name, tp, amount, comments, role_users, vas_name=None,
                        order_id=None,
-                       state=None, super_id=None, sn_size=None):
+                       state=None, super_id=None, use_date_sn=False):
     if state is None:
         state = TransactionState.CREATED
 
     # [(user_id, role), ...]
     user_id = role_users[0].user_id
-    sn = generate_sn(user_id, size=sn_size)
+    sn = generate_sn(user_id, use_date_sn)
     while dba.get_tx_by_sn(sn) is not None:
         sn = generate_sn(user_id)
     tx = Transaction(sn=sn, channel_name=channel_name, order_id=order_id,

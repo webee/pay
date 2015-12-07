@@ -33,7 +33,7 @@ def pay_param(out_trade_no, subject, body, total_fee, notify_url, return_url):
     params.update({
         'service': ali_pay.Service.DIRECT_PAY_BY_USER,
         'return_url': return_url,
-        #'qr_pay_mode': '2',
+        # 'qr_pay_mode': '2',
     })
 
     params['sign'] = signer.sign(params, params['sign_type'])
@@ -63,16 +63,20 @@ def app_param(out_trade_no, subject, body, total_fee, notify_url):
     params = _get_common_params(out_trade_no, subject, body, total_fee, notify_url)
     params.update({
         'service': ali_pay.Service.MOBILE_SECURITYPAY_PAY,
-        'sign_type': SignType.RSA,
         'rn_check': 'F',
         'it_b_pay': ali_pay.PAYMENT_EXPIRE_TIME,
     })
 
-    params['sign'] = signer.sign(params, params['sign_type'])
-    params['_url'] = build_url(ali_pay.GATEWAY_URL, _input_charset=ali_pay.INPUT_CHARSET)
+    order_spec = '&'.join(['%s="%s"' % (k, v) for k, v in params if v])
+    sign = signer.sign_rsa(order_spec)
 
-    logger.info("request ali pay APP {0}".format(params))
-    return params
+    order_str = "%s&sign=%s&sign_type=%s" % (order_spec, sign, SignType.RSA)
+    res = {
+        'order_str': order_str
+    }
+
+    logger.info("request ali pay APP {0}".format(res))
+    return res
 
 
 def query_trade(out_trade_no, trade_no=''):

@@ -5,6 +5,7 @@ from api_x.zyt.evas.constant import NotifyRespTypes
 from api_x.config import ali_pay
 from .constant import BizType, NotifyType
 from pytoolbox.util.log import get_logger
+from .commons import notify_verify
 from decimal import Decimal
 from .commons import is_success_status
 from . import NAME
@@ -60,13 +61,20 @@ def get_refund_notify_handle(refund_source):
 
 # pay
 def notify_pay(source, data):
+    logger.info('pay notify {0}: {1}'.format(source, data))
+
     out_trade_no = data['out_trade_no']
     trade_no = data['trade_no']
     trade_status = data['trade_status']
     total_fee = Decimal(data['total_fee'])
     seller_id = data['seller_id']
 
-    logger.info('query pay notify {0}: {1}'.format(source, data))
+    if 'refund_status' in data:
+        logger.info('ignore refund notify.')
+        return NotifyRespTypes.SUCCEED
+
+    if not notify_verify(data.get('notify_id')):
+        return NotifyRespTypes.BAD
 
     if seller_id != ali_pay.PID:
         return NotifyRespTypes.BAD
@@ -81,7 +89,7 @@ def notify_pay(source, data):
         if trade_status == ali_pay.TradeStatus.TRADE_SUCCESS:
             # 此通知的调用协议
             # 是否成功，订单号，来源系统，来源系统订单号，数据
-            handle(is_success_status(trade_status), out_trade_no, NAME, trade_no, total_fee, data)
+            handle(result, out_trade_no, NAME, trade_no, total_fee, data)
         elif trade_status == ali_pay.TradeStatus.TRADE_FINISHED:
             # FIXME: 暂时忽略
             logger.info('pay notify the finish: [{0}]'.format(out_trade_no))
@@ -94,4 +102,6 @@ def notify_pay(source, data):
 
 # refund
 def notify_refund(source, data=None):
+    logger.info('refund notify {0}: {1}'.format(source, data))
+
     return NotifyRespTypes.RETRY

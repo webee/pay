@@ -18,6 +18,7 @@ class Service:
     DIRECT_PAY_BY_USER = 'create_direct_pay_by_user'
     WAP_DIRECT_PAY_BY_USER = 'alipay.wap.create.direct.pay.by.user'
     MOBILE_SECURITYPAY_PAY = 'mobile.securitypay.pay'
+    REFUND_NOPWD_URL = 'refund_fastpay_by_platform_nopwd'
 
     NOTIFY_VERIFY = 'notify_verify'
 

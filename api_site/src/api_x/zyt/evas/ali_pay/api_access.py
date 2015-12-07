@@ -59,7 +59,8 @@ def _parse_data(raw_data):
         raise DictParsingError(raw_data)
     data = res['alipay']
 
-    if data.get('is_success') != 'T':
+    is_success = data.get('is_success')
+    if is_success == 'F' or is_success not in ['T', 'P']:
         raise ApiError(data.get('error', '接口请求异常'))
 
     return data
@@ -68,8 +69,10 @@ def _parse_data(raw_data):
 def _parse_and_verify_response_data(raw_data):
     parsed_data = _parse_data(raw_data)
 
-    resp_data = parsed_data['response']['trade']
-    resp_data['sign_type'] = parsed_data['sign_type']
-    resp_data['sign'] = parsed_data['sign']
-    if verify_sign(resp_data, do_raise=True):
-        return resp_data
+    if 'response' in parsed_data and 'trade' in parsed_data['response']:
+        resp_data = parsed_data['response']['trade']
+        resp_data['sign_type'] = parsed_data['sign_type']
+        resp_data['sign'] = parsed_data['sign']
+        if verify_sign(resp_data, do_raise=True):
+            return resp_data
+    return parsed_data

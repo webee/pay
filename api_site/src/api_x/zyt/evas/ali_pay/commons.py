@@ -15,6 +15,8 @@ def generate_absolute_url(path):
 
 
 def notify_verify(notify_id):
+    if notify_id is None:
+        return True
     params = {
         'service': ali_pay.Service.NOTIFY_VERIFY,
         'partner': ali_pay.PID,

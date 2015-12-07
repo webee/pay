@@ -49,8 +49,12 @@ def query_pay_notify(source, out_trade_no, trade_no=''):
     return notify_pay(source, data)
 
 
-def refund(out_refund_no, out_trade_no, trade_no, total_fee, refund_fee):
-    pass
+def refund(batch_no, trade_no, refund_fee, info=None):
+    from ._refund import do_refund
+
+    notify_url = generate_absolute_url(url_for('ali_pay_entry.refund_notify', source=source))
+    dback_notify_url = ''
+    return do_refund(batch_no, trade_no, refund_fee, notify_url, dback_notify_url, info=info)
 
 
 def query_refund_notify(source, out_refund_no, refunded_on, vas_name=''):

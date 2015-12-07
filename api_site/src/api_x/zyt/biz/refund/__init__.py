@@ -321,15 +321,11 @@ def _refund_by_ali_pay(payment_tx, payment_record, refund_tx, refund_record):
     from api_x.zyt.evas.ali_pay import refund
 
     trade_no = payment_tx.vas_sn
-    out_trade_no = payment_tx.sn
     out_refund_no = refund_tx.sn
-    total_fee = payment_record.amount
     refund_fee = refund_record.amount
 
-    raise RefundFailedError('ali pay refund not implemented.')
-
     try:
-        res = refund(out_refund_no, out_trade_no, trade_no, total_fee, refund_fee)
+        res = refund(out_refund_no, trade_no, refund_fee)
     except Exception as e:
         logger.exception(e)
         raise RefundFailedError()

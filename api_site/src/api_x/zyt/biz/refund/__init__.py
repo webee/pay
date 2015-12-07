@@ -223,9 +223,10 @@ def _create_refund(channel, payment_tx, amount, client_notify_url):
         balance = get_user_cash_balance(payment_record.payee_id)
         if amount > balance.available:
             raise RefundBalanceError(amount, balance.available)
+    # NOTE: refund tx sn size=>24
     tx = create_transaction(channel.name, TransactionType.REFUND, amount, comments, user_ids,
                             super_id=payment_tx.id,
-                            vas_name=payment_tx.vas_name, order_id=payment_record.order_id)
+                            vas_name=payment_tx.vas_name, order_id=payment_record.order_id, sn_size=24)
 
     fields = {
         'tx_id': tx.id,

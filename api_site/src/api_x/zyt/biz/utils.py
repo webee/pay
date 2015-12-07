@@ -10,10 +10,12 @@ _SN_GEN_LEN = 26
 _SN_MAX_LEN = 32
 
 
-def generate_sn(user_id=0):
+def generate_sn(user_id=0, size=_SN_GEN_LEN):
+    size = size if size is not None else _SN_GEN_LEN
+
     d = (datetime.utcnow() - _start).total_seconds()
     s = config.Biz.TX_SN_PREFIX + str(int(d)) + '-%d-' % user_id
-    l = _SN_GEN_LEN - len(s)
+    l = size - len(s)
     return s + strings.gen_rand_str(l)
 
 

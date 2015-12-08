@@ -18,3 +18,11 @@ def to_user(user_id):
 
 def guaranteed_by(user_id):
     return RoleUser(user_id, UserRole.GUARANTOR)
+
+
+def tx_from_user(user_id):
+    return RoleUser(user_id, UserRole.TX_FROM)
+
+
+def tx_to_user(user_id):
+    return RoleUser(user_id, UserRole.TX_TO)

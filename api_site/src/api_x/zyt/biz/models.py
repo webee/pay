@@ -19,10 +19,16 @@ class PaymentType:
 
 
 class UserRole:
+    # FROM/TO是真正的资金方向
+    # payment.TX_FROM, payment.TO
+    # refund.FROM, refund.TX_TO
     FROM = 'FROM'
     TO = 'TO'
+
     GUARANTOR = 'GUARANTOR'
-    PAYER = 'PAYER'
+    # TX_FROM/TO仅仅表示交易的方向
+    TX_FROM = 'TX_FROM'
+    TX_TO = 'TX_TO'
 
 
 class VirtualAccountSystem(db.Model):
@@ -187,7 +193,7 @@ class UserTransaction(db.Model):
     tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
     tx = db.relationship('Transaction', backref=db.backref('users', lazy='dynamic'), lazy='joined')
 
-    role = db.Column(db.Enum(UserRole.FROM, UserRole.GUARANTOR, UserRole.TO, UserRole.PAYER), nullable=False)
+    role = db.Column(db.Enum(UserRole.FROM, UserRole.GUARANTOR, UserRole.TO, UserRole.TX_FROM, UserRole.TX_TO), nullable=False)
 
     def __repr__(self):
         return '<UserTransaction #%.6d %9s:%.5d, %.6d>' % (self.id, self.role, self.user_id, self.tx_id)

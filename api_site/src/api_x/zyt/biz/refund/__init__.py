@@ -213,7 +213,7 @@ def _create_refund(channel, payment_tx, amount, client_notify_url):
 
     comments = "退款-{0}".format(payment_record.product_name)
 
-    user_ids = [user_roles.to_user(payment_record.payer_id), user_roles.from_user(payment_record.payee_id)]
+    user_ids = [user_roles.tx_to_user(payment_record.payer_id), user_roles.from_user(payment_record.payee_id)]
     if payment_record.type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
         user_ids.append(user_roles.guaranteed_by(secure_user_id))

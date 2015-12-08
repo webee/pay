@@ -151,7 +151,7 @@ def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
                     product_name, product_category, product_desc, amount,
                     client_callback_url, client_notify_url, super_tx_id=None, origin=None):
     comments = "支付-{0}".format(product_name)
-    user_ids = [user_roles.from_user(payer_id), user_roles.to_user(payee_id)]
+    user_ids = [user_roles.tx_from_user(payer_id), user_roles.to_user(payee_id)]
     if payment_type == PaymentType.GUARANTEE:
         secure_user_id = get_system_account_user_id(SECURE_USER_NAME)
         user_ids.append(user_roles.guaranteed_by(secure_user_id))

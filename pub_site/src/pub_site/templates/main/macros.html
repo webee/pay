@@ -16,13 +16,13 @@
                     <td>{{ tx.type }}</td>
                     {% if tx.is_failed %}
                         <td class="center grey">{{ "+%.2f"|format(tx.amount) }}</td>
-                    {% elif tx.role == 'TO' %}
+                    {% elif tx.role in ['TO', 'TX_TO'] %}
                         {% if tx.is_created %}
                             <td class="center light_red">{{ "+%.2f"|format(tx.amount) }}</td>
                         {% else %}
                             <td class="center red">{{ "+%.2f"|format(tx.amount) }}</td>
                         {% endif %}
-                    {% elif tx.role == 'FROM' %}
+                    {% elif tx.role in ['FROM', 'TX_FROM'] %}
                         {% if tx.is_created %}
                             <td class="center light_green">{{ "-%.2f"|format(tx.amount) }}</td>
                         {% else %}

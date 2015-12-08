@@ -2,9 +2,9 @@
     <div class="tablock margin48 tablockcur">
         <table width="952" cellspacing="0" cellpadding="0">
             <tr class="first">
-                <td width="70" height="40">创建时间</td>
+                <td width="80" height="40" class="center">创建时间</td>
                 <td width="80">类型</td>
-                <td width="87">金额(元)</td>
+                <td width="87" class="center">金额(元)</td>
                 <td width="120">状态</td>
                 <td width="270">交易名称</td>
                 <td width="100">来源</td>
@@ -12,24 +12,24 @@
             </tr>
             {% for tx in txs %}
                 <tr>
-                    <td width="70" height="60">{{ tx.created_on }}</td>
+                    <td width="80" height="60" class="center">{{ tx.created_on }}</td>
                     <td>{{ tx.type }}</td>
                     {% if tx.is_failed %}
-                        <td class="grey">{{ "+%.2f"|format(tx.amount) }}</td>
+                        <td class="center grey">{{ "+%.2f"|format(tx.amount) }}</td>
                     {% elif tx.role == 'TO' %}
                         {% if tx.is_created %}
-                            <td class="light_red">{{ "+%.2f"|format(tx.amount) }}</td>
+                            <td class="center light_red">{{ "+%.2f"|format(tx.amount) }}</td>
                         {% else %}
-                            <td class="red">{{ "+%.2f"|format(tx.amount) }}</td>
+                            <td class="center red">{{ "+%.2f"|format(tx.amount) }}</td>
                         {% endif %}
                     {% elif tx.role == 'FROM' %}
                         {% if tx.is_created %}
-                            <td class="light_green">{{ "-%.2f"|format(tx.amount) }}</td>
+                            <td class="center light_green">{{ "-%.2f"|format(tx.amount) }}</td>
                         {% else %}
-                            <td class="green">{{ "-%.2f"|format(tx.amount) }}</td>
+                            <td class="center green">{{ "-%.2f"|format(tx.amount) }}</td>
                         {% endif %}
                     {% else %}
-                        <td>{{ "%.2f"|format(tx.amount) }}</td>
+                        <td class="center">{{ "%.2f"|format(tx.amount) }}</td>
                     {% endif %}
                     <td>{{ tx.state }}</td>
                     <td>{{ tx.comments }}</td>

@@ -165,7 +165,7 @@ footer{background:#333;height:60px;}
 .tabtit ul li.cur, .tabtit ul li:hover {border-color: #3cb43c;color: #3cb43c;z-index: 2;background: #fff;}
 .tablock{margin-top:20px;display:none;}
 .tablockcur{display:block;}
-.tablock table{font-size:12px;text-align:center;}
+.tablock table{font-size:12px;text-align:left;}
 .tablock table tr{border-bottom:1px solid #dcdcdc;}
 .tablock table tr.first{height:40px;margin-top:20px;background:#fafafa;}
 .tablock table tr td a{color:#349cd8;}.tablock table tr td a:hover{text-decoration:underline;}
@@ -176,6 +176,7 @@ footer{background:#333;height:60px;}
 .tablock table tr td.green{color:#25843a;}
 .tablock table tr td.light_green{color:#12421d;}
 .tablock table tr td.grey{color:grey;}
+.tablock table tr td.center{text-align: center;}
 .page{text-align:right;}
 .page .suml,.page .pageNum{display:inline-block;}
 .page .pageNum{margin-left:18px;}

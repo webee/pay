@@ -11,8 +11,10 @@ from api_x.constant import SECURE_USER_NAME, PaymentTxState, RefundTxState, TxSt
 from api_x.zyt.vas.user import get_user_cash_balance
 from api_x.zyt.biz import user_roles
 from pytoolbox.util.dbs import transactional, require_transaction_context
+from api_x.zyt.biz.models import UserRole
 from ...vas.models import EventType
 from ..transaction import create_transaction, transit_transaction_state, update_transaction_info
+from ..transaction import add_tx_user
 from ..models import TransactionType, RefundRecord, PaymentType
 from .error import *
 from api_x.utils.entry_auth import verify_call_perm
@@ -43,7 +45,8 @@ def apply_to_refund(channel, order_id, amount, client_notify_url, data=None):
 def handle_refund_in(vas_name, sn, notify_handle=None):
     tx = get_tx_by_sn(sn)
     refund_record = tx.record
-    _succeed_refund_in(vas_name, refund_record)
+    payment_tx = tx.super
+    _succeed_refund_in(vas_name, payment_tx, refund_record)
 
     if notify_handle is not None:
         notify_handle(True)
@@ -403,8 +406,13 @@ def _unblock_refund(refund_record):
 
 
 @transactional
-def _succeed_refund_in(vas_name, refund_record):
+def _succeed_refund_in(vas_name, payment_tx, refund_record):
     """处理被退款人的事务"""
     refund_amount = refund_record.amount
-    event_id = bookkeeping(EventType.TRANSFER_IN, refund_record.sn, refund_record.payer_id, vas_name, refund_amount)
+    from_user_role = payment_tx.get_role(UserRole.FROM)
+    if from_user_role is None:
+        raise BizError('payment tx error: should has from role user.')
+    event_id = bookkeeping(EventType.TRANSFER_IN, refund_record.sn, from_user_role.user_id, vas_name, refund_amount)
     transit_transaction_state(refund_record.tx_id, RefundTxState.CREATED, RefundTxState.REFUNDED_IN, event_id)
+
+    add_tx_user(refund_record.tx_id, user_roles.to_user(from_user_role.user_id))

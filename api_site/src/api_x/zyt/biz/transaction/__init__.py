@@ -6,7 +6,7 @@ from pytoolbox.util.dbs import transactional
 from api_x import db
 from . import dba
 from ..models import Transaction, TransactionStateLog
-from ..models import UserTransaction, UserRole
+from ..models import UserTransaction
 from ..utils import generate_sn
 from .error import TransactionError, TransactionNotFoundError, TransactionStateError
 
@@ -34,6 +34,12 @@ def create_transaction(channel_name, tp, amount, comments, role_users, vas_name=
     db.session.add(tx)
 
     return tx
+
+
+@transactional
+def add_tx_user(tx_id, role_user):
+    user_transaction = UserTransaction(user_id=role_user.user_id, tx_id=tx_id, role=role_user.role)
+    db.session.add(user_transaction)
 
 
 @transactional

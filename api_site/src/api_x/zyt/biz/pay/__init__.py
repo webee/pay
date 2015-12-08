@@ -12,6 +12,7 @@ from api_x.zyt.user_mapping import get_system_account_user_id, get_user_map_by_a
 from api_x.constant import SECURE_USER_NAME, PaymentTxState, PaymentOriginType
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
+from api_x.zyt.biz.transaction import add_tx_user
 from api_x.zyt.biz.models import TransactionType, PaymentRecord, PaymentType, TransactionSnStack
 from api_x.zyt.biz.error import NonPositiveAmountError, NegativeAmountError, AmountValueMissMatchError
 from api_x.zyt.biz.error import TransactionNotFoundError, AmountValueError
@@ -186,6 +187,9 @@ def _create_payment(channel, payment_type, payer_id, payee_id, order_id,
 def succeed_paid_out(vas_name, tx, payer_id, amount):
     event_id = bookkeeping(EventType.TRANSFER_OUT, tx.sn, payer_id, vas_name, amount)
     transit_transaction_state(tx.id, PaymentTxState.CREATED, PaymentTxState.PAID_OUT, event_id)
+
+    # real payer
+    add_tx_user(tx.id, user_roles.from_user(payer_id))
 
 
 def in_to_pay_state(state, exclude=None):

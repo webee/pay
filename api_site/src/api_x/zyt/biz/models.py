@@ -134,6 +134,9 @@ class Transaction(db.Model):
 
         return self.__record
 
+    def get_role(self, role):
+        return self.users.filter_by(role=role).first()
+
     @property
     def source_sn(self):
         """ 表示当前使用的sn，参考 TransactionSnStack

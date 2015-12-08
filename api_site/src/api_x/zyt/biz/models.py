@@ -22,6 +22,7 @@ class UserRole:
     FROM = 'FROM'
     TO = 'TO'
     GUARANTOR = 'GUARANTOR'
+    PAYER = 'PAYER'
 
 
 class VirtualAccountSystem(db.Model):
@@ -186,7 +187,7 @@ class UserTransaction(db.Model):
     tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
     tx = db.relationship('Transaction', backref=db.backref('users', lazy='dynamic'), lazy='joined')
 
-    role = db.Column(db.Enum(UserRole.FROM, UserRole.GUARANTOR, UserRole.TO), nullable=False)
+    role = db.Column(db.Enum(UserRole.FROM, UserRole.GUARANTOR, UserRole.TO, UserRole.PAYER), nullable=False)
 
     def __repr__(self):
         return '<UserTransaction #%.6d %9s:%.5d, %.6d>' % (self.id, self.role, self.user_id, self.tx_id)

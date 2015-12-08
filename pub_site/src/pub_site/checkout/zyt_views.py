@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
-from flask import request, render_template, redirect, url_for
+from flask import request, render_template, redirect, url_for, flash
 from . import checkout_entry_mod as mod
 from pytoolbox.util.log import get_logger
 from pub_site import pay_client, csrf
@@ -38,6 +38,7 @@ def zyt_do_pay(sn, token):
     if not utils.check_payment_token(sn, token):
         return render_template(get_template("checkout/info"), msg="支付链接过期，请重新请求支付")
 
+    orign_sn = sn
     result = pay_client.get_payment_info(sn)
     if not pay_client.is_success_result(result):
         return payment_failed(result)
@@ -54,8 +55,12 @@ def zyt_do_pay(sn, token):
     form = ZytPayForm()
     if form.validate_on_submit():
         sn = info['sn']
-        result = 'SUCCESS' if pay_client.zyt_pay(sn, user_id) else ''
-        return pay_client.web_payment_callback(sn, result)
+        res = pay_client.zyt_pay(sn, user_id)
+        if res is not None:
+            result = 'SUCCESS' if res else ''
+            return pay_client.web_payment_callback(sn, result)
+        flash(u"支付异常", category="error")
+        return redirect(url_for('.zyt_do_pay', sn=orign_sn, token=token))
 
     return render_template('checkout/zyt_pay_web.html', form=form, info=info,
                            balance='%.2f' % pay_client.app_query_user_available_balance(user_id))

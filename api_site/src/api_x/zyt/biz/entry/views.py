@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from flask import request
 from api_x.utils import response
+from pytoolbox.util import times
 from . import biz_entry_mod as mod
 from api_x.utils.entry_auth import verify_request
 from api_x.zyt.biz.transaction import query_user_transactions
@@ -41,5 +42,5 @@ def _get_tx(utx):
         'channel_name': tx.channel_name,
         'state': tx.state,
         'comments': tx.comments,
-        'created_on': tx.created_on,
+        'created_on': times.utc2gmt8(tx.created_on),
     }

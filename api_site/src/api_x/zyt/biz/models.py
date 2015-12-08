@@ -358,7 +358,7 @@ class PrepaidRecord(db.Model):
         return self.to_id
 
     def __repr__(self):
-        return '<Prepaid %r>' % (self.user_id, self.amount)
+        return '<Prepaid %r->%r>' % (self.amount, self.to_id)
 
 
 class WithdrawRecord(db.Model):

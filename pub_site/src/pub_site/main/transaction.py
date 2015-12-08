@@ -5,11 +5,13 @@ from pub_site import pay_client
 
 
 TX_TYPE_MSG = {
+    'PAYMENT:TX_FROM': '交易付款',
     'PAYMENT:FROM': '付款',
     'PAYMENT:TO': '支付收款',
     'PAYMENT:GUARANTEE': '支付担保',
     'REFUND:FROM': '退款',
     'REFUND:TO': '退款',
+    'REFUND:TX_TO': '交易退款',
     'REFUND:GUARANTEE': '退款担保',
     'WITHDRAW:FROM': '提现',
     'PREPAID:TO': '充值',

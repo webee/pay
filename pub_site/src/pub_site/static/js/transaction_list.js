@@ -19,7 +19,7 @@ function update_available_balance(callback) {
 }
 
 $(document).ready(function () {
-    var tabs = ['#total_tx', '#in_tx', '#out_tx', '#withdraw_tx'];
+    var tabs = ['#total_tx', '#in_tx', '#out_tx', '#tx_in_tx', '#tx_out_tx'];
 
     function clear_class(ids) {
         for (var i = 0; i < ids.length; i++) {
@@ -54,6 +54,14 @@ $(document).ready(function () {
 
             $("#out_tx").click(function() {
                 get_tx_list({role: 'FROM'}, gen_activate_tab_cb('#out_tx'))
+            });
+
+            $("#tx_in_tx").click(function() {
+                get_tx_list({role: 'TX_TO'}, gen_activate_tab_cb('#tx_in_tx'))
+            });
+
+            $("#tx_out_tx").click(function() {
+                get_tx_list({role: 'TX_FROM'}, gen_activate_tab_cb('#tx_out_tx'))
             });
         }
     }

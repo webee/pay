@@ -95,10 +95,9 @@ def query_user_transactions(account_user_id, role, page, per_page, q):
     from sqlalchemy.orm import lazyload
     from sqlalchemy import or_
 
-    # FIXME: 暂时忽略TX_FROM/TO角色
     query = UserTransaction.query.options(lazyload('tx')). \
         outerjoin(Transaction). \
-        filter(UserTransaction.user_id == account_user_id, UserTransaction.role.notin_([UserRole.TX_FROM, UserRole.TX_TO]))
+        filter(UserTransaction.user_id == account_user_id)
     if role:
         query = query.filter(UserTransaction.role == role)
     if q:

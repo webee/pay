@@ -43,7 +43,7 @@ def parse_and_verify_request_data(data):
 
 
 def _verify_sign(data, do_raise=False):
-    if 'sign_type' in data and signer.verify(data, data['sign_type'], sign_type=RSASignType.SHA, urlsafe=True):
+    if 'sign_type' in data and signer.verify(data, data['sign_type'], rsa_sign_type=RSASignType.SHA, urlsafe=True):
         return True
     if do_raise:
         raise InvalidSignError(data.get('sign_type'), data)

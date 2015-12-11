@@ -6,6 +6,7 @@ import requests
 from ..error import *
 from . import signer
 from .commons import verify_sign
+from pytoolbox.util.sign import RSASignType
 from pytoolbox.util.log import get_logger
 
 
@@ -14,7 +15,7 @@ logger = get_logger(__name__)
 
 def sign_params(params):
     params = {unicode(k): unicode(v) for k, v in params.items()}
-    params['sign'] = signer.sign(params, params['sign_type'])
+    params['sign'] = signer.sign(params, params['sign_type'], sign_type=RSASignType.SHA, urlsafe=True)
 
     return params
 
@@ -42,7 +43,7 @@ def parse_and_verify_request_data(data):
 
 
 def _verify_sign(data, do_raise=False):
-    if 'sign_type' in data and signer.verify(data, data['sign_type']):
+    if 'sign_type' in data and signer.verify(data, data['sign_type'], sign_type=RSASignType.SHA, urlsafe=True):
         return True
     if do_raise:
         raise InvalidSignError(data.get('sign_type'), data)

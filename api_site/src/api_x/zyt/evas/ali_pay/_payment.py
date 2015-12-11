@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from api_x.config import ali_pay
 from pytoolbox.util.log import get_logger
 from pytoolbox.util.urls import build_url
-from pytoolbox.util.sign import SignType
+from pytoolbox.util.sign import SignType, RSASignType
 from .api_access import request
 from . import signer
 
@@ -16,10 +16,7 @@ def _get_common_params(out_trade_no, subject, body, total_fee, notify_url):
         'partner': ali_pay.PID,
         '_input_charset': ali_pay.INPUT_CHARSET,
         'payment_type': '1',  # 商品购买
-        'sign_type': SignType.MD5,
         'seller_id': ali_pay.PID,
-        'paymethod': ali_pay.PayMethod.DIRECT_PAY,
-        'enable_paymethod': 'directPay^bankPay^creditCardExpress^debitCardExpress',
         'notify_url': notify_url,
         'out_trade_no': out_trade_no,
         'subject': subject,
@@ -34,6 +31,9 @@ def pay_param(out_trade_no, subject, body, total_fee, notify_url, return_url):
         'service': ali_pay.Service.DIRECT_PAY_BY_USER,
         'return_url': return_url,
         # 'qr_pay_mode': '2',
+        'paymethod': ali_pay.PayMethod.DIRECT_PAY,
+        'enable_paymethod': 'directPay^bankPay^creditCardExpress^debitCardExpress',
+        'sign_type': SignType.MD5,
     })
 
     params['sign'] = signer.sign(params, params['sign_type'])
@@ -50,6 +50,9 @@ def wap_pay_param(out_trade_no, subject, body, total_fee, notify_url, return_url
         'return_url': return_url,
         'rn_check': 'F',
         'it_b_pay': ali_pay.PAYMENT_EXPIRE_TIME,
+        'paymethod': ali_pay.PayMethod.DIRECT_PAY,
+        'enable_paymethod': 'directPay^bankPay^creditCardExpress^debitCardExpress',
+        'sign_type': SignType.MD5,
     })
 
     params['sign'] = signer.sign(params, params['sign_type'])
@@ -67,10 +70,11 @@ def app_param(out_trade_no, subject, body, total_fee, notify_url):
         'it_b_pay': ali_pay.PAYMENT_EXPIRE_TIME,
     })
 
-    order_spec = '&'.join(['%s="%s"' % (k, v) for k, v in params if v])
-    sign = signer.sign_rsa(order_spec)
+    order_spec = '&'.join(['%s="%s"' % (k, v) for k, v in params.items() if v])
 
-    order_str = "%s&sign=%s&sign_type=%s" % (order_spec, sign, SignType.RSA)
+    sign = signer.sign_rsa(order_spec, rsa_sign_type=RSASignType.SHA, urlsafe=True)
+
+    order_str = '%s&sign="%s"&sign_type="%s"' % (order_spec, sign, SignType.RSA)
     res = {
         'order_str': order_str
     }

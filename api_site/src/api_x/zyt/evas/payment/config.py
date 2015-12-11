@@ -62,13 +62,13 @@ PAYMENT_SCENE_VASE_TYPES = {
         (TEST_PAY, test_pay.PaymentType.APP),
         (LIANLIAN_PAY, lianlian_pay.PaymentType.APP),
         (WEIXIN_PAY, weixin_pay.PaymentType.APP + '$lvye_skiing'),
-        #(ALI_PAY, ali_pay.PaymentType.APP),
+        (ALI_PAY, ali_pay.PaymentType.APP),
     ]),
 }
 
 VAS_INFOS = {
     ZYT_PAY: {
-        'name': '自游通',
+        'name': '绿野自游通',
         'desc': '余额支付'
     },
     TEST_PAY: {
@@ -84,7 +84,7 @@ VAS_INFOS = {
         'desc': '推荐有支付宝账号的用户使用'
     },
     WEIXIN_PAY: {
-        'name': '微信',
+        'name': '微信支付',
         'desc': '微信内支付或扫码支付'
     },
 }

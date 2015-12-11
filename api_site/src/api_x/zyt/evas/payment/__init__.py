@@ -67,7 +67,12 @@ def get_activated_evases(payment_scene, payment_entity):
 
     evases = []
 
-    for v in config.PAYMENT_SCENE_VASE_TYPES.get(payment_scene, {}):
+    pure_payment_scene = config.get_pure_payment_scene(payment_scene)
+    vas_types = config.PAYMENT_SCENE_VASE_TYPES.get(pure_payment_scene, {})
+    for v, t in vas_types.items():
+        if config.is_condition_failed(t):
+            continue
+
         if v in etc.Biz.ACTIVATED_EVAS:
             if vas_payment_is_enabled(payment_entity, v):
                 evases.append(v)
@@ -82,8 +87,9 @@ def get_activated_evases(payment_scene, payment_entity):
 def get_payment_type(payment_scene, vas_name):
     from . import config
 
-    vases_type = config.PAYMENT_SCENE_VASE_TYPES.get(payment_scene, {})
+    pure_payment_scene = config.get_pure_payment_scene(payment_scene)
+    vases_type = config.PAYMENT_SCENE_VASE_TYPES.get(pure_payment_scene, {})
     payment_type = vases_type.get(vas_name)
     if payment_type is None:
         raise Exception("[{0}] is not support payment scene [{1}]".format(vas_name, payment_scene))
-    return payment_type
+    return config.get_complex_payment_type(vas_name, payment_type, payment_scene)

@@ -13,8 +13,10 @@ class PaymentScene:
     WEB = 'WEB'  # 一般电脑端网页
     WAP = 'WAP'  # 手机端网页
     WEIXIN = 'WEIXIN'  # 微信内网页
+    APP = 'APP'  # app
     lvye_skiing = 'lvye_skiing'  # 绿野滑雪app
     # lvye_skiing_wp = 'lvye_skiing_wp' # 绿野滑雪windows phone app
+    lvye_pay_sdk_demo = 'lvye_pay_sdk_demo'  # 绿野支付demo app
 
 PAYMENT_TYPE_WEIGHTS = {
     TEST_PAY: 0,
@@ -34,37 +36,81 @@ PAYMENT_SCENES = {
 }
 
 
+def is_env(p):
+    from api_x.config import etc as config
+    return config.__env_name__ == p
+
+
+def is_condition_failed(t):
+    if isinstance(t, dict):
+        cond = t.get('condition')
+        return cond and not cond[0](*cond[1:])
+    return False
+
+
+def get_pure_payment_scene(payment_scene):
+    return payment_scene.split('.', 1)[0]
+
+
+def get_pure_payment_type_and_info(payment_type):
+    res = payment_type.split('$', 1)
+    if len(res) == 2:
+        return res
+    return res[0], None
+
+
+def get_complex_payment_type(vas_name, payment_type, payment_scene):
+    extra_type_infos = dict(x.split('$', 1) for x in payment_scene.split('.', 1)[1:])
+    if vas_name in extra_type_infos:
+        return payment_type + '$' + extra_type_infos[vas_name]
+    return payment_type
+
+
 # 各支付场景与第三方支付的支付方式的关联
 PAYMENT_SCENE_VASE_TYPES = {
-    PaymentScene.WEB: OrderedDict([
-        (ZYT_PAY, zyt_pay.PaymentType.WEB),
-        (TEST_PAY, test_pay.PaymentType.WEB),
-        (LIANLIAN_PAY, lianlian_pay.PaymentType.WEB),
-        (WEIXIN_PAY, weixin_pay.PaymentType.NATIVE),
-        (ALI_PAY, ali_pay.PaymentType.WEB),
-    ]),
-    PaymentScene.WAP: OrderedDict([
-        #(ZYT_PAY, zyt_pay.PaymentType.WEB),
-        (TEST_PAY, test_pay.PaymentType.WEB),
-        (LIANLIAN_PAY, lianlian_pay.PaymentType.WAP),
-        (WEIXIN_PAY, weixin_pay.PaymentType.JSAPI),
-        (ALI_PAY, ali_pay.PaymentType.WAP),
-    ]),
-    PaymentScene.WEIXIN: OrderedDict([
-        #(ZYT_PAY, zyt_pay.PaymentType.WEB),
-        (TEST_PAY, test_pay.PaymentType.WEB),
-        (LIANLIAN_PAY, lianlian_pay.PaymentType.WAP),
-        (WEIXIN_PAY, weixin_pay.PaymentType.JSAPI),
-        (ALI_PAY, ali_pay.PaymentType.WAP),
-    ]),
-    PaymentScene.lvye_skiing: OrderedDict([
-        #(ZYT_PAY, zyt_pay.PaymentType.APP),
-        (TEST_PAY, test_pay.PaymentType.APP),
-        (LIANLIAN_PAY, lianlian_pay.PaymentType.APP),
-        (WEIXIN_PAY, weixin_pay.PaymentType.APP + '$lvye_skiing'),
-        #(ALI_PAY, ali_pay.PaymentType.APP),
-    ]),
+    PaymentScene.WEB: {
+        ZYT_PAY: zyt_pay.PaymentType.WEB,
+        TEST_PAY: test_pay.PaymentType.WEB,
+        LIANLIAN_PAY: lianlian_pay.PaymentType.WEB,
+        WEIXIN_PAY: weixin_pay.PaymentType.NATIVE,
+        ALI_PAY: ali_pay.PaymentType.WEB,
+    },
+    PaymentScene.WAP: {
+        #ZYT_PAY: zyt_pay.PaymentType.WEB,
+        TEST_PAY: test_pay.PaymentType.WEB,
+        LIANLIAN_PAY: lianlian_pay.PaymentType.WAP,
+        WEIXIN_PAY: weixin_pay.PaymentType.JSAPI,
+        ALI_PAY: ali_pay.PaymentType.WAP,
+    },
+    PaymentScene.WEIXIN: {
+        #ZYT_PAY: zyt_pay.PaymentType.WEB,
+        TEST_PAY: test_pay.PaymentType.WEB,
+        LIANLIAN_PAY: lianlian_pay.PaymentType.WAP,
+        WEIXIN_PAY: weixin_pay.PaymentType.JSAPI,
+        ALI_PAY: ali_pay.PaymentType.WAP,
+    },
+    PaymentScene.APP: {
+        TEST_PAY: test_pay.PaymentType.APP,
+        LIANLIAN_PAY: lianlian_pay.PaymentType.APP,
+        ALI_PAY: ali_pay.PaymentType.APP,
+    },
+    PaymentScene.lvye_pay_sdk_demo: {
+        TEST_PAY: test_pay.PaymentType.APP,
+        LIANLIAN_PAY: lianlian_pay.PaymentType.APP,
+        ALI_PAY: ali_pay.PaymentType.APP,
+        WEIXIN_PAY: weixin_pay.PaymentType.APP,
+    },
+    PaymentScene.lvye_skiing: {
+        TEST_PAY: test_pay.PaymentType.APP,
+        LIANLIAN_PAY: lianlian_pay.PaymentType.APP,
+        ALI_PAY: {
+            'value': ali_pay.PaymentType.APP,
+            'condition': (lambda p: not is_env(p), 'prod')
+        },
+        WEIXIN_PAY: weixin_pay.PaymentType.APP + '$lvye_skiing',
+    },
 }
+
 
 VAS_INFOS = {
     ZYT_PAY: {

@@ -49,16 +49,16 @@ def _lianlian_pay_params(payment_type, payment_entity):
 
 
 def _weixin_pay_params(payment_type, payment_entity, extra_params=None):
+    from . import config
     from api_x.config import weixin_pay
     from api_x.zyt.evas.weixin_pay.payment import payment_param
 
     # payment_type中包含了wx_name, 使用在app支付的情况
-    i = payment_type.find('$')
-    if i < 0:
+    payment_type, info = config.get_pure_payment_type_and_info(payment_type)
+    if info is None:
         app_config = weixin_pay.AppConfig()
     else:
-        wx_name = payment_type[i+1:]
-        payment_type = payment_type[:i]
+        wx_name = info
         app_config = weixin_pay.AppConfig(wx_name)
 
     params = payment_param(payment_type, payment_entity.source, app_config, payment_entity.tx_sn,

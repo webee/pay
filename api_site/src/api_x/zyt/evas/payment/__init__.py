@@ -90,6 +90,7 @@ def get_payment_type(payment_scene, vas_name):
     pure_payment_scene = config.get_pure_payment_scene(payment_scene)
     vases_type = config.PAYMENT_SCENE_VASE_TYPES.get(pure_payment_scene, {})
     payment_type = vases_type.get(vas_name)
+    payment_type = config.get_real_payment_type(payment_type)
     if payment_type is None:
         raise Exception("[{0}] is not support payment scene [{1}]".format(vas_name, payment_scene))
     return config.get_complex_payment_type(vas_name, payment_type, payment_scene)

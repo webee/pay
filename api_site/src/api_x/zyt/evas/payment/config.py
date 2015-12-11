@@ -52,6 +52,14 @@ def get_pure_payment_scene(payment_scene):
     return payment_scene.split('.', 1)[0]
 
 
+def get_real_payment_type(payment_type):
+    if is_condition_failed(payment_type):
+        return None
+    if isinstance(payment_type, dict):
+        payment_type = payment_type.get('value')
+    return payment_type
+
+
 def get_pure_payment_type_and_info(payment_type):
     res = payment_type.split('$', 1)
     if len(res) == 2:

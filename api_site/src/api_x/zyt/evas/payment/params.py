@@ -4,11 +4,16 @@ from __future__ import unicode_literals
 from api_x.utils import req
 from api_x.zyt.evas import test_pay, lianlian_pay, weixin_pay, ali_pay
 from api_x.zyt import vas as zyt_pay
+from pytoolbox.util.log import get_logger
 from . import get_payment_type
+
+
+logger = get_logger(__name__)
 
 
 def prepare(payment_scene, vas_name, payment_entity, extra_params=None):
     payment_type = get_payment_type(payment_scene, vas_name)
+    logger.info('prepare param: [{0}], [{1}]'.format(vas_name, payment_type))
 
     if vas_name == test_pay.NAME:
         params = _test_pay_params(payment_type, payment_entity)

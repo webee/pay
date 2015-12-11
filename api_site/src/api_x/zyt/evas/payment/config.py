@@ -62,7 +62,7 @@ PAYMENT_SCENE_VASE_TYPES = {
         (TEST_PAY, test_pay.PaymentType.APP),
         (LIANLIAN_PAY, lianlian_pay.PaymentType.APP),
         (WEIXIN_PAY, weixin_pay.PaymentType.APP + '$lvye_skiing'),
-        (ALI_PAY, ali_pay.PaymentType.APP),
+        #(ALI_PAY, ali_pay.PaymentType.APP),
     ]),
 }
 

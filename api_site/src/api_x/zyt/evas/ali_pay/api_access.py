@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 
 def sign_params(params):
     params = {unicode(k): unicode(v) for k, v in params.items()}
-    params['sign'] = signer.sign(params, params['sign_type'], sign_type=RSASignType.SHA, urlsafe=True)
+    params['sign'] = signer.sign(params, params['sign_type'], rsa_sign_type=RSASignType.SHA, urlsafe=True)
 
     return params
 

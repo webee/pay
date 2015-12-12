@@ -6,12 +6,13 @@ from .models import EvasAlipayBatchRefundRecord
 
 
 @transactional
-def get_or_create_alipay_batch_refund_record(trade_no, refund_tx_sn):
+def getupdate_or_create_alipay_batch_refund_record(trade_no, refund_tx_sn):
     record = EvasAlipayBatchRefundRecord.query.filter_by(refund_tx_sn=refund_tx_sn).first()
+    batch_no = generate_sn()
     if record is None:
-        batch_no = generate_sn()
-        record = EvasAlipayBatchRefundRecord(batch_no=batch_no, trade_no=trade_no, refund_tx_sn=refund_tx_sn)
-        db.session.add(record)
+        record = EvasAlipayBatchRefundRecord(trade_no=trade_no, refund_tx_sn=refund_tx_sn)
+    record.batch_no = batch_no
+    db.session.add(record)
     return record
 
 

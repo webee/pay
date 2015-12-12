@@ -29,6 +29,7 @@ class EvasAlipayBatchRefundRecord(db.Model):
     refund_tx_sn = db.Column(db.VARCHAR(64), nullable=False, unique=True)
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     __table_args__ = (db.UniqueConstraint('batch_no', 'trade_no', name='batch_no_trade_no_uniq_idx'),)
 

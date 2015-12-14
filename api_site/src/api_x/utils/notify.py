@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 def sign_and_return_client_callback(url, channel_name, params, sign_type=SignType.RSA, method='POST'):
     params = add_sign_for_params(channel_name, params, sign_type)
-    logger.info("return {0} [{1}] status_code [{2}]".format(method, url, params))
+    logger.info("return {0} [{1}] [{2}]".format(method, url, params))
     return response.submit_form(url, params, method)
 
 

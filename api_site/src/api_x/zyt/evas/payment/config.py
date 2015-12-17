@@ -49,6 +49,8 @@ def is_condition_failed(t):
 
 
 def get_pure_payment_scene(payment_scene):
+    """ <payment_scene>.<vas_name>$<info>.<vas_name>$<info>
+    """
     return payment_scene.split('.', 1)[0]
 
 
@@ -61,6 +63,8 @@ def get_real_payment_type(payment_type):
 
 
 def get_pure_payment_type_and_info(payment_type):
+    """ <payment_type>$<info>
+    """
     res = payment_type.split('$', 1)
     if len(res) == 2:
         return res
@@ -68,6 +72,12 @@ def get_pure_payment_type_and_info(payment_type):
 
 
 def get_complex_payment_type(vas_name, payment_type, payment_scene):
+    """ <payment_scene>.<vas_name>$<info>.<vas_name>$<info>
+    :param vas_name:
+    :param payment_type:
+    :param payment_scene:
+    :return:
+    """
     extra_type_infos = dict(x.split('$', 1) for x in payment_scene.split('.', 1)[1:])
     if vas_name in extra_type_infos:
         return payment_type + '$' + extra_type_infos[vas_name]

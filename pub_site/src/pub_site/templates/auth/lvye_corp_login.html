@@ -23,7 +23,7 @@
             {{ input(form.password) }}
             {{ submit(form.submit, "submit-user_login_" + channel) }}
         </form>
-        <a href="{{ url_for('auth.login', next=next) }}">>>去绿野用户中心登录</a>
+        <a href="{{ url_for('auth.login', channel=CONFIG.DEFAULT_CHANNEL, next=next) }}">>>去绿野用户中心登录</a>
     </div>
     </div>
 {% endblock %}

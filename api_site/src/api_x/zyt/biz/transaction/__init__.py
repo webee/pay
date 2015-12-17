@@ -109,7 +109,7 @@ def query_user_transactions(account_user_id, role, page, per_page, q):
     if q:
         query = query.filter(or_(Transaction.comments.contains(q),
                                  Transaction.order_id.contains(q),
-                                 Transaction.state == q))
+                                 Transaction.state == q.upper()))
     query = query.order_by(Transaction.created_on.desc())
     paginator = query.paginate(page, per_page, error_out=False)
 

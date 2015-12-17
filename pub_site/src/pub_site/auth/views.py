@@ -118,6 +118,7 @@ def login():
                 user = User(domain_user.id, domain_user.username, domain_user.username, is_leader,
                             domain_user.phone, channel_name)
                 do_login_user(user)
+                domain_user.ping()
                 next_url = next_url or url_for('main.index')
                 return redirect(next_url)
             flash('用户名或密码错误', category='error')

@@ -15,4 +15,4 @@ def add_domain_user(user_domain_name, username, phone, password):
     du = DomainUser(user_domain_name=user_domain_name, username=username, phone=phone, password=password)
     db.session.add(du)
 
-    return du.id
+    return du

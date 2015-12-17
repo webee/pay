@@ -70,8 +70,8 @@ def fetch_withdraw_result_notify(minutes):
 def add_domain_user(user_domain_name, username, phone, password):
     from pub_site.auth.dba import add_domain_user
 
-    user_id = add_domain_user(user_domain_name, username, phone, password)
-    print('user_id: [{0}]'.format(user_id))
+    du = add_domain_user(user_domain_name, username, phone, password)
+    print('domain_user_id: [{0}]'.format(du.id))
 
 
 def main():

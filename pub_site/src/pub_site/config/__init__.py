@@ -48,7 +48,17 @@ class Checkout:
 
 
 # # pay api
-class PayClientConfig:
+class LvyePaySitePayClientConfig:
+    MD5_KEY = read_string('conf/test/md5_key.txt')
+    CHANNEL_PRI_KEY = read_string('conf/test/channel_pri_key.txt')
+
+    CHANNEL_NAME = 'lvye_pay_site'
+
+    ROOT_URL = "http://pay.lvye.com/api/__"
+    CHECKOUT_URL = 'http://pay.lvye.com/checkout/{sn}'
+
+
+class LvyeCorpPaySitePayClientConfig:
     MD5_KEY = read_string('conf/test/md5_key.txt')
     CHANNEL_PRI_KEY = read_string('conf/test/channel_pri_key.txt')
 

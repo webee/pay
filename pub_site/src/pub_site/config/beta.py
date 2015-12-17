@@ -16,6 +16,11 @@ class Checkout:
     PAYMENT_CHECKOUT_VALID_SECONDS = 1 * 60 * 60
 
 
-class PayClientConfig:
+class LvyePaySiteClientConfig:
+    ROOT_URL = "http://pay.lvye.com/api/__"
+    CHECKOUT_URL = 'http://pay.lvye.com/__/checkout/{sn}'
+
+
+class LvyeCorpPaySiteClientConfig:
     ROOT_URL = "http://pay.lvye.com/api/__"
     CHECKOUT_URL = 'http://pay.lvye.com/__/checkout/{sn}'

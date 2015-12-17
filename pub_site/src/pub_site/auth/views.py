@@ -120,13 +120,7 @@ def login():
                 next_url = next_url or url_for('main.index')
                 return redirect(next_url)
         flash('用户名或密码错误')
-        params = {
-            'channel': channel_name,
-            'form': form,
-        }
-        if next_url:
-            params['next'] = next_url
-        return render_template('auth/lvye_corp_login.html', **params)
+        return render_template('auth/lvye_corp_login.html', channel=channel_name, form=form, next=next_url)
     return render_template('info.html', msg="错误的登录")
 
 

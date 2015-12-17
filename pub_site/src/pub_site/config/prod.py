@@ -22,14 +22,14 @@ IS_PROD = True
 HOST_URL = 'http://pay.lvye.com'
 
 
-class LvyePaySiteClientConfig:
+class LvyePaySitePayClientConfig:
     MD5_KEY = read_string('conf/lvye_pay_site/md5_key.txt')
     CHANNEL_PRI_KEY = read_string('conf/lvye_pay_site/channel_pri_key.txt')
 
     ROOT_URL = os.environ['PAY_API_SITE'] or 'http://pay.lvye.com/api'
 
 
-class LvyeCorpPaySiteClientConfig:
+class LvyeCorpPaySitePayClientConfig:
     MD5_KEY = read_string('conf/lvye_corp_pay_site/md5_key.txt')
     CHANNEL_PRI_KEY = read_string('conf/lvye_corp_pay_site/channel_pri_key.txt')
 

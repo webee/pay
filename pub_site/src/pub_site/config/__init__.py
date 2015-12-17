@@ -46,7 +46,6 @@ class Checkout:
     PAYMENT_CHECKOUT_VALID_SECONDS = 5 * 60
     WEIXIN_AUTH_REDIRECT_URI = "http://account.lvye.cn/weixin/auth_redirect/"
 
-
 # # pay api
 class LvyePaySitePayClientConfig:
     MD5_KEY = read_string('conf/test/md5_key.txt')
@@ -62,10 +61,13 @@ class LvyeCorpPaySitePayClientConfig:
     MD5_KEY = read_string('conf/test/md5_key.txt')
     CHANNEL_PRI_KEY = read_string('conf/test/channel_pri_key.txt')
 
-    CHANNEL_NAME = 'lvye_pay_site'
+    CHANNEL_NAME = 'lvye_corp_pay_site'
 
     ROOT_URL = "http://pay.lvye.com/api/__"
     CHECKOUT_URL = 'http://pay.lvye.com/checkout/{sn}'
+
+
+DEFAULT_CHANNEL = LvyePaySitePayClientConfig.CHANNEL_NAME
 
 
 # #### data #######

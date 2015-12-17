@@ -10,12 +10,12 @@ class Checkout:
     VALID_NETLOCS = ['dev_pay.lvye.com:5102']
 
 
-class LvyePaySiteClientConfig:
+class LvyePaySitePayClientConfig:
     ROOT_URL = "http://dev_pay.lvye.com:5000"
     CHECKOUT_URL = 'http://dev_pay.lvye.com:5102/checkout/{sn}'
 
 
-class LvyeCorpPaySiteClientConfig:
+class LvyeCorpPaySitePayClientConfig:
     ROOT_URL = "http://dev_pay.lvye.com:5000"
     CHECKOUT_URL = 'http://dev_pay.lvye.com:5102/checkout/{sn}'
 

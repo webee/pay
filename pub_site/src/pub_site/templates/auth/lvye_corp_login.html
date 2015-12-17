@@ -16,6 +16,7 @@
 {% block main %}
     <div class="wxCont">
     <div class="contRight payoffRight firstRight">
+        {% include 'message.html' %}
         <form class="zyt_pay" method="post" action="{{ url_for('auth.login', channel=channel, next=next) }}">
             {{ form.csrf_token }}
             {% from 'forms.html' import input, submit %}

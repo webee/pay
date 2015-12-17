@@ -56,6 +56,8 @@ TX_CHANNEL_MSG = {
     'zyt_sample': '自游通sample系统',
     'lvye_skiing': '绿野滑雪',
     'lvye_lvxing': '绿野旅行',
+    'lvye_pay_admin': '绿野支付管理系统',
+    'lvye_corp_pay_site': '绿野公司用户操作平台',
     }
 
 

@@ -1,0 +1,29 @@
+{% extends "auth/layout.html" %}
+
+{% block css %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='css/showLoading.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block js %}
+    <script src="{{ url_for('static', filename='js/jquery/jquery-1.11.3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery/jquery.showLoading.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/verification-code.js') }}"></script>
+{% endblock %}
+
+{% block title %}用户登录{% endblock %}
+
+{% block main %}
+    <div class="wxCont">
+    <div class="contRight payoffRight firstRight">
+        <form class="zyt_pay" method="post" action="{{ url_for('auth.login', channel=channel) }}">
+            {{ form.csrf_token }}
+            {% from 'forms.html' import input, submit %}
+            {{ input(form.username) }}
+            {{ input(form.password) }}
+            {{ submit(form.submit, "submit-user_login_" + channel) }}
+        </form>
+        <a href="{{ url_for('auth.login', next=next) }}">>>去绿野用户中心登录</a>
+    </div>
+    </div>
+{% endblock %}

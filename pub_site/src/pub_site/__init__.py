@@ -5,7 +5,7 @@ from datetime import timedelta
 
 import os
 from flask import Flask, render_template
-from flask.ext.login import LoginManager
+from flask.ext.login import LoginManager, current_user
 from flask.ext.migrate import Migrate
 from flask_wtf.csrf import CsrfProtect
 from flask.ext.qrcode import QRcode
@@ -92,6 +92,7 @@ def init_config(app, env):
 
 def init_extensions(app):
     from pub_site import models
+    from pub_site.auth import models
 
     dbs.init_db(app)
     db.init_app(app)
@@ -101,6 +102,13 @@ def init_extensions(app):
 
     migrate.init_app(app, db)
     qrcode.init_app(app)
+
+
+def init_pay_clients(_pay_clients):
+    _pay_clients[config.LvyePaySitePayClientConfig.CHANNEL_NAME] = PayClient(config.LvyePaySitePayClientConfig)
+    _pay_clients[config.LvyeCorpPaySitePayClientConfig.CHANNEL_NAME] = PayClient(config.LvyeCorpPaySitePayClientConfig)
+
+    _pay_clients[config.DEFAULT_CHANNEL].setup_accepted_clients(_pay_clients.values())
 
 
 def custom_flask(app):
@@ -116,6 +124,20 @@ def custom_flask(app):
     app.permanent_session_lifetime = timedelta(minutes=10)
 
 
+class CurrentPayClient(object):
+    def __init__(self, _pay_clients):
+        self._pay_clients = _pay_clients
+
+    def __getattr__(self, item):
+        channel_name = config.DEFAULT_CHANNEL
+        try:
+            channel_name = current_user.channel_name
+        except:
+            pass
+        cur_pay_client = self._pay_clients[channel_name]
+        return getattr(cur_pay_client, item)
+
+
 # extensions.
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
@@ -123,7 +145,8 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message = None
 
 csrf = CsrfProtect()
-pay_client = PayClient()
+pay_clients = {}
+pay_client = CurrentPayClient(pay_clients)
 
 
 def create_app(env='dev', deploy=False):
@@ -133,13 +156,13 @@ def create_app(env='dev', deploy=False):
     app = Flask(__name__)
 
     init_config(app, env)
+    init_pay_clients(pay_clients)
     register_mods(app)
     init_extensions(app)
     custom_flask(app)
 
     init_template(app)
     init_errors(app)
-    pay_client.init_config(config.PayClientConfig)
 
     # reverse proxied
     app.wsgi_app = ReverseProxied(app.wsgi_app)

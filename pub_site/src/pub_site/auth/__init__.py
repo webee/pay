@@ -6,4 +6,4 @@ from flask import Blueprint
 auth_mod = Blueprint('auth', __name__, template_folder='./templates', static_folder='static')
 
 
-from . import views
+from . import views, lvye_corp_views

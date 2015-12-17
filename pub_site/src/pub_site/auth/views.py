@@ -87,11 +87,11 @@ def load_user(user_id):
 @mod.route('/login/', methods=["GET", "POST"])
 def login():
     next_url = request.args.get('next', url_for('main.index'))
+    channel_name = request.args.get('channel', config.DEFAULT_CHANNEL)
 
-    if current_user.is_authenticated():
+    if current_user.is_authenticated() and current_user.channel_name == channel_name:
         return redirect(next_url)
 
-    channel_name = request.args.get('channel', config.DEFAULT_CHANNEL)
     if channel_name == config.LvyePaySitePayClientConfig.CHANNEL_NAME:
         # 绿野用户中心
         auth_url = build_url(config.HOST_URL + url_for('auth.auth'), next=next_url)

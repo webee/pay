@@ -39,9 +39,11 @@
 			</a>
 		</h1>
         <ul class="newaLine clearfix">
+            {% if current_user.is_authenticated() and current_user.channel_name == CONFIG.DEFAULT_CHANNEL %}
         	<li><a href="http://leader.lvye.com/manage/list.jhtml" target="_blank">活动管理</a></li>
             <li><a href="http://leader.lvye.com/enter/entList.jhtml" target="_blank">报名管理</a></li>
             <li><a href="http://leader.lvye.com/lrfd/list.jhtml" target="_blank">退款管理</a></li>
+            {% endif %}
             <li><a href="http://pay.lvye.cn/myaccount/index" target="_blank">旧版自游通</a></li>
         </ul>
         <div class="loginBtn clearfix">
@@ -69,9 +71,11 @@
                 <li class="padding20 {{ 'cur' if g.current_channel == 'withdraw' else '' }}">
                     <a href="{{ url_for('withdraw.withdraw') }}">提现</a>
                 </li>
+                {% if current_user.is_authenticated() and current_user.channel_name == CONFIG.DEFAULT_CHANNEL %}
                 <li class="padding20 {{ 'cur' if g.current_channel == 'pay_to_lvye' else '' }}">
                     <a href="{{ url_for('pay_to_lvye.pay_to_lvye') }}">付款给绿野</a>
                 </li>
+                {% endif %}
             </ul>
         </div>
         {% block content %}{% endblock %}

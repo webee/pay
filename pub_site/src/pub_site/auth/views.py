@@ -2,6 +2,7 @@
 from __future__ import unicode_literals, print_function, division
 
 from flask import request, redirect, session, url_for, jsonify, render_template, flash
+from flask import after_this_request
 from flask_login import UserMixin, AnonymousUserMixin, login_user, logout_user, login_required, current_user
 
 from . import auth_mod as mod
@@ -87,10 +88,14 @@ def load_user(user_id):
 @mod.route('/login/', methods=["GET", "POST"])
 def login():
     next_url = request.args.get('next', url_for('main.index'))
-    channel_name = request.args.get('channel', config.DEFAULT_CHANNEL)
-
+    channel_name = request.args.get('channel', request.cookies.get('channel', config.DEFAULT_CHANNEL))
     if current_user.is_authenticated() and current_user.channel_name == channel_name:
         return redirect(next_url)
+
+    @after_this_request
+    def remember_channel_name(response):
+        response.set_cookie('channel', channel_name)
+        return response
 
     if channel_name == config.LvyePaySitePayClientConfig.CHANNEL_NAME:
         # 绿野用户中心
@@ -111,6 +116,7 @@ def login():
                 user = User(domain_user.id, domain_user.username, domain_user.username, is_leader,
                             domain_user.phone, channel_name)
                 do_login_user(user)
+                print('next_url: ' + next_url)
                 return redirect(next_url)
             flash('用户名或密码错误')
         return render_template('auth/lvye_corp_login.html', channel=channel_name, form=form, next=next_url)

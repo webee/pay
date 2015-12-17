@@ -35,17 +35,29 @@ PAYMENT_SCENES = {
     # other apps.
 }
 
+# conditions
+def gen_cond_is_env(p):
+    def is_env(**kwargs):
+        from api_x.config import etc as config
+        return config.__env_name__ == p
+    return is_env
 
-def is_env(p):
-    from api_x.config import etc as config
-    return config.__env_name__ == p
+
+def gen_cond_satisfy_version():
+    def satisfy_version(version, **kwargs):
+        from api_x.config import etc as config
+        print(version)
+        print(kwargs)
+        return version >= config.VERSION
+    return satisfy_version
 
 
-def is_condition_failed(t):
+def is_condition_pass(t, **kwargs):
+    # conditional vas.
     if isinstance(t, dict):
-        cond = t.get('condition')
-        return cond and not cond[0](*cond[1:])
-    return False
+        conds = t.get('conditions')
+        return all(cond(**kwargs) for cond in conds)
+    return True
 
 
 def get_pure_payment_scene(payment_scene):
@@ -54,8 +66,8 @@ def get_pure_payment_scene(payment_scene):
     return payment_scene.split('.', 1)[0]
 
 
-def get_real_payment_type(payment_type):
-    if is_condition_failed(payment_type):
+def get_real_payment_type(payment_type, **kwargs):
+    if not is_condition_pass(payment_type, **kwargs):
         return None
     if isinstance(payment_type, dict):
         payment_type = payment_type.get('value')
@@ -123,7 +135,7 @@ PAYMENT_SCENE_VASE_TYPES = {
         LIANLIAN_PAY: lianlian_pay.PaymentType.APP,
         ALI_PAY: {
             'value': ali_pay.PaymentType.APP,
-            'condition': (lambda p: not is_env(p), 'prod')
+            'conditions': [gen_cond_satisfy_version()]
         },
         WEIXIN_PAY: weixin_pay.PaymentType.APP + '$lvye_skiing',
     },

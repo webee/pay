@@ -23,7 +23,8 @@ def pay_result(tx, sn):
 @mod.route("/payment/<sn>/<payment_scene>/info", methods=["GET"])
 @payment_entry
 def pay_info(tx, sn, payment_scene):
-    return query_info(tx, payment_scene)
+    extra_params = {k: v for k, v in request.args.items()} or None
+    return query_info(tx, payment_scene, extra_params=extra_params)
 
 
 @mod.route("/payment/<sn>/<payment_scene>/<vas_name>/param", methods=["GET"])
@@ -33,17 +34,17 @@ def pay_params(tx, sn, payment_scene, vas_name):
     return prepare_params(tx, payment_scene, vas_name, extra_params=extra_params)
 
 
-def query_info(tx, payment_scene):
+def query_info(tx, payment_scene, extra_params=None):
     from api_x.zyt.evas.payment import infos
 
     # TODO: log to db.
-    logger.info("[PAYMENT INFO] {0}, {1}, {2}".format(payment_scene, tx.type, tx.sn))
+    logger.info("[PAYMENT INFO] {0}, {1}, {2}, {3}".format(payment_scene, tx.type, tx.sn, extra_params))
     payment_entity = gen_payment_entity(tx)
     if payment_entity is None:
         return response.bad_request()
 
     try:
-        data, evases, vas_infos = infos.prepare(payment_scene, payment_entity)
+        data, evases, vas_infos = infos.prepare(payment_scene, payment_entity, extra_params=extra_params)
         return response.success(info=data, activated_evas=evases, vas_infos=vas_infos)
     except Exception as e:
         logger.exception(e)

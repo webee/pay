@@ -60,17 +60,18 @@ def gen_payment_entity_by_prepaid_tx(tx):
                          prepaid_record.amount, tx.state, channel_name=tx.channel_name)
 
 
-def get_activated_evases(payment_scene, payment_entity):
+def get_activated_evases(payment_scene, payment_entity, extra_params=None):
     from api_x.zyt.user_mapping.auth import vas_payment_is_enabled
     from api_x.config import etc
     from . import config
 
+    extra_params = extra_params or {}
     evases = []
 
     pure_payment_scene = config.get_pure_payment_scene(payment_scene)
     vas_types = config.PAYMENT_SCENE_VASE_TYPES.get(pure_payment_scene, {})
     for v, t in vas_types.items():
-        if config.is_condition_failed(t):
+        if not config.is_condition_pass(t, **extra_params):
             continue
 
         if v in etc.Biz.ACTIVATED_EVAS:
@@ -84,13 +85,14 @@ def get_activated_evases(payment_scene, payment_entity):
     return evases
 
 
-def get_payment_type(payment_scene, vas_name):
+def get_payment_type(payment_scene, vas_name, extra_params=None):
     from . import config
 
+    extra_params = extra_params or {}
     pure_payment_scene = config.get_pure_payment_scene(payment_scene)
     vases_type = config.PAYMENT_SCENE_VASE_TYPES.get(pure_payment_scene, {})
     payment_type = vases_type.get(vas_name)
-    payment_type = config.get_real_payment_type(payment_type)
+    payment_type = config.get_real_payment_type(payment_type, **extra_params)
     if payment_type is None:
         raise Exception("[{0}] is not support payment scene [{1}]".format(vas_name, payment_scene))
     return config.get_complex_payment_type(vas_name, payment_type, payment_scene)

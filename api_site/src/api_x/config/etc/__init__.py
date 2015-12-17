@@ -2,6 +2,8 @@
 from pytoolbox.util.pmc_config import read_string
 from pytoolbox.util import public_key
 
+VERSION = '1.0.0'
+
 
 class App:
     import os

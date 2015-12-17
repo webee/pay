@@ -5,7 +5,7 @@ from .config import VAS_INFOS
 from . import get_activated_evases
 
 
-def prepare(payment_scene, payment_entity):
+def prepare(payment_scene, payment_entity, extra_params=None):
     data = {
         'state': payment_entity.state,
         'source': payment_entity.source,
@@ -21,5 +21,5 @@ def prepare(payment_scene, payment_entity):
     if payment_scene == '_':
         return data, None, None
 
-    evases = get_activated_evases(payment_scene, payment_entity)
+    evases = get_activated_evases(payment_scene, payment_entity, extra_params)
     return data, evases, {vas: VAS_INFOS[vas] for vas in evases}

@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 
 
 def prepare(payment_scene, vas_name, payment_entity, extra_params=None):
-    payment_type = get_payment_type(payment_scene, vas_name)
+    payment_type = get_payment_type(payment_scene, vas_name, extra_params)
     logger.info('prepare param: [{0}], [{1}]'.format(vas_name, payment_type))
 
     if vas_name == test_pay.NAME:

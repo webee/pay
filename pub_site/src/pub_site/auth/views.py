@@ -90,6 +90,7 @@ def login():
     next_url = request.args.get('next')
     channel_name = request.args.get('channel', request.cookies.get('channel', config.DEFAULT_CHANNEL))
     if current_user.is_authenticated() and current_user.channel_name == channel_name:
+        next_url = next_url or url_for('main.index')
         return redirect(next_url)
 
     @after_this_request

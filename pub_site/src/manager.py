@@ -63,6 +63,17 @@ def fetch_withdraw_result_notify(minutes):
     task.fetch_notify_withdraw_result(minutes)
 
 
+@manager.option('-d', '--user_domain', type=str, dest="user_domain_name", required=True)
+@manager.option('-u', '--username', type=str, dest="username", required=True)
+@manager.option('-p', '--phone', type=str, dest="phone", required=True)
+@manager.option('-P', '--password', type=str, dest="password", required=True)
+def add_domain_user(user_domain_name, username, phone, password):
+    from pub_site.auth.dba import add_domain_user
+
+    user_id = add_domain_user(user_domain_name, username, phone, password)
+    print('user_id: [{0}]'.format(user_id))
+
+
 def main():
     reload(sys)
     sys.setdefaultencoding('utf-8')

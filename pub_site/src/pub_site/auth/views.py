@@ -118,7 +118,7 @@ def login():
                 do_login_user(user)
                 print('next_url: ' + next_url)
                 return redirect(next_url)
-            flash('用户名或密码错误')
+        flash('用户名或密码错误')
         return render_template('auth/lvye_corp_login.html', channel=channel_name, form=form, next=next_url)
     return render_template('info.html', msg="错误的登录")
 

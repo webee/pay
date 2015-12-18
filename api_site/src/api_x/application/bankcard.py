@@ -16,6 +16,15 @@ def query_bin(card_no):
     return bankcard.query_bin(card_no)
 
 
+def query_bin_cache(card_no):
+    # 缓存bankcard_bin信息
+    bankcard_bin = dba.get_bankcard_bin(card_no)
+    if bankcard_bin is None:
+        bankcard_bin = query_bin(card_no)
+        dba.add_bankcard_bin(bankcard_bin)
+    return bankcard_bin
+
+
 def bind_bankcard(user_id, card_no, acct_name, is_corporate_account, province_code, city_code, brabank_name):
     bankcard_info = BankCardInfo.load_base_info(card_no)
     if not bankcard_info:
@@ -47,7 +56,7 @@ class BankCardInfo(object):
 
     @staticmethod
     def load_base_info(card_no):
-        bankcard_bin = query_bin(card_no)
+        bankcard_bin = query_bin_cache(card_no)
         return BankCardInfo(card_no, bankcard_bin.bank_code,
                             bankcard_bin.bank_name, bankcard_bin.card_type) if bankcard_bin else None
 

@@ -17,11 +17,7 @@ logger = get_logger(__name__)
 @verify_request('app_query_bin')
 def query_bin(card_no):
     try:
-        # 缓存bankcard_bin信息
-        bankcard_bin = dba.get_bankcard_bin(card_no)
-        if bankcard_bin is None:
-            bankcard_bin = bankcard.query_bin(card_no)
-            dba.add_bankcard_bin(bankcard_bin)
+        bankcard_bin = bankcard.query_bin_cache(card_no)
         card_bin_info = bankcard_bin.to_dict()
         return response.success(data=card_bin_info)
     except Exception as e:

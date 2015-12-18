@@ -49,6 +49,7 @@ class BankCardInfo(object):
         self.bank_name = bank_name
         self.card_type = card_type
         self.acct_name = None
+        # FIXME: 目前都默认是对私账号
         self.is_corporate_account = False
         self.province_code = None
         self.city_code = None

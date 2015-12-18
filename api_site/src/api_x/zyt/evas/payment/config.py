@@ -44,7 +44,8 @@ def gen_cond_is_env(p):
 
 
 def gen_cond_satisfy_version():
-    def satisfy_version(version, **kwargs):
+    # FIXME: 一定要带默认值
+    def satisfy_version(version='', **kwargs):
         from api_x.config import etc as config
         print(version)
         print(kwargs)

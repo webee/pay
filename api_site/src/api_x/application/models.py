@@ -45,7 +45,7 @@ class Bankcard(db.Model):
     flag = db.Column(db.SmallInteger, nullable=False)
     card_no = db.Column(db.VARCHAR(21), nullable=False)
     card_type = db.Column(db.Enum('DEBIT', 'CREDIT'), nullable=False)
-    acct_name = db.Column(db.CHAR(12), nullable=False)
+    acct_name = db.Column(db.VARCHAR(32), nullable=False)
     bank_code = db.Column(db.CHAR(9), nullable=False)
     province_code = db.Column(db.VARCHAR(12), nullable=False)
     city_code = db.Column(db.VARCHAR(12), nullable=False)

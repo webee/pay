@@ -43,9 +43,11 @@ TX_STATE_MSG = {
 
 # TODO: 直接从接口获取
 TX_VAS_MSG = {
-    'LIANLIAN_PAY': '快捷支付',
+    'LIANLIAN_PAY': '连连支付',
     'ZYT': '自游通',
     'TEST_PAY': '测试支付',
+    'WEIXIN_PAY': '微信支付',
+    'ALI_PAY': '支付宝',
     '': '',
 }
 
@@ -77,7 +79,7 @@ def _process_tx(tx):
 
     tx['state'] = TX_STATE_MSG['%s:%s' % (tx['type'], tx['state'])]
     tx['type'] = TX_TYPE_MSG['%s:%s' % (tx['type'], tx['role'])]
-    # tx['vas'] = TX_VAS_MSG[tx['vas_name']]
+    tx['vas'] = TX_VAS_MSG[tx['vas_name']]
     tx['channel'] = TX_CHANNEL_MSG[tx['channel_name']]
 
     return tx

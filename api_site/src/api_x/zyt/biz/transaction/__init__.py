@@ -97,7 +97,7 @@ def update_transaction_info(tx_id, vas_sn, vas_name=None, state=None):
     return tx
 
 
-def query_user_transactions(account_user_id, role, page, per_page, q):
+def query_user_transactions(account_user_id, role, page, per_page, q, vas_name):
     from sqlalchemy.orm import lazyload
     from sqlalchemy import or_
 
@@ -106,6 +106,8 @@ def query_user_transactions(account_user_id, role, page, per_page, q):
         filter(UserTransaction.user_id == account_user_id)
     if role:
         query = query.filter(UserTransaction.role == role)
+    if vas_name:
+        query = query.filter(Transaction.vas_name == vas_name)
     if q:
         query = query.filter(or_(Transaction.comments.contains(q),
                                  Transaction.order_id.contains(q),

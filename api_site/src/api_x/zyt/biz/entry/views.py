@@ -18,13 +18,14 @@ def list_transactions(user_id):
     page_no = int(data.get('page_no', 1))
     page_size = int(data.get('page_size', 20))
     q = data.get('q')
+    vas_name = data.get('vas_name')
 
     user_map = channel.get_user_map(user_id)
     if user_map is None:
         return response.bad_request(msg='user not exists: [{0}]'.format(user_id))
     account_user_id = user_map.account_user_id
 
-    total_num, utxs = query_user_transactions(account_user_id, role, page_no, page_size, q)
+    total_num, utxs = query_user_transactions(account_user_id, role, page_no, page_size, q, vas_name)
     txs = [_get_tx(utx) for utx in utxs]
 
     return response.success(data={'total': total_num, 'txs': txs})

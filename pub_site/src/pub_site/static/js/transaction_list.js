@@ -104,7 +104,8 @@ $(document).ready(function () {
     function handle_search_bt(params, callback) {
         $("#tx_search_bt").on("click", function() {
             var q = $("#tx_search_q")[0].value;
-            $.extend(params, {q: q, page_no: 1});
+            var vas_name = $("#tx_search_vas")[0].value;
+            $.extend(params, {q: q, page_no: 1, vas_name: vas_name});
             get_tx_list(params, callback);
         });
     }

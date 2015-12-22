@@ -177,6 +177,7 @@ footer{background:#333;height:60px;}
 .tablock table tr td.light_green{color:#12421d;}
 .tablock table tr td.grey{color:grey;}
 .tablock table tr td.center{text-align: center;}
+.tablock table tr td.right{text-align: right;}
 .page{text-align:right;}
 .page .suml,.page .pageNum{display:inline-block;}
 .page .pageNum{margin-left:18px;}

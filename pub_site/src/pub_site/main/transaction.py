@@ -43,13 +43,13 @@ TX_STATE_MSG = {
 
 # TODO: 直接从接口获取
 TX_VAS_MSG = {
+    '': '-',
     'LIANLIAN_PAY': '连连支付',
     'ZYT': '自游通',
     'TEST_PAY': '测试支付',
     'ALI_PAY': '支付宝',
     'WX1227342102': '微信支付(服务号)',
     'WX1279128101': '微信支付(滑雪达人)',
-    '': '',
 }
 
 TX_CHANNEL_MSG = {
@@ -64,8 +64,8 @@ TX_CHANNEL_MSG = {
     }
 
 
-def query_transactions(uid, role, page_no, page_size, keyword):
-    data = pay_client.list_transactions(uid, role, page_no, page_size, keyword)
+def query_transactions(uid, role, page_no, page_size, vas_name, keyword):
+    data = pay_client.list_transactions(uid, role, page_no, page_size, vas_name, keyword)
     if data is None:
         return 0, []
 

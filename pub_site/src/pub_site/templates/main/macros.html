@@ -3,41 +3,41 @@
         <table width="952" cellspacing="0" cellpadding="0">
             <tr class="first">
                 <td width="80" height="40" class="center">创建时间</td>
-                <td width="60">类型</td>
+                <td width="70" class="center">类型</td>
                 <td width="87" class="center">金额(元)</td>
-                <td width="120">状态</td>
-                <td width="270">交易名称</td>
-                <td width="80">来源</td>
-                <td width="100">交易号</td>
-                <td width="80">支付方式</td>
+                <td width="120" class="center">状态</td>
+                <td width="270" class="center">交易名称</td>
+                <td width="120" class="center">来源</td>
+                <td width="100" class="center">交易号</td>
+                <td width="80" class="center">支付方式</td>
                 <td width="100" height="40">订单号</td>
             </tr>
             {% for tx in txs %}
                 <tr>
                     <td width="80" height="60" class="center">{{ tx.created_on }}</td>
-                    <td>{{ tx.type }}</td>
+                    <td class="right">{{ tx.type }}</td>
                     {% if tx.is_failed %}
-                        <td class="center grey">{{ "+%.2f"|format(tx.amount) }}</td>
+                        <td class="right grey">{{ "+%.2f"|format(tx.amount) }}</td>
                     {% elif tx.role in ['TO', 'TX_TO'] %}
                         {% if tx.is_created %}
-                            <td class="center light_red">{{ "+%.2f"|format(tx.amount) }}</td>
+                            <td class="right light_red">{{ "+%.2f"|format(tx.amount) }}</td>
                         {% else %}
-                            <td class="center red">{{ "+%.2f"|format(tx.amount) }}</td>
+                            <td class="right red">{{ "+%.2f"|format(tx.amount) }}</td>
                         {% endif %}
                     {% elif tx.role in ['FROM', 'TX_FROM'] %}
                         {% if tx.is_created %}
-                            <td class="center light_green">{{ "-%.2f"|format(tx.amount) }}</td>
+                            <td class="right light_green">{{ "-%.2f"|format(tx.amount) }}</td>
                         {% else %}
-                            <td class="center green">{{ "-%.2f"|format(tx.amount) }}</td>
+                            <td class="right green">{{ "-%.2f"|format(tx.amount) }}</td>
                         {% endif %}
                     {% else %}
-                        <td class="center">{{ "%.2f"|format(tx.amount) }}</td>
+                        <td class="right">{{ "%.2f"|format(tx.amount) }}</td>
                     {% endif %}
-                    <td>{{ tx.state }}</td>
-                    <td>{{ tx.comments }}</td>
-                    <td>{{ tx.channel }}</td>
-                    <td>{{ tx.sn }}</td>
-                    <td>{{ tx.vas }}</td>
+                    <td class="center">{{ tx.state }}</td>
+                    <td class="center">{{ tx.comments }}</td>
+                    <td class="center">{{ tx.channel }}</td>
+                    <td class="center">{{ tx.sn }}</td>
+                    <td class="center">{{ tx.vas }}</td>
                     <td width="100" height="40">{{ tx.order_id }}</td>
                 </tr>
             {% endfor %}

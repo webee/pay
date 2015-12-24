@@ -27,9 +27,10 @@ def handle_payment_result(is_success, sn, data=None):
     if code != req_code:
         logger.warn('callback result before notify result.')
         # 必须要tx状态改变
-        # 等待1.5s
-        time.sleep(1.5)
+        # 等待2.0s
+        time.sleep(2.0)
         tx = get_payment_tx_by_sn(sn)
+        logger.info('after sleep state: [{0}]'.format(tx.state))
 
     code = 0 if tx.state not in [PaymentTxState.FAILED, PaymentTxState.CREATED] else 1
 

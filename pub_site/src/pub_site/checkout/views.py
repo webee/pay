@@ -125,7 +125,7 @@ def do_pay(sn, vas_name, payment_scene, extra_params=None, client_type=None):
             return render_template("checkout/wx_pay_native.html", code_url=code_url, info=info, sn=sn)
         elif payment_type == WeixinPayType.JSAPI:
             if client_type != RequestClientType.WEIXIN:
-                return render_template(get_template("checkout/info", client_type), go_back=True, msg="请在微信中打开使用微信支付。")
+                return render_template(get_template("checkout/wx_info", client_type), go_back=True, msg="请在微信中打开使用微信支付。")
             if '_url' in params:
                 import urllib
                 url = params['_url']

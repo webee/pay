@@ -1,0 +1,19 @@
+{% extends "checkout/layout_mobile.html" %}
+
+{% block title %}提示{% endblock %}
+
+{% block main %}
+    <h3 class="msg">{{ msg }}</h3>
+    {% if go_back %}
+        <button class="nowpay" onclick="window.history.go(-1);">返回</button>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        window.location = "weixin:";
+        setTimeout(function(){
+            window.location="http://itunes.apple.com/us/app/wechat!/id414478124?mt=8";
+        } , 1500);
+    </script>
+{% endblock %}

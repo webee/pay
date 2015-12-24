@@ -7,8 +7,8 @@ from api_x.constant import RequestClientType
 
 def ip():
     # FIXME
-    x_real_ip = request.headers.environ.get('X-Real-IP')
-    x_forwarded_for = request.headers.environ.get('X-Forwarded-For')
+    x_real_ip = request.headers.get('X-Real-IP')
+    x_forwarded_for = request.headers.get('X-Forwarded-For')
 
     _ip = x_real_ip or x_forwarded_for or request.remote_addr or "61.148.57.6"
     if _ip.startswith('192.168'):

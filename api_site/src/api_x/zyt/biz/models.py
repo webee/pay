@@ -7,6 +7,7 @@ from api_x.config import etc
 from api_x.utils import times
 from api_x.zyt.biz import utils
 from pytoolbox.util.log import get_logger
+from pytoolbox.util import ints
 from api_x import db
 import hashlib
 
@@ -457,14 +458,14 @@ class ChequeRecord(db.Model):
         }
 
         sign = signer.sign(data, SignType.RSA)
-        return '%x-%s' % (tx_id, hashlib.md5(sign).hexdigest()[::2])
+        return '%s-%s' % (ints.int_to_base36(tx_id), hashlib.md5(sign).hexdigest()[::2])
 
     @staticmethod
     def get_cheque_record_from_cash_token(cash_token):
         try:
             from api_x.zyt.biz.transaction.dba import get_tx_by_id
             tx_id, hash_sign = cash_token.split('-')
-            tx_id = int(tx_id)
+            tx_id = ints.base36_to_int(tx_id)
 
             tx = get_tx_by_id(tx_id)
             if tx is None or tx.type != TransactionType.CHEQUE:

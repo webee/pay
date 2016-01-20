@@ -22,6 +22,7 @@ CELERY_QUEUES = (
     Queue('prepaid_notify', Exchange('prepaid_notify', 'direct'), routing_key='prepaid_notify'),
     Queue('withdraw_notify', Exchange('withdraw_notify', 'direct'), routing_key='withdraw_notify'),
     Queue('refund_notify', Exchange('refund_notify', 'direct'), routing_key='refund_notify'),
+    Queue('cash_cheque_notify', Exchange('cash_cheque_notify', 'direct'), routing_key='cash_cheque_notify'),
 )
 
 CELERY_ROUTES = {
@@ -30,6 +31,7 @@ CELERY_ROUTES = {
     'api_x.task.tasks.prepaid_notify': {'queue': 'prepaid_notify', 'routing_key': 'prepaid_notify'},
     'api_x.task.tasks.withdraw_notify': {'queue': 'withdraw_notify', 'routing_key': 'withdraw_notify'},
     'api_x.task.tasks.refund_notify': {'queue': 'refund_notify', 'routing_key': 'refund_notify'},
+    'api_x.task.tasks.cash_cheque_notify': {'queue': 'cash_cheque_notify', 'routing_key': 'cash_cheque_notify'},
 }
 
 from datetime import timedelta

@@ -33,6 +33,8 @@ class TransactionType:
     TRANSFER = 'TRANSFER'
     REFUND = 'REFUND'
     WITHDRAW = 'WITHDRAW'
+    # 支票
+    CHEQUE = 'CHEQUE'
 
 
 class PaymentChangeType:
@@ -87,6 +89,18 @@ class WithdrawTxState:
     SUCCESS = 'SUCCESS'
     FROZEN = 'FROZEN'
     PROCESSING = 'PROCESSING'
+
+
+class ChequeTxState:
+    CREATED = 'CREATED'
+    # 冻结, 交结类支票的状态
+    FROZEN = 'FROZEN'
+    # 过期
+    EXPIRED = 'EXPIRED'
+    # 取消
+    CANCELED = 'CANCELED'
+    # 兑现
+    CASHED = 'CASHED'
 
 
 class TransactionState:

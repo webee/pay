@@ -1,5 +1,5 @@
 # coding=utf-8
-from api_x import db
+from pytoolbox.util.sign import SignType, Signer
 from pytoolbox.util.dbs import transactional
 from datetime import datetime
 from api_x.constant import TransactionType, PaymentChangeType
@@ -8,6 +8,7 @@ from api_x.utils import times
 from api_x.zyt.biz import utils
 from pytoolbox.util.log import get_logger
 from api_x import db
+import hashlib
 
 
 logger = get_logger(__name__)
@@ -16,6 +17,13 @@ logger = get_logger(__name__)
 class PaymentType:
     DIRECT = 'DIRECT'
     GUARANTEE = 'GUARANTEE'
+
+
+class ChequeType:
+    # 即时冻结
+    INSTANT = 'INSTANT'
+    # 请求时才扣款
+    LAZY = 'LAZY'
 
 
 class UserRole:
@@ -52,7 +60,7 @@ class Transaction(db.Model):
 
     sn = db.Column(db.CHAR(32), unique=True)
     type = db.Column(db.Enum(TransactionType.PAYMENT, TransactionType.REFUND, TransactionType.WITHDRAW,
-                             TransactionType.TRANSFER, TransactionType.PREPAID), nullable=False)
+                             TransactionType.TRANSFER, TransactionType.PREPAID, TransactionType.CHEQUE), nullable=False)
 
     channel_name = db.Column(db.VARCHAR(32), nullable=False)
     order_id = db.Column(db.VARCHAR(64), nullable=False, default='')
@@ -131,6 +139,8 @@ class Transaction(db.Model):
             self.__record = self.transfer_record.one()
         elif self.type == TransactionType.PREPAID:
             self.__record = self.prepaid_record.one()
+        elif self.type == TransactionType.CHEQUE:
+            self.__record = self.cheque_record.one()
 
         return self.__record
 
@@ -412,6 +422,62 @@ class TransferRecord(db.Model):
 
     def __repr__(self):
         return '<Transfer %r>' % (self.id,)
+
+
+class ChequeRecord(db.Model):
+    __tablename__ = 'cheque_record'
+
+    id = db.Column(db.BigInteger, primary_key=True)
+    tx_id = db.Column(db.BigInteger, db.ForeignKey('transaction.id'), nullable=False)
+    tx = db.relationship('Transaction', backref=db.backref('cheque_record', lazy='dynamic'), lazy='joined')
+
+    sn = db.Column(db.CHAR(32), nullable=False)
+
+    type = db.Column(db.Enum(ChequeType.INSTANT, ChequeType.LAZY), nullable=False)
+    signature = db.Column(db.CHAR())
+    from_id = db.Column(db.Integer, nullable=False)
+    # 兑现时才知道
+    to_id = db.Column(db.Integer, nullable=True)
+    amount = db.Column(db.Numeric(16, 2), nullable=False)
+    # 有效时间
+    valid_minutes = db.Column(db.Integer, nullable=False, default=0)
+    client_notify_url = db.Column(db.VARCHAR(128))
+
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @property
+    def cash_token(self):
+        tx_id = self.tx_id
+        signature = self.signature
+        signer = Signer('key', 'sign', etc.KEY, etc.LVYE_PRI_KEY, None)
+        data = {
+            'tx_id': tx_id,
+            'signature': signature
+        }
+
+        sign = signer.sign(data, SignType.RSA)
+        return '%x-%s' % (tx_id, hashlib.md5(sign).hexdigest()[::2])
+
+    @staticmethod
+    def get_cheque_record_from_cash_token(cash_token):
+        try:
+            from api_x.zyt.biz.transaction.dba import get_tx_by_id
+            tx_id, hash_sign = cash_token.split('-')
+            tx_id = int(tx_id)
+
+            tx = get_tx_by_id(tx_id)
+            if tx is None or tx.type != TransactionType.CHEQUE:
+                return None
+            cheque_record = tx.record
+            if cheque_record.cash_token == cash_token:
+                return cheque_record
+        except Exception as _:
+            pass
+        return None
+
+    def __repr__(self):
+        return '<Check %r, %r>' % (self.id, self.amount)
 
 
 # third party payments specific infos related to corresponding biz record.

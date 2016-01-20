@@ -50,6 +50,11 @@ def refund_notify(url, params, count=1, max_times=30, interval=60):
     do_notify_client(refund_notify, url, params, count, max_times, interval)
 
 
+@celery.task(ignore_result=True, queue='cash_cheque_notify', routing_key='cash_cheque_notify')
+def cash_cheque_notify(url, params, count=1, max_times=30, interval=120):
+    do_notify_client(cash_cheque_notify, url, params, count, max_times, interval)
+
+
 def do_notify_client(notify_task, url, params, count, max_times, interval):
     logger.info('[{0}]: [{1}]-> [{2}], [{3}]/[{4}]@[{5}]'.format(notify_task.name, url, params, count, max_times, interval))
     # max execute 30 times.

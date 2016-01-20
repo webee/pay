@@ -134,6 +134,7 @@ def _get_payment_tx_to_refund(channel_id, order_id):
     tx = payment_record.tx
 
     if tx.state == TxState.FINISHED:
+        # TODO: 在适当的时候设置交易结束, 比如交易创建3个月后.
         # 交易结束，不能退款
         raise TransactionFinishedError()
 

@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 
 @mod.route('/users/<user_id>/withdraw', methods=['POST'])
 @verify_request('app_withdraw')
-def app_withdraw(user_id):
+def withdraw(user_id):
     data = request.values
     channel = request.channel
     order_id = data.get('order_id')
@@ -58,7 +58,7 @@ def app_withdraw(user_id):
 
 @mod.route('/users/<user_id>/withdraw/<sn>', methods=['GET'])
 @verify_request('app_query_withdraw')
-def app_query_withdraw(user_id, sn):
+def query_withdraw(user_id, sn):
     data = request.values
     channel = request.channel
 

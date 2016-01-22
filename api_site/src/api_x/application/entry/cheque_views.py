@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 
 @mod.route('/users/<user_id>/cheque/draw', methods=['POST'])
-@verify_request('draw_cheque')
+@verify_request('app_draw_cheque')
 def draw_cheque(user_id):
     data = request.values
     channel = request.channel
@@ -39,7 +39,7 @@ def draw_cheque(user_id):
 
 
 @mod.route('/users/<user_id>/cheque/cash', methods=['POST'])
-@verify_request('cash_cheque')
+@verify_request('app_cash_cheque')
 def cash_cheque(user_id):
     data = request.values
     channel = request.channel
@@ -59,7 +59,7 @@ def cash_cheque(user_id):
 
 
 @mod.route('/users/<user_id>/cheque/cancel', methods=['POST'])
-@verify_request('cancel_cheque')
+@verify_request('app_cancel_cheque')
 def cancel_cheque(user_id):
     data = request.values
     channel = request.channel

@@ -1,19 +1,18 @@
 # coding=utf-8
 from __future__ import unicode_literals
-from decimal import Decimal
 
 from api_x.utils import response
 from flask import request
 from pytoolbox.util.log import get_logger
 from api_x.utils.entry_auth import verify_request
-from api_x.zyt.biz import cheque
 from api_x.zyt.biz.models import ChequeType
-from . import biz_entry_mod as mod
+from . import application_mod as mod
+from .. import cheque
 
 logger = get_logger(__name__)
 
 
-@mod.route('/users/<user_id>/cheque/draw/', methods=['POST'])
+@mod.route('/users/<user_id>/cheque/draw', methods=['POST'])
 @verify_request('draw_cheque')
 def draw_cheque(user_id):
     data = request.values
@@ -39,7 +38,7 @@ def draw_cheque(user_id):
         return response.fail(code=1, msg=e.message)
 
 
-@mod.route('/users/<user_id>/cheque/cash/', methods=['POST'])
+@mod.route('/users/<user_id>/cheque/cash', methods=['POST'])
 @verify_request('cash_cheque')
 def cash_cheque(user_id):
     data = request.values
@@ -54,6 +53,25 @@ def cash_cheque(user_id):
     try:
         cheque_record = cheque.cash_cheque(channel, to_id, cash_token)
         return response.success(sn=cheque_record.sn, amount=cheque_record.amount)
+    except Exception as e:
+        logger.exception(e)
+        return response.fail(code=1, msg=e.message)
+
+
+@mod.route('/users/<user_id>/cheque/cancel', methods=['POST'])
+@verify_request('cancel_cheque')
+def cancel_cheque(user_id):
+    data = request.values
+    channel = request.channel
+    sn = data['sn']
+
+    user_map = channel.get_user_map(user_id)
+    if user_map is None:
+        return response.bad_request(msg='user not exists: [{0}]'.format(user_id))
+
+    try:
+        cheque.cancel_cheque(channel, user_map.account_user_id, sn)
+        return response.success()
     except Exception as e:
         logger.exception(e)
         return response.fail(code=1, msg=e.message)

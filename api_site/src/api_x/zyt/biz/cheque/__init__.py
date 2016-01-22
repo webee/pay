@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from api_x import db
 from api_x.constant import ChequeTxState
 from api_x.zyt.biz.transaction import add_tx_user
-from api_x.zyt.biz.transaction.dba import get_tx_by_id
+from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
 from api_x.zyt.vas.pattern import zyt_bookkeeping, transfer_frozen, transfer
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
@@ -76,10 +76,35 @@ def cash_cheque(channel, to_id, cash_token):
     tx = cheque_record.tx
     if tx.state == ChequeTxState.EXPIRED:
         raise CashChequeError('cheque is expired.')
+    if tx.state == ChequeTxState.CANCELED:
+        raise CashChequeError('cheque is canceled.')
     if tx.state == ChequeTxState.CASHED:
         raise CashChequeError('cheque is cashed.')
     _cash_cheque(cheque_record, to_id)
     return cheque_record
+
+
+@transactional
+def cancel_cheque(channel, user_id, sn):
+    cheque_record = ChequeRecord.query.filter_by(from_id=user_id, sn=sn).first()
+    if cheque_record is None:
+        raise Exception('cheque not exists.')
+
+    tx = cheque_record.tx
+    if tx.state not in [ChequeTxState.CREATED, ChequeTxState.FROZEN]:
+        raise Exception('invalid cheque state.')
+    _cancel_cheque(tx, cheque_record)
+
+
+@transactional
+def _cancel_cheque(tx, cheque_record):
+    if cheque_record.type == ChequeType.INSTANT:
+        event_ids = []
+        event_id = zyt_bookkeeping(EventType.UNFREEZE, tx.sn, cheque_record.from_id, cheque_record.amount)
+        event_ids.append(event_id)
+        transit_transaction_state(tx.id, ChequeTxState.FROZEN, ChequeTxState.CANCELED, event_ids)
+    elif cheque_record.type == ChequeType.LAZY:
+        transit_transaction_state(tx.id, ChequeTxState.CREATED, ChequeTxState.CANCELED)
 
 
 @transactional

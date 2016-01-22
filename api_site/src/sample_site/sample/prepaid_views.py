@@ -15,8 +15,8 @@ logger = get_logger(__name__)
 @mod.route('/prepaid', methods=['POST'])
 def prepaid():
     """充值"""
-    to_user_id = request.values['to_user_id']
-    to_domain_name = request.values['to_domain_name']
+    to_user_id = request.values.get('to_user_id') or '96355632'
+    to_domain_name = request.values.get('to_domain_name')
     amount = Decimal(request.values['amount'])
     callback_url = config.HOST_URL + url_for('.prepaid_result')
     use_old_pay = request.values.get('use_old_pay')

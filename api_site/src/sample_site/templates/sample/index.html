@@ -36,7 +36,7 @@ payee: {{ payee }}({{ payee }}), 全部: {{ payee_balance.total }}, 可用: {{ p
 </form>
 <hr/>
 <form action="{{ url_for('sample.confirm_guarantee_payment') }}" method="POST">
-    <input type="text" name='order_id' value="" placeholder="order id."/>
+    <input type="text" name='order_id' value="" placeholder="order id." size="36"/>
     <input type="submit" value="担保支付确认"/>
 </form>
 <hr/>
@@ -70,5 +70,26 @@ payee: {{ payee }}({{ payee }}), 全部: {{ payee_balance.total }}, 可用: {{ p
     |old<input type="checkbox" name="use_old_pay" />
     <input type="submit" value="充值"/>
 </form>
+<hr/>
+<form action="{{ url_for('sample.draw_cheque') }}" method="POST">
+    <input type="text" name='amount' placeholder="amount"/>
+    <input type="text" name='info' placeholder="info"/>
+    valid: <input type="text" name='valid_seconds' value="300"/>
+    <select name="cheque_type">
+        <option value="INSTANT">即时冻结</option>
+        <option value="LAZY">延迟扣款</option>
+    </select>
+    <input type="submit" value="写支票"/>
+</form>
+<form action="{{ url_for('sample.cash_cheque') }}" method="POST">
+    <input type="text" name='user_id' placeholder="user_id"/>
+    <input type="text" name='cash_token' placeholder="cash_token" size="32"/>
+    <input type="submit" value="兑现支票"/>
+</form>
+<form action="{{ url_for('sample.cancel_cheque') }}" method="POST">
+    <input type="text" name='sn' placeholder="sn" size="36"/>
+    <input type="submit" value="取消支票"/>
+</form>
+<a href="{{ url_for('sample.list_cheque') }}">支票列表</a>
 </body>
 </html>

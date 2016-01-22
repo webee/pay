@@ -1,13 +1,13 @@
 """add transaction type cheque.
 
-Revision ID: 27007027f098
+Revision ID: 1a09d3c6f84d
 Revises: 1fab4bdccfb3
-Create Date: 2016-01-20 19:45:12.793745
+Create Date: 2016-01-22 17:48:37.771675
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '27007027f098'
+revision = '1a09d3c6f84d'
 down_revision = '1fab4bdccfb3'
 
 from alembic import op
@@ -21,7 +21,7 @@ def upgrade():
     sa.Column('tx_id', sa.BigInteger(), nullable=False),
     sa.Column('sn', sa.CHAR(length=32), nullable=False),
     sa.Column('type', sa.Enum('INSTANT', 'LAZY'), nullable=False),
-    sa.Column('signature', sa.CHAR(), nullable=True),
+    sa.Column('signature', sa.CHAR(length=32), nullable=True),
     sa.Column('from_id', sa.Integer(), nullable=False),
     sa.Column('to_id', sa.Integer(), nullable=True),
     sa.Column('amount', sa.Numeric(precision=16, scale=2), nullable=False),

@@ -435,17 +435,16 @@ class ChequeRecord(db.Model):
     sn = db.Column(db.CHAR(32), nullable=False)
 
     type = db.Column(db.Enum(ChequeType.INSTANT, ChequeType.LAZY), nullable=False)
-    signature = db.Column(db.CHAR())
+    signature = db.Column(db.CHAR(32))
     from_id = db.Column(db.Integer, nullable=False)
     # 兑现时才知道
     to_id = db.Column(db.Integer, nullable=True)
     amount = db.Column(db.Numeric(16, 2), nullable=False)
-    # 有效时间
-    valid_minutes = db.Column(db.Integer, nullable=False, default=0)
     client_notify_url = db.Column(db.VARCHAR(128))
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    expired_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     @property
     def cash_token(self):

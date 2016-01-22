@@ -15,6 +15,7 @@ from api_x.zyt.user_mapping import get_user_map_by_account_user_id
 from pytoolbox.util.dbs import transactional, require_transaction_context
 from pytoolbox.util.log import get_logger
 from decimal import Decimal, InvalidOperation
+from datetime import datetime, timedelta
 from api_x.task import tasks
 from .error import BadCashChequeTokenError, CashChequeError
 from .utils import gen_signature
@@ -24,7 +25,7 @@ logger = get_logger(__name__)
 
 
 @transactional
-def draw_cheque(channel, from_id, amount, order_id=None, valid_minutes=30, cheque_type=ChequeType.INSTANT,
+def draw_cheque(channel, from_id, amount, order_id=None, valid_seconds=1800, cheque_type=ChequeType.INSTANT,
                 info='', client_notify_url=''):
     # amount
     try:
@@ -35,14 +36,14 @@ def draw_cheque(channel, from_id, amount, order_id=None, valid_minutes=30, chequ
     if amount <= 0:
         raise NonPositiveAmountError(amount)
 
-    # valid_minutes
+    # valid_seconds
     try:
-        valid_minutes = int(valid_minutes)
+        valid_seconds = int(valid_seconds)
     except:
-        raise ValueError('bad valid minutes.')
+        raise ValueError('bad valid seconds.')
 
-    if valid_minutes <= 0:
-        raise ValueError('valid_minutes should be positive integer.')
+    if valid_seconds <= 0:
+        raise ValueError('valid_seconds should be positive integer.')
 
     comments = "支票: %s" % info
     user_ids = [user_roles.from_user(from_id)]
@@ -54,32 +55,35 @@ def draw_cheque(channel, from_id, amount, order_id=None, valid_minutes=30, chequ
         'type': cheque_type,
         'from_id': from_id,
         'amount': amount,
-        'valid_minutes': valid_minutes,
+        'expired_at': datetime.utcnow() + timedelta(seconds=valid_seconds),
         'signature': gen_signature(),
         'client_notify_url': client_notify_url
     }
 
     cheque_record = ChequeRecord(**fields)
-    db.session.add(cheque_type)
+    db.session.add(cheque_record)
 
     _draw_cheque(tx, cheque_record)
 
-    return tx
+    return cheque_record
 
 
-@transactional
 def cash_cheque(channel, to_id, cash_token):
     cheque_record = ChequeRecord.get_cheque_record_from_cash_token(cash_token)
     if cheque_record is None:
         raise BadCashChequeTokenError()
 
     tx = cheque_record.tx
-    if tx.state == ChequeTxState.EXPIRED:
-        raise CashChequeError('cheque is expired.')
     if tx.state == ChequeTxState.CANCELED:
         raise CashChequeError('cheque is canceled.')
     if tx.state == ChequeTxState.CASHED:
         raise CashChequeError('cheque is cashed.')
+
+    expire_cheque(tx, cheque_record)
+
+    if tx.state == ChequeTxState.EXPIRED:
+        raise CashChequeError('cheque is expired.')
+
     _cash_cheque(cheque_record, to_id)
     return cheque_record
 
@@ -97,12 +101,33 @@ def cancel_cheque(channel, user_id, sn):
 
 
 @transactional
+def list_cheque(channel, user_id):
+    """
+    default fetch user's valid cheques.
+    :param channel:
+    :param user_id:
+    :return:
+    """
+    return ChequeRecord.query.filter_by(from_id=user_id).filter(ChequeRecord.created_on == ChequeRecord.updated_on).\
+        filter(ChequeRecord.expired_at >= datetime.utcnow()).all()
+
+
+@transactional
+def expire_cheque(tx, cheque_record):
+    if tx.state not in [ChequeTxState.CREATED, ChequeTxState.FROZEN]:
+        raise Exception('invalid cheque state.')
+
+    if datetime.utcnow() > cheque_record.expired_at:
+        if cheque_record.type == ChequeType.INSTANT:
+            _do_expire_frozen_cheque(tx, cheque_record)
+        elif cheque_record.type == ChequeType.LAZY:
+            transit_transaction_state(tx.id, ChequeTxState.CREATED, ChequeTxState.EXPIRED)
+
+
+@transactional
 def _cancel_cheque(tx, cheque_record):
     if cheque_record.type == ChequeType.INSTANT:
-        event_ids = []
-        event_id = zyt_bookkeeping(EventType.UNFREEZE, tx.sn, cheque_record.from_id, cheque_record.amount)
-        event_ids.append(event_id)
-        transit_transaction_state(tx.id, ChequeTxState.FROZEN, ChequeTxState.CANCELED, event_ids)
+        _do_cancel_frozen_cheque(tx, cheque_record)
     elif cheque_record.type == ChequeType.LAZY:
         transit_transaction_state(tx.id, ChequeTxState.CREATED, ChequeTxState.CANCELED)
 
@@ -118,7 +143,6 @@ def _draw_cheque(tx, cheque_record):
         pass
 
 
-@transactional
 def _cash_cheque(cheque_record, to_id):
     from api_x.zyt.vas import NAME
     tx = cheque_record.tx
@@ -155,3 +179,19 @@ def _try_notify_client(tx, cheque_record):
 
     # notify
     sign_and_notify_client(url, params, tx.channel_name, task=tasks.cash_cheque_notify)
+
+
+def _do_cancel_frozen_cheque(tx, cheque_record):
+    event_ids = []
+    event_id = zyt_bookkeeping(EventType.UNFREEZE, tx.sn, cheque_record.from_id, cheque_record.amount)
+    event_ids.append(event_id)
+    transit_transaction_state(tx.id, ChequeTxState.FROZEN, ChequeTxState.CANCELED, event_ids)
+
+
+def _do_expire_frozen_cheque(tx, cheque_record):
+    event_ids = []
+    event_id = zyt_bookkeeping(EventType.UNFREEZE, tx.sn, cheque_record.from_id, cheque_record.amount)
+    event_ids.append(event_id)
+    transit_transaction_state(tx.id, ChequeTxState.FROZEN, ChequeTxState.EXPIRED, event_ids)
+
+

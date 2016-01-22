@@ -6,4 +6,4 @@ from flask import Blueprint
 
 sample_mod = Blueprint('sample', __name__)
 
-from . import views, prepaid_views, test_views
+from . import views, prepaid_views, test_views, cheque_views

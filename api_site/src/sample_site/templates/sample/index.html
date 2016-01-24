@@ -71,6 +71,7 @@ payee: {{ payee }}({{ payee }}), 全部: {{ payee_balance.total }}, 可用: {{ p
     <input type="submit" value="充值"/>
 </form>
 <hr/>
+{#支票#}
 <form action="{{ url_for('sample.draw_cheque') }}" method="POST">
     <input type="text" name='amount' placeholder="amount"/>
     <input type="text" name='info' placeholder="info"/>

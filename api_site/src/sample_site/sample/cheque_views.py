@@ -20,7 +20,7 @@ def draw_cheque():
 
     params = {
         'amount': Decimal(request.values['amount']),
-        'info': Decimal(request.values['amount']),
+        'info': Decimal(request.values['info']),
         'valid_seconds': int(request.values['valid_seconds']),
         'cheque_type': request.values['cheque_type'],
         'notify_url': ''

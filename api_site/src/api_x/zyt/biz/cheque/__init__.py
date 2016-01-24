@@ -78,10 +78,7 @@ def cash_cheque(channel, to_id, cash_token):
         raise CashChequeError('cheque is canceled.')
     if tx.state == ChequeTxState.CASHED:
         raise CashChequeError('cheque is cashed.')
-
-    expire_cheque(tx, cheque_record)
-
-    if tx.state == ChequeTxState.EXPIRED:
+    if tx.state == ChequeTxState.EXPIRED or expire_cheque(tx, cheque_record):
         raise CashChequeError('cheque is expired.')
 
     _cash_cheque(cheque_record, to_id)
@@ -114,14 +111,13 @@ def list_cheque(channel, user_id):
 
 @transactional
 def expire_cheque(tx, cheque_record):
-    if tx.state not in [ChequeTxState.CREATED, ChequeTxState.FROZEN]:
-        raise Exception('invalid cheque state.')
-
     if datetime.utcnow() > cheque_record.expired_at:
         if cheque_record.type == ChequeType.INSTANT:
             _do_expire_frozen_cheque(tx, cheque_record)
         elif cheque_record.type == ChequeType.LAZY:
             transit_transaction_state(tx.id, ChequeTxState.CREATED, ChequeTxState.EXPIRED)
+        return True
+    return False
 
 
 @transactional
@@ -181,6 +177,7 @@ def _try_notify_client(tx, cheque_record):
     sign_and_notify_client(url, params, tx.channel_name, task=tasks.cash_cheque_notify)
 
 
+@transactional
 def _do_cancel_frozen_cheque(tx, cheque_record):
     event_ids = []
     event_id = zyt_bookkeeping(EventType.UNFREEZE, tx.sn, cheque_record.from_id, cheque_record.amount)
@@ -188,6 +185,7 @@ def _do_cancel_frozen_cheque(tx, cheque_record):
     transit_transaction_state(tx.id, ChequeTxState.FROZEN, ChequeTxState.CANCELED, event_ids)
 
 
+@transactional
 def _do_expire_frozen_cheque(tx, cheque_record):
     event_ids = []
     event_id = zyt_bookkeeping(EventType.UNFREEZE, tx.sn, cheque_record.from_id, cheque_record.amount)

@@ -8,7 +8,7 @@ from api_x.zyt.biz.transaction.dba import get_tx_by_id, get_tx_by_sn
 from api_x.zyt.vas.pattern import zyt_bookkeeping, transfer_frozen, transfer
 from api_x.zyt.vas.models import EventType
 from api_x.zyt.biz.transaction import create_transaction, transit_transaction_state, update_transaction_info
-from api_x.zyt.biz.models import TransactionType, ChequeType, ChequeRecord
+from api_x.zyt.biz.models import TransactionType, ChequeType, ChequeRecord, Transaction
 from api_x.zyt.biz.error import NonPositiveAmountError, AmountValueError
 from api_x.zyt.biz import user_roles
 from api_x.zyt.user_mapping import get_user_map_by_account_user_id
@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 from api_x.task import tasks
 from .error import BadCashChequeTokenError, CashChequeError
 from .utils import gen_signature
+from . import dba
 
 
 logger = get_logger(__name__)
@@ -57,6 +58,7 @@ def draw_cheque(channel, from_id, amount, order_id=None, valid_seconds=1800, che
         'amount': amount,
         'expired_at': datetime.utcnow() + timedelta(seconds=valid_seconds),
         'signature': gen_signature(),
+        'info': info,
         'client_notify_url': client_notify_url
     }
 
@@ -105,8 +107,7 @@ def list_cheque(channel, user_id):
     :param user_id:
     :return:
     """
-    return ChequeRecord.query.filter_by(from_id=user_id).filter(ChequeRecord.created_on == ChequeRecord.updated_on).\
-        filter(ChequeRecord.expired_at >= datetime.utcnow()).all()
+    return dba.get_user_valid_cheques(user_id)
 
 
 @transactional

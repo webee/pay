@@ -436,6 +436,7 @@ class ChequeRecord(db.Model):
 
     type = db.Column(db.Enum(ChequeType.INSTANT, ChequeType.LAZY), nullable=False)
     signature = db.Column(db.CHAR(32))
+    info = db.Column(db.CHAR(128), default='')
     from_id = db.Column(db.Integer, nullable=False)
     # 兑现时才知道
     to_id = db.Column(db.Integer, nullable=True)
@@ -457,13 +458,13 @@ class ChequeRecord(db.Model):
         }
 
         sign = signer.sign(data, SignType.RSA)
-        return '%s.%s' % (ints.int_to_base36(tx_id), hashlib.md5(sign).hexdigest()[::2])
+        return '%s_%s' % (ints.int_to_base36(tx_id), hashlib.md5(sign).hexdigest()[::2])
 
     @staticmethod
     def get_cheque_record_from_cash_token(cash_token):
         try:
             from api_x.zyt.biz.transaction.dba import get_tx_by_id
-            tx_id, hash_sign = cash_token.split('.')
+            tx_id, hash_sign = cash_token.split('_')
             tx_id = ints.base36_to_int(tx_id)
 
             tx = get_tx_by_id(tx_id)

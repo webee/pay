@@ -171,6 +171,18 @@ def query_notify_refund():
     print('#########################################')
 
 
+@manager.command
+def expire_cheques():
+    from api_x.zyt.biz.cheque import dba, expire_cheque
+
+    cheques = dba.get_to_expire_cheques()
+    print('#########################################')
+    for cr in cheques:
+        res = expire_cheque(cr.tx, cr)
+        print('####{0}: {1}'.format(cr.sn, res))
+    print('#########################################')
+
+
 @manager.option('-c', '--channel', type=str, dest="channel_name", required=True)
 @manager.option('-F', '--from_user_domain', type=str, dest="from_user_domain_name", required=True)
 @manager.option('-f', '--from', type=str, dest="from_user_id", required=True)

@@ -90,6 +90,9 @@ def list_cheque(user_id):
     try:
         cheque_records = cheque.list_cheque(channel, user_map.account_user_id)
         return response.success(cheques=[{
+            'sn': cr.sn,
+            'info': cr.info,
+            'type': cr.type,
             'amount': cr.amount,
             'cash_token': cr.cash_token,
             'expired_at': cr.expired_at,

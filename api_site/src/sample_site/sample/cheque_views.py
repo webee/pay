@@ -20,7 +20,7 @@ def draw_cheque():
 
     params = {
         'amount': Decimal(request.values['amount']),
-        'info': Decimal(request.values['info']),
+        'info': request.values.get('info', ''),
         'valid_seconds': int(request.values['valid_seconds']),
         'cheque_type': request.values['cheque_type'],
         'notify_url': ''
@@ -43,7 +43,7 @@ def cash_cheque():
                            msg=json.dumps({'status_code': result.status_code, 'data': result.data}))
 
 
-@mod.route('/cash_cheque', methods=['POST'])
+@mod.route('/cancel_cheque', methods=['POST'])
 def cancel_cheque():
     """取消支票"""
     user_id = '96355632'

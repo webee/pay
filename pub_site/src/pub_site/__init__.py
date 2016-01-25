@@ -7,7 +7,8 @@ import os
 from flask import Flask, render_template
 from flask.ext.login import LoginManager, current_user
 from flask.ext.migrate import Migrate
-from flask_wtf.csrf import CsrfProtect
+from flask.ext.wtf.csrf import CsrfProtect
+from flask.ext.cors import CORS
 from flask.ext.qrcode import QRcode
 from tools.filters import register_filters, register_global_functions
 from pytoolbox.pay_client import PayClient
@@ -59,24 +60,32 @@ def register_mods(app):
     from pub_site.main import main_mod
     from pub_site.sms import sms_mod
     from pub_site.withdraw import withdraw_mod
+    from pub_site.cheque import cheque_mod
     from pub_site.data import data_mod
     from pub_site.pay_to_lvye import pay_to_lvye_mod
     from pub_site.frontpage import frontpage_mod
     from pub_site.notify import notify_mod
     from pub_site.checkout import checkout_entry_mod
+    from pub_site.api import api_mod
 
     app.register_blueprint(auth_mod, url_prefix='/auth')
     app.register_blueprint(main_mod)
     app.register_blueprint(sms_mod, url_prefix='/sms')
     app.register_blueprint(withdraw_mod)
+    app.register_blueprint(cheque_mod, url_prefix='/cheque')
     app.register_blueprint(data_mod)
     app.register_blueprint(pay_to_lvye_mod)
     app.register_blueprint(frontpage_mod)
     app.register_blueprint(notify_mod, url_prefix='/notify')
     app.register_blueprint(checkout_entry_mod, url_prefix='/checkout')
+    app.register_blueprint(api_mod, url_prefix='/api')
 
     # exempt api
     csrf.exempt(notify_mod)
+    csrf.exempt(api_mod)
+
+    # cors
+    cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
 def init_config(app, env):

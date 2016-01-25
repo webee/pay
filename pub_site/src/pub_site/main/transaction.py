@@ -17,6 +17,8 @@ TX_TYPE_MSG = {
     'PREPAID:TO': '充值',
     'TRANSFER:FROM': '转账付款',
     'TRANSFER:TO': '转账收款',
+    'CHEQUE:FROM': '开支票',
+    'CHEQUE:TO': '提取支票',
 }
 
 TX_STATE_MSG = {
@@ -39,6 +41,11 @@ TX_STATE_MSG = {
     'TRANSFER:CREATED': '等待支付',
     'TRANSFER:FAILED': '转账失败',
     'TRANSFER:SUCCESS': '交易完成',
+    'CHEQUE:CREATED': '支票生成',
+    'CHEQUE:FROZEN': '金额冻结',
+    'CHEQUE:CANCELED': '支票取消',
+    'CHEQUE:CASHED': '提取完成',
+    'CHEQUE:EXPIRED': '支票过期',
 }
 
 # TODO: 直接从接口获取

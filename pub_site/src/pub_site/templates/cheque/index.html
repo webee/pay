@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+{% block title %}支票{% endblock %}
+
+{% block content %}
+    <div class="contRight payoffRight firstRight">
+        {% include 'message.html' %}
+        <div id="app-cheque"></div>
+        <script src="{{ url_for('static', filename='compo/cheque.js') }}"></script>
+    </div>
+{% endblock %}

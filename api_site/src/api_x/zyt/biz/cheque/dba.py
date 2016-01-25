@@ -9,7 +9,8 @@ def get_user_valid_cheques(user_id):
     return ChequeRecord.query.options(lazyload('tx')).outerjoin(Transaction).\
         filter(ChequeRecord.from_id == user_id).\
         filter(Transaction.state.in_([ChequeTxState.CREATED, ChequeTxState.FROZEN])).\
-        filter(ChequeRecord.expired_at >= datetime.utcnow()).all()
+        filter(ChequeRecord.expired_at >= datetime.utcnow()).\
+        order_by(Transaction.created_on.desc()).all()
 
 
 def get_to_expire_cheques():

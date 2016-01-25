@@ -33,4 +33,5 @@ wsgiref==0.1.2
 flask-login==0.2.11
 flask-wtf==0.12
 beautifulsoup4==4.4.0
+Flask-Cors==2.1.2
 ipython

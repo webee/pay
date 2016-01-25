@@ -14,14 +14,12 @@ from api_x.utils.entry_auth import verify_request, prepay_entry
 logger = get_logger(__name__)
 
 
-@mod.route('/transfer', methods=['POST'])
+@mod.route('/users/<user_id>/transfer', methods=['POST'])
 @verify_request('transfer')
 @prepay_entry(TransactionType.TRANSFER)
-def transfer():
+def transfer(user_id):
     data = request.values
     channel = request.channel
-    from_user_domain_name = data['from_user_domain_name']
-    from_user_id = data['from_user_id']
     to_user_domain_name = data['to_user_domain_name']
     to_user_id = data['to_user_id']
     order_id = data.get('order_id')
@@ -30,7 +28,7 @@ def transfer():
 
     try:
         tx = transfer.apply_to_transfer(channel, order_id,
-                                        from_user_domain_name, from_user_id,
+                                        channel.user_domain.name, user_id,
                                         to_user_domain_name, to_user_id, amount, info)
         return response.success(sn=tx.sn)
     except Exception as e:

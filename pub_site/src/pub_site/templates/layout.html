@@ -76,6 +76,9 @@
                     <a href="{{ url_for('pay_to_lvye.pay_to_lvye') }}">付款给绿野</a>
                 </li>
                 {% endif %}
+                <li class="padding20 {{ 'cur' if g.current_channel == 'transfer' else '' }}">
+                    <a href="{{ url_for('transfer.index') }}">转账</a>
+                </li>
 {#                <li class="padding20 {{ 'cur' if g.current_channel == 'cheque' else '' }}">#}
 {#                    <a href="{{ url_for('cheque.index') }}">支票</a>#}
 {#                </li>#}

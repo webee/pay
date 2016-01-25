@@ -79,3 +79,11 @@ class PayToLvyeRecord(db.Model):
 
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class LvyeAccount(db.Model):
+    __tablename__ = 'lvye_account'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.VARCHAR(32), nullable=False, unique=True)
+    user_id = db.Column(db.VARCHAR(32), nullable=False, unique=True)

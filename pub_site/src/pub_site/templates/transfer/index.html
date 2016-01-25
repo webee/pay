@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% block title %}转账{% endblock %}
+{% block inline_css %}
+{% endblock %}
+{% block inline_scripts %}
+{% endblock %}
+{% block content %}
+    <div class="contRight payoffRight firstRight">
+        {% include 'message.html' %}
+        <h2 class="first">转账</h2>
+        <div class="line firstline margin48">
+            <label class="widthauto">可用余额</label>
+            <span id="available_balance" class="money" >{{ balance }}</span>&nbsp;元
+        </div>
+        <form method="post" >
+            {{ form.csrf_token }}
+            <h2 class="first">温馨提示</h2>
+            <blockquote>
+            <p class="zhuyi padding20">
+                    为了解决之前领队反映的不能正常提现的问题，即日起开通转账功能，此功能仅开放到3月31号，之后将取消转账功能，恢复正常提现流程。
+                    请各位领队在3月31号之前，把不能提现的账号余额，转账到已经绑定手机、能正常提现的账号中，之后也请不要使用未绑定手机号的账号发布活动，以免造成不能提现的问题，给您带来困扰。
+                    谢谢各位领队的配合与理解。
+            </p>
+            </blockquote>
+            {% from 'forms.html' import input, submit %}
+            {{ input(form.username, "绿野账号用户名") }}
+            {{ input(form.amount) }}
+            {{ input(form.info) }}
+            {{ submit(form.submit) }}
+        </form>
+    </div>
+{% endblock %}

@@ -1,9 +1,8 @@
 # coding=utf-8
 from __future__ import unicode_literals
 from api_x.utils import response
-from api_x.zyt.biz import transfer
+from api_x.zyt.biz import transfer as transfer_biz
 from api_x.zyt.biz.models import TransactionType
-from api_x.zyt.user_mapping import get_user_domain_by_name
 
 from flask import request
 from . import biz_entry_mod as mod
@@ -27,7 +26,7 @@ def transfer(user_id):
     info = data['info']
 
     try:
-        tx = transfer.apply_to_transfer(channel, order_id,
+        tx = transfer_biz.apply_to_transfer(channel, order_id,
                                         channel.user_domain.name, user_id,
                                         to_user_domain_name, to_user_id, amount, info)
         return response.success(sn=tx.sn)

@@ -7,12 +7,12 @@ from flask.ext.wtf import Form
 from pub_site.commons import amount_less_than_balance, MyRegexp
 from wtforms import StringField, SubmitField, FloatField, ValidationError
 from wtforms.validators import DataRequired, NumberRange, Length
-from pub_site.models import LvyeAccount
+from pub_site import dba
 
 
 def username_should_exists(form, field):
     username = field.data
-    if LvyeAccount.query.filter_by(username=username).count() == 0:
+    if not dba.is_username_exists(username):
         raise ValidationError(u"用户不存在")
 
 

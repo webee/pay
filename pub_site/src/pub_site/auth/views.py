@@ -12,6 +12,7 @@ from pub_site import config
 from pytoolbox.util.urls import build_url
 from pub_site.auth.models import DomainUser
 from .lvye_corp_login_forms import LvyeCorpLoginForm
+from pub_site import dba
 
 logger = get_logger(__name__)
 
@@ -143,6 +144,9 @@ def auth():
     logger.info('user cookie: {}, user: {}'.format(user_cookie, user))
     if user is not None:
         do_login_user(user)
+
+    # update or create lvye account
+    dba.create_or_update_lvye_account(user.user_name, user.user_id)
 
     next_url = request.args.get('next', url_for('main.index'))
     return redirect(next_url)

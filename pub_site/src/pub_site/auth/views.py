@@ -2,7 +2,7 @@
 from __future__ import unicode_literals, print_function, division
 
 from flask import request, redirect, session, url_for, jsonify, render_template, flash
-from flask import after_this_request
+from flask import after_this_request, flash
 from flask_login import UserMixin, AnonymousUserMixin, login_user, logout_user, login_required, current_user
 
 from . import auth_mod as mod
@@ -130,6 +130,8 @@ def login():
 def do_login_user(user):
     login_user(user)
     session['current_user'] = user.to_dict()
+    # FIXME, change peroid.
+    flash('即日起开通转账功能至3月31号, 请领队尽快转移未绑定手机号账户的资金', category="success")
 
 
 def do_logout_user():

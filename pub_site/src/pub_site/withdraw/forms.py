@@ -6,7 +6,7 @@ from decimal import Decimal
 from pub_site import config
 from flask.ext.login import current_user
 from pub_site.commons import amount_less_than_balance, MyRegexp, MyHiddenField, gen_verification_code_form
-from wtforms import StringField, SelectField, SubmitField, FloatField, ValidationError
+from wtforms import StringField, SelectField, SubmitField, DecimalField, ValidationError
 from wtforms.validators import DataRequired, NumberRange
 from . import dba
 from pub_site import pay_client
@@ -52,10 +52,10 @@ class BindCardForm(gen_verification_code_form(u'form-bind_card')):
 
 class WithdrawForm(gen_verification_code_form("form-withdraw")):
     bankcard = MyHiddenField()
-    amount = FloatField(u"提现金额(元)",
-                        validators=[DataRequired(u'请输入数字，小数点后最多2位， 例如"8.88"'), MyRegexp(r'^\d+(.\d{1,2})?$', message=u'请输入数字，小数点后最多2位， 例如"8.88"'),
-                                    amount_less_than_balance,
-                                    NumberRange(min=Decimal(1), message=u"提现金额最少为1元")])
+    amount = DecimalField(u"提现金额(元)",
+                          validators=[DataRequired(u'请输入数字，小数点后最多2位， 例如"8.88"'), MyRegexp(r'^\d+(.\d{1,2})?$', message=u'请输入数字，小数点后最多2位， 例如"8.88"'),
+                                      amount_less_than_balance,
+                                      NumberRange(min=Decimal(1), message=u"提现金额最少为1元")])
     submit = SubmitField(u"提交")
 
     def __init__(self, bankcards, *args, **kwargs):
